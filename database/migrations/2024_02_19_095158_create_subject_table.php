@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('subject', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('base_table_id');
-            $table->foreign('base_table_id')->references('id')->on('base_table');
             $table->string('name');
             $table->enum('status',['active','inactive']);
             $table->string('created_by')->nullable();
