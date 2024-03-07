@@ -46,7 +46,7 @@ class InstituteApiController extends Controller
             ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
             ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
             ->whereNull('base_table.deleted_at')
-            ->groupBy('institute_for.name', 'base_table.id', 'institute_for.id')
+            ->groupBy('institute_for.name', 'base_table.id', 'institute_for.id','institute_for.icon')
             ->get();
         
 
