@@ -128,6 +128,7 @@ class InstituteApiController extends Controller
 
                                         $class[] = [
                                             'class_id' => $class_array_value->class_id,
+                                            'class_icon'=> $class_array_value->icon,
                                             'class' => $class_array_value->class_name,
                                             'standard' => $standard,
                                         ];
@@ -135,6 +136,7 @@ class InstituteApiController extends Controller
                                     
                                     $medium[] = [
                                         'medium_id' =>$medium_array_value->medium_id,
+                                        'medium_icon' =>$medium_array_value->icon,
                                         'medium' => $medium_array_value->medium_name,
                                         'class' => $class,
                                     ];
@@ -142,6 +144,7 @@ class InstituteApiController extends Controller
 
                                 $board[] = [
                                     'board_id'=>$board_array_value->board_id,
+                                    'board_icon'=>$board_array_value->icon,
                                     'board' => $board_array_value->board_name,
                                     'medium' => $medium,
                                 ];
@@ -158,6 +161,7 @@ class InstituteApiController extends Controller
                     if (!isset($institute_for[$institute_for_name])) {
                         $institute_for[$institute_for_name] = [
                             'institute_id' => $institute_for_array_value->id,
+                            'institute_icon'=>$institute_for_array_value->icon, 
                             'institute_for' => $institute_for_name,
                             'board_details' => [$board],
                         ];
@@ -169,7 +173,7 @@ class InstituteApiController extends Controller
 
 
             }
-            
+
        return response()->json([
             'success' => true,
             'message' => 'Fetch Data Successfully',
