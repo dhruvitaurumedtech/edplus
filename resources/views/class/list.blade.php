@@ -162,7 +162,7 @@
                                         <div class="col-md-9">
                                             <label for="exampleInputEmail1">Icon  : </label>
                                             <input type="hidden" name="old_icon" id="old_icon">
-                                            <input type="file" onchange="previewFile_update()" name="icon" class="form-control">
+                                            <input type="file" onchange="previewFile_update()" name="icon" id="edit_icon" class="form-control">
                                             @error('icon')
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
@@ -190,9 +190,10 @@
                             <div class="card-footer">
                                 <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
                             </div>
+      </form>
                     </div>
                 </div>
-                </form>
+                
       </div>
 
     </div>
@@ -271,7 +272,7 @@
 function previewFile_update() {
   $("#icon_update").show();
   const preview = document.getElementById("icon_update");
-  const fileInput = document.querySelector("input[type=file]");
+  const fileInput = document.getElementById("edit_icon");
   const file = fileInput.files[0];
   const reader = new FileReader();
 

@@ -56,7 +56,7 @@ class ClassController extends Controller
         $id=$request->input('class_id');
         $class = Class_model::find($id);
         $request->validate([
-            'name'=>'required|unique:class',
+            'name'=>'required',
             'status'=>'required',
        ]);
        $iconFile = $request->file('icon');
