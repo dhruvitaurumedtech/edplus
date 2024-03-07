@@ -44,7 +44,7 @@ class InstituteApiController extends Controller
          
             $institute_for_array = DB::table('base_table')
             ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-            ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id')
+            ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
             ->whereNull('base_table.deleted_at')
             ->groupBy('institute_for.name', 'base_table.id', 'institute_for.id')
             ->get();
@@ -54,7 +54,7 @@ class InstituteApiController extends Controller
             foreach ($institute_for_array as $institute_for_array_value) {
                  $board_array = DB::table('base_table')
                     ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                    ->select('board.name as board_name','base_table.id','board.id as board_id')
+                    ->select('board.name as board_name','base_table.id','board.id as board_id','board.icon')
                     ->whereNull('base_table.deleted_at')
                     ->where('base_table.id',$institute_for_array_value->id)
                     ->get();
@@ -63,7 +63,7 @@ class InstituteApiController extends Controller
                             foreach ($board_array as $board_array_value) {
                                 $medium_array = DB::table('base_table')
                                 ->leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                                ->select('medium.name as medium_name','base_table.id','medium.id as medium_id')
+                                ->select('medium.name as medium_name','base_table.id','medium.id as medium_id','medium.icon')
                                 ->whereNull('base_table.deleted_at')
                                 ->where('base_table.id',$board_array_value->id)
                                 ->get();
@@ -71,7 +71,7 @@ class InstituteApiController extends Controller
                                 foreach ($medium_array as $medium_array_value) {
                                     $class_array = DB::table('base_table')
                                     ->leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                                    ->select('class.name as class_name','base_table.id','class.id as class_id')
+                                    ->select('class.name as class_name','base_table.id','class.id as class_id','class.icon')
                                     ->whereNull('base_table.deleted_at')
                                     ->where('base_table.id',$medium_array_value->id)
                                     ->get();
@@ -128,7 +128,7 @@ class InstituteApiController extends Controller
 
                                         $class[] = [
                                             'class_id' => $class_array_value->class_id,
-                                            'class_icon'=> $class_array_value->icon,
+                                            'class_icon'=> asset($class_array_value->icon),
                                             'class' => $class_array_value->class_name,
                                             'standard' => $standard,
                                         ];
@@ -136,7 +136,7 @@ class InstituteApiController extends Controller
                                     
                                     $medium[] = [
                                         'medium_id' =>$medium_array_value->medium_id,
-                                        'medium_icon' =>$medium_array_value->icon,
+                                        'medium_icon' =>asset($medium_array_value->icon),
                                         'medium' => $medium_array_value->medium_name,
                                         'class' => $class,
                                     ];
@@ -144,7 +144,7 @@ class InstituteApiController extends Controller
 
                                 $board[] = [
                                     'board_id'=>$board_array_value->board_id,
-                                    'board_icon'=>$board_array_value->icon,
+                                    'board_icon'=>asset($board_array_value->icon),
                                     'board' => $board_array_value->board_name,
                                     'medium' => $medium,
                                 ];
@@ -161,7 +161,7 @@ class InstituteApiController extends Controller
                     if (!isset($institute_for[$institute_for_name])) {
                         $institute_for[$institute_for_name] = [
                             'institute_id' => $institute_for_array_value->id,
-                            'institute_icon'=>$institute_for_array_value->icon, 
+                            'institute_icon'=>asset($institute_for_array_value->icon), 
                             'institute_for' => $institute_for_name,
                             'board_details' => [$board],
                         ];
