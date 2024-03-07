@@ -13,8 +13,6 @@ return new class extends Migration
     {
         Schema::create('class', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('board_id');
-            $table->foreign('board_id')->references('id')->on('board');
             $table->string('name');
             $table->enum('status',['active','inactive']);
             $table->string('created_by')->nullable();
