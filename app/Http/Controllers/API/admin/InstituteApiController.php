@@ -229,16 +229,16 @@ class InstituteApiController extends Controller
                     $institute_for_name = $institute_for_array_value->name;
 
                     if (!isset($institute_for[$institute_for_name])) {
-                        $institute_for[$institute_for_name] = [
+                        $institute_for[] = [
                             'institute_id' => $institute_for_array_value->id,
                             'institute_icon'=>asset($institute_for_array_value->icon), 
                             'institute_for' => $institute_for_name,
                             'board_details' => [$board],
                         ];
                     } else {
-                        $institute_for[$institute_for_name]['board_details'][] = $board;
+                        $institute_for['board_details'][] = $board;
                     }
-                    // $institute_for = array_values($institute_for);
+                    $institute_for = array_values($institute_for);
 
 
 
