@@ -42,10 +42,15 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->first();
         if ($existingUser) {
             
-            $basinstitute = Base_table::where('status','active')->select('institute_for')->groupby('institute_for')->get();
+            $basinstitute = Base_table::where('status','active')->
+            select('institute_for')->groupby('institute_for')->get();
+            $institute_for_id = ''; 
             foreach($basinstitute as $insvalue){
-                $institute_for_id = $insvalue->institute_for;
-
+                $institute_for_id .= $insvalue->institute_for;
+            }
+            $institute_for_id .= 0;
+            
+            $institute_for_id = $basinstitute->pluck('institute_for')->toArray();
             // $institute_for_array = DB::table('base_table')
             // ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
             // ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
@@ -54,7 +59,7 @@ class InstituteApiController extends Controller
             // ->get();
         
             $institute_for_array = DB::table('institute_for')
-            ->where('id',$institute_for_id)->get();
+            ->whereIN('id',$institute_for_id)->get();
 
             $institute_for = [];    
             foreach ($institute_for_array as $institute_for_array_value) {
@@ -238,7 +243,7 @@ class InstituteApiController extends Controller
 
 
             }
-        }
+        
     //    echo "<pre>";print_r($institute_for);exit;
        return response()->json([
             'success' => true,
