@@ -41,48 +41,109 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->first();
         if ($existingUser) {
-         
-            $institute_for_array = DB::table('base_table')
-            ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-            ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
-            ->whereNull('base_table.deleted_at')
-            ->groupBy('institute_for.name', 'base_table.id', 'institute_for.id','institute_for.icon')
-            ->get();
+            
+            $basinstitute = Base_table::where('status','active')->select('institute_for')->groupby('institute_for')->get();
+            foreach($basinstitute as $insvalue){
+                $institute_for_id = $insvalue->institute_for;
+
+            // $institute_for_array = DB::table('base_table')
+            // ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
+            // ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
+            // ->whereNull('base_table.deleted_at')
+            // ->groupBy('institute_for.name', 'institute_for.id','base_table.institute_for')
+            // ->get();
         
+            $institute_for_array = DB::table('institute_for')
+            ->where('id',$institute_for_id)->get();
 
             $institute_for = [];    
             foreach ($institute_for_array as $institute_for_array_value) {
-                 $board_array = DB::table('base_table')
-                    ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                    ->select('board.name as board_name','base_table.id','board.id as board_id','board.icon')
-                    ->whereNull('base_table.deleted_at')
-                    ->where('base_table.id',$institute_for_array_value->id)
+                //  $board_array = DB::table('base_table')
+                //     ->leftJoin('board', 'board.id', '=', 'base_table.board')
+                //     ->select('board.name as board_name','base_table.id','base_table.board','board.id as board_id','board.icon')
+                //     ->whereNull('base_table.deleted_at')
+                //     ->where('base_table.institute_for',$institute_for_array_value->id)
+                //     ->get();
+
+                    
+                    $onlyboardfrombase = base_table::where('institute_for',$institute_for_array_value->id)
+                    ->select('board')
+                    ->groupby('board')
+                    ->get();
+                    $boardsids = '';
+                    foreach ($onlyboardfrombase as $boardsval) {
+                        $boardsids .= $boardsval->board.',';
+                    }
+                    $boardsids .= 0; 
+                    
+                    $boardsids = $onlyboardfrombase->pluck('board')->toArray();
+                     $board_array = board::whereIN('id',$boardsids)
                     ->get();
                     
+                  
                             $board = [];
                             foreach ($board_array as $board_array_value) {
-                                $medium_array = DB::table('base_table')
-                                ->leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                                ->select('medium.name as medium_name','base_table.id','medium.id as medium_id','medium.icon')
-                                ->whereNull('base_table.deleted_at')
-                                ->where('base_table.id',$board_array_value->id)
+                                $mediumsidget = base_table::where('board',$board_array_value->id)
+                                ->select('medium')
+                                ->groupby('medium')
                                 ->get();
+                                $mediumids = '';
+                                foreach($mediumsidget as $mediumsids){
+                                    $mediumids .= $mediumsids->medium;
+                                }
+                                $mediumids .= 0;
+
+                                // $medium_array = DB::table('base_table')
+                                // ->leftJoin('medium', 'medium.id', '=', 'base_table.medium')
+                                // ->select('medium.name as medium_name','base_table.id','medium.id as medium_id','medium.icon')
+                                // ->whereNull('base_table.deleted_at')
+                                // ->where('base_table.board',$board_array_value->id)
+                                // ->get();
+                                $mediumids = $mediumsidget->pluck('medium')->toArray();
+                                $medium_array = Medium_model::whereIN('id',$mediumids)->get();
                                 $medium = [];
+                                
                                 foreach ($medium_array as $medium_array_value) {
-                                    $class_array = DB::table('base_table')
-                                    ->leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                                    ->select('class.name as class_name','base_table.id','class.id as class_id','class.icon')
-                                    ->whereNull('base_table.deleted_at')
-                                    ->where('base_table.id',$medium_array_value->id)
+
+                                    $classesidget = base_table::where('medium',$medium_array_value->id)
+                                    ->select('institute_for_class')
+                                    ->groupby('institute_for_class')
                                     ->get();
+                                    $institute_for_classids = '';
+                                    foreach($classesidget as $classesids){
+                                        $institute_for_classids .= $classesids->institute_for_class;
+                                    }
+                                    $institute_for_classids .= 0;
+                                    $institute_for_classids = $classesidget->pluck('institute_for_class')->toArray();
+                                    $class_array = Class_model::whereIN('id',$institute_for_classids)
+                                    ->get();
+                                    
                                     $class = [];
                                     foreach ($class_array as $class_array_value) {
-                                        $standard_array = DB::table('base_table')
-                                        ->leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                                        ->select('standard.name as standard_name','base_table.id','standard.id as standard_id')
-                                        ->whereNull('base_table.deleted_at')
-                                        ->where('base_table.id',$class_array_value->id)
+
+                                        $standardidget = base_table::where('institute_for_class',$class_array_value->id)
+                                        ->select('standard','id')
                                         ->get();
+                                        $standardids = '';
+                                        $baseidsfosubj = '';
+                                        foreach($standardidget as $standardidsv){
+                                            $standardids .= $standardidsv->standard;
+                                            $baseidsfosubj .= $standardidsv->id;
+                                        }
+                                        $standardids .= 0;
+                                        $baseidsfosubj .= 0;
+
+                                        $baseidsfosubj = $standardidget->pluck('id')->toArray();
+                                        $standardids = $standardidget->pluck('standard')->toArray();
+                                        $standard_array = Standard_model::whereIN('id',$standardids)
+                                        ->get();
+
+                                        // $standard_array = DB::table('base_table')
+                                        // ->leftJoin('standard', 'standard.id', '=', 'base_table.standard')
+                                        // ->select('standard.name as standard_name','base_table.id','standard.id as standard_id')
+                                        // ->whereNull('base_table.deleted_at')
+                                        // ->where('base_table.institute_for_class',$class_array_value->id)
+                                        // ->get();
 
                                         $standard = [];
                                         foreach ($standard_array as $standard_array_value) {
@@ -91,23 +152,27 @@ class InstituteApiController extends Controller
                                             ->leftJoin('stream', 'stream.id', '=', 'base_table.stream')
                                             ->select('stream.name as stream_name','base_table.id','stream.id as stream_id')
                                             ->whereNull('base_table.deleted_at')
-                                            ->where('base_table.id',$standard_array_value->id)
+                                            ->where('base_table.standard',$standard_array_value->id)
                                             ->get();
                                             $stream = [];
         
                                             foreach ($stream_array as $stream_array_value) {
-
-                                                $subject_array = DB::table('base_table')
-                                                    ->leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                                                    ->select('subject.name as subject_name','subject.id')
-                                                    ->whereNull('base_table.deleted_at')
-                                                    ->where('base_table.id',$standard_array_value->id)
-                                                    ->get();
+                                                
+                                                // $subject_array = DB::table('base_table')
+                                                // ->leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
+                                                // ->select('subject.name as subject_name','subject.id')
+                                                // ->whereNull('base_table.deleted_at')
+                                                // ->where('base_table.id',$standard_array_value->id)
+                                                // ->get();
+                                                
+                                                $subject_array = Subject_model::whereIN('base_table_id',$baseidsfosubj)
+                                                ->get();
+                                                
                                                     $subject = [];
                                                     foreach ($subject_array as $value) {
                                                         $subject[] = [
                                                             'subject_id' =>$value->id,
-                                                            'subject' => $value->subject_name
+                                                            'subject' => $value->name
                                                         ];
                                                     }
                                                 $stream[] = [
@@ -119,33 +184,33 @@ class InstituteApiController extends Controller
                                         
 
                                             $standard[] = [
-                                                'standard_id'=>$standard_array_value->standard_id,
-                                                'standard' => $standard_array_value->standard_name,
+                                                'standard_id'=>$standard_array_value->id,
+                                                'standard' => $standard_array_value->name,
                                                 'stream' => $stream,
                                                 'subject' => $subject
                                             ];
                                         }
 
                                         $class[] = [
-                                            'class_id' => $class_array_value->class_id,
+                                            'class_id' => $class_array_value->id,
                                             'class_icon'=> asset($class_array_value->icon),
-                                            'class' => $class_array_value->class_name,
+                                            'class' => $class_array_value->name,
                                             'standard' => $standard,
                                         ];
                                     }
                                     
                                     $medium[] = [
-                                        'medium_id' =>$medium_array_value->medium_id,
+                                        'medium_id' =>$medium_array_value->id,
                                         'medium_icon' =>asset($medium_array_value->icon),
-                                        'medium' => $medium_array_value->medium_name,
+                                        'medium' => $medium_array_value->name,
                                         'class' => $class,
                                     ];
                                 }
 
                                 $board[] = [
-                                    'board_id'=>$board_array_value->board_id,
+                                    'board_id'=>$board_array_value->id,
                                     'board_icon'=>asset($board_array_value->icon),
-                                    'board' => $board_array_value->board_name,
+                                    'board' => $board_array_value->name,
                                     'medium' => $medium,
                                 ];
                             }
@@ -156,7 +221,7 @@ class InstituteApiController extends Controller
                 //     'institute_for' => $institute_for_array_value->institute_for_name,
                 //     'board_detail' => $board,
                 // ];
-                    $institute_for_name = $institute_for_array_value->institute_for_name;
+                    $institute_for_name = $institute_for_array_value->name;
 
                     if (!isset($institute_for[$institute_for_name])) {
                         $institute_for[$institute_for_name] = [
@@ -173,7 +238,8 @@ class InstituteApiController extends Controller
 
 
             }
-
+        }
+    //    echo "<pre>";print_r($institute_for);exit;
        return response()->json([
             'success' => true,
             'message' => 'Fetch Data Successfully',

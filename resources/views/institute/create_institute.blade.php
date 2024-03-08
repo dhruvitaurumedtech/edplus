@@ -102,46 +102,48 @@
                                             @foreach($class_array as $index => $value)
                                                
                                                     <div class="custom-control custom-checkbox">
-                                                        <input class="custom-control-input" type="checkbox" id="medium_{{ $index }}" name="medium[]">
-                                                        <label for="medium_{{ $index }}" class="custom-control-label">{{ $value['class_name'] }}</label>
+                                                        <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="class[]">
+                                                        <label for="class_{{ $index }}" class="custom-control-label">{{ $value['class_name'] }}</label>
                                                     </div>
                                             @endforeach
                                         
                                         </div>
                                         <div class="col-md-4">
-                                            <div class="row">
-                                                <div class="col-md-12">
-                                                    <label>Select Education Level:</label><br>
-                                                        <div class="custom-control custom-checkbox">
-                                                            <input class="custom-control-input classlist" name="classname[]" type="checkbox" id="prePrimaryCheckbox" value="prePrimary" data-id="">
-                                                            <label for="prePrimaryCheckbox" class="custom-control-label"></label>
-                                                        </div>
-                                                </div>
-                                            </div>
-
-                                            <div class="row" id="prePrimaryContent">
-                                                <div class="col-md-12">
-                                                    <p>
-                                                    <div class="custom-control custom-checkbox " id="standardCheckboxdiv">
+                                            <label for="exampleInputEmail1">Standard: </label>
+                                        @foreach($standard_array as $index => $value)
+                                               
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="class[]">
+                                                        <label for="class_{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
                                                     </div>
-                                                </div>
-                                            </div>
-                                            <div class="row" id="prePrimaryContent">
-                                                <div class="col-md-12">
-                                                    <p>
-                                                    <div class="custom-control custom-checkbox " id="streamCheckboxdiv">
+                                            @endforeach
+                                        
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="exampleInputEmail1">Subject: </label>
+                                        @foreach($stream_array as $index => $value)
+                                                    <!-- $subject = explode(',',$value['subject_name']); -->
+                                               
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="stream[]">
+                                                        <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['stream_name'] }}</label>
                                                     </div>
-                                                </div>
-                                            </div>
-
-                                            
+                                            @endforeach
+                                        
+                                        </div>
+                                        <div class="col-md-4">
+                                            <label for="exampleInputEmail1">Stream: </label>
+                                        @foreach($subject_array as $index => $value)
+                                               
+                                                    <div class="custom-control custom-checkbox">
+                                                        <input class="custom-control-input" type="checkbox" id="subject_{{ $index }}" name="subject[]">
+                                                        <label for="subject_{{ $index }}" class="custom-control-label">{{ $value['subject_name'] }}</label>
+                                                    </div>
+                                            @endforeach
+                                        
                                         </div>
                                     </div>
-
                                 </div>
-                            </div>
-                    </div>
-
                     <div class="card-footer">
                         <button type="submit" class="btn btn-primary">Submit</button>
                     </div>

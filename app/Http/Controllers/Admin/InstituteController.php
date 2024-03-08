@@ -52,23 +52,41 @@ class InstituteController extends Controller
                 
                 
                
-        $class_array = DB::table('base_table')
-                    ->leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                    ->select('base_table.id', DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
+        $class_array =Base_table::leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
+                ->select('base_table.id', DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
+                ->whereNull('base_table.deleted_at')
+                ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
+                ->groupBy('base_table.id')
+                ->get()
+                ->toArray();
+
+        $standard_array = Base_table::leftJoin('standard', 'standard.id', '=', 'base_table.standard')
+                    ->select('base_table.id', DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
                     ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
+                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.standard = base_table.standard ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
                     ->get()
                     ->toArray();
-                
-                            
-                
-                // dd($medium_array);
-                
-                
-                                
-        // echo "<pre>";print_r($medium_array );exit;
-        return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array'));
+        $stream_array = Base_table::leftJoin('stream', 'stream.id', '=', 'base_table.standard')
+                    ->select('base_table.id', DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
+                    ->whereNull('base_table.deleted_at')
+                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.stream = base_table.stream ORDER BY m.id LIMIT 1)')
+                    ->groupBy('base_table.id')
+                    ->get()
+                    ->toArray();
+
+        $subject_array = Base_table::leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
+                    ->select('base_table.id', DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
+                    ->whereNull('base_table.deleted_at')
+                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.id = base_table.id ORDER BY m.id LIMIT 1)')
+                    ->groupBy('base_table.id')
+                    ->get()
+                    ->toArray();
+                               
+
+        echo "<pre>";print_r($subject_array );exit;
+        return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array',
+                                                         'standard_array','stream_array','subject_array'));
     }
     public function create_institute_for(){
         $institute_for = Institute_for_model::paginate(10); 
