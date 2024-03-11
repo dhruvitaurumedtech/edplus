@@ -78,7 +78,7 @@ class StudentController extends Controller
             $search_list = [];
             foreach ($allinstitute as $value) {
                 $search_list[] = array(
-                    'id' => $value->id,
+                    'id' => $value->id, 
                     'institute_name' => $value->institute_name,
                     'address'=>$value->address,
                 );
