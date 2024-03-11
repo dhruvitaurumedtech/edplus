@@ -99,7 +99,7 @@
                                             @foreach($class_array as $index => $value)
 
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="institute_for_class_id[]" value="{{$value['id']}}">
+                                                <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="institute_for_class_id[]" value="{{$value['class_id']}}">
                                                 <label for="class_{{ $index }}" class="custom-control-label">{{ $value['class_name'] }}</label>
                                             </div>
                                             @endforeach
@@ -110,7 +110,7 @@
                                             @foreach($standard_array as $index => $value)
 
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="standard_id[]" value="{{$value['id']}}">
+                                                <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="standard_id[]" value="{{$value['standard_id']}}">
                                                 <label for="standard{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
                                             </div>
                                             @endforeach
@@ -156,7 +156,7 @@
                                             <!-- $subject = explode(',',$value['subject_name']); -->
 
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="stream[]" value="{{$value['id']}}">
+                                                <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="stream[]" value="{{$value['stream_id']}}">
                                                 <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['stream_name'] }}</label>
                                             </div>
                                             @endforeach

@@ -64,7 +64,7 @@ class InstituteController extends Controller
                 
                
         $class_array =Base_table::leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                ->select('base_table.id','class.id', DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
+                ->select('base_table.id',DB::raw('MAX(class.id) as class_id'), DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
                 ->whereNull('base_table.deleted_at')
                 ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
                 ->groupBy('base_table.id')
@@ -72,14 +72,14 @@ class InstituteController extends Controller
                 ->toArray();
 
         $standard_array = Base_table::leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                    ->select('base_table.id','standard.id', DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
+                    ->select('base_table.id',DB::raw('MAX(standard.id) as standard_id'), DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.standard = base_table.standard ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
                     ->get()
                     ->toArray();
         $stream_array = Base_table::leftJoin('stream', 'stream.id', '=', 'base_table.stream')
-                    ->select('base_table.id','stream.id', DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
+                    ->select('base_table.id',DB::raw('MAX(stream.id) as stream_id'), DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.stream = base_table.stream ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
@@ -87,7 +87,7 @@ class InstituteController extends Controller
                     ->toArray();
 
         $subject_array = Base_table::leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                    ->select('base_table.id', 'subject.base_table_id',DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
+                    ->select('base_table.id', DB::raw('MAX(subject.base_table_id) as base_table_id'),DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.id = base_table.id ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
