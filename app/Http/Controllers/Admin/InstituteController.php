@@ -169,7 +169,7 @@ class InstituteController extends Controller
         return redirect()->route('institute_for.list')->with('success', 'Institute for deleted successfully');
   }
   function institute_register(Request $request){
-    // echo "<pre>";print_r($request->all());exit;
+    echo "<pre>";print_r($request->all());exit;
     $validator = \Validator::make($request->all(), [
         'institute_for_id' => 'required',
         'institute_board_id' => 'required',
