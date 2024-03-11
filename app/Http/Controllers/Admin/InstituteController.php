@@ -7,6 +7,7 @@ use App\Models\Base_table;
 use App\Models\board;
 use App\Models\Class_model;
 use App\Models\Class_sub;
+use App\Models\Dobusinesswith_Model;
 use App\Models\Dobusinesswith_sub;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
@@ -39,7 +40,7 @@ class InstituteController extends Controller
                     ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
                     ->select(
                         'institute_for.name as institute_for_name',
-                        DB::raw('ANY_VALUE(base_table.id) as id'), // Use ANY_VALUE for non-aggregated columns
+                        DB::raw('MAX(base_table.id) as id'), // Use ANY_VALUE for non-aggregated columns
                         'institute_for.id as institute_for_id'
                     )
                     ->groupBy('institute_for.name', 'base_table.institute_for', 'institute_for.id')
@@ -48,12 +49,12 @@ class InstituteController extends Controller
                     // echo "<pre>";print_r($institute_for_array);exit;
         $board_array = DB::table('base_table')
                     ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                    ->select('board.name as board_name', 'base_table.id', 'board.id as board_id')
+                    ->select('board.name as board_name', 'base_table.id', 'board.id')
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT id FROM base_table b WHERE b.board = base_table.board ORDER BY b.id LIMIT 1)')
                     ->get();   
         $medium_array = Base_table::leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                    ->select('base_table.id','medium.id', DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
+                    ->select('base_table.id',DB::raw('MAX(medium.id) as medium_id'), DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.medium = base_table.medium ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
@@ -63,7 +64,7 @@ class InstituteController extends Controller
                 
                
         $class_array =Base_table::leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                ->select('base_table.id','class.id', DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
+                ->select('base_table.id',DB::raw('MAX(class.id) as class_id'), DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
                 ->whereNull('base_table.deleted_at')
                 ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
                 ->groupBy('base_table.id')
@@ -71,14 +72,14 @@ class InstituteController extends Controller
                 ->toArray();
 
         $standard_array = Base_table::leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                    ->select('base_table.id','standard.id', DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
+                    ->select('base_table.id',DB::raw('MAX(standard.id) as standard_id'), DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.standard = base_table.standard ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
                     ->get()
                     ->toArray();
         $stream_array = Base_table::leftJoin('stream', 'stream.id', '=', 'base_table.stream')
-                    ->select('base_table.id','stream.id', DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
+                    ->select('base_table.id',DB::raw('MAX(stream.id) as stream_id'), DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.stream = base_table.stream ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
@@ -86,17 +87,19 @@ class InstituteController extends Controller
                     ->toArray();
 
         $subject_array = Base_table::leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                    ->select('base_table.id', 'subject.base_table_id',DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
+                    ->select('base_table.id', DB::raw('MAX(subject.base_table_id) as base_table_id'),DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.id = base_table.id ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
                     ->get()
                     ->toArray();
+
+          $do_business_with=Dobusinesswith_Model::get()->toarray();
                                
          
         // echo "<pre>";print_r($stream_array );exit;
         return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array',
-                                                         'standard_array','stream_array','subject_array'));
+                                                         'standard_array','stream_array','subject_array','do_business_with'));
     }
     public function create_institute_for(){
         $institute_for = Institute_for_model::paginate(10); 
@@ -166,16 +169,17 @@ class InstituteController extends Controller
         return redirect()->route('institute_for.list')->with('success', 'Institute for deleted successfully');
   }
   function institute_register(Request $request){
+    // echo "<pre>";print_r($request->all());exit;
     $validator = \Validator::make($request->all(), [
-        'institute_for_id' => 'required|string',
-        'institute_board_id' => 'required|string',
-        'institute_for_class_id' => 'required|string',
-        'institute_medium_id' => 'required|string',
-        'institute_work_id' => 'required|string',
-        'standard_id' => 'required|string',
-        'subject_id' => 'required|string',
-        'institute_name' => 'required|string',
-        'address' => 'required|string',
+        'institute_for_id' => 'required',
+        'institute_board_id' => 'required',
+        'institute_for_class_id' => 'required',
+        'institute_medium_id' => 'required',
+        'institute_work_id' => 'required',
+        'standard_id' => 'required',
+        'subject_id' => 'required',
+        'institute_name' => 'required',
+        'address' => 'required',
         'contact_no' => 'required|integer|min:10',
         'email' => 'required|email|unique:institute_detail,email',
     ]);
@@ -202,17 +206,17 @@ class InstituteController extends Controller
         $institute_name = $instituteDetail->institute_name;
 
         //institute_for_sub
-        $intitute_for_id = explode(',', $request->input('institute_for_id'));
-        foreach ($intitute_for_id as $value) {
-            if ($value == 5) {
-                $instituteforadd = institute_for_model::create([
-                    'name' => $request->input('institute_for'),
-                    'status' => 'active',
-                ]);
-                $institute_for_id = $instituteforadd->id;
-            } else {
+        // $intitute_for_id = explode(',', $request->input('institute_for_id'));
+        foreach ($request->input('institute_for_id') as $value) {
+            // if ($value == 5) {
+            //     $instituteforadd = institute_for_model::create([
+            //         'name' => $request->input('institute_for'),
+            //         'status' => 'active',
+            //     ]);
+            //     $institute_for_id = $instituteforadd->id;
+            // } else {
                 $institute_for_id = $value;
-            }
+            // }
             Institute_for_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -221,18 +225,19 @@ class InstituteController extends Controller
         }
 
         //board_sub
-        $institute_board_id = explode(',', $request->input('institute_board_id'));
-        foreach ($institute_board_id as $value) {
+        // $institute_board_id = explode(',', );
+        // echo "<pre>";print_r($request->input('institute_board_id'));exit;
+        foreach ($request->input('institute_board_id') as $value) {
             //other
-            if ($value == 4) {
-                $instituteboardadd = board::create([
-                    'name' => $request->input('institute_board'),
-                    'status' => 'active',
-                ]);
-                $instituteboard_id = $instituteboardadd->id;
-            } else {
+            // if ($value == 4) {
+            //     $instituteboardadd = board::create([
+            //         'name' => $request->input('institute_board'),
+            //         'status' => 'active',
+            //     ]);
+            //     $instituteboard_id = $instituteboardadd->id;
+            // } else {
                 $instituteboard_id = $value;
-            }
+            // }
             //end other
 
             Institute_board_sub::create([
@@ -243,8 +248,8 @@ class InstituteController extends Controller
         }
 
         // class
-        $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
-        foreach ($institute_for_class_id as $value) {
+        // $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
+        foreach ($request->input('institute_for_class_id') as $value) {
 
             Class_sub::create([
                 'user_id' => Auth::user()->id,
@@ -254,8 +259,8 @@ class InstituteController extends Controller
         }
 
         //medium
-        $institute_medium_id = explode(',', $request->input('institute_medium_id'));
-        foreach ($institute_medium_id as $value) {
+        // $institute_medium_id = explode(',', $request->input('institute_medium_id'));
+        foreach ($request->input('institute_medium_id') as $value) {
             Medium_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -264,8 +269,8 @@ class InstituteController extends Controller
         }
 
         //dobusiness
-        $institute_work_id = explode(',', $request->input('institute_work_id'));
-        foreach ($institute_work_id as $value) {
+        // $institute_work_id = explode(',', $request->input('institute_work_id'));
+        foreach ($request->input('institute_work_id') as $value) {
             Dobusinesswith_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -274,8 +279,8 @@ class InstituteController extends Controller
         }
 
         //standard
-        $standard_id = explode(',', $request->input('standard_id'));
-        foreach ($standard_id as $value) {
+        // $standard_id = explode(',', $request->input('standard_id'));
+        foreach ($request->input('standard_id') as $value) {
             Standard_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -285,8 +290,8 @@ class InstituteController extends Controller
 
         //stream
         if ($request->input('stream_id')) {
-            $stream = explode(',', $request->input('stream_id'));
-            foreach ($stream as $value) {
+            // $stream = explode(',', $request->input('stream_id'));
+            foreach ($request->input('stream_id') as $value) {
                 Stream_sub::create([
                     'user_id' => Auth::user()->id,
                     'institute_id' => $lastInsertedId,
@@ -295,8 +300,8 @@ class InstituteController extends Controller
             }
         }
         //subject
-        $subject_id = explode(',', $request->input('subject_id'));
-        foreach ($subject_id as $value) {
+        // $subject_id = explode(',', $request->input('subject_id'));
+        foreach ($request->input('subject_id') as $value) {
             Subject_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -304,14 +309,16 @@ class InstituteController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => 200,
-            'message' => 'institute create Successfully',
-            'data' => [
-                'institute_id' => $lastInsertedId,
-                'institute_name' => $institute_name,
-            ]
-        ], 200);
+        // return response()->json([
+        //     'success' => 200,
+        //     'message' => 'institute create Successfully',
+        //     'data' => [
+        //         'institute_id' => $lastInsertedId,
+        //         'institute_name' => $institute_name,
+        //     ]
+        // ], 200);
+    return redirect()->route('institute.list')->with('success', 'Institute Created Successfully');
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => 500,
