@@ -226,6 +226,7 @@ class InstituteController extends Controller
 
         //board_sub
         // $institute_board_id = explode(',', );
+        echo "<pre>";print_r($request->input('institute_board_id'));exit;
         foreach ($request->input('institute_board_id') as $value) {
             //other
             if ($value == 4) {
