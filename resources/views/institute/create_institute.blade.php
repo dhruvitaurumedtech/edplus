@@ -88,7 +88,7 @@
                                             @foreach($medium_array as $index => $value)
 
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="medium_{{ $index }}" name="institute_medium_id[]" value="{{$value['id']}}">
+                                                <input class="custom-control-input" type="checkbox" id="medium_{{ $index }}" name="institute_medium_id[]" value="{{$value['medium_id']}}">
                                                 <label for="medium_{{ $index }}" class="custom-control-label">{{ $value['medium_name'] }}</label>
                                             </div>
                                             @endforeach

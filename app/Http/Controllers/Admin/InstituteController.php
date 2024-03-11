@@ -54,7 +54,7 @@ class InstituteController extends Controller
                     ->whereRaw('base_table.id = (SELECT id FROM base_table b WHERE b.board = base_table.board ORDER BY b.id LIMIT 1)')
                     ->get();   
         $medium_array = Base_table::leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                    ->select('base_table.id','medium.id', DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
+                    ->select('base_table.id',DB::raw('MAX(medium.id) as medium_id'), DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.medium = base_table.medium ORDER BY m.id LIMIT 1)')
                     ->groupBy('base_table.id')
