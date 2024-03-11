@@ -208,15 +208,15 @@ class InstituteController extends Controller
         //institute_for_sub
         // $intitute_for_id = explode(',', $request->input('institute_for_id'));
         foreach ($request->input('institute_for_id') as $value) {
-            if ($value == 5) {
-                $instituteforadd = institute_for_model::create([
-                    'name' => $request->input('institute_for'),
-                    'status' => 'active',
-                ]);
-                $institute_for_id = $instituteforadd->id;
-            } else {
+            // if ($value == 5) {
+            //     $instituteforadd = institute_for_model::create([
+            //         'name' => $request->input('institute_for'),
+            //         'status' => 'active',
+            //     ]);
+            //     $institute_for_id = $instituteforadd->id;
+            // } else {
                 $institute_for_id = $value;
-            }
+            // }
             Institute_for_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -229,15 +229,15 @@ class InstituteController extends Controller
         // echo "<pre>";print_r($request->input('institute_board_id'));exit;
         foreach ($request->input('institute_board_id') as $value) {
             //other
-            if ($value == 4) {
-                $instituteboardadd = board::create([
-                    'name' => $request->input('institute_board'),
-                    'status' => 'active',
-                ]);
-                $instituteboard_id = $instituteboardadd->id;
-            } else {
+            // if ($value == 4) {
+            //     $instituteboardadd = board::create([
+            //         'name' => $request->input('institute_board'),
+            //         'status' => 'active',
+            //     ]);
+            //     $instituteboard_id = $instituteboardadd->id;
+            // } else {
                 $instituteboard_id = $value;
-            }
+            // }
             //end other
 
             Institute_board_sub::create([
