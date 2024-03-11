@@ -233,7 +233,7 @@ class InstituteApiController extends Controller
                             'institute_id' => $institute_for_array_value->id,
                             'institute_icon'=>asset($institute_for_array_value->icon), 
                             'institute_for' => $institute_for_name,
-                            'board_details' => [$board],
+                            'board_details' => $board,
                         ];
                     } else {
                         $institute_for['board_details'][] = $board;
@@ -243,13 +243,22 @@ class InstituteApiController extends Controller
 
 
             }
-        
+            $dobusiness_with = Dobusinesswith_Model::where('status','active')->get();
+            $do_business_with = [];
+            foreach($dobusiness_with as $dobusinesswith_val){
+                $do_business_with[] = array(
+                    'id'=>$dobusinesswith_val->id,
+                    'name'=>$dobusinesswith_val->name
+                    );
+            }
+            $data = array('do_business_with'=>$do_business_with,
+                          'institute_details'=>$institute_for);
     //    echo "<pre>";print_r($institute_for);exit;
-       return response()->json([
-            'success' => true,
-            'message' => 'Fetch Data Successfully',
-            'data' => $institute_for,
-        ], 200);
+            return response()->json([
+                    'success' => true,
+                    'message' => 'Fetch Data Successfully',
+                    'data' => $data,
+                ], 200);
         
         } else {
             return response()->json([
