@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::table('do_business_with', function (Blueprint $table) {
             
-            $table->integer('');
+            $table->unsignedBigInteger('category_id')->nullable()->after('id');
+            $table->foreign('category_id')->references('id')->on('video_categories');
         });
     }
 
