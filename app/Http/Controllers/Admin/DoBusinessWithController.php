@@ -5,25 +5,30 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Dobusinesswith_Model;
 use Illuminate\Http\Request;
+use App\Models\VideoCategory;
 use Illuminate\Validation\Rule;
 
 class DoBusinessWithController extends Controller
 {
     function list(){
-        $do_business_with = Dobusinesswith_Model::paginate(10); 
-        return view('do_business_with.list',compact('do_business_with'));
+        $do_business_with = Dobusinesswith_Model::paginate(10);
+        $category = VideoCategory::where('status','active')->get(); 
+        return view('do_business_with.list',compact('do_business_with','category'));
     }
     function create(){
+        $category = VideoCategory::where('status','active')->get();
         return view('do_business_with.create');
     }
     function save(Request $request){
         $request->validate([
             'name'=>['required','string','max:255',Rule::unique('do_business_with', 'name')],
+            'category'=>'required',
             'status'=>'required',
     ]);
 
     Dobusinesswith_Model::create([
         'name'=>$request->input('name'),
+        'category'=>$request->input('category'),
         'status'=>$request->input('status'),
     ]);
 
@@ -40,10 +45,12 @@ class DoBusinessWithController extends Controller
         $role = Dobusinesswith_Model::find($id);
         $request->validate([
             'name'=>['required','string','max:255',Rule::unique('do_business_with', 'name')->ignore($id)],
+            'category'=>'required',
             'status'=>'required',
        ]);
       
         $role->update([
+            'category'=>$request->input('category'),
             'name'=>$request->input('name'),
             'status'=>$request->input('status'),
         ]);
