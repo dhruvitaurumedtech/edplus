@@ -43,7 +43,20 @@
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
-                                       
+                                        
+                                        <div class="col-md-6">
+                                            <label for="exampleInputEmail1">Category : </label>
+                                            <select class="form-control" name="category">
+                                                 <option value=" ">Select Option</option>
+                                                 @foreach($category as $catval)
+                                                 <option value="{{$catval->id}}">{{$catval->name}}</option>
+                                                 @endforeach
+                                                
+                                            </select>
+                                            @error('category')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                         <div class="col-md-6">
                                             <label for="exampleInputEmail1">status : </label>
                                             <select class="form-control" name="status">
