@@ -11,13 +11,15 @@ use Illuminate\Validation\Rule;
 class DoBusinessWithController extends Controller
 {
     function list(){
-        $do_business_with = Dobusinesswith_Model::paginate(10);
-        $category = VideoCategory::where('status','active')->get(); 
+        $do_business_with = Dobusinesswith_Model::
+        join('video_categories','video_categories.id','=','do_business_with.category_id')
+        ->select('video_categories.name as category','do_business_with.*')->paginate(10);
+        $category = VideoCategory::where('status','active')->get();
         return view('do_business_with.list',compact('do_business_with','category'));
     }
     function create(){
-        $category = VideoCategory::where('status','active')->get();
-        return view('do_business_with.create');
+        $categories = VideoCategory::where('status','active')->get();
+        return view('do_business_with.create',compact('categories'));
     }
     function save(Request $request){
         $request->validate([
@@ -28,7 +30,7 @@ class DoBusinessWithController extends Controller
 
     Dobusinesswith_Model::create([
         'name'=>$request->input('name'),
-        'category'=>$request->input('category'),
+        'category_id'=>$request->input('category'),
         'status'=>$request->input('status'),
     ]);
 
@@ -50,7 +52,7 @@ class DoBusinessWithController extends Controller
        ]);
       
         $role->update([
-            'category'=>$request->input('category'),
+            'category_id'=>$request->input('category'),
             'name'=>$request->input('name'),
             'status'=>$request->input('status'),
         ]);

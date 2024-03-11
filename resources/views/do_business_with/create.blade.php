@@ -46,9 +46,9 @@
                                         
                                         <div class="col-md-6">
                                             <label for="exampleInputEmail1">Category : </label>
-                                            <select class="form-control" name="category">
+                                            <select class="form-control" name="category" id="category">
                                                  <option value=" ">Select Option</option>
-                                                 @foreach($category as $catval)
+                                                 @foreach($categories as $catval)
                                                  <option value="{{$catval->id}}">{{$catval->name}}</option>
                                                  @endforeach
                                                 

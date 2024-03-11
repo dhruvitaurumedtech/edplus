@@ -11,6 +11,6 @@ class Dobusinesswith_Model extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'do_business_with';
     protected $fillable = [
-        'name', 'status', 'created_by', 'updated_by'
+        'name','category_id', 'status', 'created_by', 'updated_by'
     ];
 }
