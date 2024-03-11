@@ -84,7 +84,7 @@ class InstituteController extends Controller
                     ->toArray();
                                
 
-        // echo "<pre>";print_r($subject_array );exit;
+        // echo "<pre>";print_r($stream_array );exit;
         return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array',
                                                          'standard_array','stream_array','subject_array'));
     }

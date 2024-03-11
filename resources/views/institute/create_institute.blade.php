@@ -113,8 +113,8 @@
                                         @foreach($standard_array as $index => $value)
                                                
                                                     <div class="custom-control custom-checkbox">
-                                                        <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="class[]">
-                                                        <label for="class_{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
+                                                        <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="class[]">
+                                                        <label for="standard{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
                                                     </div>
                                             @endforeach
                                         
