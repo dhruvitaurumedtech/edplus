@@ -110,7 +110,7 @@
                                             @foreach($standard_array as $index => $value)
 
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="standrad[]" value="{{$value['id']}}">
+                                                <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="standard_id[]" value="{{$value['id']}}">
                                                 <label for="standard{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
                                             </div>
                                             @endforeach
@@ -138,7 +138,7 @@
                                             $uniqueSubjects[] = $trimmedSubjectName;
                                             @endphp
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="subject_{{ $loop->parent->index }}_{{ $loop->index }}" name="subject[]" value="{{ $subject['base_table_id'] }}">
+                                                <input class="custom-control-input" type="checkbox" id="subject_{{ $loop->parent->index }}_{{ $loop->index }}" name="subject_id[]" value="{{ $subject['base_table_id'] }}">
                                                 <label for="subject_{{ $loop->parent->index }}_{{ $loop->index }}" class="custom-control-label">{{ $trimmedSubjectName }}</label>
                                             </div>
                                             @endif
@@ -158,6 +158,20 @@
                                             <div class="custom-control custom-checkbox">
                                                 <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="stream[]" value="{{$value['id']}}">
                                                 <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['stream_name'] }}</label>
+                                            </div>
+                                            @endforeach
+
+                                        </div>
+                                        <div class="col-md-4">
+                                            <?php if (!empty($do_business_with)) { ?>
+                                                <label for="exampleInputEmail1">Do Business Work: </label>
+                                            <?php } ?>
+                                            @foreach($do_business_with as $index => $value)
+                                            <!-- $subject = explode(',',$value['subject_name']); -->
+
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="institute_work_id[]" value="{{$value['id']}}">
+                                                <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['name'] }}</label>
                                             </div>
                                             @endforeach
 

@@ -7,6 +7,7 @@ use App\Models\Base_table;
 use App\Models\board;
 use App\Models\Class_model;
 use App\Models\Class_sub;
+use App\Models\Dobusinesswith_Model;
 use App\Models\Dobusinesswith_sub;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
@@ -92,11 +93,13 @@ class InstituteController extends Controller
                     ->groupBy('base_table.id')
                     ->get()
                     ->toArray();
+
+          $do_business_with=Dobusinesswith_Model::get()->toarray();
                                
          
         // echo "<pre>";print_r($stream_array );exit;
         return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array',
-                                                         'standard_array','stream_array','subject_array'));
+                                                         'standard_array','stream_array','subject_array','do_business_with'));
     }
     public function create_institute_for(){
         $institute_for = Institute_for_model::paginate(10); 
@@ -166,16 +169,17 @@ class InstituteController extends Controller
         return redirect()->route('institute_for.list')->with('success', 'Institute for deleted successfully');
   }
   function institute_register(Request $request){
+    // echo "<pre>";print_r($request->all());exit;
     $validator = \Validator::make($request->all(), [
-        'institute_for_id' => 'required|string',
-        'institute_board_id' => 'required|string',
-        'institute_for_class_id' => 'required|string',
-        'institute_medium_id' => 'required|string',
-        'institute_work_id' => 'required|string',
-        'standard_id' => 'required|string',
-        'subject_id' => 'required|string',
-        'institute_name' => 'required|string',
-        'address' => 'required|string',
+        'institute_for_id' => 'required',
+        'institute_board_id' => 'required',
+        'institute_for_class_id' => 'required',
+        'institute_medium_id' => 'required',
+        'institute_work_id' => 'required',
+        'standard_id' => 'required',
+        'subject_id' => 'required',
+        'institute_name' => 'required',
+        'address' => 'required',
         'contact_no' => 'required|integer|min:10',
         'email' => 'required|email|unique:institute_detail,email',
     ]);
@@ -202,8 +206,8 @@ class InstituteController extends Controller
         $institute_name = $instituteDetail->institute_name;
 
         //institute_for_sub
-        $intitute_for_id = explode(',', $request->input('institute_for_id'));
-        foreach ($intitute_for_id as $value) {
+        // $intitute_for_id = explode(',', $request->input('institute_for_id'));
+        foreach ($request->input('institute_for_id') as $value) {
             if ($value == 5) {
                 $instituteforadd = institute_for_model::create([
                     'name' => $request->input('institute_for'),
@@ -221,8 +225,8 @@ class InstituteController extends Controller
         }
 
         //board_sub
-        $institute_board_id = explode(',', $request->input('institute_board_id'));
-        foreach ($institute_board_id as $value) {
+        // $institute_board_id = explode(',', );
+        foreach ($request->input('institute_board_id') as $value) {
             //other
             if ($value == 4) {
                 $instituteboardadd = board::create([
@@ -243,8 +247,8 @@ class InstituteController extends Controller
         }
 
         // class
-        $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
-        foreach ($institute_for_class_id as $value) {
+        // $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
+        foreach ($request->input('institute_for_class_id') as $value) {
 
             Class_sub::create([
                 'user_id' => Auth::user()->id,
@@ -254,8 +258,8 @@ class InstituteController extends Controller
         }
 
         //medium
-        $institute_medium_id = explode(',', $request->input('institute_medium_id'));
-        foreach ($institute_medium_id as $value) {
+        // $institute_medium_id = explode(',', $request->input('institute_medium_id'));
+        foreach ($request->input('institute_medium_id') as $value) {
             Medium_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -264,8 +268,8 @@ class InstituteController extends Controller
         }
 
         //dobusiness
-        $institute_work_id = explode(',', $request->input('institute_work_id'));
-        foreach ($institute_work_id as $value) {
+        // $institute_work_id = explode(',', $request->input('institute_work_id'));
+        foreach ($request->input('institute_work_id') as $value) {
             Dobusinesswith_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -274,8 +278,8 @@ class InstituteController extends Controller
         }
 
         //standard
-        $standard_id = explode(',', $request->input('standard_id'));
-        foreach ($standard_id as $value) {
+        // $standard_id = explode(',', $request->input('standard_id'));
+        foreach ($request->input('standard_id') as $value) {
             Standard_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -285,8 +289,8 @@ class InstituteController extends Controller
 
         //stream
         if ($request->input('stream_id')) {
-            $stream = explode(',', $request->input('stream_id'));
-            foreach ($stream as $value) {
+            // $stream = explode(',', $request->input('stream_id'));
+            foreach ($request->input('stream_id') as $value) {
                 Stream_sub::create([
                     'user_id' => Auth::user()->id,
                     'institute_id' => $lastInsertedId,
@@ -295,8 +299,8 @@ class InstituteController extends Controller
             }
         }
         //subject
-        $subject_id = explode(',', $request->input('subject_id'));
-        foreach ($subject_id as $value) {
+        // $subject_id = explode(',', $request->input('subject_id'));
+        foreach ($request->input('subject_id') as $value) {
             Subject_sub::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $lastInsertedId,
@@ -304,14 +308,16 @@ class InstituteController extends Controller
             ]);
         }
 
-        return response()->json([
-            'success' => 200,
-            'message' => 'institute create Successfully',
-            'data' => [
-                'institute_id' => $lastInsertedId,
-                'institute_name' => $institute_name,
-            ]
-        ], 200);
+        // return response()->json([
+        //     'success' => 200,
+        //     'message' => 'institute create Successfully',
+        //     'data' => [
+        //         'institute_id' => $lastInsertedId,
+        //         'institute_name' => $institute_name,
+        //     ]
+        // ], 200);
+    return redirect()->route('institute.list')->with('success', 'Institute Created Successfully');
+
     } catch (\Exception $e) {
         return response()->json([
             'success' => 500,
