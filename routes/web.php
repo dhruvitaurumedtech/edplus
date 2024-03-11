@@ -14,7 +14,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
-
+use App\Http\Controllers\Admin\VideoCategoryController;
 use App\Http\Controllers\Users;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -160,6 +160,13 @@ Route::middleware('auth')->group(function () {
     Route::post('do-business-with/update', [DoBusinessWithController::class, 'update'])->name('do_business_with.update');
     Route::post('/do-business-with/delete', [DoBusinessWithController::class, 'delete'])->name('do_business_with.delete');
    
+    //video category
+    Route::get('video-category-list', [VideoCategoryController::class, 'index'])->name('videocategory.list');
+    Route::post('video-category-save', [VideoCategoryController::class, 'save'])->name('videocategory.save');
+    Route::post('video-category-edit', [VideoCategoryController::class, 'edit'])->name('videocategory.edit');
+    Route::post('video-category-update', [VideoCategoryController::class, 'update'])->name('videocategory.update');    
+    Route::post('video-category-delete', [VideoCategoryController::class, 'delete'])->name('videocategory.delete');
+    
     //student
     Route::post('/student/list', [StudentsController::class, 'list_student'])->name('student.list');
     Route::post('/student/create', [StudentsController::class, 'create_student'])->name('student.create');
