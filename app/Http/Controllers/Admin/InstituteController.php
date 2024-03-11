@@ -49,7 +49,7 @@ class InstituteController extends Controller
                     // echo "<pre>";print_r($institute_for_array);exit;
         $board_array = DB::table('base_table')
                     ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                    ->select('board.name as board_name', 'base_table.id', 'board.id as board_id')
+                    ->select('board.name as board_name', 'base_table.id', 'board.id')
                     ->whereNull('base_table.deleted_at')
                     ->whereRaw('base_table.id = (SELECT id FROM base_table b WHERE b.board = base_table.board ORDER BY b.id LIMIT 1)')
                     ->get();   
