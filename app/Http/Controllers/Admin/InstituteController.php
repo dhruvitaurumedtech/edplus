@@ -40,7 +40,7 @@ class InstituteController extends Controller
                     ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
                     ->select(
                         'institute_for.name as institute_for_name',
-                        DB::raw('ANY_VALUE(base_table.id) as id'), // Use ANY_VALUE for non-aggregated columns
+                        DB::raw('MAX(base_table.id) as id'), // Use ANY_VALUE for non-aggregated columns
                         'institute_for.id as institute_for_id'
                     )
                     ->groupBy('institute_for.name', 'base_table.institute_for', 'institute_for.id')
