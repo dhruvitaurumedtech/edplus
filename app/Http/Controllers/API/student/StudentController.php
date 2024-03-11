@@ -71,7 +71,7 @@ class StudentController extends Controller
                     'banner_image' => $imgpath,
                 );
             }
-
+            $perPage = 10;
             //student searched response 
             $allinstitute = Institute_detail::where('institute_name','like','%' . $search_keyword . '%')
             ->where('status','active')->paginate($perPage);
