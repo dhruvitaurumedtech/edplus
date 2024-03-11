@@ -160,7 +160,7 @@
           
           $('#id').val(reponse_data.id);
           $('#name').val(reponse_data.name);
-          $('#category').val(reponse_data.category);
+          $('#category').val(reponse_data.category_id);
           $('#status').val(reponse_data.status);
           
           $('#usereditModal').modal('show');
