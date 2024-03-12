@@ -98,7 +98,8 @@ class StudentController extends Controller
             //requested institute
             $requestnstitute =Student_detail::join('institute_detail','institute_detail.id','=','students_details.institute_id')->
             where('students_details.status','!=','approved')
-            ->where('students_details.student_id',$user_id)->paginate($perPage);
+            ->where('students_details.student_id',$user_id)
+            ->select('institute_detail.*','students_details.status as sstatus','students_details.student_id')->paginate($perPage);
            
             $requested_institute = [];
             foreach ($requestnstitute as $value) {
@@ -106,7 +107,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address'=>$value->address,
-                    'status'=>$value->status,
+                    'status'=>$value->sstatus,
                 );
             }
 
