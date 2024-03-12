@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\VideoCategoryController;
 use App\Http\Controllers\Users;
 use Illuminate\Support\Facades\Auth;
@@ -152,6 +153,13 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter/get-subject', [ChapterController::class, 'get_subjects']);
     Route::post('chapter-save', [ChapterController::class, 'chapter_save'])->name('chapter.save');
     Route::post('chapter-list', [ChapterController::class, 'chapter_lists']);
+    
+    //topic
+    Route::get('add-topic', [TopicController::class, 'index'])->name('add.topic');
+    Route::post('chapter/get-chapter', [TopicController::class, 'get_chapter']);
+    
+    
+    
     //do-business-with
     Route::get('do-business-with-list', [DoBusinessWithController::class, 'list'])->name('do_business_with.list');
     Route::get('create/do-business-with', [DoBusinessWithController::class, 'create'])->name('do_business_with.create');

@@ -14,7 +14,7 @@ class ChapterController extends Controller
     public function add_lists()
     {
         $Standard = Standard_model::
-        join('base_table','standard.id','=','base_table.standard')
+              join('base_table','standard.id','=','base_table.standard')
         ->leftjoin('stream','stream.id','=','base_table.stream')
         ->leftjoin('medium','medium.id','=','base_table.medium')
         ->leftjoin('board','board.id','=','base_table.board')
@@ -23,7 +23,7 @@ class ChapterController extends Controller
         ->where('standard.status','active')->get();
 
         $Standards = Standard_model::
-        join('base_table','standard.id','=','base_table.standard')
+              join('base_table','standard.id','=','base_table.standard')
         ->leftjoin('stream','stream.id','=','base_table.stream')
         ->leftjoin('medium','medium.id','=','base_table.medium')
         ->leftjoin('board','board.id','=','base_table.board')
