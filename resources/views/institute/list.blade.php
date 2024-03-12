@@ -47,7 +47,7 @@
                   @foreach($institute as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    <td>{{$value->name}}</td>
+                    <td>{{$value->firstname.' '.$value->lastname}}</td>
                     <td>{{$value->email}}</td>
                     <td>{{$value->mobile}}</td>
                     <td>{{$value->status}}</td>
