@@ -30,7 +30,7 @@ class StudentsController extends Controller
         $institute_id = $request->institute_id;
 
         $student = User::leftjoin('students_details','users.id','=','students_details.student_id')
-        ->where('users.role_type',[4])
+        ->where('users.role_type',[6])
         ->where('students_details.institute_id',$institute_id)
         ->select('users.*','students_details.status')->paginate(10); 
         
@@ -99,7 +99,7 @@ class StudentsController extends Controller
         'dob'=> $request->dob,
         'image'=>'public/profile/'.$imageName,
         'password' => Hash::make($request->password),
-        'role_type' =>4,
+        'role_type' =>6,
         'status'=>$request->status,
         ]);
 
