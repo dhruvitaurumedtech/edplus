@@ -5,12 +5,12 @@
     <div class="container-fluid">
       <div class="row mb-2">
         <div class="col-sm-6">
-          <h1 class="m-0">Topic  List</h1>
+          <h1 class="m-0">Topic List</h1>
         </div><!-- /.col -->
         <div class="col-sm-6">
           <ol class="breadcrumb float-sm-right">
             <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Topic  List</li>
+            <li class="breadcrumb-item active">Topic List</li>
           </ol>
         </div><!-- /.col -->
       </div><!-- /.row -->
@@ -28,7 +28,7 @@
             <div class="card-header">
               <h3 class="card-title">Topic</h3>
             </div>
-            <form method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">
+            <form method="post" action="{{ url('topic-save') }}" enctype="multipart/form-data">
             @csrf
             <!-- /.card-header -->
           <div class="card-body">
@@ -43,12 +43,12 @@
             </div>
             <div class="col-md-6">
                 <label for="subject">Subject : </label>
-                <select class="form-control" name="subject_id" id="subject_id" on>
+                <select class="form-control" name="subject" id="subject" on>
                         <option value=" ">Select Option</option>
                 </select>
             </div>
             <div class="col-md-6">
-                <label for="chapter">Chapter : </label>
+                <label for="subject">chapter : </label>
                 <select class="form-control" name="chapter_id" id="chapter_id" on>
                         <option value=" ">Select Option</option>
                 </select>
@@ -60,23 +60,34 @@
             <br>
             <div  id="container">
             <div class="col-md-6">
-                <label for="chapter_no">Chapter Number : </label>
-                <input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">
-                @error('chapter_no')
+                <label for="chapter_no">Topic no : </label>
+                <input type="text" name="topic_no[]" id="topic_no" class="form-control" placeholder="Enter Topic no">
+                @error('topic_no')
                   <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
             <div class="col-md-6">
-                <label for="chapter_name">Chapter Name : </label>
-                <input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">
+                <label for="chapter_name">Topic Name : </label>
+                <input type="text" name="topic_name[]" id="topic_name" class="form-control" placeholder="Enter Topic Name">
+                @error('topic_name')
+                  <div class="text-danger">{{ $message }}</div>
+                @enderror
+            </div>
+            <div class="col-md-6">
+                <label for="chapter_name">Video Category: </label>
+                <select class="form-control" name="video_category[]"><option>Select Option</option>
+                @foreach($videolist as $value)
+                     <option value="{{$value->id}}">{{$value->name}}</option>
+                @endforeach
+              </select>
                 @error('chapter_name')
                   <div class="text-danger">{{ $message }}</div>
                 @enderror
             </div>
 
             <div class="col-md-6">
-                <label for="chapter_image">Chapter Image : </label>
-                 <input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">
+                <label for="chapter_image">Video Upload: </label>
+                 <input type="file" name="topic_video[]" id="topic_video" class="form-control" placeholder="Select Chapter Image" multiple>
                 @error('chapter_image')
                   <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -99,32 +110,36 @@
             <th style="width: 10px">No</th>
             <th style="width: 250px">Standard</th>
             <th>Subject</th>
+            <th>Chapter</th>
+            <th>Action</th>
         </tr>
     </thead>
     <tbody>
         @php $i=1 @endphp
-        @foreach($Standards as $value)
+        @foreach($topics as $value)
         <tr>
             <td>{{$i}}</td>
             <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
             <td>
                 @foreach($subjects as $sbvalue)
                 @if($sbvalue->base_table_id == $value->base_id)
-                <div class="d-flex align-items-center">
                     {{$sbvalue->name}}
-                    @canButton('edit', 'Subject')
-                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
-                    @endCanButton
-                    @canButton('view', 'Subject')
-                    <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View">&nbsp;&nbsp;
-                    @endCanButton
-                    @canButton('delete', 'Subject')
-                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete">
-                    @endCanButton
-                </div>
-                <br>
                 @endif
                 @endforeach
+            </td>
+            <td>
+              {{$value->chapter_name}}
+            </td>
+            <td>
+                    @canButton('edit', 'Topic')
+                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
+                    @endCanButton
+                    @canButton('view', 'Topic')
+                    <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $value->subject_id }}" data-base-id="{{ $value->base_id }}" data-chapter-id="{{$value->chapter_id}}" value="View">&nbsp;&nbsp;
+                    @endCanButton
+                    @canButton('delete', 'Topic')
+                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete">
+                    @endCanButton
             </td>
         </tr>
         @php $i++ @endphp
@@ -133,7 +148,7 @@
 </table>
 
               <div class="d-flex justify-content-end">
-              {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
+              {!! $topics->withQueryString()->links('pagination::bootstrap-5') !!}
 
               </div>
               </div>
@@ -150,7 +165,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="chaptersModalLabel">Chapters</h5>
+          <h5 class="modal-title" id="chaptersModalLabel">Topic List</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -159,9 +174,9 @@
         <table class="table table-bordered">
           <thead>
             <tr>
-              <th>Chapter No.</th>
-              <th>Chapter Name</th>
-              <th>Chapter Image</th>
+              <th>Topic No.</th>
+              <th>Topic Name</th>
+              <th>Category</th>
             </tr>
           </thead>
           <tbody id="chapterdata">
@@ -180,33 +195,30 @@ document.querySelectorAll('.viewButton').forEach(function(button) {
     button.addEventListener('click', function() {
       var subject_id = this.getAttribute('data-subject-id');
       var base_id = this.getAttribute('data-base-id');
+      var chapter_id = this.getAttribute('data-chapter-id');
       
-      axios.post('chapter-list', {
+      axios.post('topic-list', {
         subject_id: subject_id,
-        base_id: base_id
+        base_id: base_id,
+        chapter_id: chapter_id,
         })
         .then(response => {          
           var chapterdata = document.getElementById('chapterdata');
           chapterdata.innerHTML = ''; // Clear existing 
 
-            response.data.chapters.forEach(function(chapter) {
+            response.data.topic_list.forEach(function(topic) {
             var tr = document.createElement('tr');
 
         // Create a new table data (<td>) for chapter number
-            var tdChapterNo = document.createElement('td');
-            tdChapterNo.textContent = chapter.chapter_no;
-            tr.appendChild(tdChapterNo); 
-            var tdChapterName = document.createElement('td');
-            tdChapterName.textContent = chapter.chapter_name;
-            tr.appendChild(tdChapterName); 
-            var tdChapterImage = document.createElement('td');
-            var img = document.createElement('img');
-            img.src = '{{ asset('') }}' + chapter.chapter_image;
-            img.alt = chapter.chapter_name;
-            img.style.width = '70px'; // Example width
-            img.style.height = '70px'; // Example height
-            tdChapterImage.appendChild(img);
-            tr.appendChild(tdChapterImage); 
+            var tdtopicno = document.createElement('td');
+            tdtopicno.textContent = topic.topic_no;
+            tr.appendChild(tdtopicno); 
+            var tdtopicname = document.createElement('td');
+            tdtopicname.textContent = topic.topic_name;
+            tr.appendChild(tdtopicname); 
+            var tdtopicname = document.createElement('td');
+            tdtopicname.textContent = topic.topic_name;
+            tr.appendChild(tdtopicname); 
             chapterdata.appendChild(tr);
             });
               $('#chaptersModal').modal('show');
@@ -244,12 +256,13 @@ document.querySelectorAll('.viewButton').forEach(function(button) {
                     console.error(error);
                 });
         });
-        $('#subject_id').on('change', function () {
+        $('#subject').on('change', function () {
             var subject_id = $(this).val();
             axios.post('chapter/get-chapter', {
                     subject_id: subject_id,
                 })
                 .then(function (response) {
+                  // alert(response.data.chapter);
                   
                     var secondDropdown = document.getElementById('chapter_id');
                         secondDropdown.innerHTML = ''; // Clear existing options
@@ -257,7 +270,7 @@ document.querySelectorAll('.viewButton').forEach(function(button) {
                         secondDropdown.appendChild(new Option('Select Subject', ''));
 
                         response.data.chapter.forEach(function(chapters) {
-                            var option = new Option(chapters.name, chapters.id);
+                            var option = new Option(chapters.chapter_name, chapters.id);
                             secondDropdown.appendChild(option);
                         });
                 })
@@ -284,24 +297,36 @@ $(document).ready(function(){
       // Add input field
       $(container).append(
         '<div class="col-md-6">'+
-              '<label for="chapter_no">Chapter Number : </label>'+
-              '<input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">'+
-              '@error('chapter_no + x')' +
+              '<label for="chapter_no">Topic No : </label>'+
+              '<input type="text" name="topic_no[]" id="topic_no" class="form-control" placeholder="Enter Topic No">'+
+              '@error('topic_no + x')' +
                 '<div class="text-danger">{{ $message }}</div>'+
                 '@enderror' +
           '</div>'+
             '<div class="col-md-6">'+
-                '<label for="chapter_name">Chapter Name : </label>'+
-                '<input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">'+
-                '@error('chapter_name + x')'+
+                '<label for="chapter_name">Topic Name : </label>'+
+                '<input type="text" name="topic_name[]" id="topic_name" class="form-control" placeholder="Enter Topic Name">'+
+                '@error('topic_name + x')'+
+                  '<div class="text-danger">{{ $message }}</div>'+
+                '@enderror'+
+            '</div>'+
+            '<div class="col-md-6">' +
+                '<label for="chapter_name">Video Category : </label>' +
+                '<select class="form-control" name="video_category[]' + x + '">' +
+                    '<option>Select Option</option>' +
+                    '<?php foreach($videolist as $value): ?>' +
+                        '<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>' +
+                    '<?php endforeach; ?>' +
+                '</select>' +
+                '@error('video_category_id + x')'+
                   '<div class="text-danger">{{ $message }}</div>'+
                 '@enderror'+
             '</div>'+
 
             '<div class="col-md-6">'+
-                '<label for="chapter_image">Chapter Image : </label>'+
-                 '<input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">'+
-                '@error('chapter_image + x')'+
+                '<label for="chapter_image">Video Upload : </label>'+
+                 '<input type="file" name="topic_video[]" id="topic_video" class="form-control" placeholder="Select Video Upload" multiple>'+
+                '@error('video + x')'+
                   '<div class="text-danger">{{ $message }}</div>'+
                 '@enderror'+
             '</div><br><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>'

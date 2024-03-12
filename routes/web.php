@@ -157,6 +157,8 @@ Route::middleware('auth')->group(function () {
     //topic
     Route::get('add-topic', [TopicController::class, 'index'])->name('add.topic');
     Route::post('chapter/get-chapter', [TopicController::class, 'get_chapter']);
+    Route::post('topic-save', [TopicController::class, 'topic_save'])->name('topic.save');
+    Route::post('topic-list', [TopicController::class, 'topic_list']);
     
     
     
