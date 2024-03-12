@@ -23,7 +23,7 @@ return new class extends Migration
             $table->foreign('chapter_id')->references('id')->on('chapters');
             $table->unsignedBigInteger('video_category_id');
             $table->foreign('video_category_id')->references('id')->on('video_categories');
-            $table->integer('topic_no');
+            $table->string('topic_no');
             $table->string('topic_name');
             $table->string('topic_video');
             $table->timestamps();

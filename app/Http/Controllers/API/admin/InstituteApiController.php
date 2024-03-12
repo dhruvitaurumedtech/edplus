@@ -180,11 +180,15 @@ class InstituteApiController extends Controller
                                                             'subject' => $value->name
                                                         ];
                                                     }
+                                                    if(!empty($stream_array_value->stream_id)){
                                                 $stream[] = [
                                                     'stream_id'=>$stream_array_value->stream_id.'',
                                                     'stream' => $stream_array_value->stream_name.'',
                                                     // 'subject' => $subject_array
                                                 ];
+                                               }
+                                               $stream =[];
+
                                             }
                                         
 
@@ -601,6 +605,9 @@ class InstituteApiController extends Controller
             ], 500);
         
         }
+    }
+    function get_homescreen(Request $request){
+        // $institute_id = 
     }
     // function get_subject_stream(Request $request){
     //     $institute_id = $request->input('institute_id');

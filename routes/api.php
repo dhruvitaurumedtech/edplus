@@ -57,3 +57,5 @@ Route::post('/institute/register-institute', [InstituteApiController::class, 're
 Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
 Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
 // Route::post('/institute/get-subject-or-stream', [InstituteApiController::class, 'get_subject_stream'])->name('get_subject_stream.get');
+
+Route::get('/institute/get-homescreen', [InstituteApiController::class, 'get_homescreen'])->name('reset.password.get');
