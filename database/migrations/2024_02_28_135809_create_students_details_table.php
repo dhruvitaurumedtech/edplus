@@ -28,9 +28,9 @@ return new class extends Migration
             $table->integer('standard_id')->nullable();
             $table->unsignedBigInteger('stream_id')->nullable();
             $table->foreign('stream_id')->references('id')->on('stream');
-            $table->unsignedBigInteger('subject_id')->nullable();
-            $table->foreign('subject_id')->references('id')->on('subject');
-            $table->enum('status',['active','inactive']);
+            $table->string('subject_id')->nullable();
+            $table->enum('status',['pending','denied','approved']);
+            $table->string('note')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
             $table->timestamps();

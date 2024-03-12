@@ -226,7 +226,18 @@
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
-
+                                        <div class="col-md-4">
+                                            <label for="exampleInputEmail1">Standard  : </label>
+                                            <select name="standard_id" id="standard_id" class="form-control">
+                                            {{ print_r($standard);}}
+                                                @foreach($standard as $standardval)
+                                                    <option value="{{ $standardval->id }}">{{ $standardval->name }}</option>
+                                                @endforeach
+                                            </select>
+                                            @error('standard_id')
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
                                         <div class="col-md-4">
                                             <label for="exampleInputEmail1">Stream  : </label>
                                             <select name="stream_id" id="stream_id" class="form-control">
@@ -241,7 +252,8 @@
 
                                         <div class="col-md-4">
                                             <label for="exampleInputEmail1">Subject  : </label>
-                                            <select name="subject_id" id="subject_id" class="form-control">
+                                            <select name="subject_id[]" id="subject_id" class="form-control" multiple>
+                                              <option value="">Select Subject</option>
                                                 @foreach($subject as $institutesubject)
                                                     <option value="{{ $institutesubject->id }}">{{ $institutesubject->name }}</option>
                                                 @endforeach

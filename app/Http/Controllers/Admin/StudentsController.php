@@ -34,14 +34,14 @@ class StudentsController extends Controller
         ->where('students_details.institute_id',$institute_id)
         ->select('users.*','students_details.status')->paginate(10); 
         
-        $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id',$id)->select('institute_for.*')->get(); 
-        $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id',$id)->select('board.*')->get();
-        $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')->where('medium_sub.institute_id',$id)->select('medium.*')->get();
-        $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')->where('class_sub.institute_id',$id)->select('class.*')->get();
-        $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')->where('stream_sub.institute_id',$id)->select('stream.*')->get();
-        $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')->where('subject_sub.institute_id',$id)->select('subject.*')->get(); 
-        $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')->where('standard_sub.institute_id',$id)->select('standard.*')->get(); 
-        return view('student.list', compact('institute_id','student','institute_for','board','medium','class','stream','subject'));
+        $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id',$institute_id)->select('institute_for.*')->get(); 
+        $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id',$institute_id)->select('board.*')->get();
+        $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')->where('medium_sub.institute_id',$institute_id)->select('medium.*')->get();
+        $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')->where('class_sub.institute_id',$institute_id)->select('class.*')->get();
+        $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')->where('stream_sub.institute_id',$institute_id)->select('stream.*')->get();
+        $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')->where('subject_sub.institute_id',$institute_id)->select('subject.*')->get(); 
+        $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')->where('standard_sub.institute_id',$institute_id)->select('standard.*')->get(); 
+        return view('student.list', compact('institute_id','student','institute_for','board','medium','class','stream','subject','standard'));
     }
 
     public function create_student(Request $request){
@@ -115,7 +115,7 @@ class StudentsController extends Controller
             'class_id' =>$request->class_id,
             'standard_id' =>$request->standard_id,
             'stream_id'=>$request->stream_id,
-            'subject_id'=>$request->subject_id,
+            'subject_id'=>implode(",",$request->subject_id),
             'status'=>$request->status,
             ]);
 
@@ -181,11 +181,15 @@ class StudentsController extends Controller
         $Student_detail_id = $request->Student_detail_id;
         $studentdetailsDT = Student_detail::where('id', $Student_detail_id)->first();
         $studentdetailsDT->update([
+            'institute_for_id' => $request->institute_for_id,
             'board_id'=>  $request->board_id,
             'medium_id' =>$request->medium_id,
             'class_id' =>$request->class_id,
+            'standard_id' =>$request->standard_id,
             'stream_id'=>$request->stream_id,
-            'subject_id'=>$request->subject_id,
+            'subject_id'=>implode(",",$request->subject_id),
+            'status'=>$request->status,
+            
         ]);
 
         return Redirect::route('student.list')->with('success', 'profile-created');
