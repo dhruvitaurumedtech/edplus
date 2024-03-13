@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use Illuminate\Support\Str;
 
 class Users extends Controller
 {
@@ -27,6 +28,29 @@ class Users extends Controller
     }
 
     public function subadmin_store(Request $request){
+        if($request->role_type == '2') {
+            $subadminPrefix = 'sa_';
+        }
+        else{
+            $subadminPrefix = 'ia_';
+          }
+            $startNumber = 101;
+            
+            $lastInsertedId = DB::table('users')->orderBy('id', 'desc')->value('unique_id');
+            if(!is_null($lastInsertedId)) {
+                $number = substr($lastInsertedId, 3);  
+                // echo $number;exit; 
+                $newID = $number + 1;
+            } else {
+                $newID = $startNumber; 
+            }
+            
+            $paddedNumber = str_pad($newID, 3, '0', STR_PAD_LEFT);
+            
+            $unique_id = $subadminPrefix . $paddedNumber;
+        
+        
+       
         // print_r($request->all());exit;
         $validator=$request->validate([
             'role_type'=>'required',
@@ -39,6 +63,7 @@ class Users extends Controller
         // Create sub-admin
         
         $subAdmin = User::create([
+            'unique_id' => $unique_id,
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,

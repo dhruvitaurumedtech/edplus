@@ -193,8 +193,29 @@ class InstituteController extends Controller
         ], 400);
     }
     try {
+            $subadminPrefix = 'ist_';
+            $startNumber = 101;
+            
+            $lastInsertedId = DB::table('institute_detail')->orderBy('id', 'desc')->value('unique_id');
+            // echo $lastInsertedId;exit;
+            if(!is_null($lastInsertedId)) {
+                 $number = substr($lastInsertedId, 3); 
+                 $numbers = str_replace('_', '', $number);
+
+                $newID = $numbers + 1;
+            } else {
+                $newID = $startNumber; 
+            }
+            
+            $paddedNumber = str_pad($newID, 3, '0', STR_PAD_LEFT);
+            
+            $unique_id = $subadminPrefix . $paddedNumber;
+        
+        
+       
         //institute_detail
         $instituteDetail = Institute_detail::create([
+            'unique_id'=>$unique_id,
             'user_id' => Auth::user()->id,
             'institute_name' => $request->input('institute_name'),
             'address' => $request->input('address'),
