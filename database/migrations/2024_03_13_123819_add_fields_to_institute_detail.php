@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('institute_detail', function (Blueprint $table) {
            
+            
             $table->string('youtube_link')->nullable()->after('email');
             $table->string('whatsaap_link')->nullable()->after('email');
             $table->string('facebook_link')->nullable()->after('email');
