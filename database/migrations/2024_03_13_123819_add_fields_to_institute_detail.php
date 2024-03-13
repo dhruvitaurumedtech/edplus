@@ -12,8 +12,6 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('institute_detail', function (Blueprint $table) {
-           
-            
             $table->string('youtube_link')->nullable()->after('email');
             $table->string('whatsaap_link')->nullable()->after('email');
             $table->string('facebook_link')->nullable()->after('email');
