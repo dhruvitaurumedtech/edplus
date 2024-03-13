@@ -32,6 +32,8 @@ class VideoController extends Controller
         }
         
         $topic = Topic_model::create([
+            'user_id'=>$request->input('user_id'),
+            'institute_id'=>$request->input('institute_id'),
             'base_table_id'=>$request->input('base_table_id'),
             'standard_id'=> $request->input('standard_id'),
             'subject_id'=> $request->input('subject_id'),
