@@ -39,7 +39,7 @@ class VideoController extends Controller
             'topic_no' => $request->input('topic_no'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id'=>$request->input('video_category_id'),
-            'topic_video'=>$videoPath
+            'topic_video'=>asset($videoPath)
         ]);
         
         
