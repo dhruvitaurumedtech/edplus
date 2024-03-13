@@ -331,10 +331,21 @@ class InstituteApiController extends Controller
             
             $unique_id = $subadminPrefix . $paddedNumber;
         
-        
+            $iconFile = $request->file('logo');
+            $imagePath = $iconFile->store('icon', 'public');
             //institute_detail
             $instituteDetail = Institute_detail::create([
                 'unique_id'=>$unique_id,
+                'youtube_link'=>$request->input('youtube_link'),
+                'whatsaap_link'=>$request->input('whatsaap_link'),
+                'facebook_link'=>$request->input('facebook_link'),
+                'instagram_link'=>$request->input('instagram_link'),
+                'website_link'=>$request->input('website_link'),
+                'gst_slab'=>$request->input('gst_slab'),
+                'gst_number'=>$request->input('gst_number'),
+                'close_time'=>$request->input('close_time'),
+                'open_time'=>$request->input('open_time'),
+                'logo'=>$imagePath,
                 'user_id' => $request->input('user_id'),
                 'institute_name' => $request->input('institute_name'),
                 'address' => $request->input('address'),
@@ -642,18 +653,81 @@ class InstituteApiController extends Controller
         }
     }
     function get_homescreen(Request $request){
-        echo $user_id = $request->input('user_id');
-exit;
-        // $institute_id = $request->input('institute_id');
-        // $token = $request->header('Authorization');
+      
+        $institute_id = $request->input('institute_id');
+        $user_id = $request->input('user_id');
 
-        // if (strpos($token, 'Bearer ') === 0) {
-        //     $token = substr($token, 7);
-        // }
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
 
 
-        // $existingUser = User::where('token', $token)->first();
-        // if ($existingUser) {
+        $existingUser = User::where('token', $token)->first();
+        if ($existingUser) {
+            if(empty($institute_id))
+            {
+                $institute_id=Institute_detail::where('user_id',$user_id)->first();
+           }
+            // Institute_detail::where();
+            $board_list = DB::table('board_sub')
+            ->join('board', 'board_sub.board_id', '=', 'board.id')
+            ->select('board.*')
+            ->where('board_sub.user_id', $user_id)
+            ->where('board_sub.institute_id', $institute_id)
+            ->get();
+        
+        $board_array = [];
+        foreach ($board_list as $board_value) {
+            $medium_list = DB::table('medium_sub')
+                ->join('medium', 'medium_sub.medium_id', '=', 'medium.id')
+                ->select('medium.*')
+                ->where('medium_sub.user_id', $user_id)
+                ->where('medium_sub.institute_id', $institute_id)
+                ->get();
+        
+            $medium_array = [];
+            foreach ($medium_list as $medium_value) {
+                $medium_array[] = [
+                    'id' => $medium_value->id,
+                    'medium_name' => $medium_value->name,
+                ];
+            }
+        
+            $banner_list = Banner_model::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->get();
+        
+           
+            $board_array[] = [
+                'id' => $board_value->id,
+                'board_name' => $board_value->name,
+                'medium' => $medium_array,
+                // Include banner_array inside board_array
+            ];
+
+        }
+         $banner_array = [];
+            foreach ($banner_list as $value) {
+                $banner_array[] = [
+                    'id' => $value->id,
+                    'banner_image' => asset($value->banner_image),
+                    'url' => $value->url . '',
+                ];
+            }
+       
+        $response = [
+            'banner'=>$banner_array,
+            'board'=>$board_array,
+        ];
+            return response()->json([
+                        'success' => 200,
+                        'message' => 'Fetch Board successfully',
+                        // 'banner' => $banner_array,
+                        'data' => $response,
+                    ], 200);
+                }
         //     $board_list = DB::table('base_table')
         //     ->join('board', 'base_table.board', '=', 'board.id')
         //     ->join('board_sub', 'board.id', '=', 'board_sub.board_id')
