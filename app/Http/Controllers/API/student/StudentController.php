@@ -268,16 +268,20 @@ class StudentController extends Controller
             $stdcount = Student_detail::where('institute_id',$institute_id)->count();
             $subcount = Subject_sub::where('institute_id',$institute_id)->count();
             
+            $institutedetaa = array('id'=>$institutedeta->id,
+            'institute_name'=>$institutedeta->institute_name,
+            'address'=>$institutedeta->address,
+            'boards'=>$boards,
+            'students'=>$stdcount,
+            'subject'=>$subcount,
+            'total_board'=>count($boards),
+            'teacher'=>0);
+
             
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'institute_data'=>$institutedeta,
-                'boards'=>$boards,
-                'students'=>$stdcount,
-                'subject'=>$subcount,
-                'total_board'=>count($boards),
-                'teacher'=>0,
+                'institute_data'=>$institutedetaa,
             ], 200, [], JSON_NUMERIC_CHECK);
         }catch(\Exception $e) {
             return response()->json([
