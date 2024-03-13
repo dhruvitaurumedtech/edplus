@@ -130,15 +130,15 @@ class InstituteApiController extends Controller
                                         ->select('standard','id')
                                         ->get();
                                         $standardids = '';
-                                        $baseidsfosubj = '';
+                                        //$baseidsfosubj = '';
                                         foreach($standardidget as $standardidsv){
                                             $standardids .= $standardidsv->standard;
-                                            $baseidsfosubj .= $standardidsv->id;
+                                            //$baseidsfosubj .= $standardidsv->id;
                                         }
                                         $standardids .= 0;
-                                        $baseidsfosubj .= 0;
+                                        //$baseidsfosubj .= 0;
 
-                                        $baseidsfosubj = $standardidget->pluck('id')->toArray();
+                                        //$baseidsfosubj = $standardidget->pluck('id')->toArray();
                                         $standardids = $standardidget->pluck('standard')->toArray();
                                         $standard_array = Standard_model::whereIN('id',$standardids)
                                         ->get();
@@ -169,6 +169,21 @@ class InstituteApiController extends Controller
                                                 // ->whereNull('base_table.deleted_at')
                                                 // ->where('base_table.id',$standard_array_value->id)
                                                 // ->get();
+                                                
+                                                $forsubdidget = base_table::where('institute_for_class',$class_array_value->id)
+                                                ->where('institute_for',$institute_for_array_value->id)
+                                                ->where('standard',$standard_array_value->id)
+                                                ->where('board',$board_array_value->id)
+                                                ->where('medium',$medium_array_value->id)
+                                                ->orwhere('stream',$stream_array_value->id)
+                                                ->select('standard','id')
+                                                ->get();
+                                                $baseidsfosubj = '';
+                                                foreach($forsubdidget as $forsubval){
+                                                    $baseidsfosubj .= $forsubval->id.',';
+                                                }
+                                                $baseidsfosubj .= 0;
+                                                $baseidsfosubj = $forsubdidget->pluck('id')->toArray();
                                                 
                                                 $subject_array = Subject_model::whereIN('base_table_id',$baseidsfosubj)
                                                 ->get();

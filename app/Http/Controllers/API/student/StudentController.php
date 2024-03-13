@@ -257,7 +257,7 @@ class StudentController extends Controller
             $institute_data = [];
             $boards = [];
 
-            $institutedeta = Institute_detail::where('id',$institute_id)->select('id','institute_name','address')->get();
+            $institutedeta = Institute_detail::where('id',$institute_id)->select('id','institute_name','address')->first();
             $boards = board::join('board_sub','board_sub.board_id','=','board.id')
            ->where('board_sub.institute_id',$institute_id)->select('board.name')->get();
 

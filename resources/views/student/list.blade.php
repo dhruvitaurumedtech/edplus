@@ -317,6 +317,8 @@
           $('#uploded_image').val(reponse_student.image);
           }
           if (reponse_studentdetail !== null) {
+            var subjects = reponse_studentdetail.subject_id;
+            var arr_subjects = subjects.split(",");
           $('#status').val(reponse_studentdetail.status);
           $('#Student_detail_id').val(reponse_studentdetail.id);
           $('#institute_for_id').val(reponse_studentdetail.institute_for_id);
@@ -324,7 +326,7 @@
           $('#medium_id').val(reponse_studentdetail.medium_id);
           $('#class_id').val(reponse_studentdetail.class_id);
           $('#stream_id').val(reponse_studentdetail.stream_id);
-          $('#subject_id').val(reponse_studentdetail.subject_id);
+          $('#subject_id').val(arr_subjects);
           }
           $('#usereditModal').modal('show');
         })
