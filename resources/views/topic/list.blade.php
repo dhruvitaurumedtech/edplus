@@ -53,6 +53,12 @@
                         <option value=" ">Select Option</option>
                 </select>
             </div>
+            <div class="col-md-6">
+                <label for="subject">Institute : </label>
+                <select class="form-control" name="institute_id" id="institute_id" on>
+                        <option value=" ">Select Option</option>
+                </select>
+            </div>
             <br>
             <a class="btn btn-success" id="addmore">
                 <i class="fas fa-plus"></i>
