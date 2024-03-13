@@ -73,9 +73,12 @@ class StudentController extends Controller
             }
             $perPage = 10;
             //student searched response 
-            $allinstitute = Institute_detail::where('unique_id','like','%' . $search_keyword . '%')
-            ->orwhere('institute_name','like','%' . $search_keyword . '%')
-            ->where('status','active')->paginate($perPage);
+            $allinstitute = Institute_detail::where('status', 'active')
+            ->where(function ($query) use ($search_keyword) {
+                $query->where('unique_id', 'like', '%' . $search_keyword . '%')
+                    ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
+            })
+    ->paginate($perPage);
             $search_list = [];
             foreach ($allinstitute as $value) {
                 $search_list[] = array(
