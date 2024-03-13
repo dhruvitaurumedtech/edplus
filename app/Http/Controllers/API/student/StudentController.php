@@ -77,8 +77,8 @@ class StudentController extends Controller
             ->where(function ($query) use ($search_keyword) {
                 $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                     ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
-            })
-    ->paginate($perPage);
+            })->paginate($perPage);
+            
             $search_list = [];
             foreach ($allinstitute as $value) {
                 $search_list[] = array(
