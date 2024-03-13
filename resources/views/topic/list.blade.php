@@ -56,7 +56,10 @@
             <div class="col-md-6">
                 <label for="subject">Institute : </label>
                 <select class="form-control" name="institute_id" id="institute_id" on>
-                        <option value=" ">Select Option</option>
+                        <option value="">Select Option</option>
+                        @foreach($institute_list as $value)
+                        <option value="{{$value->id}}">{{$value->institute_name}}</option>
+                        @endforeach
                 </select>
             </div>
             <br>

@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Base_table;
 use App\Models\Chapter;
+use App\Models\Institute_detail;
 use App\Models\Standard_model;
 use App\Models\Subject_model;
 use App\Models\Topic_model;
 use App\Models\VideoCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class TopicController extends Controller
 {
@@ -42,7 +44,8 @@ class TopicController extends Controller
         // echo "<pre>";print_r($topics);exit;
         $subjects = Subject_model::get();
         $videolist = VideoCategory::get();
-        return view('topic.list',compact('Standard','topics','subjects','videolist'));
+        $institute_list = Institute_detail::where('user_id',Auth::user()->id)->get();
+        return view('topic.list',compact('Standard','topics','subjects','videolist','institute_list'));
     }
     public function get_chapter(Request $request){
         $subject_id = $request->subject_id;
@@ -67,6 +70,8 @@ class TopicController extends Controller
             $topic_video = $request->file('topic_video')[$i];
         
             $topic_model = Topic_model::create([
+                'user_id' => Auth::user()->id,
+                'institute_id'=> $request->input('institute_id'),
                 'base_table_id' => $request->input('standard_id'),
                 'standard_id' => $base_table->standard,
                 'subject_id' => $request->input('subject'),
