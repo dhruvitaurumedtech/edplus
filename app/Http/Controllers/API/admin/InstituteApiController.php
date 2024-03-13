@@ -169,11 +169,13 @@ class InstituteApiController extends Controller
                                                 // ->whereNull('base_table.deleted_at')
                                                 // ->where('base_table.id',$standard_array_value->id)
                                                 // ->get();
+                                                
                                                 $forsubdidget = base_table::where('institute_for_class',$class_array_value->id)
+                                                ->where('institute_for',$institute_for_array_value->id)
                                                 ->where('standard',$standard_array_value->id)
+                                                ->where('board',$board_array_value->id)
                                                 ->where('medium',$medium_array_value->id)
-                                                ->where('medium',$medium_array_value->id)
-                                                ->where('stream',$stream_array_value->id)->orWhereNull('stream')
+                                                ->orwhere('stream',$stream_array_value->id)
                                                 ->select('standard','id')
                                                 ->get();
                                                 $baseidsfosubj = '';
@@ -182,7 +184,7 @@ class InstituteApiController extends Controller
                                                 }
                                                 $baseidsfosubj .= 0;
                                                 $baseidsfosubj = $forsubdidget->pluck('id')->toArray();
-
+                                                
                                                 $subject_array = Subject_model::whereIN('base_table_id',$baseidsfosubj)
                                                 ->get();
                                                 
