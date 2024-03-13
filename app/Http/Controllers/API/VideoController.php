@@ -13,6 +13,8 @@ class VideoController extends Controller
        
         $validator = \Validator::make($request->all(), [
             'base_table_id'=>'required',
+            'user_id'=>'required',
+            'institute_id'=>'required',
             'standard_id'=> 'required',
             'subject_id'=> 'required',
             'chapter_id' => 'required',
@@ -30,7 +32,6 @@ class VideoController extends Controller
             $videoPath = $request->file('topic_video')->store('videos', 'public');
             //$topic->update(['topic_video' => $videoPath]);
         }
-        
         $topic = Topic_model::create([
             'user_id'=>$request->input('user_id'),
             'institute_id'=>$request->input('institute_id'),
@@ -53,8 +54,9 @@ class VideoController extends Controller
     //if need video category type
     public function video_category(Request $request){
         $categories = VideoCategory::where('status','active')->get();
+        $videocat = [];
         foreach($categories as $catvalu){
-            $videocat = array('id'=>$catvalu->id,'name'=>$catvalu->name,'status'=>$catvalu->status);
+            $videocat[] = array('id'=>$catvalu->id,'name'=>$catvalu->name,'status'=>$catvalu->status);
         }
         return response()->json(['message' => 'Video Category List', 'Category' => $videocat]);
     }

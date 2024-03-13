@@ -4,12 +4,16 @@ namespace App\Http\Controllers\API\student;
 use App\Http\Controllers\Controller;
 use App\Models\Banner_model;
 use App\Models\board;
+use App\Models\Chapter;
 use App\Models\Subject_sub;
 use App\Models\Institute_detail;
 use App\Models\Student_detail;
 use App\Models\Search_history;
+use App\Models\Subject_model;
+use App\Models\Topic_model;
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Broadcasting\Channel;
 
 class StudentController extends Controller
 {
@@ -44,24 +48,10 @@ class StudentController extends Controller
         if ($existingUser) {
 
             //banner
-            $studentDT = Student_detail::where('id',$user_id) ->get();
-            $instituteids = '';
-            $instuser_ids = '';
-            foreach($studentDT as $value){
-                $instituteids .= $value->institute_id.',';
-                $instuser_ids .=$value->user_id.',';
-            }
-            $instituteids .= '0';
-            $instuser_ids .= '0';
-            if($instituteids == '0'){
-                $instuser_id = '1';
-            }else{
-                $instuser_id = $instuser_ids;
-            }
-                $banners = Banner_model::where('status', 'active')
-                            ->whereIn('user_id', explode(',',$instuser_id))
-                            ->orWhereIn('institute_id', explode(',',$instuser_ids))
-                            ->paginate($perPage);
+            
+            $banners = Banner_model::where('status', 'active')
+            ->whereIn('user_id', explode(',','1'))
+            ->paginate($perPage);
             $banners_data = [];
             
             foreach ($banners as $value) {
@@ -292,5 +282,187 @@ class StudentController extends Controller
         }
         
         
+    }
+
+    //student added detail
+    public function student_added_detail(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        try{
+            $user_id = $request->user_id;
+            $institute_id = $request->institute_id;
+            
+            
+            //banner
+            
+                $banners = Banner_model::where('status', 'active')
+                ->Where('institute_id', $institute_id)
+                ->paginate(10);
+            $banners_data = [];
+            
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                );
+            }
+            
+            $todays_lecture = [];
+            $announcement = [];
+            $subjects = [];
+            
+            $subdta = Student_detail::where('student_id',$user_id)
+            ->where('institute_id',$institute_id)->select('students_details.*')->first();
+            
+            $subjecqy = Subject_model::whereIN('id',explode(",",$subdta->subject_id))->get();
+            foreach($subjecqy as $subjcdt){
+                $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name);
+            }
+            $studentdata = array(
+            'banners_data'=> $banners_data,
+            'todays_lecture'=>"",
+            'announcement'=>"",
+            'subjects'=>$subjects,
+            'result'=>"");
+
+            
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch data.',
+                'data'=>$studentdata,
+            ], 200, [], JSON_NUMERIC_CHECK);
+        }catch(\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+        
+        
+
+    }
+
+    //subject wise chapert list
+    public function subject_chapers(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'subject_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        try{
+            $user_id = $request->user_id;
+            $subject_id = $request->subject_id;
+            
+            $chapers = [];
+            $cptquy = Chapter::where('subject_id',$subject_id)->get();
+            foreach($cptquy as $chval){
+            $chapers[] = array( "id"=>$chval->id,
+            "subject_id"=>$chval->subject_id,
+            "chapter_name"=>$chval->chapter_name,
+            "chapter_no"=>$chval->chapter_no,
+            "chapter_image"=>asset($chval->chapter_image));
+            }
+            
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch data.',
+                'chapter_data'=>$chapers,
+            ], 200, [], JSON_NUMERIC_CHECK);
+        }catch(\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+        
+        
+
+    }
+
+    //topic videos
+    public function topic_videos(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'subject_id' => 'required',
+            'chapter_id' => 'required',
+            'institute_id' => 'required',
+            'video_cayegory'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        try{
+            $user_id = $request->user_id;
+            $subject_id = $request->subject_id;
+            $chapter_id = $request->chapter_id;
+            $institute_id = $request->institute_id;
+            $video_cayegory = $request->video_cayegory;
+
+            $topics = [];
+            $topicqry = Topic_model::join('subject','subject.id','=','topic.subject_id')
+            ->join('chapters','chapters.id','=','topic.chapter_id')
+            ->where('topic.subject_id',$subject_id)
+            ->where('topic.chapter_id',$chapter_id)
+            ->where('topic.institute_id',$institute_id)
+            ->where('topic.video_category_id',$video_cayegory)
+            ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
+
+            foreach($topicqry as $topval){
+            $topics[] = array( "id"=>$topval->id,
+            "topic_no"=>$topval->topic_no,
+            "topic_name"=>$topval->topic_name,
+            "topic_video"=>asset($topval->topic_video),
+            "subject_id"=>$topval->subject_id,
+            "subject_name"=>$topval->sname,
+            "chapter_id"=>$topval->chapter_id,
+            "chapter_name"=>$topval->chname);
+            }
+            
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch data.',
+                'topic_data'=>$topics,
+            ], 200, [], JSON_NUMERIC_CHECK);
+        }catch(\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+        
+        
+
     }
 }
