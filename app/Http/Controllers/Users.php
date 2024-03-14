@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Redirect;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Str;
+use Tymon\JWTAuth\Facades\JWTAuth;
+
+
 
 class Users extends Controller
 {
@@ -71,7 +74,12 @@ class Users extends Controller
             'password' => Hash::make($request->password),
             'role_type' =>$request->role_type,
         ]);
+        $token = JWTAuth::fromUser($subAdmin);
 
+        User::where('email', $request->email)
+            ->update([
+                'token' => $token
+            ]);
         return Redirect::route('admin.create')->with('success', 'profile-created');
     }
 
