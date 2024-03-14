@@ -695,9 +695,7 @@ class InstituteApiController extends Controller
                 ];
             }
         
-            $banner_list = Banner_model::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
-                ->get();
+          
         
            
             $board_array[] = [
@@ -706,8 +704,12 @@ class InstituteApiController extends Controller
                 'medium' => $medium_array,
                 // Include banner_array inside board_array
             ];
+         
 
         }
+        $banner_list = Banner_model::where('user_id', $user_id)
+        ->where('institute_id', $institute_id)
+        ->get();
          $banner_array = [];
             foreach ($banner_list as $value) {
                 $banner_array[] = [
