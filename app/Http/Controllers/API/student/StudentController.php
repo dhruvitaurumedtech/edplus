@@ -101,6 +101,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address'=>$value->address,
+                    'logo'=>$value->logo,
                     'status'=>$value->sstatus,
                 );
             }
@@ -118,6 +119,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name.'('.$value->unique_id.')',
                     'address'=>$value->address,
+                    'logo'=>$value->logo,
                 );
             }
 
@@ -261,6 +263,7 @@ class StudentController extends Controller
             $institutedetaa = array('id'=>$institutedeta->id,
             'institute_name'=>$institutedeta->institute_name,
             'address'=>$institutedeta->address,
+            'logo'=>$institutedeta->logo,
             'boards'=>$boards,
             'students'=>$stdcount,
             'subject'=>$subcount,
