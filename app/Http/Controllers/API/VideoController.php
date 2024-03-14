@@ -12,7 +12,7 @@ use Illuminate\Http\Request;
 class VideoController extends Controller
 {
     public function upload_video(Request $request){
-       
+        
         $validator = \Validator::make($request->all(), [
             'base_table_id'=>'required',
             'user_id'=>'required',
@@ -27,10 +27,11 @@ class VideoController extends Controller
         ]);
         
         if ($validator->fails()) {
-            return response()->json(['error' => $validator->errors()], 400);
+            return response()->json(['success' => 400,
+            'message' => 'Upload Fail','error' => $validator->errors()], 400);
         }
        
-        if ($request->hasFile('topic_video')) {
+        if ($request->hasFile('topic_video') && $request->file('topic_video')->isValid()) {
             $videoPath = $request->file('topic_video')->store('videos', 'public');
             //$topic->update(['topic_video' => $videoPath]);
         }
@@ -49,7 +50,7 @@ class VideoController extends Controller
         
         
 
-        return response()->json(['message' => 'Topic and video uploaded successfully', 'topic' => $topic]);
+        return response()->json(['success' => 200,'message' => 'Topic and video uploaded successfully', 'topic' => $topic]);
   
     }
 
@@ -69,6 +70,6 @@ class VideoController extends Controller
         foreach($categories as $catvalu){
             $videocat[] = array('id'=>$catvalu->did,'name'=>$catvalu->name,'status'=>$catvalu->status);
         }
-        return response()->json(['message' => 'Video Category List', 'Category' => $videocat]);
+        return response()->json(['success' => 200,'message' => 'Video Category List', 'Category' => $videocat]);
     }
 }
