@@ -569,7 +569,7 @@ class InstituteApiController extends Controller
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-
+            
 
         $existingUser = User::where('token', $token)->first();
         if ($existingUser) {
