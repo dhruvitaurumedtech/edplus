@@ -12,7 +12,6 @@ use Illuminate\Http\Request;
 class VideoController extends Controller
 {
     public function upload_video(Request $request){
-        echo "<pre>";print_r("hi");exit;
         $validator = \Validator::make($request->all(), [
             'base_table_id'=>'required',
             'user_id'=>'required',
