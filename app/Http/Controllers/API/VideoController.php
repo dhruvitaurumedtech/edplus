@@ -43,6 +43,7 @@ class VideoController extends Controller
             'subject_id'=> $request->input('subject_id'),
             'chapter_id' => $request->input('chapter_id'),
             'topic_no' => $request->input('topic_no'),
+            'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id'=>$request->input('video_category_id'),
             'topic_video'=>asset($videoPath) //here add both video and pdf
