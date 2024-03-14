@@ -23,7 +23,7 @@ class VideoController extends Controller
             'topic_no' => 'required',
             'topic_name' => 'required',
             'video_category_id'=>'required',
-            'topic_video' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
+            'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
         ]);
         
         if ($validator->fails()) {
@@ -31,8 +31,8 @@ class VideoController extends Controller
             'message' => 'Upload Fail','error' => $validator->errors()], 400);
         }
        
-        if ($request->hasFile('topic_video') && $request->file('topic_video')->isValid()) {
-            $videoPath = $request->file('topic_video')->store('videos', 'public');
+        if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
+            $videoPath = $request->file('topic_video_pdf')->store('videos', 'public');
             //$topic->update(['topic_video' => $videoPath]);
         }
         $topic = Topic_model::create([
