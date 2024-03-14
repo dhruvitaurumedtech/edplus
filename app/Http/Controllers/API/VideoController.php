@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Dobusinesswith_Model;
+use App\Models\Dobusinesswith_sub;
 use App\Models\Topic_model;
 use App\Models\VideoCategory;
 use Illuminate\Http\Request;
@@ -21,7 +23,7 @@ class VideoController extends Controller
             'topic_no' => 'required',
             'topic_name' => 'required',
             'video_category_id'=>'required',
-            'topic_video' => 'required|mimes:mp4,mov,avi|max:10240', // assuming you want to limit to specific video types and a max size of 10MB
+            'topic_video' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
         ]);
         
         if ($validator->fails()) {
@@ -42,7 +44,7 @@ class VideoController extends Controller
             'topic_no' => $request->input('topic_no'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id'=>$request->input('video_category_id'),
-            'topic_video'=>asset($videoPath)
+            'topic_video'=>asset($videoPath) //here add both video and pdf
         ]);
         
         
@@ -53,10 +55,19 @@ class VideoController extends Controller
 
     //if need video category type
     public function video_category(Request $request){
-        $categories = VideoCategory::where('status','active')->get();
+        $user_id = $request->user_id;
+        $instituteid = $request->institute_id;
+        $categories = Dobusinesswith_sub::join('do_business_with','do_business_with.id','=','do_business_with_sub.do_business_with_id')
+        ->where('do_business_with_sub.user_id',$user_id)
+        ->where('do_business_with_sub.institute_id',$instituteid)
+        ->where('do_business_with.status','active')
+        ->whereNull('do_business_with.deleted_at')
+        ->select('do_business_with.name','do_business_with.id as did','do_business_with.status')
+        ->get();
+        
         $videocat = [];
         foreach($categories as $catvalu){
-            $videocat[] = array('id'=>$catvalu->id,'name'=>$catvalu->name,'status'=>$catvalu->status);
+            $videocat[] = array('id'=>$catvalu->did,'name'=>$catvalu->name,'status'=>$catvalu->status);
         }
         return response()->json(['message' => 'Video Category List', 'Category' => $videocat]);
     }
