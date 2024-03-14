@@ -23,7 +23,7 @@ class VideoController extends Controller
             'topic_no' => 'required',
             'topic_name' => 'required',
             'video_category_id'=>'required',
-            'topic_video' => 'required|mimes:mp4,mov,avi|max:10240', // assuming you want to limit to specific video types and a max size of 10MB
+            'topic_video' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
         ]);
         
         if ($validator->fails()) {
@@ -44,7 +44,7 @@ class VideoController extends Controller
             'topic_no' => $request->input('topic_no'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id'=>$request->input('video_category_id'),
-            'topic_video'=>asset($videoPath)
+            'topic_video'=>asset($videoPath) //here add both video and pdf
         ]);
         
         

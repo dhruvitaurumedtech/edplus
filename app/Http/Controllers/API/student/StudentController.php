@@ -101,7 +101,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address'=>$value->address,
-                    'logo'=>$value->logo,
+                    'logo'=>asset($value->logo),
                     'status'=>$value->sstatus,
                 );
             }
@@ -119,7 +119,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name.'('.$value->unique_id.')',
                     'address'=>$value->address,
-                    'logo'=>$value->logo,
+                    'logo'=>asset($value->logo),
                 );
             }
 
@@ -263,7 +263,7 @@ class StudentController extends Controller
             $institutedetaa = array('id'=>$institutedeta->id,
             'institute_name'=>$institutedeta->institute_name,
             'address'=>$institutedeta->address,
-            'logo'=>$institutedeta->logo,
+            'logo'=>asset($institutedeta->logo),
             'boards'=>$boards,
             'students'=>$stdcount,
             'subject'=>$subcount,
@@ -433,7 +433,9 @@ class StudentController extends Controller
             $video_cayegory = $request->video_cayegory;
 
             $topics = [];
-            $topicqry = Topic_model::join('subject','subject.id','=','topic.subject_id')
+            $topicqry = Topic_model::
+            join('subject','subject.id','=','topic.subject_id')
+            ->join('chapters','chapters.id','=','topic.chapter_id')
             ->join('chapters','chapters.id','=','topic.chapter_id')
             ->where('topic.subject_id',$subject_id)
             ->where('topic.chapter_id',$chapter_id)
