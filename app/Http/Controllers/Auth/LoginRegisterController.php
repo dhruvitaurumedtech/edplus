@@ -8,6 +8,7 @@ use Illuminate\support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\support\Facades\Validator;
 use App\Models\User;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class LoginRegisterController extends Controller
 {
@@ -40,6 +41,13 @@ class LoginRegisterController extends Controller
             'roll'=>$request->roll,
             'password'=>Hash::make($request->password)
         ]);
+
+        $token = JWTAuth::fromUser($user);
+        
+        User::where('email', $request->email)
+            ->update([
+                'token' => $token
+            ]);
 
         return response()->json([
             'status'=>true,
