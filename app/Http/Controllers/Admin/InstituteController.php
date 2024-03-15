@@ -40,66 +40,80 @@ class InstituteController extends Controller
                     ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
                     ->select(
                         'institute_for.name as institute_for_name',
-                        DB::raw('MAX(base_table.id) as id'), // Use ANY_VALUE for non-aggregated columns
-                        'institute_for.id as institute_for_id'
+                        DB::raw('MAX(base_table.id) as id'),    'institute_for.id as institute_for_id'
                     )
                     ->groupBy('institute_for.name', 'base_table.institute_for', 'institute_for.id')
                     ->whereNull('base_table.deleted_at')
                     ->get();
                     // echo "<pre>";print_r($institute_for_array);exit;
-        $board_array = DB::table('base_table')
-                    ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                    ->select('board.name as board_name', 'base_table.id', 'board.id')
-                    ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT id FROM base_table b WHERE b.board = base_table.board ORDER BY b.id LIMIT 1)')
-                    ->get();   
-        $medium_array = Base_table::leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                    ->select('base_table.id',DB::raw('MAX(medium.id) as medium_id'), DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
-                    ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.medium = base_table.medium ORDER BY m.id LIMIT 1)')
-                    ->groupBy('base_table.id')
-                    ->get()
-                    ->toArray();
+        // $board_array = DB::table('base_table')
+        //             ->leftJoin('board', 'board.id', '=', 'base_table.board')
+        //             ->select('board.name as board_name', 'base_table.id', 'board.id')
+        //             ->whereNull('base_table.deleted_at')
+        //             ->whereRaw('base_table.id = (SELECT id FROM base_table b WHERE b.board = base_table.board ORDER BY b.id LIMIT 1)')
+        //             ->get();   
+        // $medium_array = Base_table::leftJoin('medium', 'medium.id', '=', 'base_table.medium')
+        //             ->select('base_table.id',DB::raw('MAX(medium.id) as medium_id'), DB::raw('GROUP_CONCAT(DISTINCT medium.name) as medium_name'))
+        //             ->whereNull('base_table.deleted_at')
+        //             ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.medium = base_table.medium ORDER BY m.id LIMIT 1)')
+        //             ->groupBy('base_table.id')
+        //             ->get()
+        //             ->toArray();
                 
                 
                
-        $class_array =Base_table::leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
-                ->select('base_table.id',DB::raw('MAX(class.id) as class_id'), DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
-                ->whereNull('base_table.deleted_at')
-                ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
-                ->groupBy('base_table.id')
-                ->get()
-                ->toArray();
+        // $class_array =Base_table::leftJoin('class', 'class.id', '=', 'base_table.institute_for_class')
+        //         ->select('base_table.id',DB::raw('MAX(class.id) as class_id'), DB::raw('GROUP_CONCAT(DISTINCT class.name) as class_name'))
+        //         ->whereNull('base_table.deleted_at')
+        //         ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.institute_for_class = base_table.institute_for_class ORDER BY m.id LIMIT 1)')
+        //         ->groupBy('base_table.id')
+        //         ->get()
+        //         ->toArray();
 
-        $standard_array = Base_table::leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                    ->select('base_table.id',DB::raw('MAX(standard.id) as standard_id'), DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
-                    ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.standard = base_table.standard ORDER BY m.id LIMIT 1)')
-                    ->groupBy('base_table.id')
-                    ->get()
-                    ->toArray();
-        $stream_array = Base_table::leftJoin('stream', 'stream.id', '=', 'base_table.stream')
-                    ->select('base_table.id',DB::raw('MAX(stream.id) as stream_id'), DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
-                    ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.stream = base_table.stream ORDER BY m.id LIMIT 1)')
-                    ->groupBy('base_table.id')
-                    ->get()
-                    ->toArray();
+        // $standard_array = Base_table::leftJoin('standard', 'standard.id', '=', 'base_table.standard')
+        //             ->select('base_table.id',DB::raw('MAX(standard.id) as standard_id'), DB::raw('GROUP_CONCAT(DISTINCT standard.name) as standard_name'))
+        //             ->whereNull('base_table.deleted_at')
+        //             ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.standard = base_table.standard ORDER BY m.id LIMIT 1)')
+        //             ->groupBy('base_table.id')
+        //             ->get()
+        //             ->toArray();
+        // $stream_array = Base_table::leftJoin('stream', 'stream.id', '=', 'base_table.stream')
+        //             ->select('base_table.id',DB::raw('MAX(stream.id) as stream_id'), DB::raw('GROUP_CONCAT(DISTINCT stream.name) as stream_name'))
+        //             ->whereNull('base_table.deleted_at')
+        //             ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.stream = base_table.stream ORDER BY m.id LIMIT 1)')
+        //             ->groupBy('base_table.id')
+        //             ->get()
+        //             ->toArray();
 
-        $subject_array = Base_table::leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                    ->select('base_table.id', DB::raw('MAX(subject.base_table_id) as base_table_id'),DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
-                    ->whereNull('base_table.deleted_at')
-                    ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.id = base_table.id ORDER BY m.id LIMIT 1)')
-                    ->groupBy('base_table.id')
-                    ->get()
-                    ->toArray();
+        // $subject_array = Base_table::leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
+        //             ->select('base_table.id', DB::raw('MAX(subject.base_table_id) as base_table_id'),DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_name'))
+        //             ->whereNull('base_table.deleted_at')
+        //             ->whereRaw('base_table.id = (SELECT m.id FROM base_table m WHERE m.id = base_table.id ORDER BY m.id LIMIT 1)')
+        //             ->groupBy('base_table.id')
+        //             ->get()
+        //             ->toArray();
 
-          $do_business_with=Dobusinesswith_Model::get()->toarray();
+        //   $do_business_with=Dobusinesswith_Model::get()->toarray();
                                
          
         // echo "<pre>";print_r($stream_array );exit;
-        return view('institute/create_institute',compact('institute_for_array','board_array','medium_array','class_array',
-                                                         'standard_array','stream_array','subject_array','do_business_with'));
+        // ,'board_array','medium_array','class_array',
+        //                                                  'standard_array','stream_array','subject_array','do_business_with'
+        return view('institute/create_institute',compact('institute_for_array'));
+    }
+    public function get_board(Request $request){
+        $institute_for=Base_table::where('institute_for',$request->input('institute_for_id'))->get()->toarray();
+        $board = [];
+        foreach($institute_for as $value)
+        {
+            $board[] = $value['board'];
+        }
+        $board_list = Board::whereIn('id', $board)
+                    ->select('id','name')
+                    ->get()
+                    ->toArray();
+        return response()->json(['board_list'=>$board_list]);
+        
     }
     public function create_institute_for(){
         $institute_for = Institute_for_model::paginate(10); 

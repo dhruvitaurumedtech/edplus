@@ -193,6 +193,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/banner/update', [BannerController::class, 'update_banner'])->name('banner.update');
     Route::post('/banner/delete', [BannerController::class, 'banner_delete'])->name('banner.delete');
 
+    Route::post('institute/get-board', [InstituteController::class, 'get_board'])->name('institute.get.board');
+
     
 });
 

@@ -60,123 +60,16 @@
                                             <label for="exampleInputEmail1">Institute : </label>
                                             @foreach($institute_for_array as $index => $value)
                                             <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="school_{{ $index }}" name="institute_for_id[]" value="{{ $value->institute_for_id }}">
-                                                <label for="school_{{ $index }}" class="custom-control-label">{{ $value->institute_for_name }}</label>
+                                                <input class="custom-control-input" type="checkbox" id="school_{{$value->institute_for_id}}"  name="institute_for_id[]" value="{{ $value->institute_for_id }}" onchange="handleCheckboxChange(this.id)">
+                                                <label for="school_{{$value->institute_for_id}}" class="custom-control-label">{{ $value->institute_for_name }}</label>
                                             </div>
                                             @endforeach
-
-
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Board : </label>
-                                            @foreach($board_array as $index => $value)
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="board_{{ $index }}" name="institute_board_id[]" value="{{ $value->id }}">
-                                                <label for="board_{{ $index }}" class="custom-control-label">{{ $value->board_name }}</label>
-                                            </div>
-                                            @endforeach
-
-                                            <!-- <div id="otherTextboxboard" style="display: none;">
-                                                <label for="otherText">Board Name:</label>
-                                                <input type="text" id="otherText" placeholder="Board name" name="boardother" class="form-control">
-                                            </div> -->
-                                        </div>
-                                    </div>
-                                    <div class="row">
-                                        <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Medium: </label>
-                                            @foreach($medium_array as $index => $value)
-
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="medium_{{ $index }}" name="institute_medium_id[]" value="{{$value['medium_id']}}">
-                                                <label for="medium_{{ $index }}" class="custom-control-label">{{ $value['medium_name'] }}</label>
-                                            </div>
-                                            @endforeach
+                                        <div id="checkboxContainer"></div>
 
                                         </div>
-                                        <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Class: </label>
-                                            @foreach($class_array as $index => $value)
-
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="class_{{ $index }}" name="institute_for_class_id[]" value="{{$value['class_id']}}">
-                                                <label for="class_{{ $index }}" class="custom-control-label">{{ $value['class_name'] }}</label>
-                                            </div>
-                                            @endforeach
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Standard: </label>
-                                            @foreach($standard_array as $index => $value)
-
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="standard{{ $index }}" name="standard_id[]" value="{{$value['standard_id']}}">
-                                                <label for="standard{{ $index }}" class="custom-control-label">{{ $value['standard_name'] }}</label>
-                                            </div>
-                                            @endforeach
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Subject: </label>
-                                            @php
-                                            $uniqueSubjects = [];
-                                            @endphp
-
-                                            @foreach($subject_array as $subject)
-                                            
-                                            @php
-                                            $subjectNames = explode(',', $subject['subject_name']);
-                                            @endphp
-
-                                            @foreach($subjectNames as $subjectName)
-                                            @php
-                                            $trimmedSubjectName = trim($subjectName);
-                                            @endphp
-
-                                            @if (!in_array($trimmedSubjectName, $uniqueSubjects))
-                                            @php
-                                            $uniqueSubjects[] = $trimmedSubjectName;
-                                            @endphp
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="subject_{{ $loop->parent->index }}_{{ $loop->index }}" name="subject_id[]" value="{{ $subject['base_table_id'] }}">
-                                                <label for="subject_{{ $loop->parent->index }}_{{ $loop->index }}" class="custom-control-label">{{ $trimmedSubjectName }}</label>
-                                            </div>
-                                            @endif
-                                            @endforeach
-                                            @endforeach
-
-
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <?php if (!empty($stream_array)) { ?>
-                                                <label for="exampleInputEmail1">Stream: </label>
-                                            <?php } ?>
-                                            @foreach($stream_array as $index => $value)
-                                            <!-- $subject = explode(',',$value['subject_name']); -->
-
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="stream[]" value="{{$value['stream_id']}}">
-                                                <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['stream_name'] }}</label>
-                                            </div>
-                                            @endforeach
-
-                                        </div>
-                                        <div class="col-md-4">
-                                            <?php if (!empty($do_business_with)) { ?>
-                                                <label for="exampleInputEmail1">Do Business Work: </label>
-                                            <?php } ?>
-                                            @foreach($do_business_with as $index => $value)
-                                            <!-- $subject = explode(',',$value['subject_name']); -->
-
-                                            <div class="custom-control custom-checkbox">
-                                                <input class="custom-control-input" type="checkbox" id="stream_{{ $index }}" name="institute_work_id[]" value="{{$value['id']}}">
-                                                <label for="stream_{{ $index }}" class="custom-control-label">{{ $value['name'] }}</label>
-                                            </div>
-                                            @endforeach
-
-                                        </div>
-
+                                      
                                     </div>
                                 </div>
                                 <div class="card-footer">
@@ -192,5 +85,56 @@
         </div>
     </section>
 </div>
+<script>
+    function handleCheckboxChange(checkboxId) {
+        var checkbox = document.getElementById(checkboxId);
+       
+        if(checkbox.checked)
+        {
+                var checkboxId = checkbox.id;
+                let institute_for_id = checkboxId.replace('school_', '');
+                // alert(institute_for_id);
 
+                axios.post('{{ url('institute/get-board') }}', {
+                        institute_for_id: institute_for_id
+                    })
+                    .then(response => {
+                        var container = document.getElementById('checkboxContainer');
+
+                        var response_data = response.data.board_list;
+                        response_data.forEach(function(value) {
+                        
+                        var checkbox = document.createElement('input');
+                        checkbox.type = 'checkbox';
+                        checkbox.id = value.id;
+                        checkbox.value = value.name;
+                        checkbox.name = 'board[]';
+                        checkbox.className = 'custom-control-input';
+                        checkbox.addEventListener('change', handleCheckboxChange);
+
+                        var label = document.createElement('label');
+                        label.setAttribute('for', 'Board');
+                        label.className = 'custom-control-label';
+                        label.textContent = 'Board';
+
+                        var div = document.createElement('div');
+                        div.className = 'custom-control custom-checkbox';
+
+                        div.appendChild(checkbox);
+                        div.appendChild(label);
+
+                        container.appendChild(div);
+                        });
+                            
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+                }else{
+                    checkbox.style.display = "none";
+
+                }
+       
+     }
+</script>
 @include('layouts/footer')
