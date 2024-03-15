@@ -11,6 +11,6 @@ class Stream_sub extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'stream_sub';
     protected $fillable = [
-        'user_id', 'institute_id', 'stream_id', 'created_at', 'updated_at'
+        'user_id', 'institute_id','institute_for_id','board_id','medium_id','class_id', 'standard_id', 'stream_id', 'created_at', 'updated_at'
     ];
 }

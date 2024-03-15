@@ -430,7 +430,7 @@ class StudentController extends Controller
             $subject_id = $request->subject_id;
             $chapter_id = $request->chapter_id;
             $institute_id = $request->institute_id;
-            $video_cayegory = $request->video_cayegory;
+            //$video_cayegory = $request->video_cayegory;
 
             $topics = [];
             $topicqry = Topic_model::
@@ -440,7 +440,7 @@ class StudentController extends Controller
             ->where('topic.subject_id',$subject_id)
             ->where('topic.chapter_id',$chapter_id)
             ->where('topic.institute_id',$institute_id)
-            ->where('topic.video_category_id',$video_cayegory)
+            //->where('topic.video_category_id',$video_cayegory)
             ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
 
             foreach($topicqry as $topval){

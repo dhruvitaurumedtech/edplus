@@ -367,6 +367,7 @@ class InstituteApiController extends Controller
                 $institute_for_class = $svaluee->institute_for_class;
                 $standard = $svaluee->standard;
                 $stream = $svaluee->stream;
+                
 
                 Institute_for_sub::create([
                     'user_id' => $request->input('user_id'),
@@ -408,16 +409,19 @@ class InstituteApiController extends Controller
                     'standard_id' => $standard,
                 ]);
 
+                if($stream != null){
+                
                 Stream_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
+                    'institute_for_id'=>$institute_for,
                     'board_id' => $board,
                     'medium_id' => $medium,
                     'class_id' => $institute_for_class,
                     'standard_id' => $standard,
                     'stream_id' => $stream,
                 ]);
-
+            }
             }
 
             //end new code
