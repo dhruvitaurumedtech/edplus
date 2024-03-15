@@ -22,7 +22,7 @@ class VideoController extends Controller
             'chapter_id' => 'required',
             'topic_no' => 'required',
             'topic_name' => 'required',
-            'video_category_id'=>'required',
+            'category_id'=>'required',
             // 'topic_video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,application/pdf|max:5242880',
 
             'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
@@ -54,7 +54,7 @@ class VideoController extends Controller
             'topic_no' => $request->input('topic_no'),
             'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
-            'video_category_id'=>$request->input('video_category_id'),
+            'video_category_id'=>$request->input('category_id'),
             'topic_video'=>asset($videoPath) //here add both video and pdf
         ]);
         
