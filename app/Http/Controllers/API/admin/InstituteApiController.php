@@ -769,6 +769,7 @@ class InstituteApiController extends Controller
                 ->join('medium', 'medium_sub.medium_id', '=', 'medium.id')
                 ->select('medium.*')
                 ->where('medium_sub.user_id', $user_id)
+                ->where('medium_sub.board_id', $board_value->id)
                 ->where('medium_sub.institute_id', $institute_id)
                 ->get();
         

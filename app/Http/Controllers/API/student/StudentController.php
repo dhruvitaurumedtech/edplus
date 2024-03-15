@@ -5,6 +5,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Chapter;
+use App\Models\Dobusinesswith_Model;
 use App\Models\Subject_sub;
 use App\Models\Institute_detail;
 use App\Models\Student_detail;
@@ -13,6 +14,7 @@ use App\Models\Subject_model;
 use App\Models\Topic_model;
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\VideoCategory;
 use Illuminate\Broadcasting\Channel;
 
 class StudentController extends Controller
@@ -433,30 +435,39 @@ class StudentController extends Controller
             //$video_cayegory = $request->video_cayegory;
 
             $topics = [];
-            $topicqry = Topic_model::
-            join('subject','subject.id','=','topic.subject_id')
-            ->join('chapters','chapters.id','=','topic.chapter_id')
-            ->where('topic.subject_id',$subject_id)
-            ->where('topic.chapter_id',$chapter_id)
-            ->where('topic.institute_id',$institute_id)
-            //->where('topic.video_category_id',$video_cayegory)
-            ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
-            
-            foreach($topicqry as $topval){
-            $topics[] = array( "id"=>$topval->id,
-            "topic_no"=>$topval->topic_no,
-            "topic_name"=>$topval->topic_name,
-            "topic_video"=>asset($topval->topic_video),
-            "subject_id"=>$topval->subject_id,
-            "subject_name"=>$topval->sname,
-            "chapter_id"=>$topval->chapter_id,
-            "chapter_name"=>$topval->chname);
+            $category = [];
+            $catgry = Dobusinesswith_Model::join('topic','topic.video_category_id','=','do_business_with.id')
+            ->join('video_categories','video_categories.id','=','do_business_with.category_id')->
+            select('do_business_with.*','video_categories.id as vid','video_categories.name as vname')->get();
+            foreach($catgry as $catvd){
+                $topicqry = Topic_model::
+                join('subject','subject.id','=','topic.subject_id')
+                ->join('chapters','chapters.id','=','topic.chapter_id')
+                ->where('topic.subject_id',$subject_id)
+                ->where('topic.chapter_id',$chapter_id)
+                ->where('topic.institute_id',$institute_id)
+                ->where('topic.video_category_id',$catvd->id)
+                ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
+                foreach($topicqry as $topval){
+                    $topics[] = array( "id"=>$topval->id,
+                    "topic_no"=>$topval->topic_no,
+                    "topic_name"=>$topval->topic_name,
+                    "topic_video"=>asset($topval->topic_video),
+                    "subject_id"=>$topval->subject_id,
+                    "subject_name"=>$topval->sname,
+                    "chapter_id"=>$topval->chapter_id,
+                    "chapter_name"=>$topval->chname);
+                    }
+                $category[] = array('id'=>$catvd->id,'category_name'=>$catvd->name,'parent_category_id'=>$catvd->vid,'parent_category_name'=>$catvd->vname,'topics'=>$topics);
             }
+            
+            
+            
             
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'topic_data'=>$topics,
+                'topic_data'=>$category,
             ], 200, [], JSON_NUMERIC_CHECK);
         }catch(\Exception $e) {
             return response()->json([

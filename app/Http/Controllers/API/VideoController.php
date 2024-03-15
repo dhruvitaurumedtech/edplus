@@ -44,6 +44,7 @@ class VideoController extends Controller
             $videoPath = $request->file('topic_video_pdf')->store('videos', 'public');
             //$topic->update(['topic_video' => $videoPath]);
         }
+        
         $topic = Topic_model::create([
             'user_id'=>$request->input('user_id'),
             'institute_id'=>$request->input('institute_id'),
@@ -68,17 +69,20 @@ class VideoController extends Controller
     public function video_category(Request $request){
         $user_id = $request->user_id;
         $instituteid = $request->institute_id;
-        $categories = Dobusinesswith_sub::join('do_business_with','do_business_with.id','=','do_business_with_sub.do_business_with_id')
+        $categories = Dobusinesswith_sub::
+        join('do_business_with','do_business_with.id','=','do_business_with_sub.do_business_with_id')
+        ->join('video_categories','video_categories.id','=','do_business_with.category_id')
         ->where('do_business_with_sub.user_id',$user_id)
         ->where('do_business_with_sub.institute_id',$instituteid)
         ->where('do_business_with.status','active')
         ->whereNull('do_business_with.deleted_at')
-        ->select('do_business_with.name','do_business_with.id as did','do_business_with.status')
+        ->select('do_business_with.name','do_business_with.id as did','do_business_with.status','video_categories.name as cname','video_categories.id as cid')
         ->get();
         
         $videocat = [];
         foreach($categories as $catvalu){
-            $videocat[] = array('id'=>$catvalu->did,'name'=>$catvalu->name,'status'=>$catvalu->status);
+            $videocat[] = array('id'=>$catvalu->did,'name'=>$catvalu->name,
+            'parent_category_id'=>$catvalu->cid,'parent_category_name'=>$catvalu->cname,'status'=>$catvalu->status);
         }
         return response()->json(['success' => 200,'message' => 'Video Category List', 'Category' => $videocat]);
     }
