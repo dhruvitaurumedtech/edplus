@@ -413,7 +413,7 @@ class StudentController extends Controller
             'subject_id' => 'required',
             'chapter_id' => 'required',
             'institute_id' => 'required',
-            'video_cayegory'=>'required',
+            //'video_cayegory'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -436,13 +436,12 @@ class StudentController extends Controller
             $topicqry = Topic_model::
             join('subject','subject.id','=','topic.subject_id')
             ->join('chapters','chapters.id','=','topic.chapter_id')
-            ->join('chapters','chapters.id','=','topic.chapter_id')
             ->where('topic.subject_id',$subject_id)
             ->where('topic.chapter_id',$chapter_id)
             ->where('topic.institute_id',$institute_id)
             //->where('topic.video_category_id',$video_cayegory)
             ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
-
+            
             foreach($topicqry as $topval){
             $topics[] = array( "id"=>$topval->id,
             "topic_no"=>$topval->topic_no,
