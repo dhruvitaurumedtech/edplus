@@ -27,11 +27,11 @@ class VideoController extends Controller
 
             'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
         ]);
+           
+            
         if ($request->hasFile('topic_video')) {
-            // Validate the uploaded file
             $request->validate([
-                'topic_video' => 'required|mimes:mp4,mov,avi|max:5242880', // Adjust the validation rules as needed
-            ]);
+                'topic_video' => 'required|mimes:mp4,mov,avi|max:5242880']);
         }
         if ($validator->fails()) {
             return response()->json(['success' => 400,
