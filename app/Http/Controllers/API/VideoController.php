@@ -23,15 +23,10 @@ class VideoController extends Controller
             'topic_no' => 'required',
             'topic_name' => 'required',
             'video_category_id'=>'required',
-            // 'topic_video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,application/pdf|max:5242880',
-
-            'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
-        ]);
+            'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880',]);
         if ($request->hasFile('topic_video')) {
-            // Validate the uploaded file
             $request->validate([
-                'topic_video' => 'required|mimes:mp4,mov,avi|max:5242880', // Adjust the validation rules as needed
-            ]);
+                'topic_video' => 'required|mimes:mp4,mov,avi|max:5242880']);
         }
         if ($validator->fails()) {
             return response()->json(['success' => 400,
