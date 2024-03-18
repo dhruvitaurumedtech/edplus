@@ -761,7 +761,6 @@ class InstituteApiController extends Controller
             ->select('board.*')
             ->where('board_sub.user_id', $user_id)
             ->where('board_sub.institute_id', $institute_id)
-            ->groupby('board.id')
             ->get();
         
         $board_array = [];
