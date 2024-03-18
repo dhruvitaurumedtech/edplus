@@ -644,7 +644,7 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ], 400);
         }
-            }
+    }
             
     function get_class(Request $request){
         $institute_id = $request->input('institute_id');
@@ -761,6 +761,7 @@ class InstituteApiController extends Controller
             ->select('board.*')
             ->where('board_sub.user_id', $user_id)
             ->where('board_sub.institute_id', $institute_id)
+            ->groupby('board.id')
             ->get();
         
         $board_array = [];
@@ -773,21 +774,22 @@ class InstituteApiController extends Controller
                 ->where('medium_sub.institute_id', $institute_id)
                 ->get();
         
-            $medium_array = [];
+            //$medium_array = [];
             foreach ($medium_list as $medium_value) {
                 $medium_array[] = [
                     'id' => $medium_value->id,
                     'medium_name' => $medium_value->name,
                 ];
+                    
+                $board_array[] = [
+                    'id' => $board_value->id,
+                    'board_name' => $board_value->name,
+                    'medium' => $medium_array,
+                    
+                    // Include banner_array inside board_array
+                ];
+            
             }
-           
-            $board_array[] = [
-                'id' => $board_value->id,
-                'board_name' => $board_value->name,
-                'medium' => $medium_array,
-                // Include banner_array inside board_array
-            ];
-
         }
         $banner_list = Banner_model::where('user_id', $user_id)
         ->where('institute_id', $institute_id)
@@ -801,6 +803,8 @@ class InstituteApiController extends Controller
                 ];
             }
        
+            //announcement
+            $announcement = [];
         $response = [
             'banner'=>$banner_array,
             'board'=>$board_array,
@@ -817,6 +821,8 @@ class InstituteApiController extends Controller
      public function get_homescreen_second(Request $request){
         $institute_id = $request->input('institute_id');
         $user_id = $request->input('user_id');
+        $board_id = $request->input('board_id');
+        $medium_id = $request->input('medium_id');
 
         $token = $request->header('Authorization');
 
@@ -837,15 +843,26 @@ class InstituteApiController extends Controller
             ->select('standard.*')
             ->where('standard_sub.user_id', $user_id)
             ->where('standard_sub.institute_id', $institute_id)
+            ->where('standard_sub.board_id', $board_id)
+            ->where('standard_sub.medium_id', $medium_id)
             ->get();
             // print_r($standard_list);exit;
+            
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
+
+            $getbsiqy = Base_table::where('board',$board_id)
+            ->where('medium',$medium_id)
+            ->where('standard',$standard_value->id)
+            ->pluck('id')
+            ->toArray();
+            
             $subject_list = DB::table('subject_sub')
                 ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
                 ->select('subject.*')
                 ->where('subject_sub.user_id', $user_id)
                 ->where('subject_sub.institute_id', $institute_id)
+                ->whereIN('subject.base_table_id',$getbsiqy)
                 ->get();
         
             $subject_array = [];

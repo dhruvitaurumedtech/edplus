@@ -23,16 +23,31 @@ class VideoController extends Controller
             'topic_no' => 'required',
             'topic_name' => 'required',
             'category_id'=>'required',
+            'parent_category_id'=>'required',
             // 'topic_video' => 'required|file|mimetypes:video/mp4,video/quicktime,video/x-msvideo,application/pdf|max:5242880',
 
-            'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
+            //'topic_video_pdf' => 'required|mimes:mp4,mov,avi,pdf|max:5242880', // assuming you want to limit to specific video types and a max size of 10MB
         ]);
-           
-            
-        if ($request->hasFile('topic_video')) {
+        
+         $check = Dobusinesswith_Model::where('id',$request->category_id)->select('category_id')->first(); 
+         //print_r('gfg');exit; 
+         if($check->category_id == $request->parent_category_id)  
+         {
+            if($request->parent_category_id == '1'){
+                $extension = 'required|mimes:mp4,mov,avi|max:5242880';
+            }else{
+                $extension = 'required|mimes:pdf|max:5242880';
+            }
+         }else{
+            return response()->json(['success' => 400,
+            'message' => 'Please Select Currect'], 400);
+         }
+         
+        if ($request->hasFile('topic_video_pdf')) {
             $request->validate([
-                'topic_video' => 'required|mimes:mp4,mov,avi|max:5242880']);
+                'topic_video_pdf' => $extension]);
         }
+        
         if ($validator->fails()) {
             return response()->json(['success' => 400,
             'message' => 'Upload Fail','error' => $validator->errors()], 400);
