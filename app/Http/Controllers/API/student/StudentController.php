@@ -435,7 +435,7 @@ class StudentController extends Controller
             //$video_cayegory = $request->video_cayegory;
 
             $topics = [];
-            $category = [];
+            $category = []; 
             $catgry = Dobusinesswith_Model::join('topic','topic.video_category_id','=','do_business_with.id')
             ->join('video_categories','video_categories.id','=','do_business_with.category_id')->
             select('do_business_with.*','video_categories.id as vid','video_categories.name as vname')->get();
