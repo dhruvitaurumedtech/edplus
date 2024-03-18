@@ -26,6 +26,7 @@ use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
+use PHPUnit\Framework\Attributes\Medium;
 
 class InstituteApiController extends Controller
 {
@@ -756,39 +757,41 @@ class InstituteApiController extends Controller
                 $institute_id=Institute_detail::where('user_id',$user_id)->select('id')->first();
             }
             // Institute_detail::where();
-            $board_list = DB::table('board_sub')
-            ->join('board', 'board_sub.board_id', '=', 'board.id')
-            ->select('board.*')
-            ->where('board_sub.user_id', $user_id)
-            ->where('board_sub.institute_id', $institute_id)
+            $boarids = Institute_board_sub::where('user_id', $user_id)
+            ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+            $uniqueBoardIds = array_unique($boarids);
+           
+            $board_list = DB::table('board')
+            ->whereIN('id', $uniqueBoardIds)
             ->get();
         
         $board_array = [];
         foreach ($board_list as $board_value) {
-            $medium_list = DB::table('medium_sub')
-                ->join('medium', 'medium_sub.medium_id', '=', 'medium.id')
-                ->select('medium.*')
-                ->where('medium_sub.user_id', $user_id)
-                ->where('medium_sub.board_id', $board_value->id)
-                ->where('medium_sub.institute_id', $institute_id)
-                ->get();
-        
-            //$medium_array = [];
+
+            $medium_sublist = DB::table('medium_sub')
+                ->where('user_id', $user_id)
+                ->where('board_id', $board_value->id)
+                ->where('institute_id', $institute_id)
+                ->pluck('medium_id')->toArray();
+                $uniquemediumds = array_unique($medium_sublist);
+                
+            $medium_list = Medium_model::whereIN('id',$uniquemediumds)->get();
+            
+            $medium_array = [];
             foreach ($medium_list as $medium_value) {
                 $medium_array[] = [
                     'id' => $medium_value->id,
                     'medium_name' => $medium_value->name,
                 ];
-                    
-                $board_array[] = [
-                    'id' => $board_value->id,
-                    'board_name' => $board_value->name,
-                    'medium' => $medium_array,
-                    
-                    // Include banner_array inside board_array
-                ];
             
             }
+            $board_array[] = [
+                'id' => $board_value->id,
+                'board_name' => $board_value->name,
+                'medium' => $medium_array,
+                
+                // Include banner_array inside board_array
+            ];
         }
         $banner_list = Banner_model::where('user_id', $user_id)
         ->where('institute_id', $institute_id)
