@@ -24,14 +24,11 @@
             <div class="row">
                 <!-- left column -->
                 <div class="col-md-12">
-                    <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Create Banner</h3>
                         </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form method="post" action="{{ url('banner/save') }}" enctype="multipart/form-data">
+                      <form method="post" action="{{ url('banner/save') }}" enctype="multipart/form-data">
                             @csrf
                             <div class="card-body">
                                 <div class="form-group">
@@ -41,9 +38,9 @@
                                             <label for="exampleInputEmail1">Select Institute  : </label>
                                             <select name="institute_id" class="form-control">
                                                 <option value="">Select option</option>
-                                                 @foreach($institute_list as $value)
-                                                   <option value="{{$value->id}}">{{$value->institute_name}}</option>
-                                                 @endforeach
+                                                @foreach($institute_list as $value)
+                                                <option value="{{$value->id}}">{{$value->institute_name}}</option>
+                                                @endforeach
                                             </select>
                                             @error('banner_image')
                                                 <div class="text-danger">{{ $message }}</div>

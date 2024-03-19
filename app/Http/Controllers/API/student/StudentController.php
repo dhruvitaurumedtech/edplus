@@ -515,8 +515,7 @@ class StudentController extends Controller
                 $token = substr($token, 7);
             }
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
             if ($existingUser) {
 
             $user_id = $request->user_id;
