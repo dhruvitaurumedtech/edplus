@@ -389,7 +389,7 @@ class StudentController extends Controller
             Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
-            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','marks'=>'40/50');
+            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45');
             $subdta = Student_detail::where('student_id',$user_id)
             ->where('institute_id',$institute_id)->select('students_details.*')->first();
             
