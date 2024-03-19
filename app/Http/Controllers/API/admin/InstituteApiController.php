@@ -819,6 +819,11 @@ class InstituteApiController extends Controller
                         // 'banner' => $banner_array,
                         'data' => $response,
                     ], 200);
+                }else{
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Invalid token.',
+                    ], 400);  
                 }
      }
     
@@ -890,7 +895,14 @@ class InstituteApiController extends Controller
             'data' => $standard_array,
         ], 200);
     
-    }
+    }else{
+       
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);  
+        }
+    
    }
 }
 
