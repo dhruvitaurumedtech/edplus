@@ -836,6 +836,7 @@ class InstituteApiController extends Controller
 
 
         $existingUser = User::where('token', $token)->where('id',$request->input('user_id'))->first();
+        // echo "<pre>";print_r($existingUser);exit;
         if ($existingUser) {
             if(empty($institute_id))
             {
