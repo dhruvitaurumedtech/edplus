@@ -93,12 +93,13 @@ class StudentController extends Controller
             
             //requested institute
             $requestnstitute =Student_detail::join('institute_detail','institute_detail.id','=','students_details.institute_id')->
-            where('students_details.status','!=','approved')
+            where('students_details.status','!=','1')
             ->where('students_details.student_id',$user_id)
             ->select('institute_detail.*','students_details.status as sstatus','students_details.student_id')->paginate($perPage);
            
             $requested_institute = [];
             foreach ($requestnstitute as $value) {
+
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
@@ -112,7 +113,7 @@ class StudentController extends Controller
             $joininstitute =Institute_detail::where('status','active') ->whereIn('id', function($query) use ($user_id) {
                 $query->select('institute_id')
               ->where('student_id', $user_id)
-              ->where('status','=', 'approved')
+              ->where('status','=', '1')
               ->from('students_details');
             })->paginate($perPage);
             $join_with = [];
@@ -148,6 +149,7 @@ class StudentController extends Controller
             ], 500);
         }
     }
+    
 
     public function student_searchhistory_add(Request $request){
 
@@ -166,6 +168,16 @@ class StudentController extends Controller
         }
 
         try {
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+
+        $existingUser = User::where('token', $token)->first();
+        if ($existingUser) {
+        
         $search_add = Search_history::create([
             'user_id' => $request->input('user_id'),
             'title' => $request->input('title'),
@@ -176,7 +188,12 @@ class StudentController extends Controller
             'success' => 200,
             'message' => 'Serach History Added',
         ], 200);
-
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 500,
@@ -188,6 +205,7 @@ class StudentController extends Controller
 
     public function student_add_institute_request(Request $request){
         
+
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'institute_id' => 'required|string',
@@ -203,6 +221,15 @@ class StudentController extends Controller
         }
         
         try {
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+
+        $existingUser = User::where('token', $token)->first();
+        if ($existingUser) {
         $instituteid = $request->institute_id;
         $getsid = Student_detail::where('student_id',$request->user_id)
         ->where('institute_id',$instituteid)->first();
@@ -215,7 +242,7 @@ class StudentController extends Controller
             'user_id' => $getuid->user_id,
             'institute_id' => $request->input('institute_id'),
             'student_id' => $request->input('user_id'),
-            'status' => 'pending',
+            'status' => '0',
         ]);
 
         }
@@ -224,7 +251,12 @@ class StudentController extends Controller
             'success' => 200,
             'message' => 'Request added successfully',
         ], 200);
-
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 500,
@@ -251,6 +283,16 @@ class StudentController extends Controller
         }
 
         try{
+            $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer') === 0) {
+                $token = substr($token, 7);
+            }
+
+
+            $existingUser = User::where('token', $token)->first();
+            if ($existingUser) {
+
             $institute_id = $request->institute_id;
             $institute_data = [];
             $boards = [];
@@ -278,6 +320,12 @@ class StudentController extends Controller
                 'message' => 'Successfully fetch data.',
                 'institute_data'=>$institutedetaa,
             ], 200, [], JSON_NUMERIC_CHECK);
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }    
         }catch(\Exception $e) {
             return response()->json([
                 'success' => 500,
@@ -306,6 +354,16 @@ class StudentController extends Controller
         }
 
         try{
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+
+        $existingUser = User::where('token', $token)->first();
+        if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
             
@@ -326,9 +384,13 @@ class StudentController extends Controller
             }
             
             $todays_lecture = [];
+            $todays_lecture[] = array('subject'=>'Chemistry','teacher'=>'Dianne Russell','time'=>'03:30 To 05:00 PM');
             $announcement = [];
+            $announcement = array('title'=>'Rescheduled Lecture','desc'=>"Dear Students,Please be informed that today's Mathematics class has been rescheduled from 5:30 pm to 7:00 pm. Kindly make a note of this timing change to ensure you attend the session promptly.
+            Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
-            
+            $result = [];
+            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024');
             $subdta = Student_detail::where('student_id',$user_id)
             ->where('institute_id',$institute_id)->select('students_details.*')->first();
             
@@ -338,10 +400,10 @@ class StudentController extends Controller
             }
             $studentdata = array(
             'banners_data'=> $banners_data,
-            'todays_lecture'=>"",
-            'announcement'=>"",
+            'todays_lecture'=>$todays_lecture,
+            'announcement'=>$announcement,
             'subjects'=>$subjects,
-            'result'=>"");
+            'result'=>$result);
 
             
             return response()->json([
@@ -349,6 +411,12 @@ class StudentController extends Controller
                 'message' => 'Successfully fetch data.',
                 'data'=>$studentdata,
             ], 200, [], JSON_NUMERIC_CHECK);
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }     
         }catch(\Exception $e) {
             return response()->json([
                 'success' => 500,
@@ -356,8 +424,6 @@ class StudentController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-        
-        
 
     }
 
@@ -378,6 +444,15 @@ class StudentController extends Controller
         }
 
         try{
+            $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+
+        $existingUser = User::where('token', $token)->first();
+        if ($existingUser) {
             $user_id = $request->user_id;
             $subject_id = $request->subject_id;
             
@@ -396,6 +471,12 @@ class StudentController extends Controller
                 'message' => 'Successfully fetch data.',
                 'chapter_data'=>$chapers,
             ], 200, [], JSON_NUMERIC_CHECK);
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
         }catch(\Exception $e) {
             return response()->json([
                 'success' => 500,
@@ -428,6 +509,16 @@ class StudentController extends Controller
         }
 
         try{
+            $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+
+            $existingUser = User::where('token', $token)->first();
+            if ($existingUser) {
+
             $user_id = $request->user_id;
             $subject_id = $request->subject_id;
             $chapter_id = $request->chapter_id;
@@ -469,6 +560,12 @@ class StudentController extends Controller
                 'message' => 'Successfully fetch data.',
                 'topic_data'=>$category,
             ], 200, [], JSON_NUMERIC_CHECK);
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
         }catch(\Exception $e) {
             return response()->json([
                 'success' => 500,
