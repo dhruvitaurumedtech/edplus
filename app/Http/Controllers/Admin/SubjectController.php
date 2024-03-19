@@ -67,11 +67,12 @@ class SubjectController extends Controller
     
     $base_table_id = $base_table->id;
     
-    foreach ($request->input('subject') as $subject) {
+    foreach ($request->input('subject') as $i=>$subject) {
         //print_r($base_table_id);exit;
         Subject_model::create([
             'base_table_id' => $base_table_id,
             'name' => $subject,
+            'image' => $subject->subject_image[$i],
             'status' => 'active',
             'created_by' => Auth::id(),
         ]);

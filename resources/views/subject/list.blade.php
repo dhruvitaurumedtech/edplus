@@ -115,13 +115,16 @@
                                                 </label>
                                                     
                                                 <input type="text" name="subject[]" id="subject" class="form-control" placeholder="Enter Subject Name">
+                                                <input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image">
+
                                                 <a class="btn btn-success" id="delete">
                                                     <i class="fas fa-trash"></i>
                                                 </a>   
                                                 @error('subject')
                                                     <div class="text-danger">{{ $message }}</div>
                                                 @enderror
-                                            </div>    
+                                            </div> 
+                                              
                                         </div>
 
                                         <div class="col-md-6">
@@ -308,7 +311,7 @@ $(document).ready(function(){
     if(x < maxFields){ 
       x++; // Increment field counter
       // Add input field
-      $(container).append('<input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>');
+      $(container).append('<input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>');
     } else{
       alert('Maximum '+maxFields+' input fields allowed.'); // Alert when maximum is reached
     }

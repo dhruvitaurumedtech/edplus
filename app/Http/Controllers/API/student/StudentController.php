@@ -396,7 +396,7 @@ class StudentController extends Controller
             
             $subjecqy = Subject_model::whereIN('id',explode(",",$subdta->subject_id))->get();
             foreach($subjecqy as $subjcdt){
-                $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name);
+                $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
             }
             $studentdata = array(
             'banners_data'=> $banners_data,
