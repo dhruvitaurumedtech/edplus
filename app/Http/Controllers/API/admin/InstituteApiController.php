@@ -902,7 +902,7 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ], 400);  
         }
-    }
+    
    }
 }
 
