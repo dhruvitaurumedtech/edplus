@@ -32,28 +32,45 @@ class BannerController extends Controller
             'banner_image.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'status' => 'required',
         ]);
-        
         $bannerImages = [];
         if ($request->hasFile('banner_image')) {
             foreach ($request->file('banner_image') as $file) {
+              
                 $imagePath = $file->store('banner_image', 'public');
                 $bannerImages[] = $imagePath;
             }
         }
-        if(!empty($request->input('institute_id'))){
-          $institute_id = $request->input('institute_id');
-        }else{
-            $institute_id = '';
-           
-        }   
-        foreach ($bannerImages as $imagePath) {
-            Banner_model::create([
-                'user_id' => Auth::user()->id,
-                'institute_id'=>$institute_id,
-                'banner_image' => $imagePath,
-                'url'=>$request->input('url'),
-                'status' => $request->input('status'),
-            ]);
+       
+            if(!empty($request->input('institute_id'))){
+                $institute_id = $request->input('institute_id');
+            }else{
+                $institute_id = '';
+            
+            } 
+        
+            if(auth::user()->role_type=='3'){
+            foreach ($bannerImages as $imagePath) {
+                $banner_id=Banner_model::create([
+                    'user_id' => Auth::user()->id,
+                    'institute_id'=>$institute_id,
+                    'url'=>$request->input('url'),
+                    'banner_image' => $imagePath,
+                    'status' => $request->input('status'),
+                    
+                ]);
+            }
+        }
+            
+            if(auth::user()->role_type=='1'){
+                foreach ($bannerImages as $imagePath) {
+                   
+                $banner_id=Banner_model::create([
+                    'user_id' => Auth::user()->id,
+                    'banner_image' => $imagePath,
+                    'status' => $request->input('status'),
+                ]);
+              }
+            
         }
 
     return redirect()->route('banner.list')->with('success', 'Banner Created Successfully');
@@ -62,6 +79,7 @@ class BannerController extends Controller
     function edit_banner(Request $request){
         $id = $request->input('banner_id');
         $banner_list = Banner_model::find($id);
+        
         return response()->json(['banner_list'=>$banner_list]);
     }
     function update_banner(Request $request){
