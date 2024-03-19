@@ -352,7 +352,7 @@ class InstituteApiController extends Controller
                 'address' => $request->input('address'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
-                'status' => 'inactive'
+                'status' => 'active'
             ]);
             $lastInsertedId = $instituteDetail->id;
             $institute_name = $instituteDetail->institute_name;
@@ -657,7 +657,8 @@ class InstituteApiController extends Controller
         }
             
 
-        $existingUser = User::where('token', $token)->first();
+        $existingUser = User::where('token', $token)->where('id',$request->input('user_id'))->first();
+
         if ($existingUser) {
       
             $classlist = DB::table('class')
@@ -750,7 +751,8 @@ class InstituteApiController extends Controller
         }
 
 
-        $existingUser = User::where('token', $token)->first();
+        $existingUser = User::where('token', $token)->where('id',$request->input('user_id'))->first();
+
         if ($existingUser) {
             if(empty($institute_id))
             {
@@ -833,7 +835,7 @@ class InstituteApiController extends Controller
         }
 
 
-        $existingUser = User::where('token', $token)->first();
+        $existingUser = User::where('token', $token)->where('id',$request->input('user_id'))->first();
         if ($existingUser) {
             if(empty($institute_id))
             {
@@ -883,7 +885,7 @@ class InstituteApiController extends Controller
         }
         return response()->json([
             'success' => 200,
-            'message' => 'Fetch Board successfully',
+            'message' => 'Fetch Standard successfully',
             'data' => $standard_array,
         ], 200);
     
