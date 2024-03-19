@@ -46,7 +46,7 @@ class StudentController extends Controller
         $user_id = $request->user_id;
         $search_keyword = $request->search;
         $perPage = $request->input('per_page', 10);
-        $existingUser = User::where('token', $token)->first();
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
 
             //banner
@@ -174,8 +174,8 @@ class StudentController extends Controller
             $token = substr($token, 7);
         }
 
-
-        $existingUser = User::where('token', $token)->first();
+        $user_id = $request->input('user_id');
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
         
         $search_add = Search_history::create([
@@ -227,8 +227,8 @@ class StudentController extends Controller
             $token = substr($token, 7);
         }
 
-
-        $existingUser = User::where('token', $token)->first();
+        $user_id = $request->input('user_id');
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
         $instituteid = $request->institute_id;
         $getsid = Student_detail::where('student_id',$request->user_id)
@@ -289,8 +289,8 @@ class StudentController extends Controller
                 $token = substr($token, 7);
             }
 
-
-            $existingUser = User::where('token', $token)->first();
+            $user_id = $request->input('user_id');
+            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
             if ($existingUser) {
 
             $institute_id = $request->institute_id;
@@ -361,8 +361,8 @@ class StudentController extends Controller
             $token = substr($token, 7);
         }
 
-
-        $existingUser = User::where('token', $token)->first();
+        $user_id = $request->input('user_id');
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
@@ -450,8 +450,8 @@ class StudentController extends Controller
             $token = substr($token, 7);
         }
 
-
-        $existingUser = User::where('token', $token)->first();
+        $user_id = $request->input('user_id');
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $user_id = $request->user_id;
             $subject_id = $request->subject_id;
