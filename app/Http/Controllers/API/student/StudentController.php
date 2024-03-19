@@ -93,12 +93,13 @@ class StudentController extends Controller
             
             //requested institute
             $requestnstitute =Student_detail::join('institute_detail','institute_detail.id','=','students_details.institute_id')->
-            where('students_details.status','!=','approved')
+            where('students_details.status','!=','1')
             ->where('students_details.student_id',$user_id)
             ->select('institute_detail.*','students_details.status as sstatus','students_details.student_id')->paginate($perPage);
            
             $requested_institute = [];
             foreach ($requestnstitute as $value) {
+
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
@@ -112,7 +113,7 @@ class StudentController extends Controller
             $joininstitute =Institute_detail::where('status','active') ->whereIn('id', function($query) use ($user_id) {
                 $query->select('institute_id')
               ->where('student_id', $user_id)
-              ->where('status','=', 'approved')
+              ->where('status','=', '1')
               ->from('students_details');
             })->paginate($perPage);
             $join_with = [];
@@ -241,7 +242,7 @@ class StudentController extends Controller
             'user_id' => $getuid->user_id,
             'institute_id' => $request->input('institute_id'),
             'student_id' => $request->input('user_id'),
-            'status' => 'pending',
+            'status' => '0',
         ]);
 
         }
@@ -284,7 +285,7 @@ class StudentController extends Controller
         try{
             $token = $request->header('Authorization');
 
-            if (strpos($token, 'Bearer ') === 0) {
+            if (strpos($token, 'Bearer') === 0) {
                 $token = substr($token, 7);
             }
 
@@ -389,7 +390,7 @@ class StudentController extends Controller
             Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
-            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024','class');
+            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024');
             $subdta = Student_detail::where('student_id',$user_id)
             ->where('institute_id',$institute_id)->select('students_details.*')->first();
             
@@ -423,8 +424,6 @@ class StudentController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
-        
-        
 
     }
 

@@ -266,9 +266,10 @@
                                         <div class="col-md-4">
                                             <label for="exampleInputEmail1">status : </label>
                                             <select class="form-control" name="status" id="status">
-                                                  <option value="pending">Pending</option>
-                                                  <option value="denied">Denied</option>
-                                                  <option value="approved">Approved</option>
+                                                  <option value="0">Pending</option>
+                                                  <option value="1">Approved</option>
+                                                  <option value="2">Denied</option>
+                                                  
                                             </select>
                                             @error('status')
                                                 <div class="text-danger">{{ $message }}</div>
