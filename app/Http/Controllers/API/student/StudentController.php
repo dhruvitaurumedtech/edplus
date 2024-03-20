@@ -84,11 +84,16 @@ class StudentController extends Controller
             $searchhistory = Search_history::where('user_id',$user_id)->paginate($perPage);
             $searchhistory_list = [];
             foreach ($searchhistory as $value) {
-                $searchhistory_list[] = array(
-                    'id' => $value->id,
-                    'user_id' => $value->user_id,
-                    'title'=>$value->title,
-                );
+                // Check if the title already exists in the $searchhistory_list array
+                $existingTitles = array_column($searchhistory_list, 'title');
+                if (!in_array($value->title, $existingTitles)) {
+                    // Add the value to the $searchhistory_list array if the title is unique
+                    $searchhistory_list[] = [
+                        'id' => $value->id,
+                        'user_id' => $value->user_id,
+                        'title' => $value->title,
+                    ];
+                }
             }
             
             //requested institute
@@ -139,13 +144,14 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
+                'data'=>[]
             ], 400);
         }
         }catch (\Exception $e) {
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
     }
@@ -163,7 +169,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -198,7 +204,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
     }
@@ -216,7 +222,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
         
@@ -261,7 +267,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
     }
@@ -278,7 +284,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -318,7 +324,7 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'institute_data'=>$institutedetaa,
+                'data'=>array('institute_data'=>$institutedetaa),
             ], 200, [], JSON_NUMERIC_CHECK);
         }else {
             return response()->json([
@@ -330,7 +336,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
         
@@ -349,7 +355,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -390,7 +396,7 @@ class StudentController extends Controller
             Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
-            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024');
+            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024','class_highest'=>'48');
             $subdta = Student_detail::where('student_id',$user_id)
             ->where('institute_id',$institute_id)->select('students_details.*')->first();
             
@@ -398,6 +404,7 @@ class StudentController extends Controller
             foreach($subjecqy as $subjcdt){
                 $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
             }
+
             $studentdata = array(
             'banners_data'=> $banners_data,
             'todays_lecture'=>$todays_lecture,
@@ -421,7 +428,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
 
@@ -439,7 +446,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -469,7 +476,7 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'chapter_data'=>$chapers,
+                'data'=>$chapers,
             ], 200, [], JSON_NUMERIC_CHECK);
             }else {
                 return response()->json([
@@ -481,7 +488,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
         
@@ -504,7 +511,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -557,7 +564,7 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'topic_data'=>$category,
+                'data'=>$category,
             ], 200, [], JSON_NUMERIC_CHECK);
             }else {
                 return response()->json([
@@ -569,7 +576,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 500,
                 'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
+                'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
         

@@ -67,16 +67,30 @@ class SubjectController extends Controller
     
     $base_table_id = $base_table->id;
     
-    foreach ($request->input('subject') as $i=>$subject) {
-        //print_r($base_table_id);exit;
-        Subject_model::create([
-            'base_table_id' => $base_table_id,
-            'name' => $subject,
-            'image' => $subject->subject_image[$i],
-            'status' => 'active',
-            'created_by' => Auth::id(),
-        ]);
+    $subjects = $request->input('subject');
+    $subject_images = $request->file('subject_image');
+    // print_r($subject_images = $request->file('subject_image'));exit;
+    if ($subjects && $subject_images) {
+        foreach ($subjects as $i => $subject) {
+            if (isset($subject_images[$i])) {
+                $subject_image = $subject_images[$i];
+                $name = $subject_image->getClientOriginalName();
+                $subject_image->move(public_path() . '/subject/', $name);
+                Subject_model::create([
+                    'base_table_id' => $base_table_id,
+                    'name' => $subject,
+                    'image' => '/subject/' . $name, 
+                    'status' => 'active',
+                    'created_by' => Auth::id(),
+                ]);
+            } else {
+               
+            }
+        }
+    } else {
+        
     }
+
 
     return redirect()->route('subject.list')->with('success', 'Subject Created Successfully');
     }

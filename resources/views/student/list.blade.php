@@ -275,7 +275,7 @@
                                                 <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
-
+                                      <input type="text" name="note" id="note" >
                                     </div>
 
                                 </div>
