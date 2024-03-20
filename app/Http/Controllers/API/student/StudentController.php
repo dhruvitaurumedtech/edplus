@@ -536,7 +536,7 @@ class StudentController extends Controller
             $catgry = Dobusinesswith_Model::join('topic','topic.video_category_id','=','do_business_with.id')
                                           ->join('video_categories','video_categories.id','=','do_business_with.category_id')
                                           ->select('do_business_with.*','video_categories.id as vid','video_categories.name as vname')
-                                          ->groupBy('do_business_with.name', 'do_business_with.id')
+                                          ->groupBy('do_business_with.name', 'do_business_with.id','video_categories.id', 'video_categories.name')
                                           ->get();
             //  echo "<pre>";print_r($catgry);exit;
 
