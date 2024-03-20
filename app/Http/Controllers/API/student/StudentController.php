@@ -544,9 +544,7 @@ class StudentController extends Controller
                 ->where('topic.chapter_id',$chapter_id)
                 ->where('topic.institute_id',$institute_id)
                 ->where('topic.video_category_id',$catvd->id)
-                ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')
-                ->groupBy('topic.topic_video', 'topic.id', 'subject.name', 'chapters.chapter_name') 
-                ->get();
+                ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
                 foreach($topicqry as $topval){
                     $topics[] = array( "id"=>$topval->id,
                     "topic_no"=>$topval->topic_no,
