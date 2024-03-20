@@ -533,11 +533,15 @@ class StudentController extends Controller
 
             $topics = [];
             $category = []; 
-            $catgry = Dobusinesswith_Model::join('topic','topic.video_category_id','=','do_business_with.id')
-                                          ->join('video_categories','video_categories.id','=','do_business_with.category_id')
-                                          ->select('do_business_with.*','video_categories.id as vid','video_categories.name as vname')
-                                          ->groupBy('do_business_with.name', 'do_business_with.id','video_categories.id', 'video_categories.name')
-                                          ->get();
+             $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+                                                ->select('do_business_with.id', 'do_business_with.name', 'video_categories.id as vid', 'video_categories.name as vname')
+                                                ->whereIn('do_business_with.id', function($query) {
+                                                    $query->select('topic.video_category_id')
+                                                        ->from('topic')
+                                                        ->groupBy('topic.video_category_id');
+                                                })
+                                                ->get();
+
             //  echo "<pre>";print_r($catgry);exit;
 
             foreach($catgry as $catvd){
@@ -546,7 +550,7 @@ class StudentController extends Controller
                 ->where('topic.subject_id',$subject_id)
                 ->where('topic.chapter_id',$chapter_id)
                 ->where('topic.institute_id',$institute_id)
-                ->where('topic.video_category_id',$catvd->vid)
+                    ->where('topic.video_category_id',$catvd->vid)
                 ->select('topic.*','subject.name as sname','chapters.chapter_name as chname')->get();
                 foreach($topicqry as $topval){
                     $topics[] = array( "id"=>$topval->id,
@@ -558,7 +562,7 @@ class StudentController extends Controller
                     "chapter_id"=>$topval->chapter_id,
                     "chapter_name"=>$topval->chname);
                     }
-                $category[] = array('id'=>$catvd->id,'category_name'=>$catvd->name,'parent_category_id'=>$catvd->vid,'parent_category_name'=>$catvd->vname,'topics'=>$topics);
+                $category[$catvd->name] = array('id'=>$catvd->id,'category_name'=>$catvd->name,'parent_category_id'=>$catvd->vid,'parent_category_name'=>$catvd->vname,'topics'=>$topics);
             }
             
             
