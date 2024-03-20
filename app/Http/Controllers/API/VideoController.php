@@ -29,6 +29,7 @@ class VideoController extends Controller
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
 
         if ($check->category_id == $request->parent_category_id) {
+            
             if ($request->parent_category_id == '1') {
                 $extension = 'mp4,mov,avi';
             } else {
