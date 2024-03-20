@@ -460,10 +460,10 @@ class StudentController extends Controller
             $cptquy = Chapter::where('subject_id',$subject_id)->get();
             foreach($cptquy as $chval){
             $chapers[] = array( "id"=>$chval->id,
-            "subject_id"=>$chval->subject_id,
-            "chapter_name"=>$chval->chapter_name,
-            "chapter_no"=>$chval->chapter_no,
-            "chapter_image"=>asset($chval->chapter_image));
+                "subject_id"=>$chval->subject_id,
+                "chapter_name"=>$chval->chapter_name,
+                "chapter_no"=>$chval->chapter_no,
+                "chapter_image"=>asset($chval->chapter_image));
             }
             
             return response()->json([
