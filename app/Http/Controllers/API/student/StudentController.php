@@ -627,4 +627,29 @@ class StudentController extends Controller
             ]);
         }
     }
+    public function get_reject_request(Request $request){
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+        if ($existingUser) {
+            $response=Student_detail::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+            $reject_list = Student_detail::find($response->id);
+            $data=$reject_list->update(['status'=>'2']);
+            if(!empty($data)){
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully Reject Request.',
+                ], 200, [], JSON_NUMERIC_CHECK);
+            }
+        }else{
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);  
+        }
+    }
 }
