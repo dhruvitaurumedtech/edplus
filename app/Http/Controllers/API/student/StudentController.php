@@ -669,8 +669,8 @@ class StudentController extends Controller
         $user_id= $request->user_id;
         $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
         if ($existingUser) {
-            $response=User::where('id',$request->student_id)->first();
-            if($response){
+            $user_list=User::where('id',$request->student_id)->first();
+            if($user_list){
                 $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
                                ->where('institute_for_sub.institute_id',$institute_id)
                                ->where('institute_for_sub.user_id',$user_id)
@@ -755,12 +755,12 @@ class StudentController extends Controller
                 $reject_list = Student_detail::find($response->id);
                 $data=$reject_list->update(['status'=>'1']);
                 $response_data = [
-                    'first_name'=>$response->firstname,
-                    'last_name'=>$response->lastname,
-                    'date_of_birth'=>date('d-m-Y', strtotime($response->dob)),
-                    'address'=>$response->address,
-                    'email'=>$response->email,
-                    'mobile_no'=>$response->mobile,
+                    'first_name'=>$user_list->firstname,
+                    'last_name'=>$user_list->lastname,
+                    'date_of_birth'=>date('d-m-Y', strtotime($user_list->dob)),
+                    'address'=>$user_list->address,
+                    'email'=>$user_list->email,
+                    'mobile_no'=>$user_list->mobile,
                     'institute_for'=>$institute_for_list,
                     'board'=>$board_list,
                     'medium'=>$medium_list,
