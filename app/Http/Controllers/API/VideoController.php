@@ -68,7 +68,7 @@ class VideoController extends Controller
             'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id' => $request->input('category_id'),
-            'topic_video' => isset($videoPath) ? asset($videoPath) : null // Add video path if uploaded
+            'topic_video' => isset($videoPath) ? asset($videoPath) : null 
         ]);
 
         return response()->json([

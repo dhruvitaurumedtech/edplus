@@ -64,3 +64,4 @@ Route::post('/institute/get-class', [InstituteApiController::class, 'get_class']
 
 Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first'])->name('reset.password.get');
 Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second'])->name('reset.password.get');
+Route::post('/institute/get-request-list', [StudentController::class, 'get_request_list'])->name('request_list.get');

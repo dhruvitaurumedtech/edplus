@@ -564,10 +564,7 @@ class StudentController extends Controller
                     }
                 $category[$catvd->name] = array('id'=>$catvd->id,'category_name'=>$catvd->name,'parent_category_id'=>$catvd->vid,'parent_category_name'=>$catvd->vname,'topics'=>$topics);
             }
-            
-            
-            
-            
+        
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
@@ -589,5 +586,45 @@ class StudentController extends Controller
         
         
 
+    }
+    public function get_request_list(Request $request){
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+        if ($existingUser) {
+        $institute_id = $request->institute_id;
+        $request_list=Student_detail::where('institute_id',$institute_id)->where('status','0')->get()->toarray();
+        foreach($request_list as $value){
+              $user_data=User::where('id',$value['student_id'])->get()->toarray();
+              $response = [];
+              foreach($user_data as $value2){
+                  if(!empty($value2->image)){
+                    $image = asset($value2->image);
+                  }else{
+                    $image = asset('default.jpg');
+                  } 
+                  $response[] = [
+                    'student_id'=>$value2['id'],
+                    'name'=>$value2['firstname'].' '.$value2['lastname'],
+                    'photo'=>$image
+                  ];
+              }         
+              return response()->json([
+                'status' => 200,
+                'message' => 'Fetch student request list.',
+                'data'=>$response,
+            ], 200, [], JSON_NUMERIC_CHECK);
+         }
+        }
+        else{
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
     }
 }
