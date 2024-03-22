@@ -191,12 +191,14 @@ class InstituteApiController extends Controller
                                                 ->get();
                                                 
                                                     $subject = [];
+                                                    $stream= [];
                                                     foreach ($subject_array as $value) {
                                                         $subject[] = [
                                                             'subject_id' =>$value->id,
                                                             'subject' => $value->name
                                                         ];
                                                     }
+                                                    
                                                     if(!empty($stream_array_value->stream_id)){
                                                         $stream[] = [
                                                             'stream_id'=>$stream_array_value->stream_id.'',
