@@ -67,6 +67,7 @@ Route::post('/institute/get-class', [InstituteApiController::class, 'get_class']
 
 Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first'])->name('reset.password.get');
 Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second'])->name('reset.password.get');
-Route::post('/institute/get-request-list', [StudentController::class, 'get_request_list'])->name('request_list.get');
-Route::post('/institute/get-reject-request', [StudentController::class, 'get_reject_request'])->name('reject.request_list.get');
-Route::post('/institute/add-student', [StudentController::class, 'add_student'])->name('add_student');
+Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
+Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.request_list.get');
+Route::post('/institute/fetch_student_detail', [InstituteApiController::class, 'fetch_student_detail'])->name('fetch_student_detail');
+Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
