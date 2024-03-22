@@ -155,7 +155,7 @@ class InstituteApiController extends Controller
                                         foreach ($standard_array as $standard_array_value) {
 
                                             $stream_array = DB::table('base_table')
-                                            ->Join('stream', 'stream.id', '=', 'base_table.stream')
+                                            ->leftJoin('stream', 'stream.id', '=', 'base_table.stream')
                                             ->select('stream.name as stream_name','base_table.id','stream.id as stream_id')
                                             ->whereNull('base_table.deleted_at')
                                             ->where('base_table.standard',$standard_array_value->id)

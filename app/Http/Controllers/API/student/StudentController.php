@@ -653,8 +653,6 @@ class StudentController extends Controller
                 'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
-        
-        
 
     }
 
