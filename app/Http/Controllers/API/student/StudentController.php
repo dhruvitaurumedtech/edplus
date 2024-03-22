@@ -138,6 +138,16 @@ class StudentController extends Controller
                 );
             }
 
+            $parentsdt = Parents::where('student_id',$user_id)->get();
+            $veryfy = [];
+            foreach($parentsdt as $checkvery){
+                $veryfy[]= array('relation'=>$checkvery->relation,'verify'=>$checkvery->verify);
+            }
+            if(!empty($parentsdt)){
+                $studentparents = '1';
+            }else{
+                $studentparents = '0';
+            }
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
@@ -145,7 +155,9 @@ class StudentController extends Controller
                 'search_list' => $search_list,
                 'searchhistory_list'=>$searchhistory_list,
                 'requested_institute'=>$requested_institute,
-                'join_with' => $join_with),
+                'join_with' => $join_with,
+                'parents_detail'=>$studentparents,
+                'parents_verification'=>$veryfy),
             ], 200, [], JSON_NUMERIC_CHECK);
         } else {
             return response()->json([
@@ -219,9 +231,14 @@ class StudentController extends Controller
     public function student_patents_details_add(Request $request){
 
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
+            'user_id' => 'required|exists:users,id',
+            'parents.*.firstname' => 'required',
+            'parents.*.lastname' => 'required',
+            'parents.*.email' => 'required|email|unique:users,email',
+            'parents.*.mobile' => 'required',
+            'parents.*.relation' => 'required',
         ]);
-
+        
         if ($validator->fails()) {
             $errorMessages = array_values($validator->errors()->all());
             return response()->json([
@@ -241,28 +258,32 @@ class StudentController extends Controller
         $student_id = $request->input('user_id');
         $existingUser = User::where('token', $token)->where('id', $student_id)->first();
         if ($existingUser) {
-            
-            foreach($request->email as $i=>$email){
-                $parentsadd = User::create([
-                    'firstname' => $request->firstname,
-                    'lastname' => $request->lastname,
-                    'email' => $email,
-                    'mobile'=>$request->mobile,
+            // Iterate over each parent in the request
+            $parents = json_decode($request->parents, true);
+            foreach ($parents as $parentData) {
+                // Create a user for each parent
+                $user = User::create([
+                    'firstname' => $parentData['firstname'],
+                    'lastname' => $parentData['lastname'],
+                    'email' => $parentData['email'],
+                    'mobile' => $parentData['mobile'],
+                    'role_type'=>'5'
                 ]);
-
-                $lastid = $parentsadd->id;
-                $parentstable = Parents::create([
+    
+                // Retrieve the ID of the newly created user
+                $userId = $user->id;
+    
+                // Create a parent record associated with the user
+                Parents::create([
                     'student_id' => $student_id,
-                    'parent_id' => $lastid,
-                    'relation' => $request->relation,
-                    'verify'=>'0',
+                    'parent_id' => $userId,
+                    'relation' => $parentData['relation'],
+                    'verify' => '0',
                 ]);
             }
-
-        return response()->json([
-            'success' => 200,
-            'message' => 'Parents added successfully',
-        ], 200);
+    
+            return response()->json(['success' => 200,'message' => 'Parent details uploaded successfully','data'=>[]], 200);
+        
         }else {
             return response()->json([
                 'status' => 400,
@@ -707,16 +728,27 @@ class StudentController extends Controller
             ->join('medium','medium.id','=','students_details.medium_id')
             ->where('students_details.student_id', $user_id)
             ->where('students_details.status','=', '1')->select('standard.name as standard','medium.name as medium')->first();
+            //parents
+            $parentsQY = Parents::join('users','parents.parent_id','=','users.id')
+            ->where('parents.student_id',$user_id)->get();
+            $parents_dt = [];
+            foreach($parentsQY as $parentsDT){
+            $parents_dt[] = array('name'=>$parentsDT->firstname.''.$parentsDT->lastname,
+                                'email'=>$parentsDT->email,
+                                'mobile'=>$parentsDT->mobile);
+            }
             //
             $userdetail = array('id'=>$existingUser->id,
             'unique_id'=>$existingUser->unique_id,
             'name'=>$existingUser->firstname.' '.$existingUser->lastname,
             'dob'=>$existingUser->dob,
             'address'=>$existingUser->address,
-            'standard'=>$sdtls ? $sdtls->standard : null,
-            'medium'=>$sdtls ? $sdtls->medium : null,
-            'school'=>"",
-            'institutes'=>$institutes);
+            'standard'=>$sdtls ? $sdtls->standard : '',
+            'medium'=>$sdtls ? $sdtls->medium : '',
+            'school'=>$existingUser->school_name,
+            'area'=>$existingUser->area,
+            'institutes'=>$institutes,
+            'parents'=>$parents_dt);
         
             return response()->json([
                 'status' => 200,
@@ -739,7 +771,7 @@ class StudentController extends Controller
         
     }
 
-    public function profile_profile(Request $request){
+    public function student_edit_profile(Request $request){
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
         ]);
@@ -759,26 +791,24 @@ class StudentController extends Controller
             if (strpos($token, 'Bearer ') === 0) {
                 $token = substr($token, 7);
             }
-
+            $user_id = $request->user_id;
             $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
             if ($existingUser) {
-            //    $updt = User::where('id', $user_id)
-            //    ->update('firstname'=>$request->firstname,
-            //     'lastname'=>$request->lastname,
-            //     'email'=>$request->email,
-            //     'mobile'=>$request->mobile,
-            //     'address'=>$request->address,
-            //     'dob'=>$request->dob,
-            //     'school_name'=>$request->school_name,
-            //     'area'=>$request->area);
-               
-            //    foreach($request->parent_firstname as $i=>$parents_details){
-            //     User::create('firstname'=>$parents_details,
-            //     'lastname'=>$parents_details->lastname,
-            //     'email'=>$parents_details->email,
-            //     'mobile'=>$parents_details->mobile,
-            //     'address'=>$parents_details->address);
-            //    }
+               $updt = User::where('id', $user_id)
+               ->update(['firstname'=>$request->firstname,
+                'lastname'=>$request->lastname,
+                //'email'=>$request->email,
+                'mobile'=>$request->mobile,
+                'address'=>$request->address,
+                'dob'=>$request->dob,
+                'school_name'=>$request->school_name,
+                'area'=>$request->area]);
+
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Updated Successfully!',
+                    'data'=>[]
+                ], 200);
 
             }else {
                 return response()->json([
