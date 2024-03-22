@@ -21,6 +21,7 @@ use App\Models\Stream_sub;
 use App\Models\Stream_model;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
+use App\Models\Student_detail;
 use App\Models\User;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
