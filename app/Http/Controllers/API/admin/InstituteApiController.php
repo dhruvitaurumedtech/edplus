@@ -197,7 +197,7 @@ class InstituteApiController extends Controller
                                                             'subject' => $value->name
                                                         ];
                                                     }
-                                                    $stream =[];
+                                                   
                                                     if(!empty($stream_array_value->stream_id)){
                                                         $stream[] = [
                                                             'stream_id'=>$stream_array_value->stream_id.'',
