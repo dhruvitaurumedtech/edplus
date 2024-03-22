@@ -17,12 +17,12 @@ use App\Http\Controllers\API\admin\ExamController;
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
 Route::post('/auth/login', [AuthController::class, 'login']);
-Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post'); 
+Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::group(['middleware' => ['web']], function () {
-//Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
-// Route::get('/auth/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
-Route::get('/auth/reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
-Route::post('/auth/reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
+    //Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+    // Route::get('/auth/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
+    Route::get('/auth/reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
+    Route::post('/auth/reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 });
 Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
 Route::post('/institute/category-list', [VideoController::class, 'video_category'])->name('video_category.get');
@@ -35,7 +35,8 @@ Route::post('/student/subjectwise-chapters-student', [StudentController::class, 
 Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
 Route::post('/student/add-parents-details-student', [StudentController::class, 'student_patents_details_add'])->name('student_patents_details_add.get');
 Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
-Route::post('/student/profile-edit-student', [StudentController::class, 'profile_profile'])->name('profile_profile.get');
+Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
+
 Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
