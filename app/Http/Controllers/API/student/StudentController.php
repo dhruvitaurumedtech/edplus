@@ -8,6 +8,7 @@ use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Subject_sub;
 use App\Models\Institute_detail;
+use App\Models\Parents;
 use App\Models\Student_detail;
 use App\Models\Search_history;
 use App\Models\Subject_model;
@@ -37,7 +38,7 @@ class StudentController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Validation error',
-                'errors' => $errorMessages,
+                'data'=>array('errors' => $errorMessages),
             ], 400);
         }
 
@@ -104,7 +105,6 @@ class StudentController extends Controller
            
             $requested_institute = [];
             foreach ($requestnstitute as $value) {
-
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
@@ -134,11 +134,11 @@ class StudentController extends Controller
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch data.',
-                'banner' => $banners_data,
+                'data'=>array('banner' => $banners_data,
                 'search_list' => $search_list,
                 'searchhistory_list'=>$searchhistory_list,
                 'requested_institute'=>$requested_institute,
-                'join_with' => $join_with,
+                'join_with' => $join_with),
             ], 200, [], JSON_NUMERIC_CHECK);
         } else {
             return response()->json([
@@ -208,7 +208,69 @@ class StudentController extends Controller
             ], 500);
         }
     }
+    //add parents details
+    public function student_patents_details_add(Request $request){
 
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'data'=>array('errors' => $errorMessages),
+            ], 400);
+        }
+        
+        try {
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $student_id = $request->input('user_id');
+        $existingUser = User::where('token', $token)->where('id', $student_id)->first();
+        if ($existingUser) {
+            
+            foreach($request->email as $i=>$email){
+                $parentsadd = User::create([
+                    'firstname' => $request->firstname,
+                    'lastname' => $request->lastname,
+                    'email' => $email,
+                    'mobile'=>$request->mobile,
+                ]);
+
+                $lastid = $parentsadd->id;
+                $parentstable = Parents::create([
+                    'student_id' => $student_id,
+                    'parent_id' => $lastid,
+                    'relation' => $request->relation,
+                    'verify'=>'0',
+                ]);
+            }
+
+        return response()->json([
+            'success' => 200,
+            'message' => 'Parents added successfully',
+        ], 200);
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'data'=>array('error' => $e->getMessage()),
+            ], 500);
+        }
+    
+    }
     public function student_add_institute_request(Request $request){
         
 
@@ -277,6 +339,7 @@ class StudentController extends Controller
 
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required|integer',
+            'user_id'=>'required'
         ]);
 
         if ($validator->fails()) {
@@ -582,5 +645,142 @@ class StudentController extends Controller
         
         
 
+    }
+
+    public function profile_detail(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'data'=>array('errors' => $errorMessages),
+            ], 400);
+        }
+
+        try{
+            $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+            $user_id = $request->user_id;
+            $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+            if ($existingUser->token) {
+            
+            $institutes = [];
+
+            $joininstitute =Institute_detail::where('status','active')->whereIn('id', function($query) use ($user_id) {
+                $query->select('institute_id')
+              ->where('student_id', $user_id)
+              ->where('status','=', '1')
+              ->from('students_details');
+            })->get();
+            
+            foreach ($joininstitute as $value) {
+                $institutes[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name.'('.$value->unique_id.')',
+                    'address'=>$value->address,
+                    'logo'=>asset($value->logo),
+                );
+            }
+
+            //
+           $sdtls =  Student_detail::
+            join('standard','standard.id','=','students_details.standard_id')
+            ->join('medium','medium.id','=','students_details.medium_id')
+            ->where('students_details.student_id', $user_id)
+            ->where('students_details.status','=', '1')->select('standard.name as standard','medium.name as medium')->first();
+            //
+            $userdetail = array('id'=>$existingUser->id,
+            'unique_id'=>$existingUser->unique_id,
+            'name'=>$existingUser->firstname.' '.$existingUser->lastname,
+            'dob'=>$existingUser->dob,
+            'address'=>$existingUser->address,
+            'standard'=>$sdtls ? $sdtls->standard : null,
+            'medium'=>$sdtls ? $sdtls->medium : null,
+            'school'=>"",
+            'institutes'=>$institutes);
+        
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch data.',
+                'data'=>$userdetail,
+            ], 200, [], JSON_NUMERIC_CHECK);
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
+        }catch(\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'data'=>array('error' => $e->getMessage()),
+            ], 500);
+        }
+        
+    }
+
+    public function profile_profile(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+        
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'data'=>array('errors' => $errorMessages),
+            ], 400);
+        }
+
+    try{
+        $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+            $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+            if ($existingUser) {
+            //    $updt = User::where('id', $user_id)
+            //    ->update('firstname'=>$request->firstname,
+            //     'lastname'=>$request->lastname,
+            //     'email'=>$request->email,
+            //     'mobile'=>$request->mobile,
+            //     'address'=>$request->address,
+            //     'dob'=>$request->dob,
+            //     'school_name'=>$request->school_name,
+            //     'area'=>$request->area);
+               
+            //    foreach($request->parent_firstname as $i=>$parents_details){
+            //     User::create('firstname'=>$parents_details,
+            //     'lastname'=>$parents_details->lastname,
+            //     'email'=>$parents_details->email,
+            //     'mobile'=>$parents_details->mobile,
+            //     'address'=>$parents_details->address);
+            //    }
+
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
+    }catch(\Exception $e) {
+        return response()->json([
+            'success' => 500,
+            'message' => 'Something went wrong',
+            'data'=>array('error' => $e->getMessage()),
+        ], 500);
+    }
     }
 }
