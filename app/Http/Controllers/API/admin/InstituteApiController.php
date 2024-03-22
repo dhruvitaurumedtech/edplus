@@ -90,6 +90,7 @@ class InstituteApiController extends Controller
                             $board = [];
                             foreach ($board_array as $board_array_value) {
                                 $mediumsidget = base_table::where('board',$board_array_value->id)
+                                ->where('institute_for',$institute_for_array_value->id)
                                 ->select('medium')
                                 ->groupby('medium')
                                 ->get();
@@ -112,6 +113,8 @@ class InstituteApiController extends Controller
                                 foreach ($medium_array as $medium_array_value) {
 
                                     $classesidget = base_table::where('medium',$medium_array_value->id)
+                                    ->where('board',$board_array_value->id)
+                                    ->where('institute_for',$institute_for_array_value->id)
                                     ->select('institute_for_class')
                                     ->groupby('institute_for_class')
                                     ->get();
@@ -128,6 +131,9 @@ class InstituteApiController extends Controller
                                     foreach ($class_array as $class_array_value) {
 
                                         $standardidget = base_table::where('institute_for_class',$class_array_value->id)
+                                        ->where('medium',$medium_array_value->id)
+                                        ->where('board',$board_array_value->id)
+                                        ->where('institute_for',$institute_for_array_value->id)
                                         ->select('standard','id')
                                         ->get();
                                         $standardids = '';
@@ -159,6 +165,10 @@ class InstituteApiController extends Controller
                                             ->select('stream.name as stream_name','base_table.id','stream.id as stream_id')
                                             ->whereNull('base_table.deleted_at')
                                             ->where('base_table.standard',$standard_array_value->id)
+                                            // ->where('base_table.institute_for_class',$class_array_value->id)
+                                             //->where('base_table.medium',$medium_array_value->id)
+                                             //->where('base_table.board',$board_array_value->id)
+                                            // ->where('base_table.institute_for',$institute_for_array_value->id)
                                             ->get();
                                             $stream = [];
         
@@ -202,8 +212,8 @@ class InstituteApiController extends Controller
                                                             'stream' => $stream_array_value->stream_name.'',
                                                             // 'subject' => $subject_array
                                                         ];
-                                               }
-                                                       $stream =[];
+                                                    }
+                                                      
 
                                             }
                                         

@@ -655,11 +655,9 @@ class StudentController extends Controller
         }
 
     }
-<<<<<<< HEAD
    
-    public function add_student(){
+    
         
-=======
 
     public function profile_detail(Request $request){
         $validator = \Validator::make($request->all(), [
@@ -796,6 +794,7 @@ class StudentController extends Controller
             'data'=>array('error' => $e->getMessage()),
         ], 500);
     }
+}
     public function get_request_list(Request $request){
         $token = $request->header('Authorization');
 
@@ -992,6 +991,5 @@ class StudentController extends Controller
                 'message' => 'Invalid token.',
             ]);  
         }
->>>>>>> cf8194ea6f3324abd08bb9595299f1a0c1dc68b2
     }
 }
