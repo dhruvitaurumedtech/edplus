@@ -21,6 +21,7 @@ use App\Models\Stream_sub;
 use App\Models\Stream_model;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
+use App\Models\Student_detail;
 use App\Models\User;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
@@ -52,26 +53,13 @@ class InstituteApiController extends Controller
             $institute_for_id .= 0;
             
             $institute_for_id = $basinstitute->pluck('institute_for')->toArray();
-            // $institute_for_array = DB::table('base_table')
-            // ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-            // ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
-            // ->whereNull('base_table.deleted_at')
-            // ->groupBy('institute_for.name', 'institute_for.id','base_table.institute_for')
-            // ->get();
-        
+         
             $institute_for_array = DB::table('institute_for')
             ->whereIN('id',$institute_for_id)->get();
 
             $institute_for = [];    
             foreach ($institute_for_array as $institute_for_array_value) {
-                //  $board_array = DB::table('base_table')
-                //     ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                //     ->select('board.name as board_name','base_table.id','base_table.board','board.id as board_id','board.icon')
-                //     ->whereNull('base_table.deleted_at')
-                //     ->where('base_table.institute_for',$institute_for_array_value->id)
-                //     ->get();
-
-                    
+               
                     $onlyboardfrombase = base_table::where('institute_for',$institute_for_array_value->id)
                     ->select('board')
                     ->groupby('board')
@@ -100,13 +88,7 @@ class InstituteApiController extends Controller
                                 }
                                 $mediumids .= 0;
 
-                                // $medium_array = DB::table('base_table')
-                                // ->leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                                // ->select('medium.name as medium_name','base_table.id','medium.id as medium_id','medium.icon')
-                                // ->whereNull('base_table.deleted_at')
-                                // ->where('base_table.board',$board_array_value->id)
-                                // ->get();
-                                $mediumids = $mediumsidget->pluck('medium')->toArray();
+                              $mediumids = $mediumsidget->pluck('medium')->toArray();
                                 $medium_array = Medium_model::whereIN('id',$mediumids)->get();
                                 $medium = [];
                                 
@@ -137,26 +119,15 @@ class InstituteApiController extends Controller
                                         ->select('standard','id')
                                         ->get();
                                         $standardids = '';
-                                        //$baseidsfosubj = '';
                                         foreach($standardidget as $standardidsv){
                                             $standardids .= $standardidsv->standard;
-                                            //$baseidsfosubj .= $standardidsv->id;
-                                        }
+                                         }
                                         $standardids .= 0;
-                                        //$baseidsfosubj .= 0;
-
-                                        //$baseidsfosubj = $standardidget->pluck('id')->toArray();
                                         $standardids = $standardidget->pluck('standard')->toArray();
                                         $standard_array = Standard_model::whereIN('id',$standardids)
                                         ->get();
 
-                                        // $standard_array = DB::table('base_table')
-                                        // ->leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                                        // ->select('standard.name as standard_name','base_table.id','standard.id as standard_id')
-                                        // ->whereNull('base_table.deleted_at')
-                                        // ->where('base_table.institute_for_class',$class_array_value->id)
-                                        // ->get();
-
+                                      
                                         $standard = [];
                                         foreach ($standard_array as $standard_array_value) {
 
@@ -174,13 +145,7 @@ class InstituteApiController extends Controller
         
                                             foreach ($stream_array as $stream_array_value) {
                                                 
-                                                // $subject_array = DB::table('base_table')
-                                                // ->leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                                                // ->select('subject.name as subject_name','subject.id')
-                                                // ->whereNull('base_table.deleted_at')
-                                                // ->where('base_table.id',$standard_array_value->id)
-                                                // ->get();
-                                                
+                                               
                                                 $forsubdidget = base_table::where('institute_for_class',$class_array_value->id)
                                                 ->where('institute_for',$institute_for_array_value->id)
                                                 ->where('standard',$standard_array_value->id)
@@ -206,6 +171,7 @@ class InstituteApiController extends Controller
                                                             'subject' => $value->name
                                                         ];
                                                     }
+                                                    
                                                     if(!empty($stream_array_value->stream_id)){
                                                         $stream[] = [
                                                             'stream_id'=>$stream_array_value->stream_id.'',
@@ -214,6 +180,8 @@ class InstituteApiController extends Controller
                                                         ];
                                                     }
                                                       
+                                                      }
+                                                       
 
                                             }
                                         
@@ -914,5 +882,217 @@ class InstituteApiController extends Controller
         }
     
    }
+   public function get_request_list(Request $request){
+    $token = $request->header('Authorization');
+
+    if (strpos($token, 'Bearer ') === 0) {
+        $token = substr($token, 7);
+    }
+
+    $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+    // echo "<pre>";print_r($existingUser);exit;
+    if ($existingUser) {
+    $institute_id = $request->institute_id;
+    $request_list = Student_detail::where('institute_id', $institute_id)
+                              ->where('status', '0')
+                              ->get()->toarray();
+    if(!empty($request_list)){
+        foreach($request_list as $value){
+            $user_data=User::where('id',$value['student_id'])->get()->toarray();
+            $response = [];
+            foreach($user_data as $value2){
+                if(!empty($value2->image)){
+                  $image = asset($value2->image);
+                }else{
+                  $image = asset('default.jpg');
+                } 
+                $response[] = [
+                  'student_id'=>$value2['id'],
+                  'name'=>$value2['firstname'].' '.$value2['lastname'],
+                  'photo'=>$image
+                ];
+            }         
+            return response()->json([
+              'status' => 200,
+              'message' => 'Fetch student request list.',
+              'data'=>$response,
+          ], 200, [], JSON_NUMERIC_CHECK);
+       }
+      }
+      else{
+        return response()->json([
+            'status' => 400,
+            'message' => 'No data Found.',
+        ]);
+      }
+    }else{
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ]);
+        
+    }
+   
+}
+public function get_reject_request(Request $request){
+    $token = $request->header('Authorization');
+
+    if (strpos($token, 'Bearer ') === 0) {
+        $token = substr($token, 7);
+    }
+
+    $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+    if ($existingUser) {
+        $response=Student_detail::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+        $reject_list = Student_detail::find($response->id);
+        $data=$reject_list->update(['status'=>'2']);
+        if(!empty($data)){
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully Reject Request.',
+            ], 200, [], JSON_NUMERIC_CHECK);
+        }
+    }else{
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ]);  
+    }
+}
+public function fetch_student_detail(Request $request){
+    $token = $request->header('Authorization');
+
+    if (strpos($token, 'Bearer ') === 0) {
+        $token = substr($token, 7);
+    }
+    $institute_id= $request->institute_id;
+    $user_id= $request->user_id;
+    $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+    if ($existingUser) {
+        $user_list=User::where('id',$request->student_id)->first();
+        if($user_list){
+            $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
+                           ->where('institute_for_sub.institute_id',$institute_id)
+                           ->where('institute_for_sub.user_id',$user_id)
+                           ->select('institute_for.*')->get(); 
+           
+            $institute_for_list = [];
+            foreach($institute_for as $value){
+                $institute_for_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }   
+            $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
+                           ->where('board_sub.institute_id',$institute_id)
+                           ->where('board_sub.user_id',$user_id)
+                           ->select('board.*')->get()->toarray();
+            $board_list = [];
+            foreach($board as $value){
+                $board_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+            $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
+                      ->where('medium_sub.institute_id',$institute_id)
+                      ->where('medium_sub.user_id',$user_id)
+                      ->select('medium.*')->get();
+            $medium_list = [];
+            foreach($medium as $value){
+                $medium_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+            $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
+                      ->where('class_sub.institute_id',$institute_id)
+                      ->where('class_sub.user_id',$user_id)
+                      ->select('class.*')->get();
+
+            $class_list = [];
+            foreach($class as $value){
+                $class_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+            $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
+                           ->where('standard_sub.institute_id',$institute_id)
+                           ->where('standard_sub.user_id',$user_id)
+                           ->select('standard.*')->get(); 
+
+            $standard_list = [];
+            foreach($standard as $value){
+                $standard_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+            $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
+                                    ->where('stream_sub.institute_id',$institute_id)
+                                    ->where('stream_sub.user_id',$user_id)
+                                    ->select('stream.*')->get();
+            $stream_list = [];
+            foreach($stream as $value){
+                $stream_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+             $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
+                             ->where('subject_sub.institute_id',$institute_id)
+                             ->where('subject_sub.user_id',$user_id)
+                             ->select('subject.*')->get(); 
+            $subject_list = [];
+            foreach($subject as $value){
+                $subject_list[] = [
+                    'id'=>$value['id'],
+                    'name'=>$value['name'],
+                ];
+            }
+            $response=Student_detail::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+            $reject_list = Student_detail::find($response->id);
+            $data=$reject_list->update(['status'=>'1']);
+            $response_data = [
+                'first_name'=>$user_list->firstname,
+                'last_name'=>$user_list->lastname,
+                'date_of_birth'=>date('d-m-Y', strtotime($user_list->dob)),
+                'address'=>$user_list->address,
+                'email'=>$user_list->email,
+                'mobile_no'=>$user_list->mobile,
+                'institute_for'=>$institute_for_list,
+                'board'=>$board_list,
+                'medium'=>$medium_list,
+                'class_list'=>$class_list,
+                'standard_list'=>$standard_list,
+                'stream_list'=>$stream_list,
+                'subject_list'=>$subject_list
+
+            ];
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully Fetch data.',
+                'data'=> $response_data
+            ], 200, [], JSON_NUMERIC_CHECK);
+        }
+        else{
+            return response()->json([
+                'status' => 400,
+                'message' => 'No Data Found.',
+            ]); 
+        }
+
+    }
+    else{
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ]);  
+    }
+}
+    public function add_student(){
+            
+    }
 }
 
