@@ -29,7 +29,7 @@ return new class extends Migration
             $table->unsignedBigInteger('stream_id')->nullable();
             $table->foreign('stream_id')->references('id')->on('stream');
             $table->string('subject_id')->nullable();
-            $table->enum('status',['pending','denied','approved']);
+            $table->enum('status',['0','1','2']);
             $table->string('note')->nullable();
             $table->integer('created_by')->nullable();
             $table->integer('updated_by')->nullable();
