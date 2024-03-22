@@ -53,26 +53,13 @@ class InstituteApiController extends Controller
             $institute_for_id .= 0;
             
             $institute_for_id = $basinstitute->pluck('institute_for')->toArray();
-            // $institute_for_array = DB::table('base_table')
-            // ->leftJoin('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-            // ->select('institute_for.name as institute_for_name', 'base_table.id', 'institute_for.id as institute_id','institute_for.icon')
-            // ->whereNull('base_table.deleted_at')
-            // ->groupBy('institute_for.name', 'institute_for.id','base_table.institute_for')
-            // ->get();
-        
+         
             $institute_for_array = DB::table('institute_for')
             ->whereIN('id',$institute_for_id)->get();
 
             $institute_for = [];    
             foreach ($institute_for_array as $institute_for_array_value) {
-                //  $board_array = DB::table('base_table')
-                //     ->leftJoin('board', 'board.id', '=', 'base_table.board')
-                //     ->select('board.name as board_name','base_table.id','base_table.board','board.id as board_id','board.icon')
-                //     ->whereNull('base_table.deleted_at')
-                //     ->where('base_table.institute_for',$institute_for_array_value->id)
-                //     ->get();
-
-                    
+               
                     $onlyboardfrombase = base_table::where('institute_for',$institute_for_array_value->id)
                     ->select('board')
                     ->groupby('board')
@@ -100,13 +87,7 @@ class InstituteApiController extends Controller
                                 }
                                 $mediumids .= 0;
 
-                                // $medium_array = DB::table('base_table')
-                                // ->leftJoin('medium', 'medium.id', '=', 'base_table.medium')
-                                // ->select('medium.name as medium_name','base_table.id','medium.id as medium_id','medium.icon')
-                                // ->whereNull('base_table.deleted_at')
-                                // ->where('base_table.board',$board_array_value->id)
-                                // ->get();
-                                $mediumids = $mediumsidget->pluck('medium')->toArray();
+                              $mediumids = $mediumsidget->pluck('medium')->toArray();
                                 $medium_array = Medium_model::whereIN('id',$mediumids)->get();
                                 $medium = [];
                                 
@@ -132,26 +113,15 @@ class InstituteApiController extends Controller
                                         ->select('standard','id')
                                         ->get();
                                         $standardids = '';
-                                        //$baseidsfosubj = '';
                                         foreach($standardidget as $standardidsv){
                                             $standardids .= $standardidsv->standard;
-                                            //$baseidsfosubj .= $standardidsv->id;
-                                        }
+                                         }
                                         $standardids .= 0;
-                                        //$baseidsfosubj .= 0;
-
-                                        //$baseidsfosubj = $standardidget->pluck('id')->toArray();
                                         $standardids = $standardidget->pluck('standard')->toArray();
                                         $standard_array = Standard_model::whereIN('id',$standardids)
                                         ->get();
 
-                                        // $standard_array = DB::table('base_table')
-                                        // ->leftJoin('standard', 'standard.id', '=', 'base_table.standard')
-                                        // ->select('standard.name as standard_name','base_table.id','standard.id as standard_id')
-                                        // ->whereNull('base_table.deleted_at')
-                                        // ->where('base_table.institute_for_class',$class_array_value->id)
-                                        // ->get();
-
+                                      
                                         $standard = [];
                                         foreach ($standard_array as $standard_array_value) {
 
@@ -165,13 +135,7 @@ class InstituteApiController extends Controller
         
                                             foreach ($stream_array as $stream_array_value) {
                                                 
-                                                // $subject_array = DB::table('base_table')
-                                                // ->leftJoin('subject', 'subject.base_table_id', '=', 'base_table.id')
-                                                // ->select('subject.name as subject_name','subject.id')
-                                                // ->whereNull('base_table.deleted_at')
-                                                // ->where('base_table.id',$standard_array_value->id)
-                                                // ->get();
-                                                
+                                               
                                                 $forsubdidget = base_table::where('institute_for_class',$class_array_value->id)
                                                 ->where('institute_for',$institute_for_array_value->id)
                                                 ->where('standard',$standard_array_value->id)
@@ -191,7 +155,6 @@ class InstituteApiController extends Controller
                                                 ->get();
                                                 
                                                     $subject = [];
-                                                    $stream= [];
                                                     foreach ($subject_array as $value) {
                                                         $subject[] = [
                                                             'subject_id' =>$value->id,
