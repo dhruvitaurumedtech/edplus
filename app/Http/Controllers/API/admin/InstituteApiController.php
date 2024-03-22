@@ -22,7 +22,6 @@ use App\Models\Stream_model;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\User;
-use App\Models\Student_detail;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -197,7 +196,6 @@ class InstituteApiController extends Controller
                                                             'subject' => $value->name
                                                         ];
                                                     }
-                                                   
                                                     if(!empty($stream_array_value->stream_id)){
                                                         $stream[] = [
                                                             'stream_id'=>$stream_array_value->stream_id.'',
@@ -205,7 +203,7 @@ class InstituteApiController extends Controller
                                                             // 'subject' => $subject_array
                                                         ];
                                                }
-                                                       
+                                                       $stream =[];
 
                                             }
                                         
@@ -798,8 +796,8 @@ class InstituteApiController extends Controller
             ];
         }
         $banner_list = Banner_model::where('user_id', $user_id)
-                                    ->where('institute_id', $institute_id)
-                                    ->get();
+        ->where('institute_id', $institute_id)
+        ->get();
          $banner_array = [];
             foreach ($banner_list as $value) {
                 $banner_array[] = [
@@ -811,22 +809,22 @@ class InstituteApiController extends Controller
        
             //announcement
             $announcement = [];
-            $response = [
-                'banner'=>$banner_array,
-                'board'=>$board_array,
-            ];
+        $response = [
+            'banner'=>$banner_array,
+            'board'=>$board_array,
+        ];
             return response()->json([
                         'success' => 200,
                         'message' => 'Fetch Board successfully',
                         // 'banner' => $banner_array,
                         'data' => $response,
                     ], 200);
-        }else{
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);  
-        }
+                }else{
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Invalid token.',
+                    ], 400);  
+                }
      }
     
      public function get_homescreen_second(Request $request){
