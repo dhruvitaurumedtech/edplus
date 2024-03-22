@@ -22,6 +22,7 @@ use App\Models\Stream_model;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\User;
+use App\Models\Student_detail;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -913,37 +914,52 @@ class InstituteApiController extends Controller
     }
 
     $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+    // echo "<pre>";print_r($existingUser);exit;
     if ($existingUser) {
     $institute_id = $request->institute_id;
-    $request_list=Student_detail::where('institute_id',$institute_id)->where('status','0')->get()->toarray();
-    foreach($request_list as $value){
-          $user_data=User::where('id',$value['student_id'])->get()->toarray();
-          $response = [];
-          foreach($user_data as $value2){
-              if(!empty($value2->image)){
-                $image = asset($value2->image);
-              }else{
-                $image = asset('default.jpg');
-              } 
-              $response[] = [
-                'student_id'=>$value2['id'],
-                'name'=>$value2['firstname'].' '.$value2['lastname'],
-                'photo'=>$image
-              ];
-          }         
+    $request_list = Student_detail::where('institute_id', $institute_id)
+                              ->where('status', '0')
+                              ->get();
+                            
+    // echo "<pre>";print_r($request_list);exit;
+    
+    
+    if($request_list){
+        foreach($request_list as $value){
+            $user_data=User::where('id',$value['student_id'])->get()->toarray();
+            $response = [];
+            foreach($user_data as $value2){
+                if(!empty($value2->image)){
+                  $image = asset($value2->image);
+                }else{
+                  $image = asset('default.jpg');
+                } 
+                $response[] = [
+                  'student_id'=>$value2['id'],
+                  'name'=>$value2['firstname'].' '.$value2['lastname'],
+                  'photo'=>$image
+                ];
+            }         
+            return response()->json([
+              'status' => 200,
+              'message' => 'Fetch student request list.',
+              'data'=>$response,
+          ], 200, [], JSON_NUMERIC_CHECK);
+       }
+      }
+      else{
           return response()->json([
-            'status' => 200,
-            'message' => 'Fetch student request list.',
-            'data'=>$response,
-        ], 200, [], JSON_NUMERIC_CHECK);
-     }
-    }
-    else{
+              'status' => 400,
+              'message' => 'Invalid token.',
+          ]);
+      }
+    }else{
         return response()->json([
             'status' => 400,
-            'message' => 'Invalid token.',
+            'message' => 'No data Found.',
         ]);
     }
+   
 }
 public function get_reject_request(Request $request){
     $token = $request->header('Authorization');
