@@ -919,12 +919,8 @@ class InstituteApiController extends Controller
     $institute_id = $request->institute_id;
     $request_list = Student_detail::where('institute_id', $institute_id)
                               ->where('status', '0')
-                              ->get();
-                            
-    // echo "<pre>";print_r($request_list);exit;
-    
-    
-    if($request_list){
+                              ->get()->toarray();
+    if(!empty($request_list)){
         foreach($request_list as $value){
             $user_data=User::where('id',$value['student_id'])->get()->toarray();
             $response = [];
@@ -948,16 +944,17 @@ class InstituteApiController extends Controller
        }
       }
       else{
-          return response()->json([
-              'status' => 400,
-              'message' => 'Invalid token.',
-          ]);
-      }
-    }else{
         return response()->json([
             'status' => 400,
             'message' => 'No data Found.',
         ]);
+      }
+    }else{
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ]);
+        
     }
    
 }
