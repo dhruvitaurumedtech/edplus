@@ -796,8 +796,8 @@ class InstituteApiController extends Controller
             ];
         }
         $banner_list = Banner_model::where('user_id', $user_id)
-        ->where('institute_id', $institute_id)
-        ->get();
+                                    ->where('institute_id', $institute_id)
+                                    ->get();
          $banner_array = [];
             foreach ($banner_list as $value) {
                 $banner_array[] = [
@@ -809,22 +809,22 @@ class InstituteApiController extends Controller
        
             //announcement
             $announcement = [];
-        $response = [
-            'banner'=>$banner_array,
-            'board'=>$board_array,
-        ];
+            $response = [
+                'banner'=>$banner_array,
+                'board'=>$board_array,
+            ];
             return response()->json([
                         'success' => 200,
                         'message' => 'Fetch Board successfully',
                         // 'banner' => $banner_array,
                         'data' => $response,
                     ], 200);
-                }else{
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'Invalid token.',
-                    ], 400);  
-                }
+        }else{
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);  
+        }
      }
     
      public function get_homescreen_second(Request $request){

@@ -29,6 +29,7 @@ class VideoController extends Controller
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
 
         if ($check->category_id == $request->parent_category_id) {
+            
             if ($request->parent_category_id == '1') {
                 $extension = 'mp4,mov,avi';
             } else {
@@ -67,7 +68,7 @@ class VideoController extends Controller
             'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id' => $request->input('category_id'),
-            'topic_video' => isset($videoPath) ? asset($videoPath) : null // Add video path if uploaded
+            'topic_video' => isset($videoPath) ? asset($videoPath) : null 
         ]);
 
         return response()->json([
