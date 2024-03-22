@@ -53,6 +53,9 @@ Route::post('/student/institute-detail-student', [StudentController::class, 'ins
 Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
 Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
 Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
+Route::post('/student/add-parents-details-student', [StudentController::class, 'student_patents_details_add'])->name('student_patents_details_add.get');
+Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
+Route::post('/student/profile-edit-student', [StudentController::class, 'profile_profile'])->name('profile_profile.get');
 
 Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
