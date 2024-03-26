@@ -288,18 +288,52 @@ class ExamController extends Controller
                         'standard_id' => $request->standard_id,
                         'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
                         'subject_id' => $request->subject_id,
-                        // ... other attributes
                     ]);
+                } else {
+                    $exam_create = Exam_Model::where('user_id', $request->user_id)
+                        ->where('institute_id', $request->institute_id)
+                        ->where('standard_id', $request->standard_id)
+                        ->where('exam_title', $request->exam_title)
+                        ->where('exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d'))
+                        ->where('start_time', $request->start_time)
+                        ->where('end_time', $request->end_time)
+                        ->get()->toArray();
+                    if (empty($exam_create)) {
+                        Exam_Model::create([
+                            'user_id' => $request->user_id,
+                            'institute_id' => $request->institute_id,
+                            'exam_title' => $request->exam_title,
+                            'total_mark' => $request->total_mark,
+                            'exam_type' => $request->exam_type,
+                            'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
+                            'start_time' => $request->start_time,
+                            'end_time' => $request->end_time,
+                            'institute_for_id' => $request->institute_for_id,
+                            'board_id' => $request->board_id,
+                            'medium_id' => $request->medium_id,
+                            'class_id' => $request->class_id,
+                            'standard_id' => $request->standard_id,
+                            'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
+                            'subject_id' => $request->subject_id,
+                        ]);
+                    }
                 }
+
                 if ($exam_update) {
                     return response()->json([
                         'status' => 200,
                         'message' => 'Successfully Updated Exam.',
                     ], 200, [], JSON_NUMERIC_CHECK);
+                }
+                if (empty($exam_create)) {
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Successfully Inserted Exam.',
+                    ], 200, [], JSON_NUMERIC_CHECK);
                 } else {
                     return response()->json([
                         'status' => 400,
-                        'message' => 'Not inserted.',
+                        'message' => 'Already Created This standard Exam!.',
                     ]);
                 }
             } catch (ValidationException $e) {

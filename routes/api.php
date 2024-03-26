@@ -54,4 +54,4 @@ Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('a
 Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam');
 Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');
 Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
-Route::post('/institute/update-exam', [ExamController::class, 'update_exam'])->name('update_exam');
+Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
