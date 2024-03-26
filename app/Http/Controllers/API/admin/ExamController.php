@@ -26,6 +26,8 @@ class ExamController extends Controller
         if ($existingUser) {
             try {
                 $validatedData = $request->validate([
+                    'user_id' => 'required',
+                    'institute_id' => 'required',
                     'exam_title' => 'required|string|max:255',
                     'total_mark' => 'required|integer',
                     'exam_type' => 'required|string|max:255',
@@ -39,16 +41,19 @@ class ExamController extends Controller
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
-                $exam_data = Exam_Model::where('standard_id', $validatedData['standard_id'])
-                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']))
+                $exam_data = Exam_Model::where('user_id', $validatedData['user_id'])
+                    ->where('institute_id', $validatedData['institute_id'])
+                    ->where('standard_id', $validatedData['standard_id'])
+                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $validatedData['exam_date'])->format('Y-m-d'))
                     ->where('start_time', $validatedData['start_time'])
                     ->where('end_time', $validatedData['end_time'])
-                    ->get()->toarray();
-                echo "<pre>";
-                print_r($exam_data);
-                exit;
+                    ->get()->toArray();
+
+
                 if (empty($exam_data)) {
                     $exam = new Exam_Model;
+                    $exam->user_id = $validatedData['user_id'];
+                    $exam->institute_id = $validatedData['institute_id'];
                     $exam->exam_title = $validatedData['exam_title'];
                     $exam->total_mark = $validatedData['total_mark'];
                     $exam->exam_type = $validatedData['exam_type'];
@@ -77,11 +82,10 @@ class ExamController extends Controller
                 } else {
                     return response()->json([
                         'status' => 400,
-                        'message' => 'Already Exist Exam!.',
+                        'message' => 'Already Created This standard Exam!.',
                     ]);
                 }
             } catch (ValidationException $e) {
-                // Validation failed, return validation errors in JSON format
                 return response()->json(['errors' => $e->validator->errors()->all()], 422);
             }
         } else {
