@@ -10,6 +10,7 @@ use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Subject_sub;
 use App\Models\Class_model;
+use App\Models\Exam_Model;
 use App\Models\Stream_model;
 use App\Models\Standard_model;
 use App\Models\Institute_detail;
@@ -816,6 +817,49 @@ class StudentController extends Controller
                     'message' => 'Invalid token.',
                 ], 400);
             }
+    }catch(\Exception $e) {
+        return response()->json([
+            'success' => 500,
+            'message' => 'Something went wrong',
+            'data'=>array('error' => $e->getMessage()),
+        ], 500);
+    }
+}
+
+public function exams_list(Request $request){
+    $validator = \Validator::make($request->all(), [
+        'user_id' => 'required',
+    ]);
+    
+    if ($validator->fails()) {
+        $errorMessages = array_values($validator->errors()->all());
+        return response()->json([
+            'success' => 400,
+            'message' => 'Validation error',
+            'data'=>array('errors' => $errorMessages),
+        ], 400);
+    }
+
+    try{
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+        if ($existingUser) {
+            $institute_id = $request->institute_id;
+            $student_id = $request->user_id;
+
+            $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$student_id)->first();
+            $exams = Exam_Model::where('');
+
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
     }catch(\Exception $e) {
         return response()->json([
             'success' => 500,
