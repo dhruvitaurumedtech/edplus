@@ -130,6 +130,7 @@ class ExamController extends Controller
                 )
                 ->where('exam.institute_id', $request->institute_id)
                 ->where('exam.user_id', $request->user_id)
+                ->wherenull('exam.deleted_at')
                 ->get()->toarray();
             if (!empty($exam_list)) {
                 $exam_list_array = [];
@@ -177,18 +178,132 @@ class ExamController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $exam_id = $request->input('exam_id');
-            $banner_list = Exam_Model::find($exam_id);
-            if (!$banner_list) {
+            $exam_list = Exam_Model::find($exam_id);
+            if (!$exam_list) {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Exam Not Found.',
                 ], 400);
             } else {
-                $banner_list->delete();
+                $exam_list->delete();
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully Exam Delete.',
                 ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+    }
+    public function edit_exam(Request $request)
+    {
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            $exam_id = $request->input('exam_id');
+            $examlist = Exam_Model::where('id', $exam_id)->get();
+            if (!$examlist) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Exam Not Found.',
+                ], 400);
+            } else {
+                foreach ($examlist as $value) {
+                    $exam_list_array[] = [
+                        'exam_title' => $value->exam_title,
+                        'exam_type' => $value->exam_type,
+                        'exam_date' => $value->exam_date,
+                        'start_time' => $value->start_time,
+                        'end_time' => $value->end_time,
+                        'institute_for' => $value->institute_for_id,
+                        'board' => $value->board_id,
+                        'medium' => $value->medium_id,
+                        'class' => $value->class_id,
+                        'standard' => $value->standard_id,
+                        'stream' => $value->stream_id . '',
+                        'subject' => $value->subject_id,
+                    ];
+                }
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Successfully Fetch Exam',
+                    'data' => $exam_list_array
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+    }
+    public function update_exam(Request $request)
+    {
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            try {
+                $validatedData = $request->validate([
+                    'user_id' => 'required',
+                    'institute_id' => 'required',
+                    'exam_title' => 'required|string|max:255',
+                    'total_mark' => 'required|integer',
+                    'exam_type' => 'required|string|max:255',
+                    'exam_date' => 'required|date',
+                    'start_time' => 'required|date_format:H:i:s',
+                    'end_time' => 'required|date_format:H:i:s|after:start_time',
+                    'institute_for_id' => 'required',
+                    'board_id' => 'required',
+                    'medium_id' => 'required',
+                    'class_id' => 'required',
+                    'standard_id' => 'required',
+                    'subject_id' => 'required',
+                ]);
+                $exam_update = Exam_Model::find($request->exam_id);
+                if ($exam_update) {
+                    $exam_update->update([
+                        'user_id' => $request->user_id,
+                        'institute_id' => $request->institute_id,
+                        'exam_title' => $request->exam_title,
+                        'total_mark' => $request->total_mark,
+                        'exam_type' => $request->exam_type,
+                        'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
+                        'start_time' => $request->start_time,
+                        'end_time' => $request->end_time,
+                        'institute_for_id' => $request->institute_for_id,
+                        'board_id' => $request->board_id,
+                        'medium_id' => $request->medium_id,
+                        'class_id' => $request->class_id,
+                        'standard_id' => $request->standard_id,
+                        'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
+                        'subject_id' => $request->subject_id,
+                        // ... other attributes
+                    ]);
+                }
+                if ($exam_update) {
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Successfully Updated Exam.',
+                    ], 200, [], JSON_NUMERIC_CHECK);
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Not inserted.',
+                    ]);
+                }
+            } catch (ValidationException $e) {
+                return response()->json(['errors' => $e->validator->errors()->all()], 422);
             }
         } else {
             return response()->json([
