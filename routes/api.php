@@ -55,3 +55,4 @@ Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('g
 Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');
 Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
 Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
+Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');

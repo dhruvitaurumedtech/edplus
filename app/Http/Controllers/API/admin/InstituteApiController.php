@@ -967,10 +967,10 @@ class InstituteApiController extends Controller
                     ->select('institute_for.*')->get();
 
                 $institute_for_list = [];
-                foreach ($institute_for as $value) {
+                foreach ($institute_for as $institute_for_value) {
                     $institute_for_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $institute_for_value['id'],
+                        'name' => $institute_for_value['name'],
                     ];
                 }
                 $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
@@ -978,10 +978,10 @@ class InstituteApiController extends Controller
                     ->where('board_sub.user_id', $user_id)
                     ->select('board.*')->get()->toarray();
                 $board_list = [];
-                foreach ($board as $value) {
+                foreach ($board as $board_value) {
                     $board_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $board_value['id'],
+                        'name' => $board_value['name'],
                     ];
                 }
                 $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
@@ -989,10 +989,10 @@ class InstituteApiController extends Controller
                     ->where('medium_sub.user_id', $user_id)
                     ->select('medium.*')->get();
                 $medium_list = [];
-                foreach ($medium as $value) {
+                foreach ($medium as $medium_value) {
                     $medium_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $medium_value['id'],
+                        'name' => $medium_value['name'],
                     ];
                 }
                 $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
@@ -1001,10 +1001,10 @@ class InstituteApiController extends Controller
                     ->select('class.*')->get();
 
                 $class_list = [];
-                foreach ($class as $value) {
+                foreach ($class as $class_value) {
                     $class_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $class_value['id'],
+                        'name' => $class_value['name'],
                     ];
                 }
                 $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
@@ -1013,10 +1013,10 @@ class InstituteApiController extends Controller
                     ->select('standard.*')->get();
 
                 $standard_list = [];
-                foreach ($standard as $value) {
+                foreach ($standard as $standard_value) {
                     $standard_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $standard_value['id'],
+                        'name' => $standard_value['name'],
                     ];
                 }
                 $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
@@ -1024,10 +1024,10 @@ class InstituteApiController extends Controller
                     ->where('stream_sub.user_id', $user_id)
                     ->select('stream.*')->get();
                 $stream_list = [];
-                foreach ($stream as $value) {
+                foreach ($stream as $stream_value) {
                     $stream_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $stream_value['id'],
+                        'name' => $stream_value['name'],
                     ];
                 }
                 $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
@@ -1035,10 +1035,10 @@ class InstituteApiController extends Controller
                     ->where('subject_sub.user_id', $user_id)
                     ->select('subject.*')->get();
                 $subject_list = [];
-                foreach ($subject as $value) {
+                foreach ($subject as $subject_value) {
                     $subject_list[] = [
-                        'id' => $value['id'],
-                        'name' => $value['name'],
+                        'id' => $subject_value['id'],
+                        'name' => $subject_value['name'],
                     ];
                 }
 

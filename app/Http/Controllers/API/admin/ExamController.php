@@ -3,7 +3,14 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\board;
+use App\Models\Class_model;
 use App\Models\Exam_Model;
+use App\Models\Institute_for_model;
+use App\Models\Medium_model;
+use App\Models\Standard_model;
+use App\Models\Stream_model;
+use App\Models\Subject_model;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -344,6 +351,120 @@ class ExamController extends Controller
                 'status' => 400,
                 'message' => 'Invalid token.',
             ], 400);
+        }
+    }
+    public function fetch_exam_form_detail(Request $request)
+    {
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $institute_id = $request->institute_id;
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
+                ->where('institute_for_sub.institute_id', $institute_id)
+                ->where('institute_for_sub.user_id', $user_id)
+                ->select('institute_for.*')->get();
+
+            $institute_for_list = [];
+            foreach ($institute_for as $institute_for_value) {
+                $institute_for_list[] = [
+                    'id' => $institute_for_value['id'],
+                    'name' => $institute_for_value['name'],
+                ];
+            }
+            $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
+                ->where('board_sub.institute_id', $institute_id)
+                ->where('board_sub.user_id', $user_id)
+                ->select('board.*')->get()->toarray();
+            $board_list = [];
+            foreach ($board as $board_value) {
+                $board_list[] = [
+                    'id' => $board_value['id'],
+                    'name' => $board_value['name'],
+                ];
+            }
+            $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
+                ->where('medium_sub.institute_id', $institute_id)
+                ->where('medium_sub.user_id', $user_id)
+                ->select('medium.*')->get();
+            $medium_list = [];
+            foreach ($medium as $medium_value) {
+                $medium_list[] = [
+                    'id' => $medium_value['id'],
+                    'name' => $medium_value['name'],
+                ];
+            }
+            $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
+                ->where('class_sub.institute_id', $institute_id)
+                ->where('class_sub.user_id', $user_id)
+                ->select('class.*')->get();
+
+            $class_list = [];
+            foreach ($class as $class_value) {
+                $class_list[] = [
+                    'id' => $class_value['id'],
+                    'name' => $class_value['name'],
+                ];
+            }
+            $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
+                ->where('standard_sub.institute_id', $institute_id)
+                ->where('standard_sub.user_id', $user_id)
+                ->select('standard.*')->get();
+
+            $standard_list = [];
+            foreach ($standard as $standard_value) {
+                $standard_list[] = [
+                    'id' => $standard_value['id'],
+                    'name' => $standard_value['name'],
+                ];
+            }
+            $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
+                ->where('stream_sub.institute_id', $institute_id)
+                ->where('stream_sub.user_id', $user_id)
+                ->select('stream.*')->get();
+            $stream_list = [];
+            foreach ($stream as $stream_value) {
+                $stream_list[] = [
+                    'id' => $stream_value['id'],
+                    'name' => $stream_value['name'],
+                ];
+            }
+            $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
+                ->where('subject_sub.institute_id', $institute_id)
+                ->where('subject_sub.user_id', $user_id)
+                ->select('subject.*')->get();
+            $subject_list = [];
+            foreach ($subject as $subject_value) {
+                $subject_list[] = [
+                    'id' => $subject_value['id'],
+                    'name' => $subject_value['name'],
+                ];
+            }
+
+            $response_data = [
+                'institute_for' => $institute_for_list,
+                'board' => $board_list,
+                'medium' => $medium_list,
+                'class_list' => $class_list,
+                'standard_list' => $standard_list,
+                'stream_list' => $stream_list,
+                'subject_list' => $subject_list
+
+            ];
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully Fetch data.',
+                'data' => $response_data
+            ], 200, [], JSON_NUMERIC_CHECK);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
         }
     }
 }
