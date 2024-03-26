@@ -51,3 +51,4 @@ Route::post('/institute/fetch_student_detail', [InstituteApiController::class, '
 Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('add_exam');
 Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam');
+Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');

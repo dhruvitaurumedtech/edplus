@@ -164,7 +164,37 @@ class ExamController extends Controller
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
-            ]);
+            ], 400);
+        }
+    }
+    public function delete_exam(Request $request)
+    {
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            $exam_id = $request->input('exam_id');
+            $banner_list = Exam_Model::find($exam_id);
+            if (!$banner_list) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Exam Not Found.',
+                ], 400);
+            } else {
+                $banner_list->delete();
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully Exam Delete.',
+                ], 200);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
         }
     }
 }
