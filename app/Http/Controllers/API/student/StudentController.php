@@ -740,11 +740,11 @@ class StudentController extends Controller
             }
             //
             $userdetail = array('id'=>$existingUser->id,
-            'unique_id'=>$existingUser->unique_id,
+            'unique_id'=>$existingUser->unique_id.'',
             'name'=>$existingUser->firstname.' '.$existingUser->lastname,
             'email'=>$existingUser->email,
-            'mobile'=>$existingUser->mobile,
-            'image'=>$existingUser->image,
+            'mobile'=>$existingUser->mobile.'',
+            'image'=>$existingUser->image.'',
             'dob'=>$existingUser->dob,
             'address'=>$existingUser->address,
             'standard'=>$sdtls ? $sdtls->standard : '',
