@@ -740,8 +740,11 @@ class StudentController extends Controller
             }
             //
             $userdetail = array('id'=>$existingUser->id,
-            'unique_id'=>$existingUser->unique_id,
+            'unique_id'=>$existingUser->unique_id.'',
             'name'=>$existingUser->firstname.' '.$existingUser->lastname,
+            'email'=>$existingUser->email,
+            'mobile'=>$existingUser->mobile.'',
+            'image'=>$existingUser->image.'',
             'dob'=>$existingUser->dob,
             'address'=>$existingUser->address,
             'standard'=>$sdtls ? $sdtls->standard : '',
@@ -829,6 +832,7 @@ class StudentController extends Controller
 public function exams_list(Request $request){
     $validator = \Validator::make($request->all(), [
         'user_id' => 'required',
+        'institute_id'=>'required',
     ]);
     
     if ($validator->fails()) {
@@ -845,15 +849,39 @@ public function exams_list(Request $request){
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-        $user_id = $request->user_id;
+        $institute_id = $request->institute_id;
+        $student_id = $request->user_id;
+
         $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
         if ($existingUser) {
-            $institute_id = $request->institute_id;
-            $student_id = $request->user_id;
-
             $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$student_id)->first();
-            $exams = Exam_Model::where('');
-
+            $subjectIds = explode(',', $stdetail->subject_id);
+            $exams = Exam_Model::join('subject','subject.id','=','exam.subject_id')
+            ->join('standard','standard.id','=','exam.standard_id')
+            ->where('institute_id',$stdetail->institute_id)
+            ->where('exam.board_id',$stdetail->board_id)
+            ->where('exam.medium_id',$stdetail->medium_id)
+            ->where('exam.class_id',$stdetail->class_id)
+            ->where('exam.standard_id',$stdetail->standard_id)
+            ->orWhere('exam.stream_id',$stdetail->stream_id)
+            ->whereIN('exam.subject_id',$subjectIds)
+            ->select('exam.*','subject.name as subject','standard.name as standard')
+            ->get();
+            $examlist = [];
+            foreach($exams as $examsDT){
+                $examlist[] = array('exam_title'=>$examsDT->exam_title,
+                            'total_mark'=>$examsDT->total_mark,
+                            'exam_type'=>$examsDT->exam_type,
+                            'subject'=>$examsDT->subject,
+                            'standard'=>$examsDT->standard,
+                            'date'=>$examsDT->exam_date,
+                            'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
+            }
+            return response()->json([
+                'success' => 200,
+                'message' => 'Exams List',
+                'data'=>$examlist
+            ], 200);
         }else {
             return response()->json([
                 'status' => 400,
