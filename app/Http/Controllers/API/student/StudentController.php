@@ -864,10 +864,12 @@ public function exams_list(Request $request){
             ->where('exam.class_id',$stdetail->class_id)
             ->where('exam.standard_id',$stdetail->standard_id)
             ->orWhere('exam.stream_id',$stdetail->stream_id)
-            ->whereIN('exam.subject_id',$stdetail->subjectIds);
+            ->whereIN('exam.subject_id',$subjectIds)
+            ->select('exam.*','subject.name as subject','standard.name as standard')
+            ->get();
             $examlist = [];
             foreach($exams as $examsDT){
-                $examlist = array('exam_title'=>$examsDT->exam_title,
+                $examlist[] = array('exam_title'=>$examsDT->exam_title,
                             'total_mark'=>$examsDT->total_mark,
                             'exam_type'=>$examsDT->exam_type,
                             'subject'=>$examsDT->subject,
@@ -875,7 +877,11 @@ public function exams_list(Request $request){
                             'date'=>$examsDT->exam_date,
                             'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
-
+            return response()->json([
+                'success' => 200,
+                'message' => 'Exams List',
+                'data'=>$examlist
+            ], 200);
         }else {
             return response()->json([
                 'status' => 400,
