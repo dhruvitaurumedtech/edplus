@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers\API\student;
 use App\Http\Controllers\Controller;
+use App\Mail\WelcomeMail;
 use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Institute_for_model;
-
+use App\Mail\DirectMessage;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Subject_sub;
@@ -263,6 +265,7 @@ class StudentController extends Controller
             $parents = json_decode($request->parents, true);
             foreach ($parents as $parentData) {
                 // Create a user for each parent
+                $tomail = $parentData['email'];
                 $user = User::create([
                     'firstname' => $parentData['firstname'],
                     'lastname' => $parentData['lastname'],
@@ -270,10 +273,10 @@ class StudentController extends Controller
                     'mobile' => $parentData['mobile'],
                     'role_type'=>'5'
                 ]);
-    
+                
                 // Retrieve the ID of the newly created user
                 $userId = $user->id;
-    
+                
                 // Create a parent record associated with the user
                 Parents::create([
                     'student_id' => $student_id,
@@ -281,6 +284,22 @@ class StudentController extends Controller
                     'relation' => $parentData['relation'],
                     'verify' => '0',
                 ]);
+                $messageContent="hi";
+                // Mail::to($tomail)->send('emails.forgot');
+                // Mail::to($tomail)->send(new WelcomeMail());
+                $data = [
+                    'name' => 'John Doe',
+                    'email' => $tomail,
+                    // Add any other data you want to pass to the email
+                ];
+                
+                Mail::to($tomail)->send(new WelcomeMail($data));
+                // Mail::to('recipient@example.com')->send(new WelcomeMail());
+
+                // Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
+                //     $message->to($tomail);
+                //     $message->subject('Reset Password');
+                //   });
             }
     
             return response()->json(['success' => 200,'message' => 'Parent details uploaded successfully','data'=>[]], 200);
@@ -497,10 +516,37 @@ class StudentController extends Controller
                 $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
             }
 
+            //upcoming exams
+            $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$user_id)->first();
+            $subjectIds = explode(',', $stdetail->subject_id);
+            $exams = Exam_Model::join('subject','subject.id','=','exam.subject_id')
+            ->join('standard','standard.id','=','exam.standard_id')
+            ->where('institute_id',$stdetail->institute_id)
+            ->where('exam.board_id',$stdetail->board_id)
+            ->where('exam.medium_id',$stdetail->medium_id)
+            ->where('exam.class_id',$stdetail->class_id)
+            ->where('exam.standard_id',$stdetail->standard_id)
+            ->orWhere('exam.stream_id',$stdetail->stream_id)
+            ->whereIN('exam.subject_id',$subjectIds)
+            ->select('exam.*','subject.name as subject','standard.name as standard')
+            ->orderBy('exam.created_at', 'desc')
+            ->limit(3)
+            ->get();
+            $examlist = [];
+            foreach($exams as $examsDT){
+                $examlist[] = array('exam_title'=>$examsDT->exam_title,
+                            'total_mark'=>$examsDT->total_mark,
+                            'exam_type'=>$examsDT->exam_type,
+                            'subject'=>$examsDT->subject,
+                            'standard'=>$examsDT->standard,
+                            'date'=>$examsDT->exam_date,
+                            'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
+            }
             $studentdata = array(
             'banners_data'=> $banners_data,
             'todays_lecture'=>$todays_lecture,
             'announcement'=>$announcement,
+            'upcoming_exams'=>$examlist,
             'subjects'=>$subjects,
             'result'=>$result);
 
@@ -584,8 +630,6 @@ class StudentController extends Controller
             ], 500);
         }
         
-        
-
     }
 
     //topic videos
@@ -675,9 +719,6 @@ class StudentController extends Controller
                 'data'=>array('error' => $e->getMessage()),
             ], 500); 
         }
-        
-        
-
     }
 
     public function profile_detail(Request $request){
