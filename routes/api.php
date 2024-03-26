@@ -50,3 +50,4 @@ Route::post('/institute/get-reject-request', [InstituteApiController::class, 'ge
 Route::post('/institute/fetch_student_detail', [InstituteApiController::class, 'fetch_student_detail'])->name('fetch_student_detail');
 Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('add_exam');
+Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam');

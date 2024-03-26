@@ -7,7 +7,10 @@ use App\Models\Exam_Model;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
+
+use function PHPSTORM_META\map;
 
 class ExamController extends Controller
 {
@@ -97,33 +100,71 @@ class ExamController extends Controller
     }
 
 
-    public function create()
+    public function get_exam(Request $request)
     {
-        //
-    }
+        $token = $request->header('Authorization');
 
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $user_id = $request->user_id;
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            $exam_list = DB::table('exam')
+                ->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
+                ->leftJoin('board', 'board.id', '=', 'exam.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
+                ->leftJoin('class', 'class.id', '=', 'exam.class_id')
+                ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
+                ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
+                ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                ->select(
+                    'institute_for.name as institute_for_name',
+                    'board.name as board_name',
+                    'medium.name as medium_name',
+                    'class.name as class_name',
+                    'standard.name as standard_name',
+                    'stream.name as stream_name',
+                    'subject.name as subject_name',
+                    'exam.*'
+                )
+                ->where('exam.institute_id', $request->institute_id)
+                ->where('exam.user_id', $request->user_id)
+                ->get()->toarray();
+            if (!empty($exam_list)) {
+                $exam_list_array = [];
+                foreach ($exam_list as $key => $value) {
+                    $exam_list_array[] = [
+                        'exam_title' => $value->exam_title,
+                        'exam_type' => $value->exam_type,
+                        'exam_date' => $value->exam_date,
+                        'start_time' => $value->start_time,
+                        'end_time' => $value->end_time,
+                        'institute_for' => $value->institute_for_name,
+                        'board' => $value->board_name,
+                        'medium' => $value->medium_name,
+                        'class' => $value->class_name,
+                        'standard' => $value->standard_name,
+                        'stream' => $value->stream_name . '',
+                        'subject' => $value->subject_name,
+                    ];
+                }
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Successfully Fetch Exam List',
+                    'data' => $exam_list_array
+                ], 200);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'No Data Found.',
+                ], 400);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
     }
 }
