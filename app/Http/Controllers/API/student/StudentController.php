@@ -672,7 +672,7 @@ class StudentController extends Controller
                 'success' => 500,
                 'message' => 'Something went wrong',
                 'data'=>array('error' => $e->getMessage()),
-            ], 500);
+            ], 500); 
         }
         
         
