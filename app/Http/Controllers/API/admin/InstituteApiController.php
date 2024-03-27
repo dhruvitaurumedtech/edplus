@@ -1156,7 +1156,19 @@ class InstituteApiController extends Controller
                 'subject_id' => $request->subject_id,
                 'status' => '1',
             ]);
+
             if (!empty($studentdetail)) {
+                //student detail update
+                $student_details = User::find($student_id);
+                $data = $student_details->update([
+                    'firstname' => $request->first_name,
+                    'lastname' => $request->last_name,
+                    'dob' => $request->date_of_birth,
+                    'address' => $request->address,
+                    'email' => $request->email_id,
+                    'mobile' => $request->mobile_no,
+                ]);
+
 
                 $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->first();
                 $reject_list = Student_detail::find($response->id);

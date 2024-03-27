@@ -142,14 +142,19 @@ class ExamController extends Controller
             if (!empty($exam_list)) {
                 $exam_list_array = [];
                 foreach ($exam_list as $key => $value) {
+                    $start_time_convert = Carbon::createFromFormat('H:i:s', $value->start_time);
+                    $start_time = $start_time_convert->format('h:i A');
+                    $end_time_convert = Carbon::createFromFormat('H:i:s', $value->end_time);
+                    $end_time = $end_time_convert->format('h:i A');
+
                     $exam_list_array[] = [
                         'exam_id' => $value->id,
                         'exam_title' => $value->exam_title,
                         'exam_type' => $value->exam_type,
                         'exam_date' => $value->exam_date,
                         'total_mark' => $value->total_mark,
-                        'start_time' => $value->start_time,
-                        'end_time' => $value->end_time,
+                        'start_time' => $start_time,
+                        'end_time' => $end_time,
                         'institute_for' => $value->institute_for_name,
                         'board' => $value->board_name,
                         'medium' => $value->medium_name,
