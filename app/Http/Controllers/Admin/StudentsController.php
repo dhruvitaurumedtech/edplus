@@ -79,6 +79,7 @@ class StudentsController extends Controller
 
     public function save_student(Request $request)
     {
+
         $validator = $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
@@ -120,8 +121,6 @@ class StudentsController extends Controller
             'subject_id' => implode(",", $request->subject_id),
             'status' => $request->status,
         ]);
-        echo "i";
-        exit;
         return Redirect::route('student.create')->with('success', 'profile-created');
     }
 
