@@ -892,8 +892,8 @@ class InstituteApiController extends Controller
                     $user_data = User::where('id', $value['student_id'])->get()->toarray();
                     $response = [];
                     foreach ($user_data as $value2) {
-                        if (!empty($value2->image)) {
-                            $image = asset($value2->image);
+                        if (!empty($value2['image'])) {
+                            $image = asset($value2['image']);
                         } else {
                             $image = asset('default.jpg');
                         }
@@ -943,8 +943,8 @@ class InstituteApiController extends Controller
                     $user_data = User::where('id', $value['student_id'])->get()->toarray();
                     $response = [];
                     foreach ($user_data as $value2) {
-                        if (!empty($value2->image)) {
-                            $image = asset($value2->image);
+                        if (!empty($value2['image'])) {
+                            $image = asset($value2['image']);
                         } else {
                             $image = asset('default.jpg');
                         }
@@ -957,7 +957,7 @@ class InstituteApiController extends Controller
                     }
                     return response()->json([
                         'status' => 200,
-                        'message' => 'Fetch student request list.',
+                        'message' => 'Fetch student reject request list.',
                         'data' => $response,
                     ], 200, [], JSON_NUMERIC_CHECK);
                 }
