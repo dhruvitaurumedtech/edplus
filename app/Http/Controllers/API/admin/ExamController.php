@@ -257,7 +257,7 @@ class ExamController extends Controller
                         'exam_date' => $value->exam_date,
                         'start_time' => $value->start_time,
                         'end_time' => $value->end_time,
-                        'institute_for' => $value->institute_for_id,
+                        'institute_for' => $value->institute_for_name,
                         'board' => $value->board_name,
                         'medium' => $value->medium_name,
                         'class' => $value->class_name,
