@@ -129,7 +129,8 @@ class StudentController extends Controller
                 $query->select('institute_id')
               ->where('student_id', $user_id)
               ->where('status','=', '1')
-              ->from('students_details');
+              ->from('students_details')
+              ->whereNull('deleted_at');
             })->paginate($perPage);
             $join_with = [];
             foreach ($joininstitute as $value) {
@@ -278,7 +279,7 @@ class StudentController extends Controller
                 $userId = $user->id;
                 
                 // Create a parent record associated with the user
-                Parents::create([
+                $parnsad = Parents::create([
                     'student_id' => $student_id,
                     'parent_id' => $userId,
                     'relation' => $parentData['relation'],
@@ -288,8 +289,9 @@ class StudentController extends Controller
                 // Mail::to($tomail)->send('emails.forgot');
                 // Mail::to($tomail)->send(new WelcomeMail());
                 $data = [
-                    'name' => 'John Doe',
+                    'name' => $parentData['firstname'] .' '.$parentData['lastname'],
                     'email' => $tomail,
+                    'id'=>$parnsad->id
                     // Add any other data you want to pass to the email
                 ];
                 
@@ -487,9 +489,17 @@ class StudentController extends Controller
             
             //banner
             
-                $banners = Banner_model::where('status', 'active')
+                $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->paginate(10);
+
+            if(!empty($bannerss)){
+                $banners = $bannerss;
+            }else{
+                $banners = Banner_model::where('status', 'active')
+                ->Where('user_id', '1')
+                ->paginate(10);
+            }
             $banners_data = [];
             
             foreach ($banners as $value) {
@@ -507,15 +517,21 @@ class StudentController extends Controller
             Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
-            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024','class_highest'=>'48');
+            $examlist = [];
+            $result[] = array('subject'=>'Mathematics',
+            'chapter'=>'chapter 1(MCQ)',
+            'total_marks'=>'50',
+            'achiveddmarks_marks'=>'45',
+            'date'=>'29/01/2024','class_highest'=>'48');
             $subdta = Student_detail::where('student_id',$user_id)
-            ->where('institute_id',$institute_id)->select('students_details.*')->first();
+            ->where('institute_id',$institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
             
+            if(!empty($subdta)){
             $subjecqy = Subject_model::whereIN('id',explode(",",$subdta->subject_id))->get();
             foreach($subjecqy as $subjcdt){
                 $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
             }
-
+        
             //upcoming exams
             $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$user_id)->first();
             $subjectIds = explode(',', $stdetail->subject_id);
@@ -532,7 +548,7 @@ class StudentController extends Controller
             ->orderBy('exam.created_at', 'desc')
             ->limit(3)
             ->get();
-            $examlist = [];
+            
             foreach($exams as $examsDT){
                 $examlist[] = array('exam_title'=>$examsDT->exam_title,
                             'total_mark'=>$examsDT->total_mark,
@@ -542,6 +558,7 @@ class StudentController extends Controller
                             'date'=>$examsDT->exam_date,
                             'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
+        }
             $studentdata = array(
             'banners_data'=> $banners_data,
             'todays_lecture'=>$todays_lecture,
@@ -895,11 +912,17 @@ public function exams_list(Request $request){
 
         $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
         if ($existingUser) {
-            $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$student_id)->first();
+            $stdetail = Student_detail::where('institute_id',$institute_id)
+            ->where('student_id',$student_id)
+            ->whereNull('deleted_at')
+            ->first();
+            $examlist = [];
+            if(!empty($stdetail))
+            {
             $subjectIds = explode(',', $stdetail->subject_id);
             $exams = Exam_Model::join('subject','subject.id','=','exam.subject_id')
             ->join('standard','standard.id','=','exam.standard_id')
-            ->where('institute_id',$stdetail->institute_id)
+            //->where('institute_id',$stdetail->institute_id)
             ->where('exam.board_id',$stdetail->board_id)
             ->where('exam.medium_id',$stdetail->medium_id)
             ->where('exam.class_id',$stdetail->class_id)
@@ -908,7 +931,7 @@ public function exams_list(Request $request){
             ->whereIN('exam.subject_id',$subjectIds)
             ->select('exam.*','subject.name as subject','standard.name as standard')
             ->get();
-            $examlist = [];
+            
             foreach($exams as $examsDT){
                 $examlist[] = array('exam_title'=>$examsDT->exam_title,
                             'total_mark'=>$examsDT->total_mark,
@@ -918,6 +941,7 @@ public function exams_list(Request $request){
                             'date'=>$examsDT->exam_date,
                             'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
+        }
             return response()->json([
                 'success' => 200,
                 'message' => 'Exams List',
@@ -937,4 +961,66 @@ public function exams_list(Request $request){
         ], 500);
     }
 }
+
+//remove institute from student 
+    public function remove_institute(Request $request){
+    
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id'=>'required',
+        ]);
+        
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'data'=>array('errors' => $errorMessages),
+            ], 400);
+        }
+    
+        try{
+            $token = $request->header('Authorization');
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+            $institute_id = $request->institute_id;
+            $student_id = $request->user_id;
+    
+            $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
+            if ($existingUser) {
+                $gette = Student_detail::where('student_id',$student_id)
+                ->where('institute_id',$institute_id)
+                ->first();
+                if(!empty($gette)){
+                    $remove = Student_detail::where('student_id',$student_id)
+                    ->where('institute_id',$institute_id)
+                    ->delete();
+                    return response()->json([
+                        'success' => 200,
+                        'message' => 'Institute Remove',
+                        'data'=>[]
+                    ], 200);
+                }else{
+                    return response()->json([
+                        'success' => 200,
+                        'message' => 'Data not found',
+                        'data'=>[]
+                    ], 200);
+                }
+                
+            }else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
+        }catch(\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'data'=>array('error' => $e->getMessage()),
+            ], 500);
+        }
+    }
 }
