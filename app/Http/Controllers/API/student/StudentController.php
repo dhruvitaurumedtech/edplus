@@ -987,7 +987,7 @@ class StudentController extends Controller
                 );
             }
             $student_list_final = array(
-                'standard_name' => $student_list[0]->standard_name,
+                'standard_name' => $student_list_value->standard_name,
                 'subject_name' => $student_list_value->subject_name,
                 'total_mark' => $student_list_value->total_mark,
                 'student_name' => $student_list_array
