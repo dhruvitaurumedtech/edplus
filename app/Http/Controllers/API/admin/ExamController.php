@@ -143,6 +143,7 @@ class ExamController extends Controller
                 $exam_list_array = [];
                 foreach ($exam_list as $key => $value) {
                     $exam_list_array[] = [
+                        'exam_id' => $value->id,
                         'exam_title' => $value->exam_title,
                         'exam_type' => $value->exam_type,
                         'exam_date' => $value->exam_date,
