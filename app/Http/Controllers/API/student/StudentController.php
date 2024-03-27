@@ -983,14 +983,19 @@ class StudentController extends Controller
                 $student_list_array[] = array(
                     'student_name' => $student_list_value->firstname . ' ' . $student_list_value->lastname,
                     'standard_name' => $student_list_value->standard_name,
-                    'subject_name' => $student_list_value->subject_name,
-                    'total_mark' => $student_list_value->total_mark
+
                 );
             }
+            $student_list_final = array(
+                'standard_name' => $student_list[0]->standard_name,
+                'subject_name' => $student_list_value->subject_name,
+                'total_mark' => $student_list_value->total_mark,
+                'student_name' => $student_list_array
+            );
             return response()->json([
                 'success' => 200,
                 'message' => 'Exams List',
-                'data' => $student_list_array
+                'data' => $student_list_final
             ], 200);
         } else {
             return response()->json([
