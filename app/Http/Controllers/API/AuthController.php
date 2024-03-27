@@ -31,7 +31,6 @@ class AuthController extends Controller
                 'password' => 'required|string|min:6',
                 'mobile' => 'required|min:10',
                 'role_type' => 'required|integer',
-                'description' => 'required',
             ],
             [
                 'mobile' => 'The mobile field must be at least 10 characters',
@@ -78,7 +77,6 @@ class AuthController extends Controller
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
-            'description' => $request->description,
             'password' => Hash::make($request->password),
             'mobile' => $request->mobile,
             'role_type' => $request->role_type,
