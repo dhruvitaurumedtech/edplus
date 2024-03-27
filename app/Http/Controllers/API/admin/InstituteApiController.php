@@ -900,7 +900,8 @@ class InstituteApiController extends Controller
                         $response[] = [
                             'student_id' => $value2['id'],
                             'name' => $value2['firstname'] . ' ' . $value2['lastname'],
-                            'photo' => $image
+                            'photo' => $image,
+                            'description' => ''
                         ];
                     }
                     return response()->json([

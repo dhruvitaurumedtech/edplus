@@ -31,6 +31,7 @@ class AuthController extends Controller
                 'password' => 'required|string|min:6',
                 'mobile' => 'required|min:10',
                 'role_type' => 'required|integer',
+                'description' => 'required',
             ],
             [
                 'mobile' => 'The mobile field must be at least 10 characters',
@@ -77,6 +78,7 @@ class AuthController extends Controller
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
             'email' => $request->email,
+            'description' => $request->description,
             'password' => Hash::make($request->password),
             'mobile' => $request->mobile,
             'role_type' => $request->role_type,
@@ -119,7 +121,7 @@ class AuthController extends Controller
                 foreach ($user as $value) {
                     $data = array(
                         'user_id' => $value->id,
-                        'user_name' => $value->firstname.' '.$value->lastname,
+                        'user_name' => $value->firstname . ' ' . $value->lastname,
                         'mobile' => $value->mobile,
                         'user_email' => $value->email,
                         'user_image' => $photo,
@@ -178,7 +180,7 @@ class AuthController extends Controller
                 'message' => 'Login successful',
                 'data' => [
                     'user_id' => $user->id,
-                    'user_name' => $user->firstname.' '.$user->lastname,
+                    'user_name' => $user->firstname . ' ' . $user->lastname,
                     'mobile_no' => $user->mobile,
                     'user_email' => $user->email,
                     'user_image' => $photo,
