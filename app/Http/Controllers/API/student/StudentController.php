@@ -994,7 +994,7 @@ class StudentController extends Controller
             );
             return response()->json([
                 'success' => 200,
-                'message' => 'Exams List',
+                'message' => 'Student List',
                 'data' => $student_list_final
             ], 200);
         } else {
