@@ -976,7 +976,7 @@ class StudentController extends Controller
                 ->join('subject', 'subject.id', '=', 'exam.subject_id')
                 ->where('institute_id', $institute_id)
                 ->where('standard_id', $standard_id)
-                ->select('users.firstname', 'users.lastname', 'users.image', 'standard.name as standard_name', 'exam.total_mark', 'subject.name as subject_name')
+                ->select('users.firstname', 'users.lastname', 'users.image', 'standard.name as standard_name', 'exam.total_mark', 'subject.name as subject_name', 'exam.id as exam_id')
                 ->get();
             $student_list_array = [];
             foreach ($student_list as $student_list_value) {
@@ -990,6 +990,7 @@ class StudentController extends Controller
                 'standard_name' => $student_list_value->standard_name,
                 'subject_name' => $student_list_value->subject_name,
                 'total_mark' => $student_list_value->total_mark,
+                'exam_id' => $student_list_value->exam_id,
                 'student_name' => $student_list_array
             );
             return response()->json([
