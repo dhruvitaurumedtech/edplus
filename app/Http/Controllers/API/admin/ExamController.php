@@ -146,6 +146,7 @@ class ExamController extends Controller
                         'exam_title' => $value->exam_title,
                         'exam_type' => $value->exam_type,
                         'exam_date' => $value->exam_date,
+                        'total_mark' => $value->total_mark,
                         'start_time' => $value->start_time,
                         'end_time' => $value->end_time,
                         'institute_for' => $value->institute_for_name,

@@ -901,7 +901,7 @@ class InstituteApiController extends Controller
                             'student_id' => $value2['id'],
                             'name' => $value2['firstname'] . ' ' . $value2['lastname'],
                             'photo' => $image,
-                            'description' => $value2['description']
+                            'description' => $value2['description'] . ''
                         ];
                     }
                     return response()->json([
@@ -937,30 +937,30 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             $request_list = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
-                ->get()->toarray();
+                ->pluck('student_id');
+
             if (!empty($request_list)) {
-                foreach ($request_list as $value) {
-                    $user_data = User::where('id', $value['student_id'])->get()->toarray();
-                    $response = [];
-                    foreach ($user_data as $value2) {
-                        if (!empty($value2['image'])) {
-                            $image = asset($value2['image']);
-                        } else {
-                            $image = asset('default.jpg');
-                        }
-                        $response[] = [
-                            'student_id' => $value2['id'],
-                            'name' => $value2['firstname'] . ' ' . $value2['lastname'],
-                            'photo' => $image,
-                            'description' => $value2['description']
-                        ];
+
+                $user_data = User::whereIN('id', $request_list)->get();
+                $response = [];
+                foreach ($user_data as $value2) {
+                    if (!empty($value2['image'])) {
+                        $image = asset($value2['image']);
+                    } else {
+                        $image = asset('default.jpg');
                     }
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Fetch student reject request list.',
-                        'data' => $response,
-                    ], 200, [], JSON_NUMERIC_CHECK);
+                    $response[] = [
+                        'student_id' => $value2['id'],
+                        'name' => $value2['firstname'] . ' ' . $value2['lastname'],
+                        'photo' => $image,
+                    ];
                 }
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Fetch student Reject list.',
+                    'data' => $response,
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
