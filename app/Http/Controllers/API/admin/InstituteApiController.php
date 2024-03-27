@@ -892,15 +892,15 @@ class InstituteApiController extends Controller
                     $user_data = User::where('id', $value['student_id'])->get()->toarray();
                     $response = [];
                     foreach ($user_data as $value2) {
-                        if (!empty($value2->image)) {
-                            $image = asset($value2->image);
+                        if (!empty($value2['image'])) {
+                            $image = asset($value2['image']);
                         } else {
                             $image = asset('default.jpg');
                         }
                         $response[] = [
                             'student_id' => $value2['id'],
                             'name' => $value2['firstname'] . ' ' . $value2['lastname'],
-                            'photo' => $image
+                            'photo' => $image,
                         ];
                     }
                     return response()->json([
@@ -909,6 +909,57 @@ class InstituteApiController extends Controller
                         'data' => $response,
                     ], 200, [], JSON_NUMERIC_CHECK);
                 }
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'No data Found.',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+    public function get_reject_request_list(Request $request)
+    {
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        // echo "<pre>";print_r($existingUser);exit;
+        if ($existingUser) {
+            $institute_id = $request->institute_id;
+            $request_list = Student_detail::where('institute_id', $institute_id)
+                ->where('status', '2')
+                ->pluck('student_id');
+
+            if (!empty($request_list)) {
+
+                $user_data = User::whereIN('id', $request_list)->get();
+                $response = [];
+                foreach ($user_data as $value2) {
+                    if (!empty($value2['image'])) {
+                        $image = asset($value2['image']);
+                    } else {
+                        $image = asset('default.jpg');
+                    }
+                    $response[] = [
+                        'student_id' => $value2['id'],
+                        'name' => $value2['firstname'] . ' ' . $value2['lastname'],
+                        'photo' => $image,
+                    ];
+                }
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Fetch student Reject list.',
+                    'data' => $response,
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
@@ -1104,7 +1155,19 @@ class InstituteApiController extends Controller
                 'subject_id' => $request->subject_id,
                 'status' => '1',
             ]);
+
             if (!empty($studentdetail)) {
+                //student detail update
+                $student_details = User::find($student_id);
+                $data = $student_details->update([
+                    'firstname' => $request->first_name,
+                    'lastname' => $request->last_name,
+                    'dob' => $request->date_of_birth,
+                    'address' => $request->address,
+                    'email' => $request->email_id,
+                    'mobile' => $request->mobile_no,
+                ]);
+
 
                 $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->first();
                 $reject_list = Student_detail::find($response->id);

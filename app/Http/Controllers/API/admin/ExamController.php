@@ -142,12 +142,19 @@ class ExamController extends Controller
             if (!empty($exam_list)) {
                 $exam_list_array = [];
                 foreach ($exam_list as $key => $value) {
+                    $start_time_convert = Carbon::createFromFormat('H:i:s', $value->start_time);
+                    $start_time = $start_time_convert->format('h:i A');
+                    $end_time_convert = Carbon::createFromFormat('H:i:s', $value->end_time);
+                    $end_time = $end_time_convert->format('h:i A');
+
                     $exam_list_array[] = [
+                        'exam_id' => $value->id,
                         'exam_title' => $value->exam_title,
                         'exam_type' => $value->exam_type,
                         'exam_date' => $value->exam_date,
-                        'start_time' => $value->start_time,
-                        'end_time' => $value->end_time,
+                        'total_mark' => $value->total_mark,
+                        'start_time' => $start_time,
+                        'end_time' => $end_time,
                         'institute_for' => $value->institute_for_name,
                         'board' => $value->board_name,
                         'medium' => $value->medium_name,
@@ -215,7 +222,28 @@ class ExamController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $exam_id = $request->input('exam_id');
-            $examlist = Exam_Model::where('id', $exam_id)->get();
+            // $examlist = Exam_Model::where('id', $exam_id)->get();
+            $examlist = DB::table('exam')
+                ->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
+                ->leftJoin('board', 'board.id', '=', 'exam.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
+                ->leftJoin('class', 'class.id', '=', 'exam.class_id')
+                ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
+                ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
+                ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                ->select(
+                    'institute_for.name as institute_for_name',
+                    'board.name as board_name',
+                    'medium.name as medium_name',
+                    'class.name as class_name',
+                    'standard.name as standard_name',
+                    'stream.name as stream_name',
+                    'subject.name as subject_name',
+                    'exam.*'
+                )
+                ->where('exam.id', $exam_id)
+                ->wherenull('exam.deleted_at')
+                ->get()->toarray();
             if (!$examlist) {
                 return response()->json([
                     'status' => 400,
@@ -229,13 +257,13 @@ class ExamController extends Controller
                         'exam_date' => $value->exam_date,
                         'start_time' => $value->start_time,
                         'end_time' => $value->end_time,
-                        'institute_for' => $value->institute_for_id,
-                        'board' => $value->board_id,
-                        'medium' => $value->medium_id,
-                        'class' => $value->class_id,
-                        'standard' => $value->standard_id,
-                        'stream' => $value->stream_id . '',
-                        'subject' => $value->subject_id,
+                        'institute_for' => $value->institute_for_name,
+                        'board' => $value->board_name,
+                        'medium' => $value->medium_name,
+                        'class' => $value->class_name,
+                        'standard' => $value->standard_name,
+                        'stream' => $value->stream_name . '',
+                        'subject' => $value->subject_name,
                     ];
                 }
                 return response()->json([

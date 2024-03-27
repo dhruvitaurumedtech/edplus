@@ -119,7 +119,7 @@ class AuthController extends Controller
                 foreach ($user as $value) {
                     $data = array(
                         'user_id' => $value->id,
-                        'user_name' => $value->firstname.' '.$value->lastname,
+                        'user_name' => $value->firstname . ' ' . $value->lastname,
                         'mobile' => $value->mobile,
                         'user_email' => $value->email,
                         'user_image' => $photo,
@@ -178,7 +178,7 @@ class AuthController extends Controller
                 'message' => 'Login successful',
                 'data' => [
                     'user_id' => $user->id,
-                    'user_name' => $user->firstname.' '.$user->lastname,
+                    'user_name' => $user->firstname . ' ' . $user->lastname,
                     'mobile_no' => $user->mobile,
                     'user_email' => $user->email,
                     'user_image' => $photo,

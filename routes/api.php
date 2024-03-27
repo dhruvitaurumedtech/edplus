@@ -48,7 +48,9 @@ Route::post('/institute/get-class', [InstituteApiController::class, 'get_class']
 Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first'])->name('reset.password.get');
 Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second'])->name('reset.password.get');
 Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
-Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.request_list.get');
+Route::post('/institute/get-reject-request-list', [InstituteApiController::class, 'get_reject_request_list'])->name('reject.request_list.get');
+
+Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request');
 Route::post('/institute/fetch_student_detail', [InstituteApiController::class, 'fetch_student_detail'])->name('fetch_student_detail');
 Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('add_exam');
@@ -57,3 +59,4 @@ Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->n
 Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
 Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
 Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
+Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
