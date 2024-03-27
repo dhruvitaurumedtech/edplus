@@ -18,9 +18,9 @@ class User extends Authenticatable implements JWTSubject
      *
      * @var array<int, string>
      */
-    protected $table= 'users';
+    protected $table = 'users';
     protected $fillable = [
-        'unique_id','firstname','lastname', 'email','mobile', 'otp_num', 'password', 'image', 'role_type','address','dob'
+        'unique_id', 'firstname', 'lastname', 'email', 'description', 'mobile', 'otp_num', 'password', 'image', 'role_type', 'address', 'dob'
     ];
 
     /**
@@ -42,7 +42,8 @@ class User extends Authenticatable implements JWTSubject
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    public function getJWTIdentifier() {
+    public function getJWTIdentifier()
+    {
         return $this->getKey();
     }
     /**
@@ -50,12 +51,13 @@ class User extends Authenticatable implements JWTSubject
      *
      * @return array
      */
-    public function getJWTCustomClaims() {
+    public function getJWTCustomClaims()
+    {
         return [
             // 'email'=>$this->email,
             // 'name'=>$this->name
-          ];
-    }    
+        ];
+    }
     public function canButton($permission, $menu_name)
     {
         // Check if the user has the specified permission for the given menu ID
