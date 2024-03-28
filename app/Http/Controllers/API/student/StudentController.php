@@ -300,7 +300,7 @@ class StudentController extends Controller
                 $userId = $user->id;
                 
                 // Create a parent record associated with the user
-                $parnsad = Parents::create([
+                Parents::create([
                     'student_id' => $student_id,
                     'parent_id' => $userId,
                     'relation' => $parentData['relation'],
@@ -310,9 +310,8 @@ class StudentController extends Controller
                 // Mail::to($tomail)->send('emails.forgot');
                 // Mail::to($tomail)->send(new WelcomeMail());
                 $data = [
-                    'name' => $parentData['firstname'] .' '.$parentData['lastname'],
+                    'name' => 'John Doe',
                     'email' => $tomail,
-                    'id'=>$parnsad->id
                     // Add any other data you want to pass to the email
                 ];
                 
@@ -564,17 +563,9 @@ class StudentController extends Controller
             
             //banner
             
-                $bannerss = Banner_model::where('status', 'active')
+                $banners = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->paginate(10);
-
-            if(!empty($bannerss)){
-                $banners = $bannerss;
-            }else{
-                $banners = Banner_model::where('status', 'active')
-                ->Where('user_id', '1')
-                ->paginate(10);
-            }
             $banners_data = [];
             
             foreach ($banners as $value) {
@@ -592,21 +583,15 @@ class StudentController extends Controller
             Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
-            $examlist = [];
-            $result[] = array('subject'=>'Mathematics',
-            'chapter'=>'chapter 1(MCQ)',
-            'total_marks'=>'50',
-            'achiveddmarks_marks'=>'45',
-            'date'=>'29/01/2024','class_highest'=>'48');
+            $result[] = array('subject'=>'Mathematics','chapter'=>'chapter 1(MCQ)','total_marks'=>'50','achiveddmarks_marks'=>'45','date'=>'29/01/2024','class_highest'=>'48');
             $subdta = Student_detail::where('student_id',$user_id)
-            ->where('institute_id',$institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+            ->where('institute_id',$institute_id)->select('students_details.*')->first();
             
-            if(!empty($subdta)){
             $subjecqy = Subject_model::whereIN('id',explode(",",$subdta->subject_id))->get();
             foreach($subjecqy as $subjcdt){
                 $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
             }
-        
+
             //upcoming exams
             $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$user_id)->first();
             $subjectIds = explode(',', $stdetail->subject_id);
@@ -623,7 +608,7 @@ class StudentController extends Controller
             ->orderBy('exam.created_at', 'desc')
             ->limit(3)
             ->get();
-            
+            $examlist = [];
             foreach($exams as $examsDT){
                 $examlist[] = array('exam_title'=>$examsDT->exam_title,
                             'total_mark'=>$examsDT->total_mark,
@@ -633,7 +618,6 @@ class StudentController extends Controller
                             'date'=>$examsDT->exam_date,
                             'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
-        }
             $studentdata = array(
             'banners_data'=> $banners_data,
             'todays_lecture'=>$todays_lecture,
@@ -1118,17 +1102,11 @@ class StudentController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            $stdetail = Student_detail::where('institute_id',$institute_id)
-            ->where('student_id',$student_id)
-            ->whereNull('deleted_at')
-            ->first();
-            $examlist = [];
-            if(!empty($stdetail))
-            {
+            $stdetail = Student_detail::where('institute_id',$institute_id)->where('student_id',$student_id)->first();
             $subjectIds = explode(',', $stdetail->subject_id);
             $exams = Exam_Model::join('subject','subject.id','=','exam.subject_id')
             ->join('standard','standard.id','=','exam.standard_id')
-            //->where('institute_id',$stdetail->institute_id)
+            ->where('institute_id',$stdetail->institute_id)
             ->where('exam.board_id',$stdetail->board_id)
             ->where('exam.medium_id',$stdetail->medium_id)
             ->where('exam.class_id',$stdetail->class_id)
@@ -1137,7 +1115,7 @@ class StudentController extends Controller
             ->whereIN('exam.subject_id',$subjectIds)
             ->select('exam.*','subject.name as subject','standard.name as standard')
             ->get();
-            
+            $examlist = [];
             foreach($exams as $examsDT){
                 $examlist[] = array('exam_title'=>$examsDT->exam_title,
                             'total_mark'=>$examsDT->total_mark,
@@ -1148,31 +1126,6 @@ class StudentController extends Controller
                             'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
         }
-            // Student_detail::where('institute_id', $institute_id)
-            //     ->where('student_id', $user_id)
-            //     ->get();
-            $student_list = Exam_Model::join('users', 'users.id', '=', 'exam.user_id')
-                ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                ->join('subject', 'subject.id', '=', 'exam.subject_id')
-                ->where('institute_id', $institute_id)
-                ->where('standard_id', $standard_id)
-                ->select('users.firstname', 'users.lastname', 'users.image', 'standard.name as standard_name', 'exam.total_mark', 'subject.name as subject_name', 'exam.id as exam_id')
-                ->get();
-            $student_list_array = [];
-            foreach ($student_list as $student_list_value) {
-                $student_list_array[] = array(
-                    'student_name' => $student_list_value->firstname . ' ' . $student_list_value->lastname,
-                    'standard_name' => $student_list_value->standard_name,
-
-                );
-            }
-            $student_list_final = array(
-                'standard_name' => $student_list_value->standard_name,
-                'subject_name' => $student_list_value->subject_name,
-                'total_mark' => $student_list_value->total_mark,
-                'exam_id' => $student_list_value->exam_id,
-                'student_name' => $student_list_array
-            );
             return response()->json([
                 'success' => 200,
                 'message' => 'Student List',
