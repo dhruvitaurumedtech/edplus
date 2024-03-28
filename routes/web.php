@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\VideoCategoryController;
 use App\Http\Controllers\Users;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\student\StudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -195,10 +196,16 @@ Route::middleware('auth')->group(function () {
 
     Route::post('institute/get-board', [InstituteController::class, 'get_board'])->name('institute.get.board');
 
+    //email varification
+    //Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
+    //Route::get('/update-value/{token}', 'StudentController@verifyEmail');
+
+
     
 });
 
-
+Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
+    
    
 // Route::patch('/permissions/{user_id}', [PermissionController::class, 'update'])->middleware(['auth', 'verified'])->name('permissions.update');
 

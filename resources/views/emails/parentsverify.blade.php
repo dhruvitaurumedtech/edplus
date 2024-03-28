@@ -7,13 +7,15 @@
     <title>Email Verification</title>
 </head>
 <body>
-    <p>Please click the button below to verify your email address:</p>
-    
-    <a onclick="verifyfun()" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer; border-radius: 5px;">Verify Email</a>
-</body>
-<script>
-    function verifyfun(){
+    <form >
+        @csrf
+        
 
-    }
-</script>
+        <p>Please click the button below to verify your email address:</p>
+        <a href="{{ url('/update-value/' . $id) }}" class="btn btn-success">Verify Email</a>
+        
+        
+    </form>
+</body>
+
 </html>
