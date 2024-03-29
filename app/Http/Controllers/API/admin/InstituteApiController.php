@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\announcements_model;
 use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Class_model;
@@ -1096,7 +1097,7 @@ class InstituteApiController extends Controller
                 }
 
                 $response_data = [
-                    'id'=>$user_list->id,
+                    'id' => $user_list->id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
                     'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
@@ -1195,139 +1196,258 @@ class InstituteApiController extends Controller
     }
 
     //institute all detail
-    public function institute_details(Request $request){
-        
+    public function institute_details(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
 
         $token = $request->header('Authorization');
 
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-        
+
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
 
             $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
-            ->where('institute_for_sub.institute_id', $institute_id)
-            ->where('institute_for_sub.user_id', $user_id)
-            ->select('institute_for.*')->get();
+                ->where('institute_for_sub.institute_id', $institute_id)
+                ->where('institute_for_sub.user_id', $user_id)
+                ->select('institute_for.*')->get();
             $institute_fors = [];
-            foreach($institute_for as $inst_forsd){
-                $institute_fors[] = array('id'=>$inst_forsd->id,'name'=>$inst_forsd->name);
+            foreach ($institute_for as $inst_forsd) {
+                $institute_fors[] = array('id' => $inst_forsd->id, 'name' => $inst_forsd->name);
             }
 
             $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
-            ->where('board_sub.institute_id', $institute_id)
-            ->where('board_sub.user_id', $user_id)
-            ->select('board.*')->get();
+                ->where('board_sub.institute_id', $institute_id)
+                ->where('board_sub.user_id', $user_id)
+                ->select('board.*')->get();
             $boards = [];
-            foreach($board as $boardsdt){
-                $boards[] = array('id'=>$boardsdt->id,'name'=>$boardsdt->name);
+            foreach ($board as $boardsdt) {
+                $boards[] = array('id' => $boardsdt->id, 'name' => $boardsdt->name);
             }
 
             $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
-            ->where('medium_sub.institute_id', $institute_id)
-            ->where('medium_sub.user_id', $user_id)
-            ->select('medium.*')->get();
+                ->where('medium_sub.institute_id', $institute_id)
+                ->where('medium_sub.user_id', $user_id)
+                ->select('medium.*')->get();
             $mediums = [];
-            foreach($medium as $mediumdt){
-                $mediums[] = array('id'=>$mediumdt->id,'name'=>$mediumdt->name);
+            foreach ($medium as $mediumdt) {
+                $mediums[] = array('id' => $mediumdt->id, 'name' => $mediumdt->name);
             }
 
             $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
-            ->where('class_sub.institute_id', $institute_id)
-            ->where('class_sub.user_id', $user_id)
-            ->select('class.*')->get();
+                ->where('class_sub.institute_id', $institute_id)
+                ->where('class_sub.user_id', $user_id)
+                ->select('class.*')->get();
             $classs = [];
-            foreach($class as $classdt){
-                $classs[] = array('id'=>$classdt->id,'name'=>$classdt->name);
+            foreach ($class as $classdt) {
+                $classs[] = array('id' => $classdt->id, 'name' => $classdt->name);
             }
 
             $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
-            ->where('stream_sub.institute_id', $institute_id)
-            ->where('stream_sub.user_id', $user_id)
-            ->select('stream.*')->get();
+                ->where('stream_sub.institute_id', $institute_id)
+                ->where('stream_sub.user_id', $user_id)
+                ->select('stream.*')->get();
             $streams = [];
-            foreach($stream as $streamdt){
-                $streams[] = array('id'=>$streamdt->id,'name'=>$streamdt->name);
+            foreach ($stream as $streamdt) {
+                $streams[] = array('id' => $streamdt->id, 'name' => $streamdt->name);
             }
 
             $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
-            ->where('subject_sub.institute_id', $institute_id)
-            ->where('subject_sub.user_id', $user_id)
-            ->select('subject.*')->get();
+                ->where('subject_sub.institute_id', $institute_id)
+                ->where('subject_sub.user_id', $user_id)
+                ->select('subject.*')->get();
             $subjects = [];
-            foreach($subject as $subjectdt){
-                $subjects[] = array('id'=>$subjectdt->id,'name'=>$subjectdt->name);
+            foreach ($subject as $subjectdt) {
+                $subjects[] = array('id' => $subjectdt->id, 'name' => $subjectdt->name);
             }
 
             $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
-            ->where('standard_sub.institute_id', $institute_id)
-            ->where('standard_sub.user_id', $user_id)
-            ->select('standard.*')->get();
+                ->where('standard_sub.institute_id', $institute_id)
+                ->where('standard_sub.user_id', $user_id)
+                ->select('standard.*')->get();
             $standards = [];
-            foreach($standard as $standarddt){
-                $standards[] = array('id'=>$standarddt->id,'name'=>$standarddt->name);
+            foreach ($standard as $standarddt) {
+                $standards[] = array('id' => $standarddt->id, 'name' => $standarddt->name);
             }
 
-            $alldata = array('institute_fors'=>$institute_fors,
-                            'boards'=>$boards,
-                            'mediums'=>$mediums,
-                            'classs'=>$classs,
-                            'streams'=>$streams,
-                            'subjects'=>$subjects,
-                            'standards'=>$standards);
+            $alldata = array(
+                'institute_fors' => $institute_fors,
+                'boards' => $boards,
+                'mediums' => $mediums,
+                'classs' => $classs,
+                'streams' => $streams,
+                'subjects' => $subjects,
+                'standards' => $standards
+            );
 
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch Data.',
-                'data'=>$alldata
+                'data' => $alldata
             ], 200, [], JSON_NUMERIC_CHECK);
-            
         } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
             ]);
         }
-    
     }
     //student list for add exam marks
-    public function student_list_for_add_marks(Request $request){
-        
+    public function student_list_for_add_marks(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'user_id' => 'required',
+            'exam_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
 
         $token = $request->header('Authorization');
 
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-        
+
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             $institute_id = $request->institute_id;
             $user_id = $request->user_id;
             $exam_id = $request->exam_id;
-            $examdt = Exam_Model::where('id',$exam_id)->first();
-            $studentDT = Student_detail::join('user','user.id','=','students_details.student_id')
-            ->where('institute_id',$institute_id)
-            ->where('user_id',$user_id)
-            ->where('board_id ',$examdt->board_id)
-            ->where('medium_id',$examdt->medium_id)
-            ->where('class_id',$examdt->class_id)
-            ->where('standard_id ',$examdt->standard_id)
-            ->where('stream_id',$examdt->stream_id)
-            ->where('subject_id ',$examdt->subject_id)->select('');
-            foreach($studentDT as $stddt){
-                $studentsDET[] = array('');
+            $examdt = Exam_Model::where('id', $exam_id)->first();
+
+            if (!empty($examdt)) {
+                $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+                    ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+                    ->where('students_details.institute_id', $institute_id)
+                    ->where('students_details.user_id', $user_id)
+                    ->where('students_details.board_id', $examdt->board_id)
+                    ->where('students_details.medium_id', $examdt->medium_id)
+                    ->where('students_details.class_id', $examdt->class_id)
+                    ->where('students_details.standard_id', $examdt->standard_id)
+                    //->where('students_details.stream_id', $examdt->stream_id)
+                    ->when($examdt->stream_id, function ($query, $stream_id) {
+                        return $query->where('students_details.stream_id', $stream_id);
+                    })
+                    ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                    ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
+                $studentsDET = [];
+                foreach ($studentDT as $stddt) {
+                    $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+                    $studentsDET[] = array(
+                        'student_id' => $stddt->student_id,
+                        'exam_id' => $request->exam_id,
+                        'firstname' => $stddt->firstname,
+                        'lastname' => $stddt->lastname,
+                        'total_mark' => $examdt->total_mark,
+                        'standard' => $stddt->standardname,
+                        'subject' => $subjectqy->name
+                    );
+                }
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Exam not found.',
+                    'data' => []
+                ], 400, [], JSON_NUMERIC_CHECK);
             }
             return response()->json([
                 'status' => 200,
                 'message' => 'Successfully fetch Data.',
-                'data'=>$studentsDET
+                'data' => $studentsDET
             ], 200, [], JSON_NUMERIC_CHECK);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+    //student list with marks
+    public function student_list_with_marks(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'exam_id' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            //$student_id = $request->student_id;
+            $user_id = $request->user_id;
+            $examid = $request->exam_id;
+            $examdtr = Exam_Model::where('id', $examid)->first();
+
+            if (!empty($examdtr)) {
+                $marksdt = Marks_model::join('users', 'users.id', '=', 'marks.student_id')
+                    ->where('marks.exam_id', $examid)
+                    ->select('marks.*', 'users.firstname', 'users.lastname')->get();
+                $studentsDET = [];
+                foreach ($marksdt as $markses) {
+                    $subjectq = Subject_model::where('id', $examdtr->subject_id)->first();
+                    $standardtq = Standard_model::where('id', $examdtr->standard_id)->first();
+                    $studentsDET[] = array(
+                        'student_id' => $markses->student_id,
+                        'exam_id' => $request->exam_id,
+                        'firstname' => $markses->firstname,
+                        'lastname' => $markses->lastname,
+                        'total_mark' => $examdtr->total_mark,
+                        'mark' => $markses->mark,
+                        'standard' => $standardtq->name,
+                        'subject' => $subjectq->name
+                    );
+                }
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Exam not found.',
+                    'data' => []
+                ], 400, [], JSON_NUMERIC_CHECK);
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch Data.',
+                'data' => $studentsDET
+            ], 200, [], JSON_NUMERIC_CHECK);
         } else {
             return response()->json([
                 'status' => 400,
@@ -1336,14 +1456,31 @@ class InstituteApiController extends Controller
         }
     }
     //add exam marks
-    public function add_marks(Request $request){
+    public function add_marks(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required|integer',
+            'user_id' => 'required',
+            'student_id' => 'required',
+            'exam_id' => 'required',
+            'mark' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
 
         $token = $request->header('Authorization');
 
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-        
+
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             $institute_id = $request->institute_id;
@@ -1351,19 +1488,19 @@ class InstituteApiController extends Controller
             $student_id = $request->student_id;
             $exam_id = $request->exam_id;
             $mark = $request->mark;
-            
+
             $admarks = Marks_model::create([
-                'student_id'=>$student_id,
-                'exam_id'=>$exam_id,
-                'mark'=>$mark,
+                'student_id' => $student_id,
+                'exam_id' => $exam_id,
+                'mark' => $mark,
             ]);
-            
-            if($admarks){
+
+            if ($admarks) {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Added.',
                 ]);
-            }else{
+            } else {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Data not added.',
@@ -1376,4 +1513,174 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+
+    //add announcements
+    public function add_announcements(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'institute_for_id' => 'required',
+            'class_id' => 'required',
+            //'stream_id' => 'required',
+            'subject_id' => 'required',
+            'role_type' => 'required',
+            'title' => 'required',
+            'detail' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            $user_id = $request->user_id;
+            $institute_id = $request->institute_id;
+            $board_id = $request->board_id;
+            $medium_id = $request->medium_id;
+            $institute_for_id = $request->institute_for_id;
+            $class_id = $request->class_id;
+            $stream_id = $request->stream_id;
+            $subject_id = $request->subject_id;
+            $role_type = $request->role_type;
+            $title = $request->title;
+            $detail = $request->detail;
+
+            $addannounc = announcements_model::create([
+                'user_id' => $user_id,
+                'institute_id' => $institute_id,
+                'board_id' => $board_id,
+                'medium_id' => $medium_id,
+                'institute_for_id' => $institute_for_id,
+                'class_id' => $class_id,
+                'stream_id' => $stream_id,
+                'subject_id' => $subject_id,
+                'role_type' => $role_type,
+                'title' => $title,
+                'detail' => $detail,
+            ]);
+
+            if ($addannounc) {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Announcement added successfully.',
+                ]);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Data not added.',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
+    //announcement list
+    public function announcements_list(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            //$student_id = $request->student_id;
+            $user_id = $request->user_id;
+            $institute_id = $request->institute_id;
+            $board_id = $request->board_id;
+            $standard_id = $request->standard_id;
+            $searchData = $request->searchData;
+
+            $anoouncmntdt = announcements_model::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->when($searchData, function ($query, $searchData) {
+                    return $query->where(function ($query) use ($searchData) {
+                        $query->where('title', 'like', '%' . $searchData . '%')
+                            ->orWhere('content', 'like', '%' . $searchData . '%');
+                    });
+                })
+                ->when($board_id, function ($query, $board_id) {
+                    return $query->where(function ($query) use ($board_id) {
+                        $query->where('board_id', $board_id);
+                    });
+                })
+                ->when($standard_id, function ($query, $standard_id) {
+                    return $query->where(function ($query) use ($standard_id) {
+                        $query->where('standard_id', $standard_id);
+                    });
+                })
+                ->get();
+
+            if (!empty($anoouncmntdt)) {
+
+                $announcementDT = [];
+                foreach ($anoouncmntdt as $anoouncmnt) {
+
+                    $subjectq = Subject_model::where('id', $anoouncmnt->subject_id)->first();
+                    $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
+                    $boarddt = board::where('id', $anoouncmnt->board_id)->first();
+
+                    $studentsDET[] = array(
+                        'date' => $anoouncmnt->created_at,
+                        'title' => $anoouncmnt->title,
+                        'detail' => $anoouncmnt->detail,
+                    );
+                }
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Exam not found.',
+                    'data' => []
+                ], 400, [], JSON_NUMERIC_CHECK);
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch Data.',
+                'data' => $studentsDET
+            ], 200, [], JSON_NUMERIC_CHECK);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
+    //add time table
 }

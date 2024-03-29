@@ -61,3 +61,7 @@ Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'upd
 Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
 Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
 Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
+Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
+Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
+Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
+Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
