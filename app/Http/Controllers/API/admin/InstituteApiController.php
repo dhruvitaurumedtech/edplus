@@ -27,6 +27,7 @@ use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
+use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use PHPUnit\Framework\Attributes\Medium;
 
@@ -1095,6 +1096,7 @@ class InstituteApiController extends Controller
                 }
 
                 $response_data = [
+                    'id'=>$user_list->id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
                     'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
@@ -1280,7 +1282,7 @@ class InstituteApiController extends Controller
 
             return response()->json([
                 'status' => 200,
-                'message' => 'Successfully Insert Student.',
+                'message' => 'Successfully fetch Data.',
                 'data'=>$alldata
             ], 200, [], JSON_NUMERIC_CHECK);
             
@@ -1293,7 +1295,46 @@ class InstituteApiController extends Controller
     
     }
     //student list for add exam marks
+    public function student_list_for_add_marks(Request $request){
+        
 
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            $institute_id = $request->institute_id;
+            $user_id = $request->user_id;
+            $exam_id = $request->exam_id;
+            $examdt = Exam_Model::where('id',$exam_id)->first();
+            $studentDT = Student_detail::join('user','user.id','=','students_details.student_id')
+            ->where('institute_id',$institute_id)
+            ->where('user_id',$user_id)
+            ->where('board_id ',$examdt->board_id)
+            ->where('medium_id',$examdt->medium_id)
+            ->where('class_id',$examdt->class_id)
+            ->where('standard_id ',$examdt->standard_id)
+            ->where('stream_id',$examdt->stream_id)
+            ->where('subject_id ',$examdt->subject_id)->select('');
+            foreach($studentDT as $stddt){
+                $studentsDET[] = array('');
+            }
+            return response()->json([
+                'status' => 200,
+                'message' => 'Successfully fetch Data.',
+                'data'=>$studentsDET
+            ], 200, [], JSON_NUMERIC_CHECK);
+
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
     //add exam marks
     public function add_marks(Request $request){
 
