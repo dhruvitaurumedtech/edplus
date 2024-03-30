@@ -1368,6 +1368,11 @@ class InstituteApiController extends Controller
                         'subject' => $subjectqy->name
                     );
                 }
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully fetch Data.',
+                    'data' => $studentsDET
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
@@ -1375,11 +1380,7 @@ class InstituteApiController extends Controller
                     'data' => []
                 ], 400, [], JSON_NUMERIC_CHECK);
             }
-            return response()->json([
-                'status' => 200,
-                'message' => 'Successfully fetch Data.',
-                'data' => $studentsDET
-            ], 200, [], JSON_NUMERIC_CHECK);
+            
         } else {
             return response()->json([
                 'status' => 400,
@@ -1436,6 +1437,11 @@ class InstituteApiController extends Controller
                         'subject' => $subjectq->name
                     );
                 }
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully fetch Data.',
+                    'data' => $studentsDET
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
@@ -1443,11 +1449,7 @@ class InstituteApiController extends Controller
                     'data' => []
                 ], 400, [], JSON_NUMERIC_CHECK);
             }
-            return response()->json([
-                'status' => 200,
-                'message' => 'Successfully fetch Data.',
-                'data' => $studentsDET
-            ], 200, [], JSON_NUMERIC_CHECK);
+            
         } else {
             return response()->json([
                 'status' => 400,
@@ -1579,6 +1581,7 @@ class InstituteApiController extends Controller
                 return response()->json([
                     'status' => 400,
                     'message' => 'Announcement added successfully.',
+                    'data'=>[]
                 ]);
             } else {
                 return response()->json([
@@ -1656,24 +1659,31 @@ class InstituteApiController extends Controller
                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
 
-                    $studentsDET[] = array(
+                    $announcementDT[] = array(
+                        'id'=>$anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
                         'title' => $anoouncmnt->title,
                         'detail' => $anoouncmnt->detail,
+                        'subject_id'=>$subjectq->id,
+                        'subject'=>$subjectq->name,
+                        'standard_id'=>$standardtq->id,
+                        'standard'=>$standardtq->name,
+                        'board_id'=>$boarddt->id,
+                        'board'=>$boarddt->name,
                     );
                 }
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully fetch Data.',
+                    'data' => $announcementDT
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Exam not found.',
-                    'data' => []
                 ], 400, [], JSON_NUMERIC_CHECK);
             }
-            return response()->json([
-                'status' => 200,
-                'message' => 'Successfully fetch Data.',
-                'data' => $studentsDET
-            ], 200, [], JSON_NUMERIC_CHECK);
+            
         } else {
             return response()->json([
                 'status' => 400,

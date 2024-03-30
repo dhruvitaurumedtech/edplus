@@ -7,6 +7,7 @@ use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
+use App\Models\announcements_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
@@ -16,6 +17,7 @@ use App\Models\Exam_Model;
 use App\Models\Stream_model;
 use App\Models\Standard_model;
 use App\Models\Institute_detail;
+use App\Models\Marks_model;
 use App\Models\Parents;
 use App\Models\Student_detail;
 use App\Models\Search_history;
@@ -544,18 +546,38 @@ class StudentController extends Controller
             }
             
             $todays_lecture = [];
-            $todays_lecture[] = array('subject'=>'Chemistry','teacher'=>'Dianne Russell','time'=>'03:30 To 05:00 PM');
-            $announcement = [];
-            $announcement = array('title'=>'Rescheduled Lecture','desc'=>"Dear Students,Please be informed that today's Mathematics class has been rescheduled from 5:30 pm to 7:00 pm. Kindly make a note of this timing change to ensure you attend the session promptly.
-            Thank you for your attention and cooperation.",'time'=>'10:00 AM');
             $subjects = [];
             $result = [];
+            $announcement = [];
             $examlist = [];
-            $result[] = array('subject'=>'Mathematics',
-            'chapter'=>'chapter 1(MCQ)',
-            'total_marks'=>'50',
-            'achiveddmarks_marks'=>'45',
-            'date'=>'29/01/2024','class_highest'=>'48');
+
+
+            $todays_lecture[] = array('subject'=>'Chemistry','teacher'=>'Dianne Russell','time'=>'03:30 To 05:00 PM');
+            $announcQY = announcements_model::where('institute_id',$institute_id)->get();
+            foreach($announcQY as $announcDT){
+                $announcement[] = array('title'=>$announcDT->title,
+                'desc'=>$announcDT->detail,
+                'time'=>$announcDT->created_at);
+            }
+            
+            
+            $resultQY = Marks_model::join('exam','exam.id','=','marks.exam_id')
+            ->join('subject','subject.id','=','exam.subject_id')
+            ->where('marks.student_id',$user_id)
+            ->where('exam.institute_id',$institute_id)
+            ->select('marks.*','subject.name as subject','exam.subject_id','exam.total_mark','exam.exam_type','exam.exam_date','exam.exam_title')
+            ->orderByDesc('marks.created_at')->limit(3)->get();
+            $highestMarks = $resultQY->max('marks');
+                foreach($resultQY as $resultDDt){
+                $result[] = array('subject'=>$resultDDt->subject,
+                'title'=>$resultDDt->exam_title.'('.$resultDDt->exam_type.')',
+                'total_marks'=>$resultDDt->total_marks,
+                'achiveddmarks_marks'=>$resultDDt->mark,
+                'date'=>$resultDDt->exam_date,
+                'class_highest'=>$highestMarks);
+            }
+            
+
             $subdta = Student_detail::where('student_id',$user_id)
             ->where('institute_id',$institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
             
@@ -584,12 +606,12 @@ class StudentController extends Controller
             
             foreach($exams as $examsDT){
                 $examlist[] = array('exam_title'=>$examsDT->exam_title,
-                            'total_mark'=>$examsDT->total_mark,
-                            'exam_type'=>$examsDT->exam_type,
-                            'subject'=>$examsDT->subject,
-                            'standard'=>$examsDT->standard,
-                            'date'=>$examsDT->exam_date,
-                            'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
+                'total_mark'=>$examsDT->total_mark,
+                'exam_type'=>$examsDT->exam_type,
+                'subject'=>$examsDT->subject,
+                'standard'=>$examsDT->standard,
+                'date'=>$examsDT->exam_date,
+                'time'=>$examsDT->start_time.' to '.$examsDT->end_time,);
             }
         }
             $studentdata = array(
@@ -1064,5 +1086,81 @@ public function exams_list(Request $request){
                 'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
+    }
+
+    //exam result
+    public function exam_result(Request $request){
+
+        
+    $validator = \Validator::make($request->all(), [
+        'user_id' => 'required',
+        'exam_id'=>'required',
+    ]);
+    
+    if ($validator->fails()) {
+        $errorMessages = array_values($validator->errors()->all());
+        return response()->json([
+            'success' => 400,
+            'message' => 'Validation error',
+            'data'=>array('errors' => $errorMessages),
+        ], 400);
+    }
+
+    try{
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        
+        $student_id = $request->user_id;
+        $exam_id = $request->exam_id;
+
+        $existingUser = User::where('token', $token)->where('id',$student_id)->first();
+        if ($existingUser) {
+            
+            $stdetails = Exam_Model::where('id',$exam_id)->first();
+            $result = [];
+            if(!empty($stdetails))
+            {
+                
+            $resulttQY = Marks_model::join('exam','exam.id','=','marks.exam_id')
+            ->join('subject','subject.id','=','exam.subject_id')
+            ->where('marks.student_id',$student_id)
+            ->where('marks.exam_id',$exam_id)
+            ->select('marks.*','subject.name as subjectname','exam.subject_id','exam.total_mark','exam.exam_type','exam.exam_date','exam.exam_title')
+            ->orderByDesc('marks.created_at')->limit(3)->first();
+            
+            $highestMarks = Marks_model::where('exam_id', $exam_id)->max('mark');
+
+
+                if(!empty($resulttQY)){
+                $result[] = array('subject'=>$resulttQY->subjectname,
+                'title'=>$resulttQY->exam_title.'('.$resulttQY->exam_type.')',
+                'total_marks'=>$resulttQY->total_marks,
+                'achiveddmarks_marks'=>$resulttQY->mark,
+                'date'=>$resulttQY->exam_date,
+                'class_highest'=>$highestMarks);
+            }
+            }
+
+            return response()->json([
+                'success' => 200,
+                'message' => 'Result Fetch Successfully',
+                'data'=>$result
+            ], 200);
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+    }catch(\Exception $e) {
+        return response()->json([
+            'success' => 500,
+            'message' => 'Something went wrong',
+            'data'=>array('error' => $e->getMessage()),
+        ], 500);
+    }
+
     }
 }
