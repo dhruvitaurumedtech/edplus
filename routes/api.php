@@ -66,3 +66,4 @@ Route::post('/institute/student-list-exam', [InstituteApiController::class, 'stu
 Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
 Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
 Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
+Route::post('/institute/add-timetable', [InstituteApiController::class, 'add_time_table'])->name('add_time_table');

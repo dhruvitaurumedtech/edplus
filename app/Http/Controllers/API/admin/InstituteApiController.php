@@ -1693,4 +1693,7 @@ class InstituteApiController extends Controller
     }
 
     //add time table
+    public function add_time_table(Request $request){
+        
+    }
 }
