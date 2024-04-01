@@ -147,14 +147,16 @@ class StudentController extends Controller
             }
 
             $parentsdt = Parents::where('student_id',$user_id)->get();
+            
             $veryfy = [];
             foreach($parentsdt as $checkvery){
                 $veryfy[]= array('relation'=>$checkvery->relation,'verify'=>$checkvery->verify);
             }
-            if(!empty($parentsdt)){
-                $studentparents = '1';
-            }else{
+            if($parentsdt->isEmpty()){
+                
                 $studentparents = '0';
+            }else{
+                $studentparents = '1';
             }
             return response()->json([
                 'status' => 200,

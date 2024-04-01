@@ -147,7 +147,6 @@ class InstituteApiController extends Controller
 
                                 foreach ($stream_array as $stream_array_value) {
 
-
                                     $forsubdidget = base_table::where('institute_for_class', $class_array_value->id)
                                         ->where('institute_for', $institute_for_array_value->id)
                                         ->where('standard', $standard_array_value->id)
