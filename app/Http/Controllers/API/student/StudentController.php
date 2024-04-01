@@ -854,12 +854,17 @@ class StudentController extends Controller
                                 'mobile'=>$parentsDT->mobile);
             }
             //
+            if($existingUser->image){
+                $img = $existingUser->image;
+            }else{
+                $img = asset('profile/image.jpg');
+            }
             $userdetail = array('id'=>$existingUser->id,
             'unique_id'=>$existingUser->unique_id.'',
             'name'=>$existingUser->firstname.' '.$existingUser->lastname,
             'email'=>$existingUser->email,
             'mobile'=>$existingUser->mobile.'',
-            'image'=>$existingUser->image.'',
+            'image'=>$img.'',
             'dob'=>$existingUser->dob,
             'address'=>$existingUser->address,
             'standard'=>$sdtls ? $sdtls->standard : '',
