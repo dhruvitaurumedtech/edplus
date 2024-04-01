@@ -591,7 +591,7 @@ class StudentController extends Controller
                 if($subjcdt->image){
                     $img = asset($subjcdt->image);
                 }else{
-                    $img = asset('profile/image.jpg');
+                    $img = asset('default.jpg');
                 }
                 $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$img);
             }
@@ -864,7 +864,7 @@ class StudentController extends Controller
             if($existingUser->image){
                 $img = $existingUser->image;
             }else{
-                $img = asset('profile/image.jpg');
+                $img = asset('default.jpg');
             }
             $userdetail = array('id'=>$existingUser->id,
             'unique_id'=>$existingUser->unique_id.'',
