@@ -42,6 +42,8 @@ class ExamController extends Controller
                     'total_mark' => 'required|integer',
                     'exam_type' => 'required|string|max:255',
                     'exam_date' => 'required|date',
+                    // 'start_time' => 'required|date_format:H:i:s',
+                    // 'end_time' => 'required|date_format:H:i:s|after:start_time',
                     'start_time' => 'required|date_format:H:i:s',
                     'end_time' => 'required|date_format:H:i:s|after:start_time',
                     'institute_for_id' => 'required',
