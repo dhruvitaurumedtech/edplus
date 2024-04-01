@@ -588,7 +588,12 @@ class StudentController extends Controller
             if(!empty($subdta)){
             $subjecqy = Subject_model::whereIN('id',explode(",",$subdta->subject_id))->get();
             foreach($subjecqy as $subjcdt){
-                $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$subjcdt->image);
+                if($subjcdt->image){
+                    $img = asset($subjcdt->image);
+                }else{
+                    $img = asset('profile/image.jpg');
+                }
+                $subjects[] = array('id'=>$subjcdt->id,'name'=>$subjcdt->name,'image'=>$img);
             }
         
             //upcoming exams
@@ -987,7 +992,7 @@ public function exams_list(Request $request){
             $examlist = [];
             if(!empty($stdetails))
             {
-                foreach($stdetails as $stdetail){ 
+                foreach($stdetails as $stdetail){
                     $subjectIds = explode(',', $stdetail->subject_id);
                     $exams = Exam_Model::join('subject','subject.id','=','exam.subject_id')
                     ->join('standard','standard.id','=','exam.standard_id')
