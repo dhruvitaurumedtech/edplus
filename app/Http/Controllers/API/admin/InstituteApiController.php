@@ -162,14 +162,20 @@ class InstituteApiController extends Controller
                                     $baseidsfosubj .= 0;
                                     $baseidsfosubj = $forsubdidget->pluck('id')->toArray();
 
-                                    $subject_array = Subject_model::whereIN('base_table_id', $baseidsfosubj)
-                                        ->get();
+                                    // $subject_array = Subject_model::whereIN('base_table_id', $baseidsfosubj)
+                                    //     ->get();
+
+                                    $subject_array = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
+                                    ->whereIN('subject.base_table_id', $baseidsfosubj)
+                                    ->select('subject.*','base_table.stream')
+                                    ->get();
 
                                     $subject = [];
                                     foreach ($subject_array as $value) {
                                         $subject[] = [
                                             'subject_id' => $value->id,
-                                            'subject' => $value->name
+                                            'subject' => $value->name,
+                                            'stream_id' => $value->stream.''
                                         ];
                                     }
 
