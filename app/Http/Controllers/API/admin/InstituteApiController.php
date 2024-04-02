@@ -165,20 +165,6 @@ class InstituteApiController extends Controller
                                     // $subject_array = Subject_model::whereIN('base_table_id', $baseidsfosubj)
                                     //     ->get();
 
-                                    $subject_array = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
-                                    ->whereIN('subject.base_table_id', $baseidsfosubj)
-                                    ->select('subject.*','base_table.stream')
-                                    ->get();
-
-                                    $subject = [];
-                                    foreach ($subject_array as $value) {
-                                        $subject[] = [
-                                            'subject_id' => $value->id,
-                                            'subject' => $value->name,
-                                            'stream_id' => $value->stream.''
-                                        ];
-                                    }
-
                                     if (!empty($stream_array_value->stream_id)) {
                                         $stream[] = [
                                             'stream_id' => $stream_array_value->stream_id . '',
@@ -187,16 +173,34 @@ class InstituteApiController extends Controller
                                         ];
                                     }
                                 }
-
-
+                                
+                                $subject_array = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
+                                    ->whereIN('subject.base_table_id', $baseidsfosubj)
+                                    ->select('subject.*','base_table.stream')
+                                    ->toSql();
+                                    
+                                    $subject = [];
+                                    foreach ($subject_array as $value) {
+                                        if($value->stream != null){
+                                            $sstream = $value->stream;
+                                        }else{
+                                            $sstream = 0;
+                                        }
+                                        $subject[] = [
+                                            'subject_id' => $value->id,
+                                            'subject' => $value->name,
+                                            'stream_id' => $sstream
+                                        ];
+                                    }
                                 $standard[] = [
                                     'standard_id' => $standard_array_value->id,
                                     'standard' => $standard_array_value->name,
                                     'stream' => $stream,
                                     'subject' => $subject
                                 ];
+                                
                             }
-
+                            
                             $class[] = [
                                 'class_id' => $class_array_value->id,
                                 'class_icon' => asset($class_array_value->icon),
