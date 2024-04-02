@@ -222,25 +222,7 @@ class ExamController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $exam_id = $request->input('exam_id');
-            // $examlist = Exam_Model::where('id', $exam_id)->get();
             $examlist = DB::table('exam')
-                ->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
-                ->leftJoin('board', 'board.id', '=', 'exam.board_id')
-                ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
-                ->leftJoin('class', 'class.id', '=', 'exam.class_id')
-                ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
-                ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
-                ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
-                ->select(
-                    'institute_for.name as institute_for_name',
-                    'board.name as board_name',
-                    'medium.name as medium_name',
-                    'class.name as class_name',
-                    'standard.name as standard_name',
-                    'stream.name as stream_name',
-                    'subject.name as subject_name',
-                    'exam.*'
-                )
                 ->where('exam.id', $exam_id)
                 ->wherenull('exam.deleted_at')
                 ->get()->toarray();
@@ -250,27 +232,70 @@ class ExamController extends Controller
                     'message' => 'Exam Not Found.',
                 ], 400);
             } else {
-                foreach ($examlist as $value) {
-                    $exam_list_array[] = [
-                        'exam_title' => $value->exam_title,
-                        'exam_type' => $value->exam_type,
-                        'exam_date' => $value->exam_date,
-                        'start_time' => $value->start_time,
-                        'end_time' => $value->end_time,
-                        'institute_for' => $value->institute_for_name,
-                        'board' => $value->board_name,
-                        'medium' => $value->medium_name,
-                        'class' => $value->class_name,
-                        'standard' => $value->standard_name,
-                        'stream' => $value->stream_name . '',
-                        'subject' => $value->subject_name,
-                    ];
+                
+                $validatedData = $request->validate([
+                    'user_id' => 'required',
+                    'institute_id' => 'required',
+                    'exam_title' => 'required|string|max:255',
+                    'total_mark' => 'required|integer',
+                    'exam_type' => 'required|string|max:255',
+                    'exam_date' => 'required|date',
+                    'start_time' => 'required|date_format:H:i:s',
+                    'end_time' => 'required|date_format:H:i:s|after:start_time',
+                    'institute_for_id' => 'required',
+                    'board_id' => 'required',
+                    'medium_id' => 'required',
+                    'class_id' => 'required',
+                    'standard_id' => 'required',
+                    'subject_id' => 'required',
+                ]);
+                $exam_data = Exam_Model::where('user_id', $validatedData['user_id'])
+                    ->where('institute_id', $validatedData['institute_id'])
+                    ->where('standard_id', $validatedData['standard_id'])
+                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $validatedData['exam_date'])->format('Y-m-d'))
+                    ->where('start_time', $validatedData['start_time'])
+                    ->where('end_time', $validatedData['end_time'])
+                    ->whereNot('id', $exam_id)
+                    ->get()->toArray();
+
+
+                if (empty($exam_data)) {
+                    $exam = Exam_Model::find($exam_id);
+                    $exam->user_id = $validatedData['user_id'];
+                    $exam->institute_id = $validatedData['institute_id'];
+                    $exam->exam_title = $validatedData['exam_title'];
+                    $exam->total_mark = $validatedData['total_mark'];
+                    $exam->exam_type = $validatedData['exam_type'];
+                    $exam->exam_date = Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']);
+                    $exam->start_time = $validatedData['start_time'];
+                    $exam->end_time = $validatedData['end_time'];
+                    $exam->institute_for_id = $validatedData['institute_for_id'];
+                    $exam->board_id = $validatedData['board_id'];
+                    $exam->medium_id = $validatedData['medium_id'];
+                    $exam->class_id = $validatedData['class_id'];
+                    $exam->standard_id = $validatedData['standard_id'];
+                    $exam->stream_id = (!empty($validatedData['stream_id'])) ? $validatedData['stream_id'] : '';
+                    $exam->subject_id = $validatedData['subject_id'];
+                    $exam->save();
+                    if (!empty($exam->id)) {
+                        return response()->json([
+                            'status' => 200,
+                            'message' => 'Successfully Create Exam.',
+                            'data'=>$exam
+                        ], 200, [], JSON_NUMERIC_CHECK);
+                    } else {
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'Not inserted.',
+                        ]);
+                    }
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Already Created This standard Exam!.',
+                    ]);
                 }
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Successfully Fetch Exam',
-                    'data' => $exam_list_array
-                ], 200);
+            
             }
         } else {
             return response()->json([
