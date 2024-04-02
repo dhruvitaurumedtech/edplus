@@ -177,7 +177,7 @@ class InstituteApiController extends Controller
                                 $subject_array = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
                                     ->whereIN('subject.base_table_id', $baseidsfosubj)
                                     ->select('subject.*','base_table.stream')
-                                    ->toSql();
+                                    ->get();
                                     
                                     $subject = [];
                                     foreach ($subject_array as $value) {
