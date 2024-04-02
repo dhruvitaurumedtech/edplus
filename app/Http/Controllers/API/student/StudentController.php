@@ -925,6 +925,14 @@ class StudentController extends Controller
             $user_id = $request->user_id;
             $existingUser = User::where('token', $token)->where('id',$request->user_id)->first();
             if ($existingUser) {
+                if($request->file('image')){
+                    $iconFile = $request->file('image');
+                    $imagePath = $iconFile->store('profile', 'public');
+                }else{
+                    $imagePath = null;
+                }
+                
+
                $updt = User::where('id', $user_id)
                ->update(['firstname'=>$request->firstname,
                 'lastname'=>$request->lastname,
@@ -933,6 +941,7 @@ class StudentController extends Controller
                 'address'=>$request->address,
                 'dob'=>$request->dob,
                 'school_name'=>$request->school_name,
+                'image'=>$imagePath,
                 'area'=>$request->area]);
 
                 return response()->json([
