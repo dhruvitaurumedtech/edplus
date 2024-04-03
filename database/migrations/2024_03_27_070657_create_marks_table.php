@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('marks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('student_id');
-            $table->foreign('student_id')->references('id')->on('students_details');
+            $table->foreign('student_id')->references('id')->on('users');
             $table->unsignedBigInteger('exam_id');
             $table->foreign('exam_id')->references('id')->on('exam');
             $table->string('mark');
