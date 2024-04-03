@@ -339,9 +339,10 @@ class InstituteApiController extends Controller
             ]);
             $lastInsertedId = $instituteDetail->id;
             $institute_name = $instituteDetail->institute_name;
-
+            
             $subjectid = explode(',', $request->input('subject_id'));
             $sectsbbsiqy = Subject_model::whereIN('id', $subjectid)->pluck('base_table_id')->toArray();
+
             $uniqueArray = array_unique($sectsbbsiqy);
             $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
             foreach ($basedtqy as $svaluee) {
@@ -353,20 +354,36 @@ class InstituteApiController extends Controller
                 $stream = $svaluee->stream;
 
 
-                Institute_for_sub::create([
+                $createinstitutefor = Institute_for_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
                     'institute_for_id' => $institute_for,
                 ]);
 
-                Institute_board_sub::create([
+                if(!$createinstitutefor){
+                    $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->first();
+                    $delt = $instituteFordet->delete();
+                }
+
+                $createboard = Institute_board_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
                     'institute_for_id' => $institute_for,
                     'board_id' => $board,
                 ]);
 
-                Medium_sub::create([
+                if(!$createboard){
+                    $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->first();
+                    $instituteFordet->delete();
+
+                    $instituteForSub = Institute_for_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+                    
+                }
+
+                $createmedium = Medium_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
                     'institute_for_id' => $institute_for,
@@ -374,7 +391,19 @@ class InstituteApiController extends Controller
                     'medium_id' => $medium,
                 ]);
 
-                Class_sub::create([
+                if(!$createmedium){
+                    $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->first();
+                    $instituteFordet->delete();
+
+                    Institute_for_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Institute_board_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+                }
+
+                $createclass = Class_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
                     'institute_for_id' => $institute_for,
@@ -383,7 +412,23 @@ class InstituteApiController extends Controller
                     'class_id' => $institute_for_class,
                 ]);
 
-                Standard_sub::create([
+                if(!$createclass){
+                    $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->first();
+                    $instituteFordet->delete();
+
+                    Institute_for_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Institute_board_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Medium_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+                    
+                }
+
+                $createstnd = Standard_sub::create([
                     'user_id' => $request->input('user_id'),
                     'institute_id' => $lastInsertedId,
                     'institute_for_id' => $institute_for,
@@ -393,9 +438,27 @@ class InstituteApiController extends Controller
                     'standard_id' => $standard,
                 ]);
 
+                if(!$createstnd){
+                    $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->first();
+                    $instituteFordet->delete();
+
+                    Institute_for_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Institute_board_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Medium_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Class_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+                }
+
                 if ($stream != null) {
 
-                    Stream_sub::create([
+                    $createstrem = Stream_sub::create([
                         'user_id' => $request->input('user_id'),
                         'institute_id' => $lastInsertedId,
                         'institute_for_id' => $institute_for,
@@ -405,21 +468,82 @@ class InstituteApiController extends Controller
                         'standard_id' => $standard,
                         'stream_id' => $stream,
                     ]);
+
+                    if(!$createstrem){
+                        $instituteFordet = Institute_detail::where('id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->first();
+                        $instituteFordet->delete();
+    
+                        Institute_for_sub::where('institute_id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->delete();
+    
+                        Institute_board_sub::where('institute_id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->delete();
+    
+                        Medium_sub::where('institute_id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->delete();
+    
+                        Class_sub::where('institute_id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->delete();
+
+                        Standard_sub::where('institute_id',$lastInsertedId)
+                        ->where('user_id',$request->input('user_id'))->delete();
+                    }
                 }
             }
 
             //end new code
 
             //dobusiness
-            $institute_work_id = explode(',', $request->input('institute_work_id'));
-            foreach ($institute_work_id as $value) {
-                Dobusinesswith_sub::create([
-                    'user_id' => $request->input('user_id'),
-                    'institute_id' => $lastInsertedId,
-                    'do_business_with_id' => $value,
-                ]);
-            }
+                try{
+                $institute_work_id = explode(',', $request->input('institute_work_id'));
+                foreach ($institute_work_id as $value) {
+                    Dobusinesswith_sub::create([
+                        'user_id' => $request->input('user_id'),
+                        'institute_id' => $lastInsertedId,
+                        'do_business_with_id' => $value,
+                    ]);
+                }
+            }catch (\Exception $e){
 
+                Subject_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Standard_sub::where('institute_id', $lastInsertedId)
+                ->where('user_id', $request->input('user_id'))->delete();
+                
+                Stream_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Standard_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Class_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Medium_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Institute_board_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                Institute_for_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+                
+                Dobusinesswith_sub::where('institute_id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->delete();
+
+                $indel = Institute_detail::where('id',$lastInsertedId)
+                ->where('user_id',$request->input('user_id'))->forceDelete();
+                
+
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500); 
+            }
+            
             //institute_for_sub
             $intitute_for_id = explode(',', $request->input('institute_for_id'));
             foreach ($intitute_for_id as $value) {
@@ -520,12 +644,54 @@ class InstituteApiController extends Controller
             //subject
 
             $subject_id = explode(',', $request->input('subject_id'));
+            
             foreach ($subject_id as $value) {
-                Subject_sub::create([
-                    'user_id' => $request->input('user_id'),
-                    'institute_id' => $lastInsertedId,
-                    'subject_id' => $value,
-                ]);
+                try{
+                     Subject_sub::create([
+                        'user_id' => $request->input('user_id'),
+                        'institute_id' => $lastInsertedId,
+                        'subject_id' => $value,
+                    ]);
+                } catch (\Exception $e){
+
+                    Subject_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Standard_sub::where('institute_id', $lastInsertedId)
+                    ->where('user_id', $request->input('user_id'))->delete();
+                    
+                    Stream_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Standard_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Class_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Medium_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Institute_board_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    Institute_for_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+                    
+                    Dobusinesswith_sub::where('institute_id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->delete();
+
+                    $indel = Institute_detail::where('id',$lastInsertedId)
+                    ->where('user_id',$request->input('user_id'))->forceDelete();
+                    
+
+                    return response()->json([
+                        'success' => 500,
+                        'message' => 'Server Error',
+                        'error' => $e->getMessage(),
+                    ], 500); 
+                }
+                
             }
 
             return response()->json([
