@@ -274,7 +274,8 @@ class ExamController extends Controller
                     $exam->medium_id = $validatedData['medium_id'];
                     $exam->class_id = $validatedData['class_id'];
                     $exam->standard_id = $validatedData['standard_id'];
-                    $exam->stream_id = (!empty($validatedData['stream_id'])) ? $validatedData['stream_id'] : '';
+                    //$exam->stream_id = (!empty($validatedData['stream_id'])) ? $validatedData['stream_id'] : '';
+                    $exam->stream_id = $validatedData['stream_id'];
                     $exam->subject_id = $validatedData['subject_id'];
                     $exam->save();
                     if (!empty($exam->id)) {
