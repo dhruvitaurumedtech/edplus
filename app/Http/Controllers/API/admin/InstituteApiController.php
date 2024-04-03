@@ -1732,7 +1732,7 @@ class InstituteApiController extends Controller
 
             if ($admarks) {
                 return response()->json([
-                    'status' => 400,
+                    'status' => 200,
                     'message' => 'Added.',
                 ]);
             } else {
