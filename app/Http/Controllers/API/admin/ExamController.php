@@ -260,6 +260,7 @@ class ExamController extends Controller
 
 
                 if (empty($exam_data)) {
+                    
                     $exam = Exam_Model::find($exam_id);
                     $exam->user_id = $validatedData['user_id'];
                     $exam->institute_id = $validatedData['institute_id'];
@@ -274,7 +275,7 @@ class ExamController extends Controller
                     $exam->medium_id = $validatedData['medium_id'];
                     $exam->class_id = $validatedData['class_id'];
                     $exam->standard_id = $validatedData['standard_id'];
-                    $exam->stream_id = $validatedData['stream_id'];
+                    $exam->stream_id = $request->stream_id;
                     $exam->subject_id = $validatedData['subject_id'];
                     $exam->save();
                     if (!empty($exam->id)) {
