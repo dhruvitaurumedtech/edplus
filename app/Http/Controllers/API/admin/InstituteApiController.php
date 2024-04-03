@@ -1734,17 +1734,20 @@ class InstituteApiController extends Controller
                 return response()->json([
                     'status' => 200,
                     'message' => 'Added.',
+                    'data'=>[]
                 ]);
             } else {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Data not added.',
+                    'data'=>[]
                 ]);
             }
         } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
+                'data'=>[]
             ]);
         }
     }
