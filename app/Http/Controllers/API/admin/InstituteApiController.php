@@ -1734,11 +1734,21 @@ class InstituteApiController extends Controller
             $exam_id = $request->exam_id;
             $mark = $request->mark;
 
-            $admarks = Marks_model::create([
-                'student_id' => $student_id,
-                'exam_id' => $exam_id,
-                'mark' => $mark,
-            ]);
+            $addesmarks = Marks_model::where('student_id',$student_id)->where('exam_id',$exam_id)->first();
+            if($addesmarks->isNotEmpty()){
+                $admarks = Marks_model::where('id',$addesmarks->id)->update([
+                    'student_id' => $student_id,
+                    'exam_id' => $exam_id,
+                    'mark' => $mark,
+                ]);
+            }else{
+                $admarks = Marks_model::create([
+                    'student_id' => $student_id,
+                    'exam_id' => $exam_id,
+                    'mark' => $mark,
+                ]);
+            }
+            
 
             if ($admarks) {
                 return response()->json([
