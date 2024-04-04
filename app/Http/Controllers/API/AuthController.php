@@ -220,6 +220,7 @@ class AuthController extends Controller
         }
     
         Auth::logout($userId);
+        user::where('id',$userId)->update(['token' => '']);
         return response()->json([
             'status' => '200',
             'message' => 'Successfully logged out',
