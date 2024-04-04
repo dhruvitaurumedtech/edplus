@@ -576,7 +576,7 @@ class StudentController extends Controller
                 $result[] = array('subject'=>$resultDDt->subject,
                 'title'=>$resultDDt->exam_title.'('.$resultDDt->exam_type.')',
                 'total_marks'=>$resultDDt->total_marks,
-                'achiveddmarks_marks'=>$resultDDt->mark,
+                'achiveddmarks_marks'=>boolval($resultDDt->mark),
                 'date'=>$resultDDt->exam_date,
                 'class_highest'=>$highestMarks);
             }

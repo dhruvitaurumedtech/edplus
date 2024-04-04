@@ -318,7 +318,6 @@ class InstituteApiController extends Controller
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
             //institute_detail
-           
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
                 'youtube_link' => $request->input('youtube_link'),
@@ -331,9 +330,9 @@ class InstituteApiController extends Controller
                 'close_time' => $request->input('close_time'),
                 'open_time' => $request->input('open_time'),
                 'logo' => $imagePath,
+                'about_us'=>$request->about_us,
                 'user_id' => $request->input('user_id'),
                 'institute_name' => $request->input('institute_name'),
-                'about_us'=>$request->input('about_us'),
                 'address' => $request->input('address'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
@@ -1604,9 +1603,11 @@ class InstituteApiController extends Controller
                 $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+                    $marksofstd = Marks_model::where('student_id',$stddt->student_id)->where('exam_id',$request->exam_id)->first();
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
+                        'marks'=>boolval($marksofstd->mark),
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,
