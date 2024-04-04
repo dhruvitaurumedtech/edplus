@@ -1601,9 +1601,11 @@ class InstituteApiController extends Controller
                 $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+                    $marksofstd = Marks_model::where('student_id',$stddt->student_id)->where('exam_id',$request->exam_id)->first();
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
+                        'marks'=>$marksofstd->mark,
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,
