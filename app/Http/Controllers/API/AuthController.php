@@ -208,9 +208,18 @@ class AuthController extends Controller
             ]
         ]);
     }
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logout();
+        $userId = $request->user_id;
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json([
+                'status' => '404',
+                'message' => 'User not found',
+            ], 404);
+        }
+    
+        Auth::logout($userId);
         return response()->json([
             'status' => '200',
             'message' => 'Successfully logged out',
