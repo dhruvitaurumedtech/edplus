@@ -165,6 +165,7 @@ class AuthController extends Controller
         $user = Auth::user();
         // $providedToken = $request->header('Authorization');
         $existingUser = User::where('email', $request->email)->first();
+        
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             if (!empty($user->photo)) {
@@ -172,7 +173,11 @@ class AuthController extends Controller
             } else {
                 $photo = asset('profile/image.jpg');
             }
-
+            $token = JWTAuth::fromUser($user);
+            User::where('email', $request->email)
+            ->update([
+                'token' => $token
+            ]);
             return response()->json([
                 'status' => 200,
                 'message' => 'Login successful',
@@ -183,7 +188,7 @@ class AuthController extends Controller
                     'user_email' => $user->email,
                     'user_image' => $photo,
                     'role_type' => $user->role_type,
-                    'token' => $existingUser->token,
+                    'token' => $token,
                 ]
             ], 200, [], JSON_NUMERIC_CHECK);
         } else {
