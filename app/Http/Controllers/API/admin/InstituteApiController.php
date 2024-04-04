@@ -1318,6 +1318,7 @@ class InstituteApiController extends Controller
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
+            try{
             if($existingUser->roll_type==6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
@@ -1419,7 +1420,13 @@ class InstituteApiController extends Controller
                     ]);
                 }
             }
-            
+            }catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Something went wrong',
+                    'data'=>array('error' => $e->getMessage()),
+                ], 500);
+            }  
         } else {
             return response()->json([
                 'status' => 400,
