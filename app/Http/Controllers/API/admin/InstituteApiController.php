@@ -1735,7 +1735,7 @@ class InstituteApiController extends Controller
             $mark = $request->mark;
 
             $addesmarks = Marks_model::where('student_id',$student_id)->where('exam_id',$exam_id)->first();
-            if($addesmarks->isNotEmpty()){
+            if($addesmarks){
                 $admarks = Marks_model::where('id',$addesmarks->id)->update([
                     'student_id' => $student_id,
                     'exam_id' => $exam_id,
