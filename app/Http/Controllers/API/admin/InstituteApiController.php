@@ -1555,6 +1555,7 @@ class InstituteApiController extends Controller
     //student list for add exam marks
     public function student_list_for_add_marks(Request $request)
     {
+        
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
