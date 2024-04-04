@@ -1454,8 +1454,11 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            $user_id = $request->user_id;
+            
             $institute_id = $request->institute_id;
+
+            $instituteDTS = Institute_detail::where('id',$institute_id)->first();
+            $user_id = $instituteDTS->user_id; 
 
             $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
                 ->where('institute_for_sub.institute_id', $institute_id)
