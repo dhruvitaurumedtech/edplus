@@ -463,6 +463,7 @@ class StudentController extends Controller
             $institutedetaa = array('id'=>$institutedeta->id,
             'institute_name'=>$institutedeta->institute_name,
             'address'=>$institutedeta->address,
+            'about_us'=>$institutedeta->about_us,
             'logo'=>asset($institutedeta->logo),
             'boards'=>$boards,
             'students'=>$stdcount,

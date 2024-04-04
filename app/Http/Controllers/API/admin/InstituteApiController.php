@@ -318,6 +318,7 @@ class InstituteApiController extends Controller
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
             //institute_detail
+           
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
                 'youtube_link' => $request->input('youtube_link'),
@@ -332,6 +333,7 @@ class InstituteApiController extends Controller
                 'logo' => $imagePath,
                 'user_id' => $request->input('user_id'),
                 'institute_name' => $request->input('institute_name'),
+                'about_us'=>$request->input('about_us'),
                 'address' => $request->input('address'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
