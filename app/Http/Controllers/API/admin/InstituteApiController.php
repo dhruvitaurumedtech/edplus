@@ -947,7 +947,13 @@ class InstituteApiController extends Controller
             $banner_list = Banner_model::where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->get();
+                if($banner_list->isEmpty()){
+                    $banner_list = Banner_model::where('status', 'active')
+                    ->where('user_id','1')
+                    ->get();
+                }
             $banner_array = [];
+
             foreach ($banner_list as $value) {
                 $banner_array[] = [
                     'id' => $value->id,
