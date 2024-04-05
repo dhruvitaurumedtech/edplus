@@ -33,13 +33,19 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No">No</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
                     @if(auth::user()->role_type == '3')
-                    <th style="width: 10px"><Sr class="No">Institute Name</Sr></th>
-                    <th style="width: 10px"><Sr class="No">Url</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">Institute Name</Sr>
+                    </th>
+                    <th style="width: 10px">
+                      <Sr class="No">Url</Sr>
+                    </th>
                     @endif
                     <th style="width: 200px">Banner_image</th>
                     <th style="width: 500px">Status</th>
@@ -57,26 +63,27 @@
                     @endif
                     <td><img src="{{asset($value->banner_image) }}" alt="banner" style="width:100px;height:100px;"></td>
                     <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif</td>
-                   
+                      @endif
+                    </td>
+
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Banner')
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton
-                      &nbsp;&nbsp;
-                      @canButton('delete', 'Banner')
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      @endCanButton
+                        @canButton('edit', 'Banner')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Banner')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -100,51 +107,51 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="post" action="{{ url('banner/update') }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                    
-                                    <div class="col-md-9">
-                                           <input type="hidden" id="banner_id" name="banner_id">
-                                            <label for="exampleInputEmail1">Banner Image  : </label>
-                                            <input type="hidden" name="old_banner_image" id="old_banner_image">
-                                            <input type="file" onchange="previewFile()" name="banner_image" class="form-control">
-                                            @error('icon')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-3">
-                                             <img src="" id="banner_image"  alt="banner" class="mt-4" style="width:100px;height:100px;">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status" id="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+        <form method="post" action="{{ url('banner/update') }}" enctype="multipart/form-data">
+          @csrf
+          <div class="card-body">
+            <div class="form-group">
+              <div class="row">
 
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-                            </div>
-                    </div>
+                <div class="col-md-9">
+                  <input type="hidden" id="banner_id" name="banner_id">
+                  <label for="exampleInputEmail1">Banner Image : </label>
+                  <input type="hidden" name="old_banner_image" id="old_banner_image">
+                  <input type="file" onchange="previewFile()" name="banner_image" class="form-control">
+                  @error('icon')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
                 </div>
-                </form>
-      </div>
+                <div class="col-md-3">
+                  <img src="" id="banner_image" alt="banner" class="mt-4" style="width:100px;height:100px;">
+                </div>
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">status : </label>
+                  <select class="form-control" name="status" id="status">
+                    <option value=" ">Select Option</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  @error('status')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
 
+
+              </div>
+
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+          </div>
+      </div>
     </div>
+    </form>
   </div>
+
+</div>
+</div>
 </div>
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
@@ -152,11 +159,12 @@
       var banner_id = this.getAttribute('data-user-id');
 
       axios.post('/banner/edit', {
-        banner_id: banner_id
+          banner_id: banner_id
         })
         .then(response => {
           var reponse_data = response.data.banner_list;
-          var iconSrc ='{{ asset('') }}' + reponse_data.banner_image;
+          var iconSrc = '{{ asset('
+          ') }}' + reponse_data.banner_image;
           $('#banner_id').val(reponse_data.id);
           $('#banner_image').attr('src', iconSrc);
           $('#old_banner_image').val(reponse_data.banner_image);
@@ -185,7 +193,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('/banner/delete', {
-            banner_id: banner_id
+              banner_id: banner_id
             })
             .then(response => {
               location.reload(true);
@@ -198,20 +206,20 @@
       });
     });
   });
+
   function previewFile() {
-  const preview = document.getElementById("banner_image");
-  const fileInput = document.querySelector("input[type=file]");
-  const file = fileInput.files[0];
-  const reader = new FileReader();
+    const preview = document.getElementById("banner_image");
+    const fileInput = document.querySelector("input[type=file]");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-  reader.addEventListener("load", () => {
-    preview.src = reader.result;
-  }, false);
+    reader.addEventListener("load", () => {
+      preview.src = reader.result;
+    }, false);
 
-  if (file) {
-    reader.readAsDataURL(file);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
-}
-  
 </script>
 @include('layouts/footer ')

@@ -44,15 +44,15 @@
             <div class="card-header">
               <h3 class="card-title">Role List</h3>
               @canButton('add', 'Role')
-                  <a href="{{ url('create/role') }}" class="btn btn-success" style="float: right;">Create role</a>
+              <a href="{{ url('create/role') }}" class="btn btn-success" style="float: right;">Create role</a>
               @endCanButton
 
 
             </div>
             <!-- /.card-header -->
-            
+
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
                     <th style="width: 10px">#</th>
@@ -68,30 +68,30 @@
                     <td>{{$value->role_name}}</td>
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Role')
-                      <input type="submit" class="btn btn-primary editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton
-                      <form method="get" action="{{url('permission')}}">
-                        @csrf
-                      <input type="hidden" value="{{ $value->id }}" name="id">
-                      <input type="submit" class="btn btn-success"  value="Permission">
-                     
-                      </form>
-                      &nbsp;&nbsp;
-                      @canButton('delete', 'Role')
-                       
+                        @canButton('edit', 'Role')
+                        <input type="submit" class="btn btn-primary editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        <form method="get" action="{{url('permission')}}">
+                          @csrf
+                          <input type="hidden" value="{{ $value->id }}" name="id">
+                          <input type="submit" class="btn btn-success" value="Permission">
+
+                        </form>
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Role')
+
                         @if($value->id !='1')
-                      <input type="submit" class="btn btn-danger deletebutton" data-role-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger deletebutton" data-role-id="{{ $value->id }}" value="Delete">
                         @endif
-                      @endCanButton  
-                    </div>
+                        @endCanButton
+                      </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
-          
+
             <div class="d-flex justify-content-end">
               {!! $roles->withQueryString()->links('pagination::bootstrap-5') !!}
 
@@ -180,7 +180,5 @@
       });
     });
   });
-  
-  
 </script>
 @include('layouts/footer ')

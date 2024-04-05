@@ -23,62 +23,64 @@
   <section class="content">
     <div class="container-fluid">
       <div class="row">
-      <div class="col-md-5">
-                    <!-- general form elements -->
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Create Standard</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form method="post" action="{{ url('standard-list/save') }}">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                   
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">Standard Name  : </label>
-                                            <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+        <div class="col-md-5">
+          <!-- general form elements -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">Create Standard</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form method="post" action="{{ url('standard-list/save') }}">
+              @csrf
+              <div class="card-body">
+                <div class="form-group">
+                  <div class="row">
 
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
-                            </div>
-                        </form>
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">Standard Name : </label>
+                      <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
+                      @error('name')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
                     </div>
+
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">status : </label>
+                      <select class="form-control" name="status">
+                        <option value=" ">Select Option</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                      @error('status')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                  </div>
+
                 </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <div class="col-md-7">
           <div class="card card-success">
             <div class="card-header">
               <h3 class="card-title">Standard List</h3>
-              </div>
+            </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No">No</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
                     <th style="width: 200px">Name</th>
                     <th style="width: 500px">Status</th>
                     <th>Action</th>
@@ -91,24 +93,26 @@
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
                     <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif</td>
-                   
+                      @endif
+                    </td>
+
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Standard')
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton&nbsp;&nbsp;
-                      @canButton('delete', 'Standard')
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      @endCanButton</div>
+                        @canButton('edit', 'Standard')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton&nbsp;&nbsp;
+                        @canButton('delete', 'Standard')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
+                      </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -119,7 +123,7 @@
           </div>
 
         </div>
-        
+
   </section>
 
 </div>
@@ -133,47 +137,47 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="post" action="{{ url('standard/update') }}">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                   
-                                        <div class="col-md-12">
-                                            <input type="hidden" id="standard_id" name="standard_id">
-                                            <label for="exampleInputEmail1">Name  : </label>
-                                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                       
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status" id="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+        <form method="post" action="{{ url('standard/update') }}">
+          @csrf
+          <div class="card-body">
+            <div class="form-group">
+              <div class="row">
 
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-                            </div>
-                    </div>
+                <div class="col-md-12">
+                  <input type="hidden" id="standard_id" name="standard_id">
+                  <label for="exampleInputEmail1">Name : </label>
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                  @error('name')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
                 </div>
-                </form>
-      </div>
 
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">status : </label>
+                  <select class="form-control" name="status" id="status">
+                    <option value=" ">Select Option</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  @error('status')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+          </div>
+      </div>
     </div>
+    </form>
   </div>
+
+</div>
+</div>
 </div>
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
@@ -181,7 +185,7 @@
       var standard_id = this.getAttribute('data-user-id');
 
       axios.post('/standard-list/edit', {
-        standard_id: standard_id
+          standard_id: standard_id
         })
         .then(response => {
           var reponse_data = response.data.standard_list;
@@ -213,7 +217,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('/standard/delete', {
-            standard_id: standard_id
+              standard_id: standard_id
             })
             .then(response => {
               location.reload(true);
@@ -226,7 +230,5 @@
       });
     });
   });
-  
-  
 </script>
 @include('layouts/footer ')

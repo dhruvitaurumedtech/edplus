@@ -31,10 +31,12 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No"></Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No"></Sr>
+                    </th>
                     <th style="width: 400px">Name</th>
                     <th style="width: 400px">Email</th>
                     <th style="width: 400px">Mobile</th>
@@ -53,20 +55,20 @@
                     <td>{{$value['status']}}</td>
                     <td>
                       <div class="d-flex">
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
-                      &nbsp;&nbsp;
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
-                      &nbsp;&nbsp;
-                      <form method="post" action="{{url('/student/list')}}">
-                        @csrf
-                         <input type="hidden" name="institute_id" value="{{ $value['id'] }}">
-                         <input type="submit" class="btn btn-warning"  value="Student List">
-                      </form>
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
+                        &nbsp;&nbsp;
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
+                        &nbsp;&nbsp;
+                        <form method="post" action="{{url('/student/list')}}">
+                          @csrf
+                          <input type="hidden" name="institute_id" value="{{ $value['id'] }}">
+                          <input type="submit" class="btn btn-warning" value="Student List">
+                        </form>
                       </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -93,49 +95,49 @@
         <form method="post" action="{{ url('admin/update') }}">
           @csrf
           <div class="card-body">
-          <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
-                    <div class="col-sm-10">
-                    <select class="form-control" name="role_type" id="role_type">
-                        <option value="">Select Role</option>
-                        <option value="2">Admin</option>
-                        <option value="3">Institute</option>
-                    </select>
-                    @error('role_type')
-                     <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
-                    </div>
-                  </div> 
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-10">
-                      <input type="hidden" name="user_id" id="user_id">
-                      <input type="text" id="name" name="name" class="form-control"   placeholder="Name">
-                    @error('name')
-                     <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                      <input type="email" class="form-control"  id="email" name="email" placeholder="Email">
-                    @error('email')
-                     <div class="alert alert-danger">{{ $message }}</div>
-                    @enderror
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-10">
-                      <input type="text" id="mobile" name="mobile" class="form-control"   placeholder="Mobile Number">
-                    </div>
-                  </div>
-                  
-          <hr>
-          <div class="">
-            <button type="submit" class="btn btn-info" style="float:right">Update</button>
-          </div>
+            <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
+              <div class="col-sm-10">
+                <select class="form-control" name="role_type" id="role_type">
+                  <option value="">Select Role</option>
+                  <option value="2">Admin</option>
+                  <option value="3">Institute</option>
+                </select>
+                @error('role_type')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="hidden" name="user_id" id="user_id">
+                <input type="text" id="name" name="name" class="form-control" placeholder="Name">
+                @error('name')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+              <div class="col-sm-10">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                @error('email')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
+              </div>
+            </div>
+
+            <hr>
+            <div class="">
+              <button type="submit" class="btn btn-info" style="float:right">Update</button>
+            </div>
         </form>
       </div>
 
@@ -148,11 +150,11 @@
       var user_id = this.getAttribute('data-user-id');
 
       axios.post('/admin/edit', {
-        user_id: user_id
+          user_id: user_id
         })
         .then(response => {
           var reponse_data = response.data.userDT;
-          
+
           $('#user_id').val(reponse_data.id);
           $('#role_type').val(reponse_data.role_type);
           $('#name').val(reponse_data.name);
@@ -183,7 +185,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('/admin/delete', {
-            user_id: user_id
+              user_id: user_id
             })
             .then(response => {
               location.reload(true);
@@ -196,8 +198,8 @@
       });
     });
   });
-  
-  
+
+
 
   // document.querySelectorAll('.studentlist').forEach(function(button) {
   //   button.addEventListener('click', function() {

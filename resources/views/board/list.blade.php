@@ -45,16 +45,15 @@
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-                    <div class="col-md-9">
+                    <div class="col-md-12">
                       <label for="exampleInputEmail1">Icon : </label>
                       <input type="file" onchange="previewFile()" name="icon" id="nicon" class="form-control">
                       @error('icon')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-
-                    <div class="col-md-3">
-                      <img src="" id="icon" alt="Icon" class="mt-4" style="display: none;">
+                    <div class="col-md-12">
+                      <img src="" id="icon" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
                     </div>
                     <div class="col-md-12">
                       <label for="exampleInputEmail1">status : </label>
@@ -67,7 +66,6 @@
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-
                   </div>
 
                 </div>
@@ -90,7 +88,7 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
                     <th style="width: 10px">
@@ -108,7 +106,7 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" style="height:80px;width:80px;"></td>
+                    <td><img src="{{asset($value->icon) }}" alt="Icon" style="height:50px;"></td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
@@ -141,65 +139,67 @@
           </div>
 
         </div>
-
-
+      </div>
+    </div>
   </section>
 
-</div>
-<div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="usereditModalLabel">Edit Board </h5>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
-        </button>
-      </div>
-      <div class="modal-body">
-        <form method="post" action="{{ url('board-update') }}" enctype="multipart/form-data">
-          @csrf
-          <div class="card-body">
-            <div class="form-group">
-              <div class="row">
-                <div class="col-md-12">
-                  <input type="hidden" id="board_id" name="board_id">
-                  <label for="exampleInputEmail1">Name : </label>
-                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                  @error('name')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
-                </div>
-                <div class="col-md-9">
-                  <label for="exampleInputEmail1">Icon : </label>
-                  <input type="hidden" name="old_icon" id="old_icon">
-                  <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
-                  @error('icon')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
-                </div>
-                <div class="col-md-3">
-                  <img src="" id="icon_update" alt="Icon" class="mt-4">
-                </div>
 
-                <div class="col-md-12">
-                  <label for="exampleInputEmail1">status : </label>
-                  <select class="form-control" name="status" id="status">
-                    <option value=" ">Select Option</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
-                  </select>
-                  @error('status')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
+  <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="usereditModalLabel">Edit Board </h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form method="post" action="{{ url('board-update') }}" enctype="multipart/form-data">
+            @csrf
+            <div class="card-body">
+              <div class="form-group">
+                <div class="row">
+                  <div class="col-md-12">
+                    <input type="hidden" id="board_id" name="board_id">
+                    <label for="exampleInputEmail1">Name : </label>
+                    <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                    @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-md-9">
+                    <label for="exampleInputEmail1">Icon : </label>
+                    <input type="hidden" name="old_icon" id="old_icon">
+                    <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
+                    @error('icon')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-md-3">
+                    <img src="" id="icon_update" alt="Icon" class="mt-4">
+                  </div>
+
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">status : </label>
+                    <select class="form-control" name="status" id="status">
+                      <option value=" ">Select Option</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    @error('status')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+
                 </div>
 
               </div>
-
             </div>
-          </div>
-          <div class="card-footer">
-            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-          </div>
+            <div class="card-footer">
+              <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+            </div>
+          </form>
+        </div>
       </div>
     </div>
     </form>
@@ -208,6 +208,7 @@
 </div>
 </div>
 </div>
+
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
     button.addEventListener('click', function() {
@@ -264,7 +265,9 @@
       });
     });
   });
+</script>
 
+<script>
   //create form function
   function previewFile() {
     $("#icon").show();
@@ -283,6 +286,7 @@
   }
 
   function previewFile_update(inputElement) {
+    $("#icon_update").show();
     const preview = document.getElementById("icon_update");
     const file = inputElement.files[0];
     const reader = new FileReader();
@@ -296,4 +300,6 @@
     }
   }
 </script>
+
+
 @include('layouts/footer')

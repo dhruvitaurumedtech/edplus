@@ -25,48 +25,48 @@
       <div class="row">
         <!-- create -->
         <div class="col-md-5">
-                    <!-- general form elements -->
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Create Stream</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form method="post" action="{{ url('stream-save') }}">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">Stream Name  : </label>
-                                            <input type="text" name="name" class="form-control" placeholder="Enter Stream Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
-                            </div>
-                            </form>
+          <!-- general form elements -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">Create Stream</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form method="post" action="{{ url('stream-save') }}">
+              @csrf
+              <div class="card-body">
+                <div class="form-group">
+                  <div class="row">
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">Stream Name : </label>
+                      <input type="text" name="name" class="form-control" placeholder="Enter Stream Name">
+                      @error('name')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
                     </div>
+
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">status : </label>
+                      <select class="form-control" name="status">
+                        <option value=" ">Select Option</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                      @error('status')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                  </div>
+
                 </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <!-- list -->
         <div class="col-md-7">
@@ -79,10 +79,12 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No">No</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
                     <th style="width: 200px">Name</th>
                     <th style="width: 500px">Status</th>
                     <th>Action</th>
@@ -95,26 +97,27 @@
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
                     <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif</td>
-                   
+                      @endif
+                    </td>
+
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Stream')
-                      <input type="submit" class="btn btn-success editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton
-                      &nbsp;&nbsp;
-                      @canButton('delete', 'Stream')
-                       <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      @endCanButton
+                        @canButton('edit', 'Stream')
+                        <input type="submit" class="btn btn-success editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Stream')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -138,46 +141,46 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="post" action="{{ url('stream-update') }}">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                        <div class="col-md-12">
-                                            <input type="hidden" id="stream_id" name="stream_id">
-                                            <label for="exampleInputEmail1">Name  : </label>
-                                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                       
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status" id="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-                            </div>
-                    </div>
+        <form method="post" action="{{ url('stream-update') }}">
+          @csrf
+          <div class="card-body">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-12">
+                  <input type="hidden" id="stream_id" name="stream_id">
+                  <label for="exampleInputEmail1">Name : </label>
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                  @error('name')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
                 </div>
-                </form>
-      </div>
 
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">status : </label>
+                  <select class="form-control" name="status" id="status">
+                    <option value=" ">Select Option</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  @error('status')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+          </div>
+      </div>
     </div>
+    </form>
   </div>
+
+</div>
+</div>
 </div>
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
@@ -185,7 +188,7 @@
       var stream_id = this.getAttribute('data-user-id');
 
       axios.post('stream-edit', {
-        stream_id: stream_id
+          stream_id: stream_id
         })
         .then(response => {
           var reponse_data = response.data.straemlist;
@@ -216,7 +219,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('stream-delete', {
-            stream_id: stream_id
+              stream_id: stream_id
             })
             .then(response => {
               location.reload(true);
@@ -229,7 +232,5 @@
       });
     });
   });
-  
-  
 </script>
 @include('layouts/footer ')

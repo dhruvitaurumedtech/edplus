@@ -1,10 +1,10 @@
 <footer class="main-footer">
-    <strong>Copyright &copy; 2024-2025 
+  <strong>Copyright &copy; 2024-2025
     <div class="float-right d-none d-sm-inline-block">
     </div>
-  </footer>
+</footer>
 
- 
+
 <script src="{{asset('admin_assets/plugins/jquery/jquery.min.js')}}"></script>
 <script src="{{asset('admin_assets/plugins/jquery-ui/jquery-ui.min.js')}}"></script>
 <script>
@@ -23,5 +23,7 @@
 <script src="{{asset('admin_assets/plugins/overlayScrollbars/js/jquery.overlayScrollbars.min.js')}}"></script>
 <script src="{{asset('admin_assets/dist/js/adminlte.js')}}"></script>
 <script src="{{asset('admin_assets/dist/js/pages/dashboard.js')}}"></script>
+<script src="{{asset('assets/js/app.js')}}"></script>
 </body>
+
 </html>
