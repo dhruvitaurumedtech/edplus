@@ -1956,4 +1956,30 @@ class InstituteApiController extends Controller
     public function add_time_table(Request $request){
         
     }
+
+    public function delete_account(Request $request){
+        
+        $userId = $request->user_id;
+        $token = $request->header('Authorization');
+        
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $userId)->first();
+        if ($existingUser) {
+           
+        user::where('id',$userId)->delete();
+        return response()->json([
+            'status' => '200',
+            'message' => 'Delete Account Successfully!',
+        ]);
+
+    }else {
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ], 400);
+    }     
+    }
 }
