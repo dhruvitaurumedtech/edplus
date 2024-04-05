@@ -246,7 +246,7 @@ class AuthController extends Controller
     }
 
     public function delete_account(Request $request){
-        
+        print_r('hello');exit;
         $userId = $request->user_id;
         $token = $request->header('Authorization');
         if (strpos($token, 'Bearer ') === 0) {
