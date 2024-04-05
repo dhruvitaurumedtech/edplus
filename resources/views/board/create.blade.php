@@ -37,32 +37,32 @@
                                 <div class="form-group">
                                     <div class="row">
                                         <div class="col-md-6">
-                                            <label for="exampleInputEmail1">Board Name  : </label>
+                                            <label for="exampleInputEmail1">Board Name : </label>
                                             <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
                                             @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
+                                            <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-4">
-                                            <label for="exampleInputEmail1">Icon  : </label>
-                                            <input type="file" onchange="previewFile()" name="icon" class="form-control" >
+                                            <label for="exampleInputEmail1">Icon : </label>
+                                            <input type="file" onchange="previewFile()" name="icon" class="form-control">
                                             @error('icon')
-                                                <div class="text-danger">{{ $message }}</div>
+                                            <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
                                         <div class="col-md-2">
-                                             <img src="" id="icon"  alt="Icon" class="mt-4" style="display: none;">
+                                            <img src="" id="icon" alt="Icon" class="mt-4" style="display: none;">
                                         </div>
 
                                         <div class="col-md-6">
                                             <label for="exampleInputEmail1">status : </label>
                                             <select class="form-control" name="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
+                                                <option value=" ">Select Option</option>
+                                                <option value="active">Active</option>
+                                                <option value="inactive">Inactive</option>
                                             </select>
                                             @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
+                                            <div class="text-danger">{{ $message }}</div>
                                             @enderror
                                         </div>
 
@@ -88,7 +88,7 @@
 </section>
 </div>
 <script>
-     function previewFile() {
+    function previewFile() {
         $("#icon").show();
 
         const preview = document.getElementById("icon");
@@ -103,7 +103,7 @@
         if (file) {
             reader.readAsDataURL(file);
         }
-        }
+    }
 </script>
 
 @include('layouts/footer')

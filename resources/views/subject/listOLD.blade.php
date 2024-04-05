@@ -33,10 +33,12 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No">No</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
                     <th style="width: 200px">Name</th>
                     <th style="width: 200px">Standard</th>
                     <th style="width: 200px">Stream</th>
@@ -53,24 +55,26 @@
                     <td>{{$value->standard_name}}</td>
                     <td>{{$value->stream_name}}</td>
                     <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif</td>
-                   
+                      @endif
+                    </td>
+
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Subject')
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton &nbsp;&nbsp;
-                      @canButton('delete', 'Subject')
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      @endCanButton</div>
+                        @canButton('edit', 'Subject')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton &nbsp;&nbsp;
+                        @canButton('delete', 'Subject')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
+                      </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -94,75 +98,75 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="post" action="{{ url('subject/update') }}">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                    <div class="col-md-12">
-                                             <label for="exampleInputEmail1">Select standard : </label>
-                                            <select class="form-control" name="standard_id" id="standard_id">
-                                                 <option value=" ">Select standard</option>
-                                                 @foreach($standardlist as $value)
-                                                 <option value="{{$value['id']}}">{{$value['name']}}</option>
-                                                 @endforeach
-                                            </select>
-                                            @error('board_id')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1" id="stream_label"> Select Stream : </label>
-                                            <select class="form-control" name="stream_id" id="secondDropdown2" style="display: none;">
-                                                 <option value=" ">Select stream</option>
-                                               
-                                            </select>
-                                            @error('institute_id')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-12">
-                                            <input type="hidden" id="subject_id" name="subject_id">
-                                            <label for="exampleInputEmail1">Name  : </label>
-                                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                       
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status" id="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-                            </div>
-                    </div>
+        <form method="post" action="{{ url('subject/update') }}">
+          @csrf
+          <div class="card-body">
+            <div class="form-group">
+              <div class="row">
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">Select standard : </label>
+                  <select class="form-control" name="standard_id" id="standard_id">
+                    <option value=" ">Select standard</option>
+                    @foreach($standardlist as $value)
+                    <option value="{{$value['id']}}">{{$value['name']}}</option>
+                    @endforeach
+                  </select>
+                  @error('board_id')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
                 </div>
-                </form>
-      </div>
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1" id="stream_label"> Select Stream : </label>
+                  <select class="form-control" name="stream_id" id="secondDropdown2" style="display: none;">
+                    <option value=" ">Select stream</option>
 
+                  </select>
+                  @error('institute_id')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+                <div class="col-md-12">
+                  <input type="hidden" id="subject_id" name="subject_id">
+                  <label for="exampleInputEmail1">Name : </label>
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                  @error('name')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">status : </label>
+                  <select class="form-control" name="status" id="status">
+                    <option value=" ">Select Option</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  @error('status')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+          </div>
+      </div>
     </div>
+    </form>
   </div>
+
+</div>
+</div>
 </div>
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
     button.addEventListener('click', function() {
       var subject_id = this.getAttribute('data-user-id');
       axios.post('/subject/edit', {
-        subject_id: subject_id
+          subject_id: subject_id
         })
         .then(response => {
           var reponse_data = response.data.subjectlist;
@@ -194,7 +198,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('/subject/delete', {
-            subject_id: subject_id
+              subject_id: subject_id
             })
             .then(response => {
               location.reload(true);
@@ -207,48 +211,44 @@
       });
     });
   });
-  
-  
 </script>
 <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
 <script>
-    
-    $(document).ready(function () {
-        
-        $('#standard_id').on('change', function () {
-            var standard_id = $(this).val();
-            axios.post('/get/standard_wise_stream', {
-                    standard_id: standard_id,
-                })
-                .then(function (response) {
-                    console.log(response.data.streamlist);
-                    if (response.data.streamlist && Object.keys(response.data.streamlist).length > 0) {
-                        $('#secondDropdown2').show();
-                        $('#streamlabel').show();
+  $(document).ready(function() {
 
-                        var secondDropdown = document.getElementById('secondDropdown2');
-                        secondDropdown.innerHTML = ''; // Clear existing options
+    $('#standard_id').on('change', function() {
+      var standard_id = $(this).val();
+      axios.post('/get/standard_wise_stream', {
+          standard_id: standard_id,
+        })
+        .then(function(response) {
+          console.log(response.data.streamlist);
+          if (response.data.streamlist && Object.keys(response.data.streamlist).length > 0) {
+            $('#secondDropdown2').show();
+            $('#streamlabel').show();
 
-                        secondDropdown.appendChild(new Option('Select stream', ''));
+            var secondDropdown = document.getElementById('secondDropdown2');
+            secondDropdown.innerHTML = ''; // Clear existing options
 
-                        response.data.streamlist.forEach(function(stream) {
-                            var option = new Option(stream.name, stream.id);
-                            secondDropdown.appendChild(option);
-                        });
-                    }else{
-                        $('#secondDropdown2').hide();
-                        $('#streamlabel').hide();
-                    }
+            secondDropdown.appendChild(new Option('Select stream', ''));
 
-                })
-                .catch(function (error) {
-                    console.error(error);
-                });
+            response.data.streamlist.forEach(function(stream) {
+              var option = new Option(stream.name, stream.id);
+              secondDropdown.appendChild(option);
+            });
+          } else {
+            $('#secondDropdown2').hide();
+            $('#streamlabel').hide();
+          }
 
-            
+        })
+        .catch(function(error) {
+          console.error(error);
         });
+
+
     });
-    
+  });
 </script>
 @include('layouts/footer ')

@@ -23,59 +23,59 @@
   <section class="content">
     <div class="container-fluid">
       <div class="row">
-      <div class="col-md-5">
-                    <!-- general form elements -->
-                    <div class="card card-success">
-                        <div class="card-header">
-                            <h3 class="card-title">Create Class</h3>
-                        </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
-                        <form method="post" action="{{ url('class-list/save') }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                   
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">Class Name  : </label>
-                                            <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-9">
-                                            <label for="exampleInputEmail1">Icon  : </label>
-                                            <input type="file" name="icon" onchange="previewFile_create()" class="form-control" >
-                                            @error('icon')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-3">
-                                             <img src="" id="icon_create"  alt="Icon" class="mt-4" style="display: none;">
-                                        </div>
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+        <div class="col-md-5">
+          <!-- general form elements -->
+          <div class="card card-success">
+            <div class="card-header">
+              <h3 class="card-title">Create Class</h3>
+            </div>
+            <!-- /.card-header -->
+            <!-- form start -->
+            <form method="post" action="{{ url('class-list/save') }}" enctype="multipart/form-data">
+              @csrf
+              <div class="card-body">
+                <div class="form-group">
+                  <div class="row">
 
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
-                            </div>
-                        </form>
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">Class Name : </label>
+                      <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
+                      @error('name')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
                     </div>
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">Icon : </label>
+                      <input type="file" name="icon" onchange="previewFile_create()" class="form-control">
+                      @error('icon')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+                    <div class="col-md-12">
+                      <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
+                    </div>
+                    <div class="col-md-12">
+                      <label for="exampleInputEmail1">status : </label>
+                      <select class="form-control" name="status">
+                        <option value=" ">Select Option</option>
+                        <option value="active">Active</option>
+                        <option value="inactive">Inactive</option>
+                      </select>
+                      @error('status')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+
+                  </div>
+
                 </div>
+              </div>
+              <div class="card-footer">
+                <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+              </div>
+            </form>
+          </div>
+        </div>
 
         <div class="col-md-7">
           <div class="card card-success">
@@ -84,10 +84,12 @@
             </div>
             <!-- /.card-header -->
             <div class="card-body">
-              <table class="table table-bordered">
+              <table class="table table-bordered table-responsive">
                 <thead>
                   <tr>
-                    <th style="width: 10px"><Sr class="No">No</Sr></th>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
                     <th style="width: 200px">Name</th>
                     <th style="width: 200px">Icon</th>
                     <th style="width: 500px">Status</th>
@@ -100,28 +102,29 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon"></td>
+                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize"></td>
                     <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif</td>
-                   
+                      @endif
+                    </td>
+
                     <td>
                       <div class="d-flex">
-                      @canButton('edit', 'Class')
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                       @endCanButton
-                      &nbsp;&nbsp;
-                      @canButton('delete', 'Class')
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      @endCanButton
+                        @canButton('edit', 'Class')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Class')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-               </tbody>
+                </tbody>
               </table>
             </div>
 
@@ -145,71 +148,71 @@
         </button>
       </div>
       <div class="modal-body">
-      <form method="post" action="{{ url('class/update') }}" enctype="multipart/form-data">
-                            @csrf
-                            <div class="card-body">
-                                <div class="form-group">
-                                    <div class="row">
-                                   
-                                        <div class="col-md-12">
-                                            <input type="hidden" id="class_id" name="class_id">
-                                            <label for="exampleInputEmail1">Name  : </label>
-                                            <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                                            @error('name')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-9">
-                                            <label for="exampleInputEmail1">Icon  : </label>
-                                            <input type="hidden" name="old_icon" id="old_icon">
-                                            <input type="file" onchange="previewFile_update()" name="icon" id="edit_icon" class="form-control">
-                                            @error('icon')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-md-3">
-                                             <img src="" id="icon_update"  alt="Icon" class="mt-4">
-                                        </div>
-                                       
-                                        <div class="col-md-12">
-                                            <label for="exampleInputEmail1">status : </label>
-                                            <select class="form-control" name="status" id="status">
-                                                 <option value=" ">Select Option</option>
-                                                 <option value="active">Active</option>
-                                                 <option value="inactive">Inactive</option>
-                                            </select>
-                                            @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
+        <form method="post" action="{{ url('class/update') }}" enctype="multipart/form-data">
+          @csrf
+          <div class="card-body">
+            <div class="form-group">
+              <div class="row">
 
-                                    </div>
-
-                                </div>
-                            </div>
-                            <div class="card-footer">
-                                <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
-                            </div>
-      </form>
-                    </div>
+                <div class="col-md-12">
+                  <input type="hidden" id="class_id" name="class_id">
+                  <label for="exampleInputEmail1">Name : </label>
+                  <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                  @error('name')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
                 </div>
-                
-      </div>
+                <div class="col-md-9">
+                  <label for="exampleInputEmail1">Icon : </label>
+                  <input type="hidden" name="old_icon" id="old_icon">
+                  <input type="file" onchange="previewFile_update()" name="icon" id="edit_icon" class="form-control">
+                  @error('icon')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+                <div class="col-md-3">
+                  <img src="" id="icon_update" alt="Icon" class="mt-4">
+                </div>
 
+                <div class="col-md-12">
+                  <label for="exampleInputEmail1">status : </label>
+                  <select class="form-control" name="status" id="status">
+                    <option value=" ">Select Option</option>
+                    <option value="active">Active</option>
+                    <option value="inactive">Inactive</option>
+                  </select>
+                  @error('status')
+                  <div class="text-danger">{{ $message }}</div>
+                  @enderror
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+          </div>
+        </form>
+      </div>
     </div>
+
   </div>
+
 </div>
+
 <script>
   document.querySelectorAll('.editButton').forEach(function(button) {
     button.addEventListener('click', function() {
       var class_id = this.getAttribute('data-user-id');
 
       axios.post('/class-list/edit', {
-        class_id: class_id
+          class_id: class_id
         })
         .then(response => {
           var reponse_data = response.data.class_list;
-          var iconSrc ='{{ asset('') }}' + reponse_data.icon;
+          var iconSrc = '{{ asset('
+          ') }}' + reponse_data.icon;
 
           $('#class_id').val(reponse_data.id);
           $('#old_icon').val(reponse_data.icon);
@@ -240,7 +243,7 @@
       }).then((result) => {
         if (result.isConfirmed) {
           axios.post('/class/delete', {
-            class_id: class_id
+              class_id: class_id
             })
             .then(response => {
               location.reload(true);
@@ -253,36 +256,39 @@
       });
     });
   });
-  
+</script>
+
+<script>
   function previewFile_create() {
     $("#icon_create").show();
-  const preview = document.getElementById("icon_create");
-  const fileInput = document.querySelector("input[type=file]");
-  const file = fileInput.files[0];
-  const reader = new FileReader();
+    const preview = document.getElementById("icon_create");
+    const fileInput = document.querySelector("input[type=file]");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-  reader.addEventListener("load", () => {
-    preview.src = reader.result;
-  }, false);
+    reader.addEventListener("load", () => {
+      preview.src = reader.result;
+    }, false);
 
-  if (file) {
-    reader.readAsDataURL(file);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
-}
-function previewFile_update() {
-  $("#icon_update").show();
-  const preview = document.getElementById("icon_update");
-  const fileInput = document.getElementById("edit_icon");
-  const file = fileInput.files[0];
-  const reader = new FileReader();
 
-  reader.addEventListener("load", () => {
-    preview.src = reader.result;
-  }, false);
+  function previewFile_update() {
+    $("#icon_update").show();
+    const preview = document.getElementById("icon_update");
+    const fileInput = document.getElementById("edit_icon");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-  if (file) {
-    reader.readAsDataURL(file);
+    reader.addEventListener("load", () => {
+      preview.src = reader.result;
+    }, false);
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
-}
 </script>
 @include('layouts/footer ')
