@@ -13,7 +13,7 @@ class BannerController extends Controller
 {
     public function list_banner(){
         $banner_list = DB::table('banner')
-        ->join('institute_detail', 'banner.institute_id', '=', 'institute_detail.id')
+        ->leftjoin('institute_detail', 'banner.institute_id', '=', 'institute_detail.id')
         ->select('banner.*','institute_detail.institute_name')
         ->whereNull('banner.deleted_at')
         ->where('banner.user_id', Auth::user()->id)
