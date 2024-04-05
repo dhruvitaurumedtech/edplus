@@ -223,13 +223,13 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         $userId = $request->user_id;
-        $user = User::find($userId);
-        if (!$user) {
-            return response()->json([
-                'status' => '404',
-                'message' => 'User not found',
-            ], 404);
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
         }
+
+        $existingUser = User::where('token', $token)->where('id', $userId)->first();
+        if ($existingUser) {
     
         Auth::logout($userId);
         user::where('id',$userId)->update(['token' => '']);
@@ -237,6 +237,12 @@ class AuthController extends Controller
             'status' => '200',
             'message' => 'Successfully logged out',
         ]);
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }     
     }
 
     public function delete_account(Request $request){
