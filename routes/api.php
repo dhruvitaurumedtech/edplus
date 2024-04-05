@@ -18,6 +18,7 @@ Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
 Route::post('/auth/login', [AuthController::class, 'login']);
 Route::post('/auth/logout', [AuthController::class, 'logout']);
+Route::post('/auth/delete-account', [AuthController::class, 'delete_account']);
 Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::group(['middleware' => ['web']], function () {
     //Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);

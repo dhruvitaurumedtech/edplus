@@ -164,8 +164,8 @@ class AuthController extends Controller
         ]);
         $user = Auth::user();
         // $providedToken = $request->header('Authorization');
-        $existingUser = User::where('email', $request->email)->first();
-        
+        $existingUser = User::where('email', $request->email)->whereNull('deleted_at')->first();
+        if($existingUser){        
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             if (!empty($user->photo)) {
@@ -196,6 +196,13 @@ class AuthController extends Controller
                 'status' => 400,
                 'message' => 'Invalid credentials'
             ]);
+        }
+        //
+        }else{
+            return response()->json([
+                'status' => '404',
+                'message' => 'User not found',
+            ], 404);
         }
     }
     protected function validateToken($user, $providedToken)
@@ -230,5 +237,30 @@ class AuthController extends Controller
             'status' => '200',
             'message' => 'Successfully logged out',
         ]);
+    }
+
+    public function delete_account(Request $request){
+        
+        $userId = $request->user_id;
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $userId)->first();
+        if ($existingUser) {
+           
+        user::where('id',$userId)->delete();
+        return response()->json([
+            'status' => '200',
+            'message' => 'Delete Account Successfully!',
+        ]);
+
+    }else {
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ], 400);
+    }     
     }
 }
