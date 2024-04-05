@@ -330,6 +330,7 @@ class InstituteApiController extends Controller
                 'close_time' => $request->input('close_time'),
                 'open_time' => $request->input('open_time'),
                 'logo' => $imagePath,
+                'about_us'=>$request->about_us,
                 'user_id' => $request->input('user_id'),
                 'institute_name' => $request->input('institute_name'),
                 'address' => $request->input('address'),
@@ -1602,9 +1603,11 @@ class InstituteApiController extends Controller
                 $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+                    $marksofstd = Marks_model::where('student_id',$stddt->student_id)->where('exam_id',$request->exam_id)->first();
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
+                        'marks'=>(double)$marksofstd->mark,
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,
@@ -1952,5 +1955,31 @@ class InstituteApiController extends Controller
     //add time table
     public function add_time_table(Request $request){
         
+    }
+
+    public function delete_account(Request $request){
+        
+        $userId = $request->user_id;
+        $token = $request->header('Authorization');
+        
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $userId)->first();
+        if ($existingUser) {
+           
+        user::where('id',$userId)->delete();
+        return response()->json([
+            'status' => '200',
+            'message' => 'Delete Account Successfully!',
+        ]);
+
+    }else {
+        return response()->json([
+            'status' => 400,
+            'message' => 'Invalid token.',
+        ], 400);
+    }     
     }
 }

@@ -164,7 +164,8 @@ class AuthController extends Controller
         ]);
         $user = Auth::user();
         // $providedToken = $request->header('Authorization');
-        $existingUser = User::where('email', $request->email)->first();
+        $existingUser = User::where('email', $request->email)->whereNull('deleted_at')->first();
+        if($existingUser){        
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
             $user = Auth::user();
             if (!empty($user->photo)) {
@@ -172,7 +173,11 @@ class AuthController extends Controller
             } else {
                 $photo = asset('profile/image.jpg');
             }
-
+            $token = JWTAuth::fromUser($user);
+            User::where('email', $request->email)
+            ->update([
+                'token' => $token
+            ]);
             return response()->json([
                 'status' => 200,
                 'message' => 'Login successful',
@@ -183,7 +188,7 @@ class AuthController extends Controller
                     'user_email' => $user->email,
                     'user_image' => $photo,
                     'role_type' => $user->role_type,
-                    'token' => $existingUser->token,
+                    'token' => $token,
                 ]
             ], 200, [], JSON_NUMERIC_CHECK);
         } else {
@@ -191,6 +196,13 @@ class AuthController extends Controller
                 'status' => 400,
                 'message' => 'Invalid credentials'
             ]);
+        }
+        //
+        }else{
+            return response()->json([
+                'status' => '404',
+                'message' => 'User not found',
+            ], 404);
         }
     }
     protected function validateToken($user, $providedToken)
@@ -208,12 +220,30 @@ class AuthController extends Controller
             ]
         ]);
     }
-    public function logout()
+    public function logout(Request $request)
     {
-        Auth::logout();
+        $userId = $request->user_id;
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $userId)->first();
+        if ($existingUser) {
+    
+        Auth::logout($userId);
+        user::where('id',$userId)->update(['token' => '']);
         return response()->json([
             'status' => '200',
             'message' => 'Successfully logged out',
         ]);
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }     
     }
+
+    
 }

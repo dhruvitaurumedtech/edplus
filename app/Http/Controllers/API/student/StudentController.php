@@ -453,7 +453,7 @@ class StudentController extends Controller
             $institute_data = [];
             $boards = [];
 
-            $institutedeta = Institute_detail::where('id',$institute_id)->select('id','institute_name','address')->first();
+            $institutedeta = Institute_detail::where('id',$institute_id)->select('id','institute_name','address','about_us')->first();
             $boards = board::join('board_sub','board_sub.board_id','=','board.id')
            ->where('board_sub.institute_id',$institute_id)->select('board.name')->get();
 
@@ -463,6 +463,7 @@ class StudentController extends Controller
             $institutedetaa = array('id'=>$institutedeta->id,
             'institute_name'=>$institutedeta->institute_name,
             'address'=>$institutedeta->address,
+            'about_us'=>$institutedeta->about_us,
             'logo'=>asset($institutedeta->logo),
             'boards'=>$boards,
             'students'=>$stdcount,
@@ -489,7 +490,6 @@ class StudentController extends Controller
                 'data'=>array('error' => $e->getMessage()),
             ], 500);
         }
-        
         
     }
 
@@ -576,7 +576,7 @@ class StudentController extends Controller
                 $result[] = array('subject'=>$resultDDt->subject,
                 'title'=>$resultDDt->exam_title.'('.$resultDDt->exam_type.')',
                 'total_marks'=>$resultDDt->total_marks,
-                'achiveddmarks_marks'=>$resultDDt->mark,
+                'achiveddmarks_marks'=>boolval($resultDDt->mark),
                 'date'=>$resultDDt->exam_date,
                 'class_highest'=>$highestMarks);
             }
