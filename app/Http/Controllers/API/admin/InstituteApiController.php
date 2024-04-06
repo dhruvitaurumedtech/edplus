@@ -1392,21 +1392,21 @@ class InstituteApiController extends Controller
                     }
             }else{
                 
-                if(!empty($request->first_name) && $existingUser->roll_type != 6){
-                    $data = user::create([
-                        'firstname' => $request->first_name,
-                        'lastname' => $request->last_name,
-                        'dob' => $request->date_of_birth,
-                        'address' => $request->address,
-                        'email' => $request->email_id,
-                        'mobile' => $request->mobile_no,
-                    ]);
-                    $student_id =$data->id;
-                }else{
-                    $student_id =$student_id;
-                }
-                
-                
+                // if(!empty($request->first_name) && $existingUser->roll_type != 6){
+                //     $data = user::create([
+                //         'firstname' => $request->first_name,
+                //         'lastname' => $request->last_name,
+                //         'dob' => $request->date_of_birth,
+                //         'address' => $request->address,
+                //         'email' => $request->email_id,
+                //         'mobile' => $request->mobile_no,
+                //     ]);
+                //     $student_id =$data->id;
+                // }else{
+                //     $student_id =$student_id;
+                // }
+                $student_id =$request->user_id;
+                //print_r($student_id);exit;
                 if (!empty($student_id)) {
                     
                     $studentdetail = Student_detail::create([
@@ -1418,7 +1418,7 @@ class InstituteApiController extends Controller
                         'medium_id' => $request->medium_id,
                         'class_id' => $request->class_id,
                         'standard_id' => $request->standard_id,
-                        'stream_id' => $stream_id,
+                        //'stream_id' => $stream_id,
                         'subject_id' => $request->subject_id,
                         'status' => '1',
                         ]);
