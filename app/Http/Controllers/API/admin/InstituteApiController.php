@@ -1340,7 +1340,14 @@ class InstituteApiController extends Controller
             $studentdtls = Student_detail::where('student_id',$student_id)
             ->where('institute_id',$institute_id)->first();
             
+            if($request->stream_id == null){
+                $stream_id = null;
+            }else{
+                $stream_id = $request->stream_id;
+            }
+
             if(!empty($studentdtls)){
+                
                 $studentdetail = Student_detail::where('student_id',$student_id)
                     ->where('institute_id',$institute_id)->update([
                     'user_id' => $user_id,
@@ -1351,7 +1358,7 @@ class InstituteApiController extends Controller
                     'medium_id' => $request->medium_id,
                     'class_id' => $request->class_id,
                     'standard_id' => $request->standard_id,
-                    'stream_id' => $request->stream_id,
+                    'stream_id' =>$stream_id,
                     'subject_id' => $request->subject_id,
                     'status' => '1',
                     ]);
@@ -1411,7 +1418,7 @@ class InstituteApiController extends Controller
                         'medium_id' => $request->medium_id,
                         'class_id' => $request->class_id,
                         'standard_id' => $request->standard_id,
-                        'stream_id' => $request->stream_id,
+                        'stream_id' => $stream_id,
                         'subject_id' => $request->subject_id,
                         'status' => '1',
                         ]);
