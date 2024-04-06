@@ -1326,7 +1326,7 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try{
-            if($existingUser->roll_type==6){
+            if($existingUser->roll_type == 6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $getuidfins = Institute_detail::where('id',$institute_id)->first();
@@ -1341,7 +1341,7 @@ class InstituteApiController extends Controller
             ->where('institute_id',$institute_id)->first();
             
             if($request->stream_id == null){
-                $stream_id = null;
+                $stream_id = '';
             }else{
                 $stream_id = $request->stream_id;
             }
@@ -1392,7 +1392,7 @@ class InstituteApiController extends Controller
                     }
             }else{
                 
-                if(!empty($request->first_name)){
+                if(!empty($request->first_name) && $existingUser->roll_type != 6){
                     $data = user::create([
                         'firstname' => $request->first_name,
                         'lastname' => $request->last_name,
@@ -1407,7 +1407,7 @@ class InstituteApiController extends Controller
                 }
                 
                 
-                if (!empty($data)) {
+                if (!empty($student_id)) {
                     
                     $studentdetail = Student_detail::create([
                         'user_id' => $user_id,
