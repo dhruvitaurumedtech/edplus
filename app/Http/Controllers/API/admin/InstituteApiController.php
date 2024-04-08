@@ -286,6 +286,7 @@ class InstituteApiController extends Controller
             'address' => 'required|string',
             'contact_no' => 'required|integer|min:10',
             'email' => 'required|email|unique:institute_detail,email',
+            'logo'=>'required'
         ]);
 
         if ($validator->fails()) {
@@ -1327,7 +1328,7 @@ class InstituteApiController extends Controller
         if ($existingUser) {
             try{
                 
-            if($existingUser->role_type == 6){
+            if($existingUser->roll_type == 6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $getuidfins = Institute_detail::where('id',$institute_id)->first();

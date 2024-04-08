@@ -190,7 +190,8 @@ class AuthController extends Controller
                 }else{
                     $institute_id = null;
                 }
-            return response()->json([
+            
+                return response()->json([
                 'status' => 200,
                 'message' => 'Login successful',
                 'data' => [
