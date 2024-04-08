@@ -1327,7 +1327,7 @@ class InstituteApiController extends Controller
         if ($existingUser) {
             try{
                 
-            if($existingUser->roll_type == 6){
+            if($existingUser->role_type == 6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $getuidfins = Institute_detail::where('id',$institute_id)->first();
