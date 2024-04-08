@@ -31,6 +31,7 @@ use App\Models\Base_table;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use PHPUnit\Framework\Attributes\Medium;
+use Spatie\Permission\Models\Role;
 
 class InstituteApiController extends Controller
 {
@@ -1996,5 +1997,57 @@ class InstituteApiController extends Controller
             'message' => 'Invalid token.',
         ], 400);
     }     
+    }
+
+    //roles list
+    public function roles(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        
+        if ($existingUser) {
+            try{
+                $rolesDT = [];
+                $suad = [1,2,3];
+                $roleqry = Role::whereNull('deleted_at')->whereNotIN('id',$suad)->get();
+                foreach($roleqry as $roldel){
+                    $rolesDT[]=array('id'=>$roldel->id,
+                    'role_name'=>$roldel->role_name);
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data'=>$rolesDT
+                ]);
+            }catch (\Exception $e){
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Something went wrong',
+                    'data'=>[]
+                ]);
+            }
+         }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }  
     }
 }
