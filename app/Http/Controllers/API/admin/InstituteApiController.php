@@ -947,7 +947,13 @@ class InstituteApiController extends Controller
             $banner_list = Banner_model::where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->get();
+                if($banner_list->isEmpty()){
+                    $banner_list = Banner_model::where('status', 'active')
+                    ->where('user_id','1')
+                    ->get();
+                }
             $banner_array = [];
+
             foreach ($banner_list as $value) {
                 $banner_array[] = [
                     'id' => $value->id,
@@ -1320,7 +1326,7 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try{
-            if($existingUser->roll_type==6){
+            if($existingUser->roll_type == 6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $getuidfins = Institute_detail::where('id',$institute_id)->first();
@@ -1334,7 +1340,14 @@ class InstituteApiController extends Controller
             $studentdtls = Student_detail::where('student_id',$student_id)
             ->where('institute_id',$institute_id)->first();
             
+            if($request->stream_id == null){
+                $stream_id = '';
+            }else{
+                $stream_id = $request->stream_id;
+            }
+
             if(!empty($studentdtls)){
+                
                 $studentdetail = Student_detail::where('student_id',$student_id)
                     ->where('institute_id',$institute_id)->update([
                     'user_id' => $user_id,
@@ -1345,7 +1358,7 @@ class InstituteApiController extends Controller
                     'medium_id' => $request->medium_id,
                     'class_id' => $request->class_id,
                     'standard_id' => $request->standard_id,
-                    'stream_id' => $request->stream_id,
+                    'stream_id' =>$stream_id,
                     'subject_id' => $request->subject_id,
                     'status' => '1',
                     ]);
@@ -1379,22 +1392,22 @@ class InstituteApiController extends Controller
                     }
             }else{
                 
-                if(!empty($request->first_name)){
-                    $data = user::create([
-                        'firstname' => $request->first_name,
-                        'lastname' => $request->last_name,
-                        'dob' => $request->date_of_birth,
-                        'address' => $request->address,
-                        'email' => $request->email_id,
-                        'mobile' => $request->mobile_no,
-                    ]);
-                    $student_id =$data->id;
-                }else{
-                    $student_id =$student_id;
-                }
-                
-                
-                if (!empty($data)) {
+                // if(!empty($request->first_name) && $existingUser->roll_type != 6){
+                //     $data = user::create([
+                //         'firstname' => $request->first_name,
+                //         'lastname' => $request->last_name,
+                //         'dob' => $request->date_of_birth,
+                //         'address' => $request->address,
+                //         'email' => $request->email_id,
+                //         'mobile' => $request->mobile_no,
+                //     ]);
+                //     $student_id =$data->id;
+                // }else{
+                //     $student_id =$student_id;
+                // }
+                $student_id =$request->user_id;
+                //print_r($student_id);exit;
+                if (!empty($student_id)) {
                     
                     $studentdetail = Student_detail::create([
                         'user_id' => $user_id,
@@ -1405,7 +1418,7 @@ class InstituteApiController extends Controller
                         'medium_id' => $request->medium_id,
                         'class_id' => $request->class_id,
                         'standard_id' => $request->standard_id,
-                        'stream_id' => $request->stream_id,
+                        //'stream_id' => $stream_id,
                         'subject_id' => $request->subject_id,
                         'status' => '1',
                         ]);

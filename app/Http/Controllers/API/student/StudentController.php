@@ -531,7 +531,7 @@ class StudentController extends Controller
                 ->Where('user_id', $user_id)
                 ->paginate(10);
             
-            if($bannerss->isEmpty()){ 
+            if($bannerss->isEmpty()){
                 
                 $banners = Banner_model::where('status', 'active')
                 ->Where('user_id', '1')

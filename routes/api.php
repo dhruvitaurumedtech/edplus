@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\BannerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\API\institude\SubjectDetailController;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
+use App\Http\Controllers\API\BannerApiController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
@@ -68,5 +70,11 @@ Route::post('/institute/student-list-with-marks', [InstituteApiController::class
 Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
 Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
 Route::post('/institute/add-timetable', [InstituteApiController::class, 'add_time_table'])->name('add_time_table');
+
+//banner controller
+Route::post('/banner/banner-add',[BannerApiController::class, 'banner_add'])->name('banner_add');
+Route::post('/banner/banner-status-update',[BannerApiController::class, 'update_status'])->name('update_status');
+Route::post('/banner/banner-update-details',[BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
+Route::post('/banner/banner-list',[BannerApiController::class, 'banner_list'])->name('banner_list');
 
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
