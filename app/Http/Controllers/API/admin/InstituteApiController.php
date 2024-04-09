@@ -1807,7 +1807,8 @@ class InstituteApiController extends Controller
             'subject_id' => 'required',
             'role_type' => 'required',
             'title' => 'required',
-            'detail' => 'required'
+            'detail' => 'required',
+            'standard_id'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -1838,6 +1839,7 @@ class InstituteApiController extends Controller
             $role_type = $request->role_type;
             $title = $request->title;
             $detail = $request->detail;
+            $standard_id = $request->standard_id;
 
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
@@ -1851,6 +1853,7 @@ class InstituteApiController extends Controller
                 'role_type' => $role_type,
                 'title' => $title,
                 'detail' => $detail,
+                'standard_id'=>$standard_id
             ]);
 
             if ($addannounc) {
