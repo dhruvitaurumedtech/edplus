@@ -9,6 +9,7 @@ use App\Models\board;
 use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
 use App\Models\announcements_model;
+use App\Models\Attendance_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
@@ -1218,23 +1219,27 @@ class StudentController extends Controller
 
         $user_id = $request->user_id;
         $institute_id = $request->institute_id;
-        $standard_id = $request->standard_id;
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
-            $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id', 'left')
-                ->join('attendance', 'attendance.student_id', '=', 'students_details.student_id', 'left')
-                ->select('users.*', 'attendance.date', 'attendance.attendance')
+            $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
+                ->select('users.*', 'students_details.student_id')
                 ->where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
-                ->where('standard_id', $standard_id)
                 ->get()->toArray();
             foreach ($student_data as $value) {
+
+                $attendance_data = Attendance_model::where('student_id', $value['student_id'])->get()->toarray();
+
+                $stdwithattd = [];
+                foreach ($attendance_data as $value2) {
+
+                    $stdwithattd[] = array('attendance' => $value2['attendance'], 'date' => $value2['date']);
+                }
                 $student_response[] = [
                     'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                    'attendance' => $value['attendance'] . '',
-                    'date' => $value['date']
+                    'attendance' => $stdwithattd
                 ];
             }
             return response()->json([

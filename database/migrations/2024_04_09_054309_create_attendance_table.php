@@ -15,8 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('user_id');
             $table->string('institute_id');
-            $table->unsignedBigInteger('subject_id');
-            $table->foreign('subject_id')->references('id')->on('subject');
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign('student_id')->references('id')->on('users');
             $table->enum('attendance', ['P', 'A']);
