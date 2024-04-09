@@ -20,6 +20,7 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign('student_id')->references('id')->on('users');
             $table->enum('attendance', ['P', 'A']);
+            $table->string('date');
             $table->timestamps();
             $table->softDeletes();
         });

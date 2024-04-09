@@ -11,6 +11,6 @@ class Attendance_model extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'attendance';
     protected $fillable = [
-        'user_id', 'institute_id', 'subject_id', 'student_id', 'attendance',
+        'user_id', 'institute_id', 'subject_id', 'student_id', 'attendance', 'date'
     ];
 }
