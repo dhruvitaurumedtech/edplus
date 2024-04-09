@@ -1914,7 +1914,7 @@ class InstituteApiController extends Controller
                 ->when($searchData, function ($query, $searchData) {
                     return $query->where(function ($query) use ($searchData) {
                         $query->where('title', 'like', '%' . $searchData . '%')
-                            ->orWhere('content', 'like', '%' . $searchData . '%');
+                            ->orWhere('detail', 'like', '%' . $searchData . '%');
                     });
                 })
                 ->when($board_id, function ($query, $board_id) {
