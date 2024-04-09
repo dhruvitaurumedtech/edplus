@@ -1872,7 +1872,7 @@ class InstituteApiController extends Controller
 
             if ($addannounc) {
                 return response()->json([
-                    'status' => 400,
+                    'status' => 200,
                     'message' => 'Announcement added successfully.',
                     'data' => []
                 ]);

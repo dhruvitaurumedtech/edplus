@@ -34,7 +34,7 @@ class ParentsController extends Controller
             $user_id = $request->user_id;
             try{
                 //banner
-
+                
                 //child
                 $childs = [];
                 $chilsdata = Parents::join('users','users.id','=','parents.student_id')
