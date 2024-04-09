@@ -1423,7 +1423,7 @@ class InstituteApiController extends Controller
                         'standard_id' => $request->standard_id,
                         //'stream_id' => $stream_id,
                         'subject_id' => $request->subject_id,
-                        'status' => '1',
+                        'status' => '0',
                         ]);
 
                     return response()->json([
@@ -1991,12 +1991,12 @@ class InstituteApiController extends Controller
             'message' => 'Delete Account Successfully!',
         ]);
 
-    }else {
-        return response()->json([
-            'status' => 400,
-            'message' => 'Invalid token.',
-        ], 400);
-    }     
+        }else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }     
     }
 
     //roles list

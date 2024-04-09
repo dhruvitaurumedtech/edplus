@@ -77,5 +77,9 @@ Route::post('/banner/banner-status-update',[BannerApiController::class, 'update_
 Route::post('/banner/banner-update-details',[BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
 Route::post('/banner/banner-list',[BannerApiController::class, 'banner_list'])->name('banner_list');
 
+
+//parents API's
+Route::post('/parents/child-list-parents',[BannerApiController::class, 'child_list'])->name('child_list');
+
 Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
