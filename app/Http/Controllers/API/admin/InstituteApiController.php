@@ -1815,7 +1815,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
-            'institute_for_id' => 'required',
+            //'institute_for_id' => 'required',
             'class_id' => 'required',
             //'stream_id' => 'required',
             'subject_id' => 'required',

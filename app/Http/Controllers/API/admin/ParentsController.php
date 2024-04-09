@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Parents;
+use App\Models\Subject_model;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -43,7 +44,7 @@ class ParentsController extends Controller
                 ->where('parents.parent_id',$user_id)->where('parents.verify','1')
                 ->select('users.firstname','users.lastname','institute_detail.institute_name')->get();
                 foreach($chilsdata as $chilDT){
-
+                    $subjectQY = Subject_model::where();
                     $childs[] = array('firstname'=>$chilDT->firstname,
                     'lastname'=>$chilDT->lastname,
                     'institute_name'=>$chilDT->institute_name,
