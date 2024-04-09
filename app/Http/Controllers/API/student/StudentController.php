@@ -243,7 +243,7 @@ class StudentController extends Controller
         }
     }
     //add parents details
-    public function student_patents_details_add(Request $request)
+    public function student_parents_details_add(Request $request)
     {
 
         $validator = \Validator::make($request->all(), [
@@ -309,7 +309,7 @@ class StudentController extends Controller
 
                     Mail::to($tomail)->send(new WelcomeMail($data));
                     // Mail::to('recipient@example.com')->send(new WelcomeMail());
-
+                    
                     // Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
                     //     $message->to($tomail);
                     //     $message->subject('Reset Password');
@@ -358,7 +358,6 @@ class StudentController extends Controller
                 return view('already_verified');
             }
         } else {
-
             return view('verification_failure');
         }
     }

@@ -15,6 +15,7 @@ use App\Http\Controllers\API\institude\SubjectDetailController;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
+use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\BannerApiController;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -37,7 +38,7 @@ Route::post('/student/institute-detail-student', [StudentController::class, 'ins
 Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
 Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
 Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
-Route::post('/student/add-parents-details-student', [StudentController::class, 'student_patents_details_add'])->name('student_patents_details_add.get');
+Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
 Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
 Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
 Route::post('/student/exams-student', [StudentController::class, 'exams_list'])->name('exams_list.get');
@@ -84,7 +85,7 @@ Route::post('/institute/attendance', [AttendanceController::class, 'attendance']
 Route::post('/institute/student_list', [StudentController::class, 'student_list']);
 
 //parents API's
-Route::post('/parents/child-list-parents', [BannerApiController::class, 'child_list'])->name('child_list');
+Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
 
 Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);

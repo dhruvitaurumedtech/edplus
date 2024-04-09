@@ -1809,7 +1809,7 @@ class InstituteApiController extends Controller
     //add announcements
     public function add_announcements(Request $request)
     {
-
+        // echo "<pre>";print_r($request->all());exit;
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
@@ -1841,12 +1841,13 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
             $board_id = $request->board_id;
             $medium_id = $request->medium_id;
-            $institute_for_id = $request->institute_for_id;
+            // $institute_for_id = $request->institute_for_id;
             $class_id = $request->class_id;
             $stream_id = $request->stream_id;
             $subject_id = $request->subject_id;
@@ -1854,22 +1855,27 @@ class InstituteApiController extends Controller
             $title = $request->title;
             $detail = $request->detail;
             $standard_id = $request->standard_id;
-
+            
+            if ($stream_id == 'null') {
+                $stream_idd = null;
+            } else {
+                $stream_idd = $request->stream_id;
+            }
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
                 'institute_id' => $institute_id,
                 'board_id' => $board_id,
                 'medium_id' => $medium_id,
-                'institute_for_id' => $institute_for_id,
+                //'institute_for_id' => $institute_for_id,
                 'class_id' => $class_id,
-                'stream_id' => $stream_id,
+                'stream_id' => $stream_idd,
                 'subject_id' => $subject_id,
                 'role_type' => $role_type,
                 'title' => $title,
                 'detail' => $detail,
                 'standard_id' => $standard_id
             ]);
-
+           
             if ($addannounc) {
                 return response()->json([
                     'status' => 200,
