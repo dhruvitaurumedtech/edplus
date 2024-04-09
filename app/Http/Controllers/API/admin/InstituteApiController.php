@@ -1329,7 +1329,7 @@ class InstituteApiController extends Controller
         if ($existingUser) {
             try{
                 
-            if($existingUser->roll_type == 6){
+            if($existingUser->role_type == 6){
                 $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $getuidfins = Institute_detail::where('id',$institute_id)->first();
@@ -1938,6 +1938,13 @@ class InstituteApiController extends Controller
                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
 
+                    $roles = [];
+                    $roledsid = explode(",",$anoouncmnt->role_type);
+                    $roqy = Role::whereIN('id',$roledsid)->get();
+                    foreach($roqy as $rolDT){
+                        $roles[] = array('id'=>$rolDT->id,'name'=>$rolDT->role_name);
+                    }
+
                     $announcementDT[] = array(
                         'id'=>$anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
@@ -1949,6 +1956,7 @@ class InstituteApiController extends Controller
                         'standard'=>$standardtq->name,
                         'board_id'=>$boarddt->id,
                         'board'=>$boarddt->name,
+                        'role'=>$roles
                     );
                 }
                 return response()->json([
