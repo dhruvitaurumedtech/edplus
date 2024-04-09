@@ -8,10 +8,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class board extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'board';
     protected $fillable = [
-        'institute_for_id', 'name', 'icon','status', 'created_by', 'updated_by'
+        'institute_for_id', 'name', 'icon', 'status', 'created_by', 'updated_by'
     ];
     public function boardSub()
     {

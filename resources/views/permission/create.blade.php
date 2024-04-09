@@ -1,54 +1,47 @@
-@include('layouts/header')
-<div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <div class="content-header">
-        <div class="container-fluid">
-            <div class="row mb-2">
-                <div class="col-sm-6">
-                    <h1 class="m-0">Permission</h1>
-                </div><!-- /.col -->
-                <div class="col-sm-6">
-                    <ol class="breadcrumb float-sm-right">
-                        <li class="breadcrumb-item"><a href="#">Home</a></li>
-                        <li class="breadcrumb-item active">Permission</li>
-                    </ol>
-                </div><!-- /.col -->
-            </div><!-- /.row -->
-        </div><!-- /.container-fluid -->
-    </div>
-    <!-- /.content-header -->
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            @if (session('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-            @endif
-        </div>
-    </div>
+<!DOCTYPE html>
+<html lang="en">
 
-    <script>
-        window.setTimeout(function() {
-            $(".alert-success").slideUp(500, function() {
-                $(this).remove();
-            });
-        }, 3000);
-    </script>
-    <!-- Main content -->
-    <section class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <!-- left column -->
-                <div class="col-md-12">
-                    <!-- general form elements -->
-                    <div class="card card-primary">
-                        <div class="card-header">
-                            <h3 class="card-title">Create Permission</h3>
-                        </div>
-                        <form method="post" action="{{url('permission/insert')}}">
-                            @csrf
-                            <input type="hidden" name="role_id" value="{{ $id }}">
-                            <table class="table table-bordered table-responsive">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Permission - e School</title>
+
+    <!-- css  -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+    <link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
+    <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
+    <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+
+</head>
+
+<body>
+
+    <div class="dashboard">
+
+        @include('layouts/header-sidebar')
+
+        <!-- MAIN -->
+        <div class="dashboard-app">
+
+            @include('layouts/header-topbar')
+
+            <!-- Sub MAIN -->
+            <div class="link-dir">
+                <h1 class="display-4">Permission</h1>
+                <ul>
+                    <li><a href="index.php">Home</a></li>
+                    <li><a href="javascript:void(0)">/</a></li>
+                    <li><a href="javascript:void(0)">Permission</a></li>
+                </ul>
+            </div>
+
+            <div class="dashboard-content side-content">
+
+                <div class="row">
+                    <!-- table -->
+                    <div class="col-lg-12 mt-5">
+                        <form class="s-chapter-form" action="#">
+                            <table class="table table-bordered table-responsive-sm institute-table">
                                 <thead>
                                     <tr>
                                         <th style="width: 100px">Menu Name</th>
@@ -59,6 +52,7 @@
                                         <th><input type="checkbox" id="check-all-delete"> delete</th>
                                     </tr>
                                 </thead>
+                                <tbody>
                                 <tbody>
 
                                     @php $menu = get_all_menu_list() @endphp
@@ -116,28 +110,28 @@
             </div>
 
         </div>
-    </section>
-</div>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script>
-    $(document).ready(function() {
-        $('#check-all-add').click(function() {
-            var isChecked = $(this).prop('checked');
-            $('.permission-checkbox-add').prop('checked', isChecked);
+        </section>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#check-all-add').click(function() {
+                var isChecked = $(this).prop('checked');
+                $('.permission-checkbox-add').prop('checked', isChecked);
+            });
+            $('#check-all-edit').click(function() {
+                var isChecked = $(this).prop('checked');
+                $('.permission-checkbox-edit').prop('checked', isChecked);
+            });
+            $('#check-all-view').click(function() {
+                var isChecked = $(this).prop('checked');
+                $('.permission-checkbox-view').prop('checked', isChecked);
+            });
+            $('#check-all-delete').click(function() {
+                var isChecked = $(this).prop('checked');
+                $('.permission-checkbox-delete').prop('checked', isChecked);
+            });
         });
-        $('#check-all-edit').click(function() {
-            var isChecked = $(this).prop('checked');
-            $('.permission-checkbox-edit').prop('checked', isChecked);
-        });
-        $('#check-all-view').click(function() {
-            var isChecked = $(this).prop('checked');
-            $('.permission-checkbox-view').prop('checked', isChecked);
-        });
-        $('#check-all-delete').click(function() {
-            var isChecked = $(this).prop('checked');
-            $('.permission-checkbox-delete').prop('checked', isChecked);
-        });
-    });
-</script>
-</script>
-@include('layouts/footer')
+    </script>
+    </script>
+    @include('layouts/footer_new')
