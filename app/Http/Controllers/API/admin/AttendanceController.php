@@ -35,12 +35,13 @@ class AttendanceController extends Controller
                 'institute_id' => $request->institute_id,
                 'subject_id' => $request->subject_id,
                 'student_id' => $request->student_id,
+                'date' => $request->date,
             ])->first();
 
             if ($existingAttendance) {
                 $existingAttendance->attendance = $request->status;
                 $existingAttendance->save();
-                return response()->json(['message' => 'Attendance updated successfully'], 200);
+                return response()->json(['status' => 200, 'message' => 'Attendance updated successfully'], 200);
             }
 
             Attendance_model::create([
@@ -49,9 +50,10 @@ class AttendanceController extends Controller
                 'subject_id' => $request->subject_id,
                 'student_id' => $request->student_id,
                 'attendance' => $request->status,
+                'date' => $request->date,
             ]);
 
-            return response()->json(['message' => 'Attendance marked successfully'], 201);
+            return response()->json(['status' => 200, 'message' => 'Attendance marked successfully'], 201);
         } else {
             return response()->json([
                 'status' => 400,

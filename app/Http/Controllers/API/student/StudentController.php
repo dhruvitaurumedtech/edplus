@@ -1223,8 +1223,9 @@ class StudentController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
-            $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->select('users.*')
+            $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id', 'left')
+                ->join('attendance', 'attendance.student_id', '=', 'students_details.student_id', 'left')
+                ->select('users.*', 'attendance.date', 'attendance.attendance')
                 ->where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->where('standard_id', $standard_id)
@@ -1232,7 +1233,9 @@ class StudentController extends Controller
             foreach ($student_data as $value) {
                 $student_response[] = [
                     'student_id' => $value['id'],
-                    'student_name' => $value['firstname'] . ' ' . $value['lastname']
+                    'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                    'attendance' => $value['attendance'] . '',
+                    'date' => $value['date']
                 ];
             }
             return response()->json([
