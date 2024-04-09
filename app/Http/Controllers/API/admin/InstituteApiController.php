@@ -31,6 +31,7 @@ use App\Models\Base_table;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use PHPUnit\Framework\Attributes\Medium;
+use Spatie\Permission\Models\Role;
 
 class InstituteApiController extends Controller
 {
@@ -285,6 +286,7 @@ class InstituteApiController extends Controller
             'address' => 'required|string',
             'contact_no' => 'required|integer|min:10',
             'email' => 'required|email|unique:institute_detail,email',
+            'logo' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -1322,7 +1324,8 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-                if ($existingUser->roll_type == 6) {
+
+                if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
                     $getuidfins = Institute_detail::where('id', $institute_id)->first();
@@ -1388,19 +1391,19 @@ class InstituteApiController extends Controller
                     }
                 } else {
 
-                    // if(!empty($request->first_name) && $existingUser->roll_type != 6){
-                    //     $data = user::create([
-                    //         'firstname' => $request->first_name,
-                    //         'lastname' => $request->last_name,
-                    //         'dob' => $request->date_of_birth,
-                    //         'address' => $request->address,
-                    //         'email' => $request->email_id,
-                    //         'mobile' => $request->mobile_no,
-                    //     ]);
-                    //     $student_id =$data->id;
-                    // }else{
-                    //     $student_id =$student_id;
-                    // }
+                    if ($existingUser->role_type != 6 && empty($request->student_id)) {
+                        $data = user::create([
+                            'firstname' => $request->first_name,
+                            'lastname' => $request->last_name,
+                            'dob' => $request->date_of_birth,
+                            'address' => $request->address,
+                            'email' => $request->email_id,
+                            'mobile' => $request->mobile_no,
+                        ]);
+                        $student_id = $data->id;
+                    } else {
+                        $student_id = $student_id;
+                    }
                     $student_id = $request->user_id;
                     //print_r($student_id);exit;
                     if (!empty($student_id)) {
@@ -1416,7 +1419,7 @@ class InstituteApiController extends Controller
                             'standard_id' => $request->standard_id,
                             //'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
-                            'status' => '1',
+                            'status' => '0',
                         ]);
 
                         return response()->json([
@@ -1798,7 +1801,8 @@ class InstituteApiController extends Controller
             'subject_id' => 'required',
             'role_type' => 'required',
             'title' => 'required',
-            'detail' => 'required'
+            'detail' => 'required',
+            'standard_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1829,6 +1833,7 @@ class InstituteApiController extends Controller
             $role_type = $request->role_type;
             $title = $request->title;
             $detail = $request->detail;
+            $standard_id = $request->standard_id;
 
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
@@ -1842,6 +1847,7 @@ class InstituteApiController extends Controller
                 'role_type' => $role_type,
                 'title' => $title,
                 'detail' => $detail,
+                'standard_id' => $standard_id
             ]);
 
             if ($addannounc) {
@@ -1902,7 +1908,7 @@ class InstituteApiController extends Controller
                 ->when($searchData, function ($query, $searchData) {
                     return $query->where(function ($query) use ($searchData) {
                         $query->where('title', 'like', '%' . $searchData . '%')
-                            ->orWhere('content', 'like', '%' . $searchData . '%');
+                            ->orWhere('detail', 'like', '%' . $searchData . '%');
                     });
                 })
                 ->when($board_id, function ($query, $board_id) {
@@ -1926,6 +1932,13 @@ class InstituteApiController extends Controller
                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
 
+                    $roles = [];
+                    $roledsid = explode(",", $anoouncmnt->role_type);
+                    $roqy = Role::whereIN('id', $roledsid)->get();
+                    foreach ($roqy as $rolDT) {
+                        $roles[] = array('id' => $rolDT->id, 'name' => $rolDT->role_name);
+                    }
+
                     $announcementDT[] = array(
                         'id' => $anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
@@ -1937,6 +1950,7 @@ class InstituteApiController extends Controller
                         'standard' => $standardtq->name,
                         'board_id' => $boarddt->id,
                         'board' => $boarddt->name,
+                        'role' => $roles
                     );
                 }
                 return response()->json([
@@ -1981,6 +1995,61 @@ class InstituteApiController extends Controller
                 'status' => '200',
                 'message' => 'Delete Account Successfully!',
             ]);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+    }
+
+    //roles list
+    public function roles(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+
+        if ($existingUser) {
+            try {
+                $rolesDT = [];
+                $suad = [1, 2, 3];
+                $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
+                foreach ($roleqry as $roldel) {
+                    $rolesDT[] = array(
+                        'id' => $roldel->id,
+                        'role_name' => $roldel->role_name
+                    );
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $rolesDT
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Something went wrong',
+                    'data' => []
+                ]);
+            }
         } else {
             return response()->json([
                 'status' => 400,

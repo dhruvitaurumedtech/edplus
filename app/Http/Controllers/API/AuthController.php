@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -178,7 +179,19 @@ class AuthController extends Controller
             ->update([
                 'token' => $token
             ]);
-            return response()->json([
+
+            if($existingUser->role_type == 3){
+                $instituteid = Institute_detail::where('user_id', $user->id)->select('id')->first();
+                if(empty($instituteid)){
+                    $institute_id = null;
+                }else{
+                    $institute_id = $instituteid->id;
+                }
+                }else{
+                    $institute_id = null;
+                }
+            
+                return response()->json([
                 'status' => 200,
                 'message' => 'Login successful',
                 'data' => [
@@ -188,6 +201,7 @@ class AuthController extends Controller
                     'user_email' => $user->email,
                     'user_image' => $photo,
                     'role_type' => $user->role_type,
+                    'institute_id'=>$institute_id,
                     'token' => $token,
                 ]
             ], 200, [], JSON_NUMERIC_CHECK);
