@@ -1841,6 +1841,11 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if($request->stream_id == null){
+            $stremid = '';
+        }else{
+            $stremid = $request->stream_id;
+        }
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
@@ -1848,7 +1853,7 @@ class InstituteApiController extends Controller
             $medium_id = $request->medium_id;
             $institute_for_id = $request->institute_for_id;
             $class_id = $request->class_id;
-            $stream_id = $request->stream_id;
+            $stream_id = $stremid;
             $subject_id = $request->subject_id;
             $role_type = $request->role_type;
             $title = $request->title;
