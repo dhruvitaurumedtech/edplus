@@ -1323,7 +1323,27 @@ class InstituteApiController extends Controller
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try {
+            try{
+                
+            if($existingUser->role_type == 6){
+                $student_id = $request->user_id;
+                $institute_id = $request->institute_id;
+                $getuidfins = Institute_detail::where('id',$institute_id)->first();
+                $user_id = $getuidfins->user_id;
+            }else{
+                $student_id = $request->student_id;
+                $institute_id = $request->institute_id;
+                $user_id = $request->user_id;
+            }
+            
+            $studentdtls = Student_detail::where('student_id',$student_id)
+            ->where('institute_id',$institute_id)->first();
+            
+            if($request->stream_id == null){
+                $stream_id = '';
+            }else{
+                $stream_id = $request->stream_id;
+            }
 
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
@@ -1852,7 +1872,7 @@ class InstituteApiController extends Controller
 
             if ($addannounc) {
                 return response()->json([
-                    'status' => 400,
+                    'status' => 200,
                     'message' => 'Announcement added successfully.',
                     'data' => []
                 ]);
@@ -1933,10 +1953,10 @@ class InstituteApiController extends Controller
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
 
                     $roles = [];
-                    $roledsid = explode(",", $anoouncmnt->role_type);
-                    $roqy = Role::whereIN('id', $roledsid)->get();
-                    foreach ($roqy as $rolDT) {
-                        $roles[] = array('id' => $rolDT->id, 'name' => $rolDT->role_name);
+                    $roledsid = explode(",",$anoouncmnt->role_type);
+                    $roqy = Role::whereIN('id',$roledsid)->get();
+                    foreach($roqy as $rolDT){
+                        $roles[] = array('id'=>$rolDT->id,'name'=>$rolDT->role_name);
                     }
 
                     $announcementDT[] = array(
@@ -1944,13 +1964,13 @@ class InstituteApiController extends Controller
                         'date' => $anoouncmnt->created_at,
                         'title' => $anoouncmnt->title,
                         'detail' => $anoouncmnt->detail,
-                        'subject_id' => $subjectq->id,
-                        'subject' => $subjectq->name,
-                        'standard_id' => $standardtq->id,
-                        'standard' => $standardtq->name,
-                        'board_id' => $boarddt->id,
-                        'board' => $boarddt->name,
-                        'role' => $roles
+                        'subject_id'=>$subjectq->id,
+                        'subject'=>$subjectq->name,
+                        'standard_id'=>$standardtq->id,
+                        'standard'=>$standardtq->name,
+                        'board_id'=>$boarddt->id,
+                        'board'=>$boarddt->name,
+                        'role'=>$roles
                     );
                 }
                 return response()->json([
