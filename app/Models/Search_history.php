@@ -10,7 +10,7 @@ class Search_history extends Model
     use HasFactory;
     protected $table = 'search_history';
     protected $fillable = [
-        'user_id','title','created_at','updated_at'
+        'user_id','institute_id','title','created_at','updated_at'
     ];
     
 }
