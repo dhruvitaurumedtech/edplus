@@ -2174,4 +2174,104 @@ class InstituteApiController extends Controller
         }
     }
 
+    public function filters_data(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try{
+
+            $user_id = $request->user_id;
+            $institute_id = $request->institute_id;
+
+                
+            $boarids = Institute_board_sub::where('user_id', $user_id)
+            ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+            $uniqueBoardIds = array_unique($boarids);
+
+            $board_list = DB::table('board')
+                ->whereIN('id', $uniqueBoardIds)
+                ->get();
+
+            $board_array = [];
+            foreach ($board_list as $board_value) {
+
+                $medium_sublist = DB::table('medium_sub')
+                    ->where('user_id', $user_id)
+                    ->where('board_id', $board_value->id)
+                    ->where('institute_id', $institute_id)
+                    ->pluck('medium_id')->toArray();
+                $uniquemediumds = array_unique($medium_sublist);
+
+                $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+                $medium_array = [];
+                foreach ($medium_list as $medium_value) {
+                    
+                    $stndQY = Standard_sub::join('standard','standard.id','standard_sub.standard_id')
+                    ->where('standard_sub.user_id', $user_id)
+                    ->where('standard_sub.institute_id', $institute_id)
+                    ->where('standard_sub.board_id', $board_value->id)
+                    ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id','standard.name as std_name')->get();
+                    $stddata = [];
+                    foreach($stndQY as $stndDT){
+                        $stddata[] = array('id'=>$stndDT->std_id,
+                        'name'=>$stndDT->std_name);
+                    }
+
+                    $medium_array[] = [
+                        'id' => $medium_value->id,
+                        'medium_name' => $medium_value->name,
+                        'standard'=>$stddata
+                    ];
+                }
+
+                $board_array[] = [
+                    'id' => $board_value->id,
+                    'board_name' => $board_value->name,
+                    'medium' => $medium_array,
+
+                    // Include banner_array inside board_array
+                ];
+            }
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $board_array
+                ]);
+
+            }catch(\Exception $e){
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    
+    }
 }
