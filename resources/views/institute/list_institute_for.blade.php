@@ -18,7 +18,7 @@
 
       <!-- Sub MAIN -->
       <div class="link-dir">
-        <h1 class="display-4">Institute admin</h1>
+        <h1 class="display-4">Institute For List</h1>
         <ul>
           <li><a href="index.php">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -35,128 +35,140 @@
           });
         }, 3000);
       </script>
-      <div class="dashboard-content side-content">
-        <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
+      <div class="row">
+        <div class="col-md-10 offset-md-1">
+          @if (session('success'))
+          <div class="alert alert-success">
+            {{ session('success') }}
           </div>
+          @endif
         </div>
-        <section class="content">
-          <div class="container-fluid">
-            <div class="row">
-              <div class="col-md-5">
-                <div class="card card-success">
-                  <div class="card-header">
-                    <h3 class="card-title">Create Institute For</h3>
+      </div>
+      <div class="dashboard-content side-content">
+
+        <div class="row">
+          <div class="col-lg-6">
+            <div class="institute-form">
+              <form method="post" action="{{ url('institute-for/save') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="row">
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">Name : </label>
+                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Name">
+                    @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
                   </div>
-                  <form method="post" action="{{ url('institute-for/save') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="card-body">
-                      <div class="form-group">
-                        <div class="row">
-                          <div class="col-md-12">
-                            <label for="exampleInputEmail1">Name : </label>
-                            <input type="text" name="name" class="form-control" placeholder="Enter Name">
-                            @error('name')
-                            <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                          </div>
-                          <div class="col-md-12">
-                            <label for="exampleInputEmail1">Icon : </label>
-                            <input type="file" onchange="previewFile_create()" name="icon" class="form-control">
-                            @error('icon')
-                            <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                          </div>
-                          <div class="col-md-12">
-                            <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
-                          </div>
-                          <div class="col-md-12">
-                            <label for="exampleInputEmail1">status : </label>
-                            <select class="form-control" name="status">
-                              <option value=" ">Select Option</option>
-                              <option value="active">Active</option>
-                              <option value="inactive">Inactive</option>
-                            </select>
-                            @error('status')
-                            <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                          </div>
-
-
+                  <div class="col-md-12">
+                    <label>Icon : </label>
+                    <div class="file">
+                      <div class="input-group search-box-2">
+                        <input type="text" class="form-control" placeholder="Chapter Image">
+                        <div class="input-group-append">
+                          <span class="btn_upload">
+                            <input type="file" id="imag" title="" class="input-img  file__input--label search-box" name="icon" for="customFile" data-text-btn="Upload" />
+                            Choose Image
+                          </span>
                         </div>
-
                       </div>
+                      <img id="ImgPreview" src="" class="preview1" />
+                      <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
                     </div>
-                    <div class="card-footer">
-                      <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-              <div class="col-md-7">
-                <div class="card">
-                  <div class="create-title-btn">
-                    <h4 class="mt-2">Institute For List</h4>
-                    <!-- /.card-header -->
-                    <div class="card-body">
-                      <table class="table table-bordered table-responsive">
-                        <thead>
-                          <tr>
-                            <th style="width: 10px">
-                              <Sr class="No">No</Sr>
-                            </th>
-                            <th style="width: 200px">Name</th>
-                            <th style="width: 200px">Icon</th>
-                            <th style="width: 500px">Status</th>
-                            <th>Action</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          @php $i=1 @endphp
-                          @foreach($institute_for as $value)
-                          <tr>
-                            <td>{{$i}}</td>
-                            <td>{{$value->name}}</td>
-                            <td><img src="{{asset($value->icon) }}" style="height: 80px;width:80px" alt="Icon" class="img-resize"></td>
-                            <td>@if($value->status == 'active')
-                              <input type="button" value="Active" class="btn btn-success">
-                              @else
-                              <input type="button" value="Inactive" class="btn btn-danger">
-                              @endif
-                            </td>
-
-                            <td>
-                              <div class="d-flex">
-                                @canButton('edit', 'Institute_for')
-                                <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                                @endCanButton
-                                &nbsp;&nbsp;
-                                @canButton('delete', 'Institute_for')
-                                <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                                @endCanButton
-                              </div>
-                          </tr>
-                          @php $i++ @endphp
-                          @endforeach
-                        </tbody>
-                      </table>
-                    </div>
-
-                    <div class="d-flex justify-content-end">
-                      {!! $institute_for->withQueryString()->links('pagination::bootstrap-5') !!}
-
-                    </div>
+                    <!-- <label for="exampleInputEmail1">Icon : </label>
+                    <input type="file" onchange="previewFile_create()" name="icon" class="form-control search-box"> -->
+                    @error('icon')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
                   </div>
-
+                  <div class="col-md-12">
+                    <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize search-box" style="display: none;">
+                  </div>
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">status : </label>
+                    <select class="form-control search-box" name="status">
+                      <option value=" ">Select Option</option>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    @error('status')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-md-12">
+                    <button type="submit" class="btn btn-primary mt-3" style="float: right;">Submit</button>
+                  </div>
                 </div>
-              </div>
+
+
+              </form>
             </div>
-        </section>
+
+          </div>
+          <div class="col-lg-6">
+            <div class="institute-form">
+              <h3>List of Institute</h3>
+
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
+
+              <table class="table table-responsive-sm table-bordered institute-table mt-4">
+                <thead>
+                  <tr>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
+                    <th style="width: 200px">Name</th>
+                    <th style="width: 200px">Icon</th>
+                    <th style="width: 500px">Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @php $i=1 @endphp
+                  @foreach($institute_for as $value)
+                  <tr>
+                    <td>{{$i}}</td>
+                    <td>{{$value->name}}</td>
+                    <td><img src="{{asset($value->icon) }}" style="height: 80px;width:80px" alt="Icon" class="img-resize"></td>
+                    <td>@if($value->status == 'active')
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
+                      @endif
+                    </td>
+
+                    <td>
+                      <div class="d-flex">
+                        @canButton('edit', 'Institute_for')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Institute_for')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
+                      </div>
+                  </tr>
+                  @php $i++ @endphp
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+            <div class="d-flex justify-content-end">
+              {!! $institute_for->withQueryString()->links('pagination::bootstrap-5') !!}
+
+            </div>
+          </div>
+
+
+
+
+
+
+        </div>
       </div>
 
       <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
