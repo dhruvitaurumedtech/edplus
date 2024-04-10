@@ -1313,6 +1313,20 @@ class InstituteApiController extends Controller
     }
     public function add_student(Request $request)
     {
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
         // echo "<pre>";print_r($request->all());exit;
         $token = $request->header('Authorization');
 
@@ -1365,6 +1379,9 @@ class InstituteApiController extends Controller
                     $stream_id = $request->stream_id;
                 }
 
+                $insdelQY = Institute_detail::where('board_id',$request->board_id)
+                ->where('board_id',$request->board_id)
+                ->get();
                 if (!empty($studentdtls)) {
 
                     $studentdetail = Student_detail::where('student_id', $student_id)

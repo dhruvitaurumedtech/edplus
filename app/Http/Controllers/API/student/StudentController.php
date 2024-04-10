@@ -105,9 +105,10 @@ class StudentController extends Controller
                     // Check if the title already exists in the $searchhistory_list array
                     $existingTitles = array_column($searchhistory_list, 'title');
                     if (!in_array($value->title, $existingTitles)) {
-                        // Add the value to the $searchhistory_list array if the title is unique
+                        
                         $searchhistory_list[] = [
                             'id' => $value->id,
+                            'institute_id'=>$value->institute_id,
                             'user_id' => $value->user_id,
                             'title' => $value->title,
                         ];
@@ -196,6 +197,7 @@ class StudentController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'title' => 'required|string',
+            'institute_id'=>'required'
         ]);
 
         if ($validator->fails()) {
@@ -221,6 +223,7 @@ class StudentController extends Controller
                 $search_add = Search_history::create([
                     'user_id' => $request->input('user_id'),
                     'title' => $request->input('title'),
+                    'institute_id'=>$request->input('institute_id'),
                 ]);
 
 
