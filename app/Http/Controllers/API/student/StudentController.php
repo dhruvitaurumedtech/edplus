@@ -226,7 +226,6 @@ class StudentController extends Controller
                     'institute_id'=>$request->input('institute_id'),
                 ]);
 
-
                 return response()->json([
                     'success' => 200,
                     'message' => 'Serach History Added',

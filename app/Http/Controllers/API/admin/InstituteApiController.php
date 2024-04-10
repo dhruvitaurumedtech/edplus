@@ -1379,9 +1379,12 @@ class InstituteApiController extends Controller
                     $stream_id = $request->stream_id;
                 }
 
-                $insdelQY = Institute_detail::where('board_id',$request->board_id)
-                ->where('board_id',$request->board_id)
-                ->get();
+                $insdelQY = Standard_sub::where('board_id',$request->board_id)
+                ->where('medium_id',$request->medium_id)
+                ->where('class_id',$request->class_id)
+                ->where('standard_id',$request->standard_id)
+                ->where('institute_id', $institute_id)
+                ->first();
                 if (!empty($studentdtls)) {
 
                     $studentdetail = Student_detail::where('student_id', $student_id)
@@ -1389,10 +1392,10 @@ class InstituteApiController extends Controller
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
                             'student_id' => $student_id,
-                            'institute_for_id' => $request->institute_for_id,
+                            'institute_for_id' => $insdelQY->institute_for_id,
                             'board_id' =>  $request->board_id,
                             'medium_id' => $request->medium_id,
-                            'class_id' => $request->class_id,
+                            'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
                             'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
@@ -1449,10 +1452,10 @@ class InstituteApiController extends Controller
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
                             'student_id' => $student_id,
-                            'institute_for_id' => $request->institute_for_id,
+                            'institute_for_id' => $insdelQY->institute_for_id,
                             'board_id' =>  $request->board_id,
                             'medium_id' => $request->medium_id,
-                            'class_id' => $request->class_id,
+                            'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
                             //'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
