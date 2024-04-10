@@ -2103,4 +2103,75 @@ class InstituteApiController extends Controller
             ], 400);
         }
     }
+
+    //student list all and filter wise
+    public function institute_students(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try{
+                $user_id = $request->user_id;
+                $institute_id = $request->institute_id;
+
+                //filter fields
+                $board = $request->board;
+                $medium = $request->medium;
+                $standard = $request->standard;
+
+                $students = Student_detail::join('users','users.id','students_details.student_id')
+                ->join('board','board.id','students_details.board_id')
+                ->join('medium','medium.id','students_details.medium_id')
+                ->join('standard','standard.id','students_details.standard_id')
+                ->where('students_details.user_id',$user_id)
+                ->where('students_details.institute_id',$institute_id)
+                ->select('users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
+                ->get();
+
+                $stulist = [];
+                foreach($students as $stdDT){
+                    $stulist[] = array('name'=>$stdDT->firstname.' '.$stdDT->lastname,
+                    'board'=>$stdDT->board.'('.$stdDT->medium.')',
+                    'standard'=>$stdDT->standard); 
+                }
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $stulist
+                ]);
+
+            }catch(\Exception $e){
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
 }
