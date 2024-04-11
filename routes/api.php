@@ -73,7 +73,8 @@ Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks']
 Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
 Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
 Route::post('/institute/add-timetable', [InstituteApiController::class, 'add_time_table'])->name('add_time_table');
-
+Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
+Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
 //banner controller
 Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
 Route::post('/banner/banner-status-update', [BannerApiController::class, 'update_status'])->name('update_status');
@@ -82,7 +83,7 @@ Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])-
 
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
-Route::post('/institute/student_list', [StudentController::class, 'student_list']);
+
 
 //parents API's
 Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
