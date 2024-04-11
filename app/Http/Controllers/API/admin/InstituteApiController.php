@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
+use PDO;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
 
@@ -1337,27 +1338,7 @@ class InstituteApiController extends Controller
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
-                
-            if($existingUser->role_type == 6){
-                $student_id = $request->user_id;
-                $institute_id = $request->institute_id;
-                $getuidfins = Institute_detail::where('id',$institute_id)->first();
-                $user_id = $getuidfins->user_id;
-            }else{
-                $student_id = $request->student_id;
-                $institute_id = $request->institute_id;
-                $user_id = $request->user_id;
-            }
-            
-            $studentdtls = Student_detail::where('student_id',$student_id)
-            ->where('institute_id',$institute_id)->first();
-            
-            if($request->stream_id == null){
-                $stream_id = '';
-            }else{
-                $stream_id = $request->stream_id;
-            }
+            try {
 
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
@@ -1379,12 +1360,32 @@ class InstituteApiController extends Controller
                     $stream_id = $request->stream_id;
                 }
 
-                $insdelQY = Standard_sub::where('board_id',$request->board_id)
-                ->where('medium_id',$request->medium_id)
-                ->where('class_id',$request->class_id)
-                ->where('standard_id',$request->standard_id)
-                ->where('institute_id', $institute_id)
-                ->first();
+                if ($existingUser->role_type == 6) {
+                    $student_id = $request->user_id;
+                    $institute_id = $request->institute_id;
+                    $getuidfins = Institute_detail::where('id', $institute_id)->first();
+                    $user_id = $getuidfins->user_id;
+                } else {
+                    $student_id = $request->student_id;
+                    $institute_id = $request->institute_id;
+                    $user_id = $request->user_id;
+                }
+
+                $studentdtls = Student_detail::where('student_id', $student_id)
+                    ->where('institute_id', $institute_id)->first();
+
+                if ($request->stream_id == null) {
+                    $stream_id = '';
+                } else {
+                    $stream_id = $request->stream_id;
+                }
+
+                $insdelQY = Standard_sub::where('board_id', $request->board_id)
+                    ->where('medium_id', $request->medium_id)
+                    ->where('class_id', $request->class_id)
+                    ->where('standard_id', $request->standard_id)
+                    ->where('institute_id', $institute_id)
+                    ->first();
                 if (!empty($studentdtls)) {
 
                     $studentdetail = Student_detail::where('student_id', $student_id)
@@ -1861,7 +1862,7 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        
+
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
@@ -1875,7 +1876,7 @@ class InstituteApiController extends Controller
             $title = $request->title;
             $detail = $request->detail;
             $standard_id = $request->standard_id;
-            
+
             if ($stream_id == 'null') {
                 $stream_idd = null;
             } else {
@@ -1895,7 +1896,7 @@ class InstituteApiController extends Controller
                 'detail' => $detail,
                 'standard_id' => $standard_id
             ]);
-           
+
             if ($addannounc) {
                 return response()->json([
                     'status' => 200,
@@ -1979,10 +1980,10 @@ class InstituteApiController extends Controller
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
 
                     $roles = [];
-                    $roledsid = explode(",",$anoouncmnt->role_type);
-                    $roqy = Role::whereIN('id',$roledsid)->get();
-                    foreach($roqy as $rolDT){
-                        $roles[] = array('id'=>$rolDT->id,'name'=>$rolDT->role_name);
+                    $roledsid = explode(",", $anoouncmnt->role_type);
+                    $roqy = Role::whereIN('id', $roledsid)->get();
+                    foreach ($roqy as $rolDT) {
+                        $roles[] = array('id' => $rolDT->id, 'name' => $rolDT->role_name);
                     }
 
                     $announcementDT[] = array(
@@ -1990,13 +1991,13 @@ class InstituteApiController extends Controller
                         'date' => $anoouncmnt->created_at,
                         'title' => $anoouncmnt->title,
                         'detail' => $anoouncmnt->detail,
-                        'subject_id'=>$subjectq->id,
-                        'subject'=>$subjectq->name,
-                        'standard_id'=>$standardtq->id,
-                        'standard'=>$standardtq->name,
-                        'board_id'=>$boarddt->id,
-                        'board'=>$boarddt->name,
-                        'role'=>$roles
+                        'subject_id' => $subjectq->id,
+                        'subject' => $subjectq->name,
+                        'standard_id' => $standardtq->id,
+                        'standard' => $standardtq->name,
+                        'board_id' => $boarddt->id,
+                        'board' => $boarddt->name,
+                        'role' => $roles
                     );
                 }
                 return response()->json([
@@ -2105,7 +2106,8 @@ class InstituteApiController extends Controller
     }
 
     //student list all and filter wise
-    public function institute_students(Request $request){
+    public function institute_students(Request $request)
+    {
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
@@ -2128,7 +2130,7 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
+            try {
                 $user_id = $request->user_id;
                 $institute_id = $request->institute_id;
 
@@ -2139,36 +2141,38 @@ class InstituteApiController extends Controller
                 $searchkeyword = $request->searchkeyword;
                 $perPage = $request->input('per_page', 10);
 
-                $students = Student_detail::join('users','users.id','students_details.student_id')
-                ->join('board','board.id','students_details.board_id')
-                ->join('medium','medium.id','students_details.medium_id')
-                ->join('standard','standard.id','students_details.standard_id')
-                ->where('students_details.user_id',$user_id)
-                ->where('students_details.institute_id',$institute_id)
-                ->when($board, function ($query, $board) {
-                    return $query->where('students_details.board_id', $board);
-                })
-                ->when($medium, function ($query, $medium) {
-                    return $query->where('students_details.medium_id', $medium);
-                })
-                ->when($standard, function ($query, $standard) {
-                    return $query->where('students_details.standard_id', $standard);
-                })
-                ->when($searchkeyword, function ($query, $searchkeyword) {
-                    return $query->where(function ($query) use ($searchkeyword) {
-                        $query->where('users.firstname', 'like', '%' . $searchkeyword . '%')
-                            ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
-                            ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
-                    });
-                })
-                ->select('users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
-                ->paginate($perPage);
+                $students = Student_detail::join('users', 'users.id', 'students_details.student_id')
+                    ->join('board', 'board.id', 'students_details.board_id')
+                    ->join('medium', 'medium.id', 'students_details.medium_id')
+                    ->join('standard', 'standard.id', 'students_details.standard_id')
+                    ->where('students_details.user_id', $user_id)
+                    ->where('students_details.institute_id', $institute_id)
+                    ->when($board, function ($query, $board) {
+                        return $query->where('students_details.board_id', $board);
+                    })
+                    ->when($medium, function ($query, $medium) {
+                        return $query->where('students_details.medium_id', $medium);
+                    })
+                    ->when($standard, function ($query, $standard) {
+                        return $query->where('students_details.standard_id', $standard);
+                    })
+                    ->when($searchkeyword, function ($query, $searchkeyword) {
+                        return $query->where(function ($query) use ($searchkeyword) {
+                            $query->where('users.firstname', 'like', '%' . $searchkeyword . '%')
+                                ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
+                                ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
+                        });
+                    })
+                    ->select('users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->paginate($perPage);
 
                 $stulist = [];
-                foreach($students as $stdDT){
-                    $stulist[] = array('name'=>$stdDT->firstname.' '.$stdDT->lastname,
-                    'board'=>$stdDT->board.'('.$stdDT->medium.')',
-                    'standard'=>$stdDT->standard); 
+                foreach ($students as $stdDT) {
+                    $stulist[] = array(
+                        'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
+                        'board' => $stdDT->board . '(' . $stdDT->medium . ')',
+                        'standard' => $stdDT->standard
+                    );
                 }
 
                 return response()->json([
@@ -2176,8 +2180,7 @@ class InstituteApiController extends Controller
                     'message' => 'Data Fetch Successfully',
                     'data' => $stulist
                 ]);
-
-            }catch(\Exception $e){
+            } catch (\Exception $e) {
                 return response()->json([
                     'success' => 500,
                     'message' => 'Server Error',
@@ -2192,7 +2195,8 @@ class InstituteApiController extends Controller
         }
     }
 
-    public function filters_data(Request $request){
+    public function filters_data(Request $request)
+    {
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
@@ -2215,14 +2219,115 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
+            try {
 
-            $user_id = $request->user_id;
-            $institute_id = $request->institute_id;
+                $user_id = $request->user_id;
+                $institute_id = $request->institute_id;
 
-                
+
+                $boarids = Institute_board_sub::where('user_id', $user_id)
+                    ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+                $uniqueBoardIds = array_unique($boarids);
+
+                $board_list = DB::table('board')
+                    ->whereIN('id', $uniqueBoardIds)
+                    ->get();
+
+                $board_array = [];
+                foreach ($board_list as $board_value) {
+
+                    $medium_sublist = DB::table('medium_sub')
+                        ->where('user_id', $user_id)
+                        ->where('board_id', $board_value->id)
+                        ->where('institute_id', $institute_id)
+                        ->pluck('medium_id')->toArray();
+                    $uniquemediumds = array_unique($medium_sublist);
+
+                    $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+                    $medium_array = [];
+                    foreach ($medium_list as $medium_value) {
+
+                        $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
+                            ->where('standard_sub.user_id', $user_id)
+                            ->where('standard_sub.institute_id', $institute_id)
+                            ->where('standard_sub.board_id', $board_value->id)
+                            ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id', 'standard.name as std_name')->get();
+                        $stddata = [];
+                        foreach ($stndQY as $stndDT) {
+                            $forcounstd = Student_detail::whereNull('deleted_at')
+                                ->where('user_id', $user_id)
+                                ->where('institute_id', $institute_id)
+                                ->where('board_id', $board_value->id)
+                                ->where('medium_id', $medium_value->id)
+                                ->get();
+                            $stdCount = $forcounstd->count();
+
+                            $stddata[] = array(
+                                'id' => $stndDT->std_id,
+                                'name' => $stndDT->std_name,
+                                'no_of_std' => $stdCount
+                            );
+                        }
+
+                        $medium_array[] = [
+                            'id' => $medium_value->id,
+                            'medium_name' => $medium_value->name,
+                            'standard' => $stddata
+                        ];
+                    }
+
+                    $board_array[] = [
+                        'id' => $board_value->id,
+                        'board_name' => $board_value->name,
+                        'medium' => $medium_array,
+
+                        // Include banner_array inside board_array
+                    ];
+                }
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $board_array
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+    public function institute_profile(Request $request)
+    {
+        $institute_id = $request->institute_id;
+        $user_id = $request->user_id;
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            $institute_detail = Institute_detail::where('institute_detail.id', $institute_id)
+                ->select('institute_detail.*')
+                ->get()->toarray();
+
+
+            if (empty($institute_id)) {
+                $institute_id = Institute_detail::where('user_id', $user_id)->select('id')->first();
+            }
+            // Institute_detail::where();
             $boarids = Institute_board_sub::where('user_id', $user_id)
-            ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+                ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
             $uniqueBoardIds = array_unique($boarids);
 
             $board_list = DB::table('board')
@@ -2243,34 +2348,11 @@ class InstituteApiController extends Controller
 
                 $medium_array = [];
                 foreach ($medium_list as $medium_value) {
-                    
-                    $stndQY = Standard_sub::join('standard','standard.id','standard_sub.standard_id')
-                    ->where('standard_sub.user_id', $user_id)
-                    ->where('standard_sub.institute_id', $institute_id)
-                    ->where('standard_sub.board_id', $board_value->id)
-                    ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id','standard.name as std_name')->get();
-                    $stddata = [];
-                    foreach($stndQY as $stndDT){
-                        $forcounstd = Student_detail::whereNull('deleted_at')
-                        ->where('user_id', $user_id)
-                        ->where('institute_id', $institute_id)
-                        ->where('board_id', $board_value->id)
-                        ->where('medium_id', $medium_value->id)
-                        ->get();
-                        $stdCount = $forcounstd->count();
-
-                        $stddata[] = array('id'=>$stndDT->std_id,
-                        'name'=>$stndDT->std_name,
-                        'no_of_std'=>$stdCount);
-                    }
-
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
-                        'standard'=>$stddata
                     ];
                 }
-
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
@@ -2279,26 +2361,34 @@ class InstituteApiController extends Controller
                     // Include banner_array inside board_array
                 ];
             }
+            $institute_response = [];
+            foreach ($institute_detail as $value) {
+                $institute_response[] = [
+                    'institute_name' => $value['institute_name'],
+                    'address' => $value['address'] . '',
+                    'contact_no' => $value['contact_no'] . '',
+                    'email' => $value['email'] . '',
+                    'about_us' => $value['about_us'] . '',
+                    'board_name' => $board_array,
+                    'website_link' => $value['website_link'] . '',
+                    'instagram_link' => $value['instagram_link'] . '',
+                    'facebook_link' => $value['facebook_link'] . '',
+                    'whatsaap_link' => $value['whatsaap_link'] . '',
+                    'youtube_link' => $value['youtube_link'] . '',
 
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $board_array
-                ]);
 
-            }catch(\Exception $e){
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+                ];
             }
+            return response()->json([
+                'status' => '200',
+                'message' => 'Institute Fetch Successfully',
+                'data' => $institute_response
+            ]);
         } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
             ]);
         }
-    
     }
 }

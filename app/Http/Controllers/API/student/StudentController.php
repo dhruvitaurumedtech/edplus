@@ -105,10 +105,10 @@ class StudentController extends Controller
                     // Check if the title already exists in the $searchhistory_list array
                     $existingTitles = array_column($searchhistory_list, 'title');
                     if (!in_array($value->title, $existingTitles)) {
-                        
+
                         $searchhistory_list[] = [
                             'id' => $value->id,
-                            'institute_id'=>$value->institute_id,
+                            'institute_id' => $value->institute_id,
                             'user_id' => $value->user_id,
                             'title' => $value->title,
                         ];
@@ -197,7 +197,7 @@ class StudentController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'title' => 'required|string',
-            'institute_id'=>'required'
+            'institute_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -223,7 +223,7 @@ class StudentController extends Controller
                 $search_add = Search_history::create([
                     'user_id' => $request->input('user_id'),
                     'title' => $request->input('title'),
-                    'institute_id'=>$request->input('institute_id'),
+                    'institute_id' => $request->input('institute_id'),
                 ]);
 
                 return response()->json([
@@ -699,7 +699,7 @@ class StudentController extends Controller
                 $chapers = [];
                 $cptquy = Chapter::where('subject_id', $subject_id)->get();
                 foreach ($cptquy as $chval) {
-                    $subasid = Subject_model::where('id',$chval->subject_id)->select('base_table_id')->first();
+                    $subasid = Subject_model::where('id', $chval->subject_id)->select('base_table_id')->first();
                     $chapers[] = array(
                         "id" => $chval->id,
                         "base_table_id" => $subasid->base_table_id,
@@ -1227,29 +1227,41 @@ class StudentController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->select('users.*', 'students_details.student_id')
-                ->where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
+                ->join('standard', 'students_details.standard_id', '=', 'standard.id')
+                ->join('stream', 'students_details.stream_id', '=', 'stream.id')
+                ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id', 'left')
+                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance')
+                ->where('students_details.user_id', $user_id)
+                ->where('students_details.institute_id', $institute_id)
                 ->get()->toArray();
+
             foreach ($student_data as $value) {
 
-                $attendance_data = Attendance_model::where('student_id', $value['student_id'])->get()->toarray();
 
-                $stdwithattd = [];
-                foreach ($attendance_data as $value2) {
+                // $attendance_data = Attendance_model::where('student_id', $value['student_id'])->get()->toarray();
 
-                    $stdwithattd[] = array('attendance' => $value2['attendance'], 'date' => $value2['date']);
-                }
+                // $stdwithattd = [];
+                // foreach ($attendance_data as $value2) {
+
+                //     $stdwithattd[] = array('attendance' => $value2['attendance'], 'date' => $value2['date']);
+                // }
+
                 $student_response[] = [
                     'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                    'attendance' => $stdwithattd
+
+                    'attendance' => $value['attendance']
                 ];
             }
+            $base = [
+                'standard' => $student_data[0]['standard_name'],
+                'stream' => $student_data[0]['stream_name'],
+                'data' => $student_response,
+            ];
             return response()->json([
                 'success' => 200,
                 'message' => 'Student Fetch Successfully',
-                'data' => $student_response
+                'data' => $base
             ], 200);
         } else {
             return response()->json([
