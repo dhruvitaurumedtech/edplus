@@ -30,6 +30,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
+use App\Models\VideoCategory;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
 
@@ -570,6 +571,7 @@ class InstituteApiController extends Controller
                         'institute_id' => $lastInsertedId,
                         'institute_for_id' => $institute_for_id,
                     ]);
+                    
                 } else {
                     $institute_for_id = $value;
                 }
@@ -2315,6 +2317,60 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ]);
         }
+    
+    }
+
+    //category list for add do business with 
+    public function category_list(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try{
+            
+            $vcategory = VideoCategory::where('status', 'active')->get();
+            
+            $cat_array = [];
+            foreach ($vcategory as $cat_value) {
+                $cat_array[] = array('id'=>$cat_value->id,'name'=>$cat_value->name);
+                
+            }
+            return response()->json([
+                'status' => '200',
+                'message' => 'Data Fetch Successfully',
+                'data' => $cat_array
+            ]);
+            }catch(\Exception $e){
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    
     
     }
 }
