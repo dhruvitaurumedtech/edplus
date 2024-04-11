@@ -2133,9 +2133,10 @@ class InstituteApiController extends Controller
                 $institute_id = $request->institute_id;
 
                 //filter fields
-                $board = $request->board;
-                $medium = $request->medium;
-                $standard = $request->standard;
+                $board = $request->board_id;
+                $medium = $request->medium_id;
+                $standard = $request->standard_id;
+                $searchkeyword = $request->searchkeyword;
 
                 $students = Student_detail::join('users','users.id','students_details.student_id')
                 ->join('board','board.id','students_details.board_id')
@@ -2143,6 +2144,22 @@ class InstituteApiController extends Controller
                 ->join('standard','standard.id','students_details.standard_id')
                 ->where('students_details.user_id',$user_id)
                 ->where('students_details.institute_id',$institute_id)
+                ->when($board, function ($query, $board) {
+                    return $query->where('students_details.board_id', $board);
+                })
+                ->when($medium, function ($query, $medium) {
+                    return $query->where('students_details.medium_id', $medium);
+                })
+                ->when($standard, function ($query, $standard) {
+                    return $query->where('students_details.standard_id', $standard);
+                })
+                ->when($searchkeyword, function ($query, $searchkeyword) {
+                    return $query->where(function ($query) use ($searchkeyword) {
+                        $query->where('users.firstname', 'like', '%' . $searchkeyword . '%')
+                            ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
+                            ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
+                    });
+                })
                 ->select('users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
                 ->get();
 
@@ -2233,8 +2250,17 @@ class InstituteApiController extends Controller
                     ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id','standard.name as std_name')->get();
                     $stddata = [];
                     foreach($stndQY as $stndDT){
+                        $forcounstd = Student_detail::whereNull('deleted_at')
+                        ->where('user_id', $user_id)
+                        ->where('institute_id', $institute_id)
+                        ->where('board_id', $board_value->id)
+                        ->where('medium_id', $medium_value->id)
+                        ->get();
+                        $stdCount = $forcounstd->count();
+
                         $stddata[] = array('id'=>$stndDT->std_id,
-                        'name'=>$stndDT->std_name);
+                        'name'=>$stndDT->std_name,
+                        'no_of_std'=>$stdCount);
                     }
 
                     $medium_array[] = [
