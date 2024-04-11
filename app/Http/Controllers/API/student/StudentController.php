@@ -309,7 +309,7 @@ class StudentController extends Controller
 
                     Mail::to($tomail)->send(new WelcomeMail($data));
                     // Mail::to('recipient@example.com')->send(new WelcomeMail());
-                    
+
                     // Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
                     //     $message->to($tomail);
                     //     $message->subject('Reset Password');
@@ -787,7 +787,7 @@ class StudentController extends Controller
                         $topics[] = array(
                             "id" => $topval->id,
                             "topic_no" => $topval->topic_no,
-                            "topic_name" => $topval->topic_name,
+                            "topic_name" => $topval->topic_name . '',
                             "topic_video" => asset($topval->topic_video),
                             "subject_id" => $topval->subject_id,
                             "subject_name" => $topval->sname,

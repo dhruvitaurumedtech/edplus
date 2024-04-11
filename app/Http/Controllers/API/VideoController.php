@@ -11,7 +11,8 @@ use Illuminate\Http\Request;
 
 class VideoController extends Controller
 {
-    public function upload_video(Request $request){
+    public function upload_video(Request $request)
+    {
 
         $validator = \Validator::make($request->all(), [
             'base_table_id' => 'required',
@@ -28,12 +29,14 @@ class VideoController extends Controller
 
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
 
+
         if ($check->category_id == $request->parent_category_id) {
-            
-            if ($request->parent_category_id == '1') {
+
+            if ($request->parent_category_id == '1' || $request->parent_category_id == '2') {
                 $extension = 'mp4,mov,avi';
             } else {
-                $extension = 'pdf'; }
+                $extension = 'pdf';
+            }
         } else {
             return response()->json([
                 'success' => 400,
@@ -68,7 +71,7 @@ class VideoController extends Controller
             'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id' => $request->input('category_id'),
-            'topic_video' => isset($videoPath) ? asset($videoPath) : null 
+            'topic_video' => isset($videoPath) ? asset($videoPath) : null
         ]);
 
         return response()->json([
@@ -76,28 +79,29 @@ class VideoController extends Controller
             'message' => 'Topic and video uploaded successfully',
             'topic' => $topic
         ]);
-
     }
 
     //if need video category type
-    public function video_category(Request $request){
+    public function video_category(Request $request)
+    {
         $user_id = $request->user_id;
         $instituteid = $request->institute_id;
-        $categories = Dobusinesswith_sub::
-        join('do_business_with','do_business_with.id','=','do_business_with_sub.do_business_with_id')
-        ->join('video_categories','video_categories.id','=','do_business_with.category_id')
-        ->where('do_business_with_sub.user_id',$user_id)
-        ->where('do_business_with_sub.institute_id',$instituteid)
-        ->where('do_business_with.status','active')
-        ->whereNull('do_business_with.deleted_at')
-        ->select('do_business_with.name','do_business_with.id as did','do_business_with.status','video_categories.name as cname','video_categories.id as cid')
-        ->get();
+        $categories = Dobusinesswith_sub::join('do_business_with', 'do_business_with.id', '=', 'do_business_with_sub.do_business_with_id')
+            ->join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+            ->where('do_business_with_sub.user_id', $user_id)
+            ->where('do_business_with_sub.institute_id', $instituteid)
+            ->where('do_business_with.status', 'active')
+            ->whereNull('do_business_with.deleted_at')
+            ->select('do_business_with.name', 'do_business_with.id as did', 'do_business_with.status', 'video_categories.name as cname', 'video_categories.id as cid')
+            ->get();
 
         $videocat = [];
-        foreach($categories as $catvalu){
-            $videocat[] = array('id'=>$catvalu->did,'name'=>$catvalu->name,
-            'parent_category_id'=>$catvalu->cid,'parent_category_name'=>$catvalu->cname,'status'=>$catvalu->status);
+        foreach ($categories as $catvalu) {
+            $videocat[] = array(
+                'id' => $catvalu->did, 'name' => $catvalu->name,
+                'parent_category_id' => $catvalu->cid, 'parent_category_name' => $catvalu->cname, 'status' => $catvalu->status
+            );
         }
-        return response()->json(['success' => 200,'message' => 'Video Category List', 'Category' => $videocat]);
+        return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
     }
 }

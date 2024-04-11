@@ -2,23 +2,15 @@
 <link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
 </head>
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
     <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
       <!-- /.content-header -->
-
-
       <script>
         window.setTimeout(function() {
           $(".alert-success").slideUp(500, function() {
@@ -26,7 +18,6 @@
           });
         }, 3000);
       </script>
-      <!-- Main content -->
       <div class="link-dir">
         <h1 class="display-4">Institute List</h1>
         <ul>
@@ -37,7 +28,6 @@
           <li><a href="{{url('institute-list')}}">Institute List</a></li>
         </ul>
       </div>
-
 
       <!-- /.card-header -->
       <!-- form start -->
@@ -110,6 +100,7 @@
         </div>
 
       </div>
+      @include('layouts/footer_new')
       <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -242,4 +233,3 @@
         //   });
         // });
       </script>
-      @include('layouts/footer_new')
