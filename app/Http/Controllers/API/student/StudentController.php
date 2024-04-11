@@ -95,6 +95,7 @@ class StudentController extends Controller
                         'id' => $value->id,
                         'institute_name' => $value->institute_name,
                         'address' => $value->address,
+                        'logo' => asset($value->logo),
                     );
                 }
 
