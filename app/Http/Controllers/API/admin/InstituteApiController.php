@@ -2161,13 +2161,17 @@ class InstituteApiController extends Controller
                             ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                     });
                 })
-                ->select('users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
+                ->select('students_details.*','users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
                 ->paginate($perPage);
 
                 $stulist = [];
                 foreach($students as $stdDT){
-                    $stulist[] = array('name'=>$stdDT->firstname.' '.$stdDT->lastname,
+                    $stulist[] = array(
+                    'id'=>$stdDT->student_id,
+                    'name'=>$stdDT->firstname.' '.$stdDT->lastname,
+                    'board_id'=>$stdDT->board_id,
                     'board'=>$stdDT->board.'('.$stdDT->medium.')',
+                    'standard_id'=>$stdDT->standard_id,
                     'standard'=>$stdDT->standard); 
                 }
 

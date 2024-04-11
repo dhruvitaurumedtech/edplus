@@ -844,36 +844,63 @@ class StudentController extends Controller
                 $token = substr($token, 7);
             }
 
-            $user_id = $request->user_id;
+            
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
             if ($existingUser->token) {
+                
+                if($existingUser->role_type == 6){
+                    $student_id = $request->user_id;
+                    
+                }else{
+                    $user_id = $request->user_id;
+                    $student_id = $request->student_id;
+                }
+
+                $studentUser = User::where('id', $student_id)->first();
+
+                $institute_id = $request->institute_id;
 
                 $institutes = [];
-
-                $joininstitute = Institute_detail::where('status', 'active')->whereIn('id', function ($query) use ($user_id) {
+                
+                $joininstitute = Institute_detail::where('status', 'active')
+                ->whereIn('id', function ($query) use ($student_id) {
                     $query->select('institute_id')
-                        ->where('student_id', $user_id)
+                        ->where('student_id', $student_id)
                         ->where('status', '=', '1')
                         ->from('students_details');
-                })->get();
+                })
+                ->when($institute_id, function($query,$institute_id){
+                    return $query->where('id', $institute_id);
+                })
+                ->get();
 
                 foreach ($joininstitute as $value) {
+                    $substdnt = Student_detail::where('student_id', $student_id)
+                    ->where('institute_id', $value->id)->first();
+
+                    $subids = explode(',',$substdnt->subject_id);
+                    $subjectids = Subject_model::whereIN('id',$subids)->get();
+                    $subs = [];
+                    foreach($subjectids as $subDT){
+                        $subs[] = array('id'=>$subDT->id,'name'=>$subDT->name);
+                    }
                     $institutes[] = array(
                         'id' => $value->id,
                         'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                         'address' => $value->address,
                         'logo' => asset($value->logo),
+                        'subjects'=>$subs //subject enroll with us
                     );
                 }
 
                 //
                 $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
                     ->join('medium', 'medium.id', '=', 'students_details.medium_id')
-                    ->where('students_details.student_id', $user_id)
+                    ->where('students_details.student_id', $student_id)
                     ->where('students_details.status', '=', '1')->select('standard.name as standard', 'medium.name as medium')->first();
                 //parents
                 $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
-                    ->where('parents.student_id', $user_id)->get();
+                    ->where('parents.student_id', $student_id)->get();
                 $parents_dt = [];
                 foreach ($parentsQY as $parentsDT) {
                     $parents_dt[] = array(
@@ -883,24 +910,24 @@ class StudentController extends Controller
                     );
                 }
                 //
-                if ($existingUser->image) {
-                    $img = $existingUser->image;
+                if ($studentUser->image) {
+                    $img = $studentUser->image;
                 } else {
                     $img = asset('default.jpg');
                 }
                 $userdetail = array(
-                    'id' => $existingUser->id,
-                    'unique_id' => $existingUser->unique_id . '',
-                    'name' => $existingUser->firstname . ' ' . $existingUser->lastname,
-                    'email' => $existingUser->email,
-                    'mobile' => $existingUser->mobile . '',
+                    'id' => $studentUser->id,
+                    'unique_id' => $studentUser->unique_id . '',
+                    'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
+                    'email' => $studentUser->email,
+                    'mobile' => $studentUser->mobile . '',
                     'image' => $img . '',
-                    'dob' => $existingUser->dob,
-                    'address' => $existingUser->address,
+                    'dob' => $studentUser->dob,
+                    'address' => $studentUser->address,
                     'standard' => $sdtls ? $sdtls->standard : '',
                     'medium' => $sdtls ? $sdtls->medium : '',
-                    'school' => $existingUser->school_name,
-                    'area' => $existingUser->area,
+                    'school' => $studentUser->school_name,
+                    'area' => $studentUser->area,
                     'institutes' => $institutes,
                     'parents' => $parents_dt
                 );
