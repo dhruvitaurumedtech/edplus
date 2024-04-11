@@ -499,10 +499,21 @@ class InstituteApiController extends Controller
             try {
                 $institute_work_id = explode(',', $request->input('institute_work_id'));
                 foreach ($institute_work_id as $value) {
+                    if ($value == 'other') {
+                        $instituteforadd = Dobusinesswith_Model::create([
+                            'name' => $request->input('do_businesswith_name'),
+                            'category_id' => $request->input('category_id'), //video category table id
+                            'status' => 'active',
+                        ]);
+                        $dobusinesswith_id = $instituteforadd->id;
+                    } else {
+                        $dobusinesswith_id = $value;
+                    }
+
                     Dobusinesswith_sub::create([
                         'user_id' => $request->input('user_id'),
                         'institute_id' => $lastInsertedId,
-                        'do_business_with_id' => $value,
+                        'do_business_with_id' => $dobusinesswith_id,
                     ]);
                 }
             } catch (\Exception $e) {
@@ -2163,14 +2174,17 @@ class InstituteApiController extends Controller
                                 ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                         });
                     })
-                    ->select('users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->select('students_details.*', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
                     ->paginate($perPage);
 
                 $stulist = [];
                 foreach ($students as $stdDT) {
                     $stulist[] = array(
+                        'id' => $stdDT->student_id,
                         'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
+                        'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
+                        'standard_id' => $stdDT->standard_id,
                         'standard' => $stdDT->standard
                     );
                 }
