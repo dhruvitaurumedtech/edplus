@@ -2137,6 +2137,7 @@ class InstituteApiController extends Controller
                 $medium = $request->medium_id;
                 $standard = $request->standard_id;
                 $searchkeyword = $request->searchkeyword;
+                $perPage = $request->input('per_page', 10);
 
                 $students = Student_detail::join('users','users.id','students_details.student_id')
                 ->join('board','board.id','students_details.board_id')
@@ -2161,7 +2162,7 @@ class InstituteApiController extends Controller
                     });
                 })
                 ->select('users.firstname','users.lastname','board.name as board','medium.name as medium','standard.name as standard')
-                ->get();
+                ->paginate($perPage);
 
                 $stulist = [];
                 foreach($students as $stdDT){
