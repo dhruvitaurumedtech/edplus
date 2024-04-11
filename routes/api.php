@@ -91,3 +91,5 @@ Route::post('/parents/child-list-parents', [ParentsController::class, 'child_lis
 
 Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
+Route::post('/institute/student_list', [StudentController::class, 'student_list']);
+Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
