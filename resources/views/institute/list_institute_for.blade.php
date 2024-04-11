@@ -94,8 +94,8 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
-                    <button type="submit" class="btn btn-primary mt-3" style="float: right;">Submit</button>
+                  <div class="col-md-12 submit-btn">
+                    <button type="submit" class="btn btn-primary mt-3 ">Submit</button>
                   </div>
                 </div>
 
@@ -171,6 +171,7 @@
         </div>
       </div>
 
+      @include('layouts/footer_new')
       <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -319,4 +320,3 @@
       }
     }
   </script>
-  @include('layouts/footer_new')
