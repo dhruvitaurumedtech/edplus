@@ -76,10 +76,13 @@
 
 
                                                     </div>
+                                                    @error('institute_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-md-12 checbox-dropdown">
-                                                <label for="exampleInputEmail1">Institute Name : </label>
+                                                <label for="exampleInputEmail1">Teacher Name : </label>
 
                                                 <div class="dropdown" data-control="checkbox-dropdown">
                                                     <label class="dropdown-label">Select</label>
@@ -97,12 +100,17 @@
 
 
                                                     </div>
+                                                    @error('teacher_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Announcement : </label>
                                                 <textarea class="form-control" name="announcement"></textarea>
-
+                                                @error('announcement')
+                                                <div class="text-danger">{{ $message }}</div>
+                                                @enderror
                                             </div>
 
 
@@ -124,21 +132,39 @@
                                 <table class="table table-bordered table-responsive">
                                     <thead>
                                         <tr>
-                                            <th style="width: 10px">
-                                                <Sr class="No">No</Sr>
-                                            </th>
-                                            <th style="width: 200px">Institute </th>
-                                            <th style="width: 200px">Teacher</th>
-                                            <th style="width: 500px">Announcement</th>
+                                            <th style="width: 200px">Announcement </th>
+                                            <th style="width: 200px">Institute</th>
+                                            <th style="width: 500px">Teacher</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach($response['institute_show'] as $value)
-                                        <td>{{$value['insutitute_name']}}</td>
 
+                                        @foreach($response as $values)
+                                        <tr>
+                                            <td>{{$values['announcement']}}</td>
+                                            <td>
+                                                @foreach($values['institute_show'] as $institute)
+                                                {{$institute['institute_name']}}
+                                                @if (!$loop->last)
+                                                <br>
+                                                @endif
+                                                @endforeach
+                                            </td>
+                                            <td>
+                                                @foreach($values['teacher_show'] as $teacher)
+                                                {{$teacher['firstname']}}
+                                                @if (!$loop->last)
+                                                <br>
+                                                @endif
+                                                @endforeach
+                                            </td>
+                                            <td><a href="" class="btn btn-success">Edit</a><a href="" class="btn btn-danger">Delete</a></td>
+                                        </tr>
                                         @endforeach
                                     </tbody>
+                                </table>
+                                </tbody>
                                 </table>
                             </div>
 

@@ -19,12 +19,13 @@ class AnnouncementController extends Controller
         $teachers = User::where('role_type', 4)->get();
         $announcement = Common_announcement::get()->toarray();
         foreach ($announcement as $value) {
-            $institute_list = Institute_detail::whereIn('id', explode(',', $value['institute_id']))->get()->toarray();
-            $teacher_list = User::whereIn('id', explode(',', $value['teacher_id']))->get()->toarray();
+            $institute_response = Institute_detail::whereIn('id', explode(',', $value['institute_id']))->get()->toarray();
+            $teacher_response = User::whereIn('id', explode(',', $value['teacher_id']))->get()->toarray();
             $response[] = [
+                'id' => $value['id'],
                 'announcement' => $value['announcement'],
-                'institute_show' => $institute_list,
-                'teacher_show' => $teacher_list,
+                'institute_show' => $institute_response,
+                'teacher_show' => $teacher_response,
             ];
         }
 
@@ -39,16 +40,16 @@ class AnnouncementController extends Controller
 
     public function save(Request $request)
     {
-        $rules = [
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id' => 'required',
             'announcement' => 'required|string',
-        ];
+        ]);
 
-        // Validate the request
-        $validator = \Validator::make($request->all(), $rules);
-
-        // Check if validation fails
         if ($validator->fails()) {
-            return redirect()->back()->withErrors($validator)->withInput();
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
         }
 
         // Validation passed, create a new announcement
