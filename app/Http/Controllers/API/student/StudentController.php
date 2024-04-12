@@ -1254,8 +1254,8 @@ class StudentController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->join('standard', 'students_details.standard_id', '=', 'standard.id')
-                ->join('stream', 'students_details.stream_id', '=', 'stream.id')
+                ->join('standard', 'students_details.standard_id', '=', 'standard.id', 'left')
+                ->join('stream', 'students_details.stream_id', '=', 'stream.id', 'left')
                 ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id', 'left')
                 ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id')
                 ->where('students_details.user_id', $user_id)
@@ -1274,12 +1274,12 @@ class StudentController extends Controller
                     'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
 
-                    'attendance' => $value['attendance']
+                    'attendance' => $value['attendance'] . ''
                 ];
             }
             $base = [
                 'standard' => $student_data[0]['standard_name'],
-                'stream' => $student_data[0]['stream_name'],
+                'stream' => $student_data[0]['stream_name'] . '',
                 'data' => $student_response,
             ];
             return response()->json([
