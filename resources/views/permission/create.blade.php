@@ -40,7 +40,9 @@
                 <div class="row">
                     <!-- table -->
                     <div class="col-lg-12 mt-5">
-                        <form class="s-chapter-form" action="#">
+                        <form class="s-chapter-form" action="{{url('permission/insert')}}" method="post">
+                            <input type="hidden" name="role_id" value="{{ $id }}">
+                            @csrf
                             <table class="table table-bordered table-responsive-sm institute-table">
                                 <thead>
                                     <tr>
@@ -101,7 +103,10 @@
 
                                 </tbody>
                             </table>
-                            <input type="submit" value="submit" class="btn btn-success mb-2 mr-2" style="float: right;">
+                            <div class="submit-btn">
+                                <input type="submit" value="Submit" class="btn bg-primary-btn text-white mt-4">
+                            </div>
+
                         </form>
                     </div>
 
