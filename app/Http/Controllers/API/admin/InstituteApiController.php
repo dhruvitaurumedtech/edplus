@@ -28,8 +28,10 @@ use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
+use App\Models\Batches_model;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
+use App\Models\VideoCategory;
 use PDO;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
@@ -246,7 +248,11 @@ class InstituteApiController extends Controller
                 }
                 $institute_for = array_values($institute_for);
             }
-            $dobusiness_with = Dobusinesswith_Model::where('status', 'active')->get();
+            $dobusiness_with = Dobusinesswith_Model::where('status', 'active')
+                ->where(function ($query) {
+                    $query->whereNull('created_by')
+                        ->orWhere('created_by', 1);
+                })->get();
             $do_business_with = [];
             foreach ($dobusiness_with as $dobusinesswith_val) {
                 $do_business_with[] = array(
@@ -503,6 +509,7 @@ class InstituteApiController extends Controller
                         $instituteforadd = Dobusinesswith_Model::create([
                             'name' => $request->input('do_businesswith_name'),
                             'category_id' => $request->input('category_id'), //video category table id
+                            'created_by' => $request->input('user_id'),
                             'status' => 'active',
                         ]);
                         $dobusinesswith_id = $instituteforadd->id;
@@ -944,11 +951,13 @@ class InstituteApiController extends Controller
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
+                        'medium_icon' => asset($medium_value->icon)
                     ];
                 }
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
+                    'board_icon' => asset($board_value->icon),
                     'medium' => $medium_array,
 
                     // Include banner_array inside board_array
@@ -2406,65 +2415,117 @@ class InstituteApiController extends Controller
             ]);
         }
     }
-    public function change_profile(Request $request)
+
+    //category list for add do business with 
+    public function category_list(Request $request)
     {
-        $institute_id = $request->institute_id;
-        $user_id = $request->user_id;
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
         $token = $request->header('Authorization');
 
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
 
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            $validator = Validator::make($request->all(), [
-                'institute_name' => 'required|string',
-                'email' => 'required|email',
-                'contact_no' => 'required|string',
-                'address' => 'required|string',
-                'country' => 'required|string',
-                'state' => 'required|string',
-                'city' => 'required|string',
-                'pincode' => 'required|string',
-                'open_time' => 'required|date_format:H:i',
-                'close_time' => 'required|date_format:H:i|after:open_time',
-                'gst_number' => 'required|string',
-                'gst_slab' => 'required|string',
-                'website_link' => 'required|url',
-                'instagram_link' => 'required|url',
-                'facebook_link' => 'required|url',
-                'whatsapp_link' => 'required|url',
-                'youtube_link' => 'required|url',
-            ]);
-            if ($validator->fails()) {
-                $errorMessages = array_values($validator->errors()->all());
-                return response()->json([
-                    'success' => 400,
-                    'message' => 'Validation error',
-                    'errors' => $errorMessages,
-                ], 400);
-            }
+            try {
 
-            $record = Institute_detail::find($institute_id);
-            $record->institute_name = $request->institute_name;
-            $record->email = $request->email;
-            $record->contact_no = $request->contact_no;
-            $record->address = $request->address;
-            $record->country = $request->country;
-            $record->state = $request->state;
-            $record->city = $request->city;
-            $record->pincode = $request->pincode;
-            $record->open_time = $request->open_time;
-            $record->close_time = $request->close_time;
-            $record->gst_number = $request->gst_number;
-            $record->gst_slab = $request->gst_slab;
-            $record->website_link = $request->website_link;
-            $record->instagram_link = $request->instagram_link;
-            $record->facebook_link = $request->facebook_link;
-            $record->whatsaap_link = $request->whatsaap_link;
-            $record->youtube_link = $request->youtube_link;
-            $record->save();
+                $vcategory = VideoCategory::where('status', 'active')->get();
+
+                $cat_array = [];
+                foreach ($vcategory as $cat_value) {
+                    $cat_array[] = array('id' => $cat_value->id, 'name' => $cat_value->name);
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $cat_array
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
+    //create batch
+    public function create_batch(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            'batch_name' => 'required',
+            'subjects' => 'required',
+            'student_capacity' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+
+                $addbatch = Batches_model::create([
+                    'user_id' => $request->user_id,
+                    'institute_id' => $request->institute_id,
+                    'board_id' => $request->board_id,
+                    'medium_id' => $request->medium_id,
+                    'stream_id' => $request->stream_id,
+                    'standard_id' => $request->standard_id,
+                    'batch_name' => $request->batch_name,
+                    'subjects' => $request->subjects,
+                    'student_capacity' => $request->student_capacity
+                ]);
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Batch Added Successfully',
+                    'data' => []
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
         } else {
             return response()->json([
                 'status' => 400,
