@@ -759,7 +759,7 @@ class StudentController extends Controller
 
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
             if ($existingUser) {
-                
+
                 $user_id = $request->user_id;
                 $subject_id = $request->subject_id;
                 $chapter_id = $request->chapter_id;
@@ -784,7 +784,7 @@ class StudentController extends Controller
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
                         ->where('topic.subject_id', $subject_id)
                         //->where('topic.chapter_id', $chapter_id)
-                        ->when($chapter_id, function ($query,$chapter_id){
+                        ->when($chapter_id, function ($query, $chapter_id) {
                             return $query->where('topic.chapter_id', $chapter_id);
                         })
                         ->where('topic.institute_id', $institute_id)
@@ -906,7 +906,7 @@ class StudentController extends Controller
                 $parents_dt = [];
                 foreach ($parentsQY as $parentsDT) {
                     $parents_dt[] = array(
-                        'name' => $parentsDT->firstname . '' . $parentsDT->lastname,
+                        'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
                         'email' => $parentsDT->email,
                         'mobile' => $parentsDT->mobile
                     );
