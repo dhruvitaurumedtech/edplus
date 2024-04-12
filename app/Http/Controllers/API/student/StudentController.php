@@ -737,7 +737,6 @@ class StudentController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'subject_id' => 'required',
-            'chapter_id' => 'required',
             'institute_id' => 'required',
             //'video_cayegory'=>'required',
         ]);
@@ -760,7 +759,7 @@ class StudentController extends Controller
 
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
             if ($existingUser) {
-
+                
                 $user_id = $request->user_id;
                 $subject_id = $request->subject_id;
                 $chapter_id = $request->chapter_id;
@@ -784,7 +783,10 @@ class StudentController extends Controller
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
                         ->where('topic.subject_id', $subject_id)
-                        ->where('topic.chapter_id', $chapter_id)
+                        //->where('topic.chapter_id', $chapter_id)
+                        ->when($chapter_id, function ($query,$chapter_id){
+                            return $query->where('topic.chapter_id', $chapter_id);
+                        })
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->vid)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')->get();
