@@ -159,7 +159,13 @@
                                                 @endif
                                                 @endforeach
                                             </td>
-                                            <td><a href="" class="btn btn-success">Edit</a><a href="" class="btn btn-danger">Delete</a></td>
+                                            <td>
+                                                <div class="d-flex">
+                                                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                    &nbsp;&nbsp;
+                                                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
+                                                </div>
+                                            </td>
                                         </tr>
                                         @endforeach
                                     </tbody>
@@ -186,50 +192,76 @@
                             </button>
                         </div>
                         <div class="modal-body">
-                            <form method="post" action="{{ url('class/update') }}" enctype="multipart/form-data">
+                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data">
+                                <input type="hidden" name="id" id="anouncement_id">
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group">
                                         <div class="row">
 
+                                            <div class="col-md-12 checbox-dropdown">
+                                                <label for="exampleInputEmail1">Institute Name : </label>
+
+                                                <div class="dropdown" data-control="checkbox-dropdown">
+                                                    <label class="dropdown-label">Select</label>
+
+                                                    <div class="dropdown-list">
+                                                        <a href="#" data-toggle="check-all" class="dropdown-option">
+                                                            Check All
+                                                        </a>
+                                                        @foreach($institute_list as $value)
+                                                        <label class="dropdown-option">
+                                                            <input type="checkbox" name="institute_id[]" id="institute_id" value="{{$value['id']}}" />
+                                                            {{$value['institute_name']}}
+                                                        </label>
+                                                        @endforeach
+
+
+                                                    </div>
+                                                    @error('institute_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
+                                            <div class="col-md-12 checbox-dropdown">
+                                                <label for="exampleInputEmail1">Teacher Name : </label>
+
+                                                <div class="dropdown" data-control="checkbox-dropdown">
+                                                    <label class="dropdown-label">Select</label>
+
+                                                    <div class="dropdown-list">
+                                                        <a href="#" data-toggle="check-all" class="dropdown-option">
+                                                            Check All
+                                                        </a>
+                                                        @foreach($teachers as $value)
+                                                        <label class="dropdown-option">
+                                                            <input type="checkbox" name="teacher_id[]" id="teacher_id" value="{{$value['id']}}" />
+                                                            {{$value['firstname']}}
+                                                        </label>
+                                                        @endforeach
+
+
+                                                    </div>
+                                                    @error('teacher_id')
+                                                    <div class="text-danger">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+                                            </div>
                                             <div class="col-md-12">
-                                                <input type="hidden" id="class_id" name="class_id">
-                                                <label for="exampleInputEmail1">Name : </label>
-                                                <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
-                                                @error('name')
+                                                <label for="exampleInputEmail1">Announcement : </label>
+                                                <textarea class="form-control" name="announcement" id="announcement"></textarea>
+                                                @error('announcement')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
-                                            </div>
-                                            <div class="col-md-9">
-                                                <label for="exampleInputEmail1">Icon : </label>
-                                                <input type="hidden" name="old_icon" id="old_icon">
-                                                <input type="file" onchange="previewFile_update()" name="icon" id="edit_icon" class="form-control">
-                                                @error('icon')
-                                                <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-3">
-                                                <img src="" id="icon_update" alt="Icon" class="mt-4">
                                             </div>
 
-                                            <div class="col-md-12">
-                                                <label for="exampleInputEmail1">status : </label>
-                                                <select class="form-control" name="status" id="status">
-                                                    <option value=" ">Select Option</option>
-                                                    <option value="active">Active</option>
-                                                    <option value="inactive">Inactive</option>
-                                                </select>
-                                                @error('status')
-                                                <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
 
                                         </div>
 
                                     </div>
                                 </div>
-                                <div class="card-footer">
-                                    <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                                <div class="col-md-12 submit-btn">
+                                    <button type="submit" class="btn btn-primary">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -242,22 +274,22 @@
             <script>
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
-                        var class_id = this.getAttribute('data-user-id');
+                        var anouncement_id = this.getAttribute('data-user-id');
 
-                        axios.post('/class-list/edit', {
-                                class_id: class_id
+                        axios.post('/announcement/edit', {
+                                anouncement_id: anouncement_id
                             })
                             .then(response => {
-                                var reponse_data = response.data.class_list;
-                                var iconSrc = '{{ asset('
-                                ') }}' + reponse_data.icon;
-
-                                $('#class_id').val(reponse_data.id);
-                                $('#old_icon').val(reponse_data.icon);
-                                $('#icon_update').attr('src', iconSrc);
-                                $('#name').val(reponse_data.name);
-                                $('#status').val(reponse_data.status);
-                                $('#usereditModal').modal('show');
+                                var response_data = response.data.announcement;
+                                for (let result of response_data) {
+                                    console.log(result);
+                                    $('#anouncement_id').val(result.id); // Assuming an error in spelling: anouncement_id -> announcement_id
+                                    $('#announcement').val(result.announcement);
+                                    // Assuming result.institute_id and result.teacher_id are boolean values
+                                    $('#institute_id').prop('checked', result.institute_id);
+                                    $('#teacher_id').prop('checked', result.teacher_id);
+                                    $('#usereditModal').modal('show');
+                                }
                             })
                             .catch(error => {
                                 console.error(error);
@@ -268,7 +300,7 @@
                     button.addEventListener('click', function(event) {
                         event.preventDefault(); // Prevent the default form submission
 
-                        var class_id = this.getAttribute('data-user-id');
+                        var announcement_id = this.getAttribute('data-user-id');
 
                         // Show SweetAlert confirmation
                         Swal.fire({
@@ -280,8 +312,8 @@
                             confirmButtonText: 'Yes, delete it!'
                         }).then((result) => {
                             if (result.isConfirmed) {
-                                axios.post('/class/delete', {
-                                        class_id: class_id
+                                axios.post('/announcement/delete', {
+                                        announcement_id: announcement_id
                                     })
                                     .then(response => {
                                         location.reload(true);
