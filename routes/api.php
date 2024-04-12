@@ -95,4 +95,4 @@ Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
 Route::post('/institute/student_list', [StudentController::class, 'student_list']);
 Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
 Route::post('/institute/change-profile', [InstituteApiController::class, 'change_profile']);
-Route::post('/institute/batch', [InstituteApiController::class, 'batch_list']);
+Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
