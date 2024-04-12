@@ -44,10 +44,10 @@ class ExamController extends Controller
                     'exam_date' => 'required|date',
                     'start_time' => 'required|date_format:H:i:s',
                     'end_time' => 'required|date_format:H:i:s|after:start_time',
-                    'institute_for_id' => 'required',
+                    //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
-                    'class_id' => 'required',
+                    //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
@@ -70,10 +70,10 @@ class ExamController extends Controller
                     $exam->exam_date = Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']);
                     $exam->start_time = $validatedData['start_time'];
                     $exam->end_time = $validatedData['end_time'];
-                    $exam->institute_for_id = $validatedData['institute_for_id'];
+                    //$exam->institute_for_id = $validatedData['institute_for_id'];
                     $exam->board_id = $validatedData['board_id'];
                     $exam->medium_id = $validatedData['medium_id'];
-                    $exam->class_id = $validatedData['class_id'];
+                    //$exam->class_id = $validatedData['class_id'];
                     $exam->standard_id = $validatedData['standard_id'];
                     $exam->stream_id = (!empty($validatedData['stream_id'])) ? $validatedData['stream_id'] : '';
                     $exam->subject_id = $validatedData['subject_id'];
@@ -118,18 +118,16 @@ class ExamController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $exam_list = DB::table('exam')
-                ->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
+                //->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
                 ->leftJoin('board', 'board.id', '=', 'exam.board_id')
                 ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
-                ->leftJoin('class', 'class.id', '=', 'exam.class_id')
+                //->leftJoin('class', 'class.id', '=', 'exam.class_id')
                 ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
                 ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
                 ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
                 ->select(
-                    'institute_for.name as institute_for_name',
                     'board.name as board_name',
                     'medium.name as medium_name',
-                    'class.name as class_name',
                     'standard.name as standard_name',
                     'stream.name as stream_name',
                     'subject.name as subject_name',
@@ -155,10 +153,10 @@ class ExamController extends Controller
                         'total_mark' => $value->total_mark,
                         'start_time' => $start_time,
                         'end_time' => $end_time,
-                        'institute_for' => $value->institute_for_name,
+                        //'institute_for' => $value->institute_for_name,
                         'board' => $value->board_name,
                         'medium' => $value->medium_name,
-                        'class' => $value->class_name,
+                        //'class' => $value->class_name,
                         'standard' => $value->standard_name,
                         'stream' => $value->stream_name . '',
                         'subject' => $value->subject_name,
@@ -242,10 +240,10 @@ class ExamController extends Controller
                     'exam_date' => 'required|date',
                     'start_time' => 'required|date_format:H:i:s',
                     'end_time' => 'required|date_format:H:i:s|after:start_time',
-                    'institute_for_id' => 'required',
+                    //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
-                    'class_id' => 'required',
+                    //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
@@ -270,10 +268,10 @@ class ExamController extends Controller
                     $exam->exam_date = Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']);
                     $exam->start_time = $validatedData['start_time'];
                     $exam->end_time = $validatedData['end_time'];
-                    $exam->institute_for_id = $validatedData['institute_for_id'];
+                    //$exam->institute_for_id = $validatedData['institute_for_id'];
                     $exam->board_id = $validatedData['board_id'];
                     $exam->medium_id = $validatedData['medium_id'];
-                    $exam->class_id = $validatedData['class_id'];
+                    //$exam->class_id = $validatedData['class_id'];
                     $exam->standard_id = $validatedData['standard_id'];
                     $exam->stream_id = $request->stream_id;
                     $exam->subject_id = $validatedData['subject_id'];
@@ -324,10 +322,10 @@ class ExamController extends Controller
                     'exam_date' => 'required|date',
                     'start_time' => 'required|date_format:H:i:s',
                     'end_time' => 'required|date_format:H:i:s|after:start_time',
-                    'institute_for_id' => 'required',
+                    //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
-                    'class_id' => 'required',
+                    //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
@@ -342,10 +340,10 @@ class ExamController extends Controller
                         'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
                         'start_time' => $request->start_time,
                         'end_time' => $request->end_time,
-                        'institute_for_id' => $request->institute_for_id,
+                        //'institute_for_id' => $request->institute_for_id,
                         'board_id' => $request->board_id,
                         'medium_id' => $request->medium_id,
-                        'class_id' => $request->class_id,
+                        //'class_id' => $request->class_id,
                         'standard_id' => $request->standard_id,
                         'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
                         'subject_id' => $request->subject_id,
@@ -369,10 +367,10 @@ class ExamController extends Controller
                             'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
                             'start_time' => $request->start_time,
                             'end_time' => $request->end_time,
-                            'institute_for_id' => $request->institute_for_id,
+                            //'institute_for_id' => $request->institute_for_id,
                             'board_id' => $request->board_id,
                             'medium_id' => $request->medium_id,
-                            'class_id' => $request->class_id,
+                            //'class_id' => $request->class_id,
                             'standard_id' => $request->standard_id,
                             'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
                             'subject_id' => $request->subject_id,
