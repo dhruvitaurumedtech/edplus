@@ -1369,8 +1369,9 @@ class InstituteApiController extends Controller
                     $student_id = $request->student_id;
                     $institute_id = $request->institute_id;
                     $user_id = $request->user_id;
+                    
                 }
-
+                $batch_id = $request->batch_id;
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
@@ -1420,6 +1421,7 @@ class InstituteApiController extends Controller
                             'standard_id' => $request->standard_id,
                             'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
+                            'batch_id'=>$batch_id,
                             'status' => '1',
                         ]);
                     if (!empty($studentdetail) && !empty($request->first_name)) {
@@ -1478,6 +1480,7 @@ class InstituteApiController extends Controller
                             'medium_id' => $request->medium_id,
                             'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
+                            'batch_id'=>$batch_id,
                             //'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
                             'status' => '0',
@@ -2501,13 +2504,13 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-
+                
                 $addbatch = Batches_model::create([
                     'user_id' => $request->user_id,
                     'institute_id' => $request->institute_id,
                     'board_id' => $request->board_id,
                     'medium_id' => $request->medium_id,
-                    'stream_id' => $request->stream_id,
+                    'stream_id' => $request->stream_id, //nullable
                     'standard_id' => $request->standard_id,
                     'batch_name' => $request->batch_name,
                     'subjects' => $request->subjects,

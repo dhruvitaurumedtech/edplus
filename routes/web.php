@@ -21,6 +21,7 @@ use App\Http\Controllers\Users;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\student\StudentController;
+use App\Http\Controllers\Videotimelimitcontroller;
 use App\Http\Controllers\WebNotificationController;
 
 /*
@@ -161,6 +162,7 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter/get-chapter', [TopicController::class, 'get_chapter']);
     Route::post('topic-save', [TopicController::class, 'topic_save'])->name('topic.save');
     Route::post('topic-list', [TopicController::class, 'topic_list']);
+    Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list']); //uploded video time limit
 
 
 
