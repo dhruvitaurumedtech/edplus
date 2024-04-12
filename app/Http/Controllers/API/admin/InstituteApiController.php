@@ -2389,6 +2389,7 @@ class InstituteApiController extends Controller
                     'facebook_link' => $value['facebook_link'] . '',
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
+                    'logo' => $value['logo']
 
 
                 ];
@@ -2398,6 +2399,72 @@ class InstituteApiController extends Controller
                 'message' => 'Institute Fetch Successfully',
                 'data' => $institute_response
             ]);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+    public function change_profile(Request $request)
+    {
+        $institute_id = $request->institute_id;
+        $user_id = $request->user_id;
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+        if ($existingUser) {
+            $validator = Validator::make($request->all(), [
+                'institute_name' => 'required|string',
+                'email' => 'required|email',
+                'contact_no' => 'required|string',
+                'address' => 'required|string',
+                'country' => 'required|string',
+                'state' => 'required|string',
+                'city' => 'required|string',
+                'pincode' => 'required|string',
+                'open_time' => 'required|date_format:H:i',
+                'close_time' => 'required|date_format:H:i|after:open_time',
+                'gst_number' => 'required|string',
+                'gst_slab' => 'required|string',
+                'website_link' => 'required|url',
+                'instagram_link' => 'required|url',
+                'facebook_link' => 'required|url',
+                'whatsapp_link' => 'required|url',
+                'youtube_link' => 'required|url',
+            ]);
+            if ($validator->fails()) {
+                $errorMessages = array_values($validator->errors()->all());
+                return response()->json([
+                    'success' => 400,
+                    'message' => 'Validation error',
+                    'errors' => $errorMessages,
+                ], 400);
+            }
+
+            $record = Institute_detail::find($institute_id);
+            $record->institute_name = $request->institute_name;
+            $record->email = $request->email;
+            $record->contact_no = $request->contact_no;
+            $record->address = $request->address;
+            $record->country = $request->country;
+            $record->state = $request->state;
+            $record->city = $request->city;
+            $record->pincode = $request->pincode;
+            $record->open_time = $request->open_time;
+            $record->close_time = $request->close_time;
+            $record->gst_number = $request->gst_number;
+            $record->gst_slab = $request->gst_slab;
+            $record->website_link = $request->website_link;
+            $record->instagram_link = $request->instagram_link;
+            $record->facebook_link = $request->facebook_link;
+            $record->whatsaap_link = $request->whatsaap_link;
+            $record->youtube_link = $request->youtube_link;
+            $record->save();
         } else {
             return response()->json([
                 'status' => 400,
