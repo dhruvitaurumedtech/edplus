@@ -249,10 +249,10 @@ class InstituteApiController extends Controller
                 $institute_for = array_values($institute_for);
             }
             $dobusiness_with = Dobusinesswith_Model::where('status', 'active')
-            ->where(function($query) {
-                $query->whereNull('created_by')
-                      ->orWhere('created_by', 1);
-            })->get();
+                ->where(function ($query) {
+                    $query->whereNull('created_by')
+                        ->orWhere('created_by', 1);
+                })->get();
             $do_business_with = [];
             foreach ($dobusiness_with as $dobusinesswith_val) {
                 $do_business_with[] = array(
@@ -509,7 +509,7 @@ class InstituteApiController extends Controller
                         $instituteforadd = Dobusinesswith_Model::create([
                             'name' => $request->input('do_businesswith_name'),
                             'category_id' => $request->input('category_id'), //video category table id
-                            'created_by'=>$request->input('user_id'),
+                            'created_by' => $request->input('user_id'),
                             'status' => 'active',
                         ]);
                         $dobusinesswith_id = $instituteforadd->id;
@@ -577,7 +577,6 @@ class InstituteApiController extends Controller
                         'institute_id' => $lastInsertedId,
                         'institute_for_id' => $institute_for_id,
                     ]);
-                    
                 } else {
                     $institute_for_id = $value;
                 }
@@ -952,13 +951,13 @@ class InstituteApiController extends Controller
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
-                        'medium_icon'=>asset($medium_value->icon)
+                        'medium_icon' => asset($medium_value->icon)
                     ];
                 }
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
-                    'board_icon'=>asset($board_value->icon),
+                    'board_icon' => asset($board_value->icon),
                     'medium' => $medium_array,
 
                     // Include banner_array inside board_array
@@ -2399,6 +2398,7 @@ class InstituteApiController extends Controller
                     'facebook_link' => $value['facebook_link'] . '',
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
+                    'logo' => $value['logo']
 
 
                 ];
@@ -2417,7 +2417,8 @@ class InstituteApiController extends Controller
     }
 
     //category list for add do business with 
-    public function category_list(Request $request){
+    public function category_list(Request $request)
+    {
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
         ]);
@@ -2439,21 +2440,20 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
-            
-            $vcategory = VideoCategory::where('status', 'active')->get();
-            
-            $cat_array = [];
-            foreach ($vcategory as $cat_value) {
-                $cat_array[] = array('id'=>$cat_value->id,'name'=>$cat_value->name);
-                
-            }
-            return response()->json([
-                'status' => '200',
-                'message' => 'Data Fetch Successfully',
-                'data' => $cat_array
-            ]);
-            }catch(\Exception $e){
+            try {
+
+                $vcategory = VideoCategory::where('status', 'active')->get();
+
+                $cat_array = [];
+                foreach ($vcategory as $cat_value) {
+                    $cat_array[] = array('id' => $cat_value->id, 'name' => $cat_value->name);
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $cat_array
+                ]);
+            } catch (\Exception $e) {
                 return response()->json([
                     'success' => 500,
                     'message' => 'Server Error',
@@ -2466,22 +2466,21 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ]);
         }
-    
-    
     }
 
     //create batch
-    public function create_batch(Request $request){
-        
+    public function create_batch(Request $request)
+    {
+
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
-            'institute_id'=>'required',
-            'board_id'=>'required',
-            'medium_id'=>'required',
-            'standard_id'=>'required',
-            'batch_name'=>'required',
-            'subjects'=>'required',
-            'student_capacity'=>'required'
+            'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            'batch_name' => 'required',
+            'subjects' => 'required',
+            'student_capacity' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -2501,26 +2500,26 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
-                        
-            $addbatch = Batches_model::create([
-                'user_id'=>$request->user_id,
-                'institute_id'=>$request->institute_id,
-                'board_id'=>$request->board_id,
-                'medium_id'=>$request->medium_id,
-                'stream_id'=>$request->stream_id,
-                'standard_id'=>$request->standard_id,
-                'batch_name'=>$request->batch_name,
-                'subjects'=>$request->subjects,
-                'student_capacity'=>$request->student_capacity
-            ]);
+            try {
 
-            return response()->json([
-                'status' => '200',
-                'message' => 'Batch Added Successfully',
-                'data' => []
-            ]);
-            }catch(\Exception $e){
+                $addbatch = Batches_model::create([
+                    'user_id' => $request->user_id,
+                    'institute_id' => $request->institute_id,
+                    'board_id' => $request->board_id,
+                    'medium_id' => $request->medium_id,
+                    'stream_id' => $request->stream_id,
+                    'standard_id' => $request->standard_id,
+                    'batch_name' => $request->batch_name,
+                    'subjects' => $request->subjects,
+                    'student_capacity' => $request->student_capacity
+                ]);
+
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Batch Added Successfully',
+                    'data' => []
+                ]);
+            } catch (\Exception $e) {
                 return response()->json([
                     'success' => 500,
                     'message' => 'Server Error',
@@ -2533,7 +2532,5 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ]);
         }
-    
-    
     }
 }

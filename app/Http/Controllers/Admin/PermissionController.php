@@ -8,13 +8,14 @@ use Illuminate\Http\Request;
 
 class PermissionController extends Controller
 {
-    function create_permission(Request $request){
+    function create_permission(Request $request)
+    {
         $id = $request->input('id');
-        return view('permission.create',compact('id'));
+        return view('permission.create', compact('id'));
     }
     public function insert_permission(Request $request)
     {
-        // echo "<pre>";print_r( $request->all());exit;
+
         $request->validate([
             'role_id' => 'required|integer',
             'menu_id' => 'required|array',
@@ -26,11 +27,11 @@ class PermissionController extends Controller
 
         // Loop through the submitted data and insert into the database
         $permissions = $request->input('permissions');
-        // echo "<pre>";print_r($permissions);exit;
+
         if (!empty($permissions)) {
             foreach ($permissions as $menuId => $permission) {
                 $existingPermission = Permission::where(['role_id' => $request->role_id, 'menu_id' => $menuId])->first();
-        
+
                 if ($existingPermission) {
                     // Update existing permission
                     $existingPermission->update([
@@ -51,14 +52,14 @@ class PermissionController extends Controller
                     ]);
                 }
             }
-        }else{
-            $updatedData = array('add'    =>  0,
-                                 'edit'   =>  0,
-                                 'view'   =>  0,
-                                 'delete' =>  0,);
+        } else {
+            $updatedData = array(
+                'add'    =>  0,
+                'edit'   =>  0,
+                'view'   =>  0,
+                'delete' =>  0,
+            );
             Permission::where('role_id', $request->role_id)->update($updatedData);
-
-        
         }
         return redirect()->back()->with('success', 'Permissions added successfully');
     }

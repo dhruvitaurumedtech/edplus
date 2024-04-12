@@ -847,14 +847,13 @@ class StudentController extends Controller
                 $token = substr($token, 7);
             }
 
-            
+
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
             if ($existingUser->token) {
-                
-                if($existingUser->role_type == 6){
+
+                if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
-                    
-                }else{
+                } else {
                     $user_id = $request->user_id;
                     $student_id = $request->student_id;
                 }
@@ -864,35 +863,35 @@ class StudentController extends Controller
                 $institute_id = $request->institute_id;
 
                 $institutes = [];
-                
+
                 $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($student_id) {
-                    $query->select('institute_id')
-                        ->where('student_id', $student_id)
-                        ->where('status', '=', '1')
-                        ->from('students_details');
-                })
-                ->when($institute_id, function($query,$institute_id){
-                    return $query->where('id', $institute_id);
-                })
-                ->get();
+                    ->whereIn('id', function ($query) use ($student_id) {
+                        $query->select('institute_id')
+                            ->where('student_id', $student_id)
+                            ->where('status', '=', '1')
+                            ->from('students_details');
+                    })
+                    ->when($institute_id, function ($query, $institute_id) {
+                        return $query->where('id', $institute_id);
+                    })
+                    ->get();
 
                 foreach ($joininstitute as $value) {
                     $substdnt = Student_detail::where('student_id', $student_id)
-                    ->where('institute_id', $value->id)->first();
+                        ->where('institute_id', $value->id)->first();
 
-                    $subids = explode(',',$substdnt->subject_id);
-                    $subjectids = Subject_model::whereIN('id',$subids)->get();
+                    $subids = explode(',', $substdnt->subject_id);
+                    $subjectids = Subject_model::whereIN('id', $subids)->get();
                     $subs = [];
-                    foreach($subjectids as $subDT){
-                        $subs[] = array('id'=>$subDT->id,'name'=>$subDT->name);
+                    foreach ($subjectids as $subDT) {
+                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name);
                     }
                     $institutes[] = array(
                         'id' => $value->id,
                         'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                         'address' => $value->address,
                         'logo' => asset($value->logo),
-                        'subjects'=>$subs //subject enroll with us
+                        'subjects' => $subs //subject enroll with us
                     );
                 }
 
@@ -1257,17 +1256,15 @@ class StudentController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->join('standard', 'students_details.standard_id', '=', 'standard.id')
-                ->join('stream', 'students_details.stream_id', '=', 'stream.id')
+                ->join('standard', 'students_details.standard_id', '=', 'standard.id', 'left')
+                ->join('stream', 'students_details.stream_id', '=', 'stream.id', 'left')
                 ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id', 'left')
-                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance')
+                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id')
                 ->where('students_details.user_id', $user_id)
                 ->where('students_details.institute_id', $institute_id)
                 ->get()->toArray();
 
             foreach ($student_data as $value) {
-
-
                 // $attendance_data = Attendance_model::where('student_id', $value['student_id'])->get()->toarray();
 
                 // $stdwithattd = [];
@@ -1275,17 +1272,16 @@ class StudentController extends Controller
 
                 //     $stdwithattd[] = array('attendance' => $value2['attendance'], 'date' => $value2['date']);
                 // }
-
                 $student_response[] = [
                     'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
 
-                    'attendance' => $value['attendance']
+                    'attendance' => $value['attendance'] . ''
                 ];
             }
             $base = [
                 'standard' => $student_data[0]['standard_name'],
-                'stream' => $student_data[0]['stream_name'],
+                'stream' => $student_data[0]['stream_name'] . '',
                 'data' => $student_response,
             ];
             return response()->json([

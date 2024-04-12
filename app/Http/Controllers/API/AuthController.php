@@ -121,7 +121,7 @@ class AuthController extends Controller
                     $data = array(
                         'user_id' => $value->id,
                         'user_name' => $value->firstname . ' ' . $value->lastname,
-                        'mobile' => $value->mobile,
+                        'mobile_no' => $value->mobile,
                         'user_email' => $value->email,
                         'user_image' => $photo,
                         'role_type' => $value->role_type,
@@ -166,53 +166,53 @@ class AuthController extends Controller
         $user = Auth::user();
         // $providedToken = $request->header('Authorization');
         $existingUser = User::where('email', $request->email)->whereNull('deleted_at')->first();
-        if($existingUser){        
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-            $user = Auth::user();
-            if (!empty($user->photo)) {
-                $photo = asset('profile/' . $user->photo);
-            } else {
-                $photo = asset('profile/image.jpg');
-            }
-            $token = JWTAuth::fromUser($user);
-            User::where('email', $request->email)
-            ->update([
-                'token' => $token
-            ]);
+        if ($existingUser) {
+            if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+                $user = Auth::user();
+                if (!empty($user->photo)) {
+                    $photo = asset('profile/' . $user->photo);
+                } else {
+                    $photo = asset('profile/image.jpg');
+                }
+                $token = JWTAuth::fromUser($user);
+                User::where('email', $request->email)
+                    ->update([
+                        'token' => $token
+                    ]);
 
-            if($existingUser->role_type == 3){
-                $instituteid = Institute_detail::where('user_id', $user->id)->select('id')->first();
-                if(empty($instituteid)){
+                if ($existingUser->role_type == 3) {
+                    $instituteid = Institute_detail::where('user_id', $user->id)->select('id')->first();
+                    if (empty($instituteid)) {
+                        $institute_id = null;
+                    } else {
+                        $institute_id = $instituteid->id;
+                    }
+                } else {
                     $institute_id = null;
-                }else{
-                    $institute_id = $instituteid->id;
                 }
-                }else{
-                    $institute_id = null;
-                }
-            
+
                 return response()->json([
-                'status' => 200,
-                'message' => 'Login successful',
-                'data' => [
-                    'user_id' => $user->id,
-                    'user_name' => $user->firstname . ' ' . $user->lastname,
-                    'mobile_no' => $user->mobile,
-                    'user_email' => $user->email,
-                    'user_image' => $photo,
-                    'role_type' => $user->role_type,
-                    'institute_id'=>$institute_id,
-                    'token' => $token,
-                ]
-            ], 200, [], JSON_NUMERIC_CHECK);
+                    'status' => 200,
+                    'message' => 'Login successful',
+                    'data' => [
+                        'user_id' => $user->id,
+                        'user_name' => $user->firstname . ' ' . $user->lastname,
+                        'mobile_no' => $user->mobile,
+                        'user_email' => $user->email,
+                        'user_image' => $photo,
+                        'role_type' => $user->role_type,
+                        'institute_id' => $institute_id,
+                        'token' => $token,
+                    ]
+                ], 200, [], JSON_NUMERIC_CHECK);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid credentials'
+                ]);
+            }
+            //
         } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid credentials'
-            ]);
-        }
-        //
-        }else{
             return response()->json([
                 'status' => '404',
                 'message' => 'User not found',
@@ -244,20 +244,18 @@ class AuthController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $userId)->first();
         if ($existingUser) {
-    
-        Auth::logout($userId);
-        user::where('id',$userId)->update(['token' => '']);
-        return response()->json([
-            'status' => '200',
-            'message' => 'Successfully logged out',
-        ]);
-        }else {
+
+            Auth::logout($userId);
+            user::where('id', $userId)->update(['token' => '']);
+            return response()->json([
+                'status' => '200',
+                'message' => 'Successfully logged out',
+            ]);
+        } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
             ], 400);
-        }     
+        }
     }
-
-    
 }
