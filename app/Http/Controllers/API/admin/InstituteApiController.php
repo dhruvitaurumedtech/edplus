@@ -2566,7 +2566,7 @@ class InstituteApiController extends Controller
                 $batchlist = Batches_model::where('user_id', $request->user_id)
                     ->where('institute_id', $request->institute_id)
                     ->where('board_id', $request->board_id)
-                    ->where('board_id', $request->standard_id)->get()->toarray();
+                    ->where('standard_id', $request->standard_id)->get()->toarray();
 
                 foreach ($batchlist as $value) {
                     $batch_response[] = [
