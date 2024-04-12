@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\ProfileController;
@@ -199,9 +200,8 @@ Route::middleware('auth')->group(function () {
     //email varification
     //Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
     //Route::get('/update-value/{token}', 'StudentController@verifyEmail');
-
-
-
+    Route::get('announcement-create', [AnnouncementController::class, 'announcement_create']);
+    Route::post('announcement/save', [AnnouncementController::class, 'save']);
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');

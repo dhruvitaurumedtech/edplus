@@ -904,7 +904,7 @@ class StudentController extends Controller
                 $parents_dt = [];
                 foreach ($parentsQY as $parentsDT) {
                     $parents_dt[] = array(
-                        'name' => $parentsDT->firstname . '' . $parentsDT->lastname,
+                        'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
                         'email' => $parentsDT->email,
                         'mobile' => $parentsDT->mobile
                     );
