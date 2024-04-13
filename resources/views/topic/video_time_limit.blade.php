@@ -29,35 +29,25 @@
           <!-- general form elements -->
           <div class="card card-success">
             <div class="card-header">
-              <h3 class="card-title">Create Video Category</h3>
+              <h3 class="card-title">Video Time Limit</h3>
             </div>
             <!-- /.card-header -->
             <!-- form start -->
-            <form method="post" action="{{ url('video-category-save') }}" enctype="multipart/form-data">
+            <form method="post" action="{{ url('video-timelimit-save') }}" enctype="multipart/form-data">
               @csrf
               <div class="card-body">
                 <div class="form-group">
                   <div class="row">
                     <div class="col-md-12">
-                      <label for="exampleInputEmail1">Video Name : </label>
-                      <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
+                      <label for="exampleInputEmail1">Hour : </label>
+                      <input type="text" name="time" class="form-control" placeholder="Enter Hour">
                       @error('name')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
 
-                    <div class="col-md-12">
-                      <label for="exampleInputEmail1">status : </label>
-                      <select class="form-control" name="status">
-                        <option value=" ">Select Option</option>
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                      </select>
-                      @error('status')
-                      <div class="text-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-
+                  
+                  
                   </div>
 
                 </div>
@@ -73,7 +63,7 @@
         <div class="col-md-7">
           <div class="card card-success">
             <div class="card-header">
-              <h3 class="card-title">Video Category List</h3>
+              <h3 class="card-title">Video Time Limit List</h3>
               <!-- @canButton('add', 'Board')
               <a href="{{url('board-create')}}" class="btn btn-success" style="float: right;">Create Board </a>
               @endCanButton -->
@@ -86,26 +76,25 @@
                     <th style="width: 10px">
                       <Sr class="No">No</Sr>
                     </th>
-                    <th style="width: 200px">Name</th>
-                    <th style="width: 500px">Status</th>
-                    <th>Action</th>
+                      <th style="width: 200px">Name</th>
+                      <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                    {{ print_r($vidtimQY);exit; }}
+                    
                   @php $i=1 @endphp
                   @foreach($vidtimQY as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    <td>{{$value->name}}</td>
+                    <td>{{$value->time}}</td>
 
                     <td>
                       <div class="d-flex">
-                        @canButton('edit', 'Board')
+                        @canButton('edit', 'Video Time Limit')
                         <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Board')
+                        @canButton('delete', 'Video Time Limit')
                         <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>

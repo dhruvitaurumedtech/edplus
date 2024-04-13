@@ -162,8 +162,8 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter/get-chapter', [TopicController::class, 'get_chapter']);
     Route::post('topic-save', [TopicController::class, 'topic_save'])->name('topic.save');
     Route::post('topic-list', [TopicController::class, 'topic_list']);
-    Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list']); //uploded video time limit
-
+    Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list'])->name('videolimit.list');; //uploded video time limit
+    Route::post('video-timelimit-save', [Videotimelimitcontroller::class, 'save'])->name('videolimit.save');;
 
 
     //do-business-with
