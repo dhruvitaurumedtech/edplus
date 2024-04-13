@@ -1258,18 +1258,28 @@ class StudentController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
-            $student_data = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->join('standard', 'students_details.standard_id', '=', 'standard.id', 'left')
-                ->join('stream', 'students_details.stream_id', '=', 'stream.id', 'left')
-                ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id', 'left')
-                ->join('batches', 'students_details.batch_id', '=', 'batches.id', 'left')
-                ->join('subject', 'students_details.subject_id', '=', 'subject.id', 'left')
-                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id')
-                ->where('students_details.user_id', $user_id)
-                ->where('students_details.institute_id', $institute_id)
-                ->where('students_details.batch_id', $batch_id)
-                ->whereIn('students_details.subject_id', $subject_ids)
-                ->get()->toArray();
+            $query = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
+            ->leftJoin('standard', 'students_details.standard_id', '=', 'standard.id')
+            ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
+            ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
+            ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
+            ->leftJoin('subject', 'students_details.subject_id', '=', 'subject.id')
+            ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id','students_details.batch_id','students_details.subject_id')
+            ->where('students_details.user_id', $user_id)
+            ->where('students_details.batch_id', $batch_id)
+            ->where('students_details.institute_id', $institute_id)
+            ->whereNull('students_details.deleted_at');
+        
+        if ($subject_ids) {
+            $subject_ids = explode(',', $subject_ids);
+            $query->whereIn('students_details.subject_id', $subject_ids);
+        }
+        
+        // Echo the generated SQL query for debugging
+        
+        $student_data = $query->get()->toArray();
+        echo "<pre>";print_r($student_data);exit;
+
 
             foreach ($student_data as $value) {
                 // $attendance_data = Attendance_model::where('student_id', $value['student_id'])->get()->toarray();
@@ -1287,7 +1297,7 @@ class StudentController extends Controller
                 ];
             }
             $base = [
-                'standard' => $student_data[0]['standard_name'],
+                'standard' => $ [0]['standard_name'],
                 'stream' => $student_data[0]['stream_name'] . '',
                 'data' => $student_response,
             ];
