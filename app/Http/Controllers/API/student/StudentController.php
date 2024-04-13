@@ -1252,6 +1252,7 @@ class StudentController extends Controller
 
         $user_id = $request->user_id;
         $institute_id = $request->institute_id;
+        $batch_id = $request->batch_id;
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
@@ -1259,9 +1260,12 @@ class StudentController extends Controller
                 ->join('standard', 'students_details.standard_id', '=', 'standard.id', 'left')
                 ->join('stream', 'students_details.stream_id', '=', 'stream.id', 'left')
                 ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id', 'left')
+                ->join('batches', 'students_details.batch_id', '=', 'batches.id', 'left')
                 ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id')
                 ->where('students_details.user_id', $user_id)
                 ->where('students_details.institute_id', $institute_id)
+                ->where('students_details.batch_id', $batch_id)
+
                 ->get()->toArray();
 
             foreach ($student_data as $value) {

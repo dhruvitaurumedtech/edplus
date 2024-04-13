@@ -75,11 +75,43 @@ class AnnouncementController extends Controller
         return response()->json(['announcement' => $announcement]);
     }
 
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
+
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id' => 'required',
+            'announcement' => 'required|string',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect()->back()
+                ->withErrors($validator)
+                ->withInput();
+        }
+
+        $announcement = Common_announcement::findOrFail($request->id);
+
+        $announcement->update([
+            'institute_id' => implode(",", $request->institute_id),
+            'teacher_id' => implode(",", $request->teacher_id),
+            'announcement' => $request->announcement,
+        ]);
+
+        return redirect('announcement-create')->with('success', 'Announcement updated successfully.');
     }
 
-    public function destroy(string $id)
+    public function destroy(Request $request)
     {
+        $announcement_id = $request->input('announcement_id');
+        $announcement_list = Common_announcement::find($announcement_id);
+
+        if (!$announcement_list) {
+            return redirect('announcement-create')->with('error', 'announcement not found');
+        }
+
+        $announcement_list->delete();
+
+        return redirect('announcement-create')->with('success', 'Announcement deleted successfully');
     }
 }
