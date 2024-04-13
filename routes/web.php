@@ -204,6 +204,7 @@ Route::middleware('auth')->group(function () {
     //Route::get('/update-value/{token}', 'StudentController@verifyEmail');
     Route::get('announcement-create', [AnnouncementController::class, 'announcement_create']);
     Route::post('announcement/save', [AnnouncementController::class, 'save']);
+    Route::post('/announcement/edit', [AnnouncementController::class, 'edit']);
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');

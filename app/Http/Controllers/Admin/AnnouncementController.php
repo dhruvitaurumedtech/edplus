@@ -31,6 +31,7 @@ class AnnouncementController extends Controller
 
 
 
+
         return view('announcement/create', compact('institute_list', 'teachers', 'response'));
     }
 
@@ -67,8 +68,11 @@ class AnnouncementController extends Controller
     {
     }
 
-    public function edit(string $id)
+    public function edit(Request $request)
     {
+        $announcement = Common_announcement::where('id', $request->anouncement_id)->get()->toarray();
+
+        return response()->json(['announcement' => $announcement]);
     }
 
     public function update(Request $request, string $id)
