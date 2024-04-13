@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('video_time_limit', function (Blueprint $table) {
             $table->id();
+            $table->string('institute_id')->nullable();
+            $table->string('teacher_id')->nullable();
             $table->unsignedBigInteger('time');
             $table->timestamps();
             $table->softDeletes();
