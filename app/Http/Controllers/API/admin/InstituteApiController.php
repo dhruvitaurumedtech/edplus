@@ -2602,4 +2602,7 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+    public function change_profile()
+    {
+    }
 }
