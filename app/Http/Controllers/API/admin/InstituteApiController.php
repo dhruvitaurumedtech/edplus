@@ -293,7 +293,11 @@ class InstituteApiController extends Controller
             'address' => 'required|string',
             'contact_no' => 'required|integer|min:10',
             'email' => 'required|email|unique:institute_detail,email',
-            'logo' => 'required'
+            'logo' => 'required',
+            'country' => 'required',
+            'state' => 'required',
+            'city' => 'required',
+            'pincode' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -328,15 +332,15 @@ class InstituteApiController extends Controller
             //institute_detail
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
-                'youtube_link' => $request->input('youtube_link'),
-                'whatsaap_link' => $request->input('whatsaap_link'),
-                'facebook_link' => $request->input('facebook_link'),
-                'instagram_link' => $request->input('instagram_link'),
-                'website_link' => $request->input('website_link'),
-                'gst_slab' => $request->input('gst_slab'),
-                'gst_number' => $request->input('gst_number'),
-                'close_time' => $request->input('close_time'),
-                'open_time' => $request->input('open_time'),
+                // 'youtube_link' => $request->input('youtube_link'),
+                // 'whatsaap_link' => $request->input('whatsaap_link'),
+                // 'facebook_link' => $request->input('facebook_link'),
+                // 'instagram_link' => $request->input('instagram_link'),
+                // 'website_link' => $request->input('website_link'),
+                // 'gst_slab' => $request->input('gst_slab'),
+                // 'gst_number' => $request->input('gst_number'),
+                // 'close_time' => $request->input('close_time'),
+                // 'open_time' => $request->input('open_time'),
                 'logo' => $imagePath,
                 'about_us' => $request->about_us,
                 'user_id' => $request->input('user_id'),
@@ -344,6 +348,10 @@ class InstituteApiController extends Controller
                 'address' => $request->input('address'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
+                'country' => $request->input('country'),
+                'state' => $request->input('state'),
+                'city' => $request->input('city'),
+                'pincode' => $request->input('pincode'),
                 'status' => 'active'
             ]);
             $lastInsertedId = $instituteDetail->id;
@@ -2593,5 +2601,8 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ]);
         }
+    }
+    public function change_profile()
+    {
     }
 }

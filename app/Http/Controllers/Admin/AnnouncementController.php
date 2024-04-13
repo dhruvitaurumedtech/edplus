@@ -18,7 +18,7 @@ class AnnouncementController extends Controller
         $institute_list = Institute_detail::get()->toArray();
         $teachers = User::where('role_type', 4)->get();
         $announcement = Common_announcement::get()->toarray();
-        $response=[];
+        $response = [];
         foreach ($announcement as $value) {
             $institute_response = Institute_detail::whereIn('id', explode(',', $value['institute_id']))->get()->toarray();
             $teacher_response = User::whereIn('id', explode(',', $value['teacher_id']))->get()->toarray();
