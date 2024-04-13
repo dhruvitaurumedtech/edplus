@@ -1268,7 +1268,7 @@ class StudentController extends Controller
                 ->where('students_details.user_id', $user_id)
                 ->where('students_details.institute_id', $institute_id)
                 ->where('students_details.batch_id', $batch_id)
-                ->whereIn('student_details.subject_id', $subject_ids)
+                ->whereIn('students_details.subject_id', $subject_ids)
                 ->get()->toArray();
 
             foreach ($student_data as $value) {
