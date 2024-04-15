@@ -1,6 +1,5 @@
-<!-- index.blade.php -->
+<!-- resources/views/banner-sizes/create.blade.php -->
 
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
@@ -37,24 +36,36 @@
                     });
                 }, 3000);
             </script>
-            <div class="row">
-                <div class="col-md-10 offset-md-1">
-                    @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-                </div>
-            </div>
-            <div class="container">
-                <div class="row justify-content-center">
-                    <div class="col-md-8">
-                        <div class="card">
-                            <div class="card-header">Banner Sizes</div>
+            <div class="dashboard-content side-content">
 
+                <div class="row">
+                    <div class="col-lg-5">
+                        <div class="institute-form">
+                            <h2>Create New Banner Size</h2>
+                            <form action="{{ route('banner-sizes.store') }}" method="POST">
+                                @csrf
+                                <div class="form-group">
+                                    <label for="size">Size</label>
+                                    <input type="text" class="form-control" id="size" name="size" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="width">Width</label>
+                                    <input type="number" class="form-control" id="width" name="width" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="height">Height</label>
+                                    <input type="number" class="form-control" id="height" name="height" required>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Create</button>
+                            </form>
+
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="institute-form">
+                            <h2>BannerSize List</h2>
                             <div class="card-body">
-                                <a href="{{ route('banner-sizes.create') }}" class="btn btn-primary mb-3">Create Banner Size</a>
-                                <table class="table">
+                                <table class="table table-responsive-sm table-bordered institute-table mt-4">
                                     <thead>
                                         <tr>
                                             <th>ID</th>
@@ -72,7 +83,7 @@
                                             <td>{{ $bannerSize->width }}</td>
                                             <td>{{ $bannerSize->height }}</td>
                                             <td>
-                                                <a href="{{ route('banner-sizes.edit', $bannerSize->id) }}" class="btn btn-sm btn-primary">Edit</a>
+                                                <a href="{{ route('banner-sizes.edit', $bannerSize->id) }}" class="btn btn-sm btn-primary editButton">Edit</a>
                                                 <form action="{{ route('banner-sizes.destroy', $bannerSize->id) }}" method="POST" class="d-inline">
                                                     @csrf
                                                     @method('DELETE')
@@ -88,3 +99,4 @@
                     </div>
                 </div>
             </div>
+            @include('layouts/footer_new')
