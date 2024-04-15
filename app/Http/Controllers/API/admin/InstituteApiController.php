@@ -1414,10 +1414,13 @@ class InstituteApiController extends Controller
                     ->where('class_id', $request->class_id)
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
-                    ->select('standard_sub.institute_for_id')
-                    ->first();
-                    print_r($insdelQY);
-                    print_r($insdelQY->institute_for_id);exit;
+                    ->tosql();
+                    print_r($request->board_id);
+                    print_r($request->medium_id);
+                    print_r($request->class_id);
+                    print_r($request->standard_id);
+                    print_r($request->institute_id);
+                    print_r($insdelQY);exit;
                 if (!empty($studentdtls)) {
                     
                     $studentupdetail = [
