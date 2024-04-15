@@ -1414,9 +1414,10 @@ class InstituteApiController extends Controller
                     ->where('class_id', $request->class_id)
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
-                    ->first();
+                    ->toSql();
+                    print_r($insdelQY);exit;
                 if (!empty($studentdtls)) {
-
+                    
                     $studentupdetail = [
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
@@ -1435,7 +1436,7 @@ class InstituteApiController extends Controller
                         if ($request->stream_id == 'null') {
                             unset($studentupdetail['stream_id']);
                         }
-
+                        
                         $studentdetail = Student_detail::where('student_id', $student_id)
                         ->where('institute_id', $institute_id)->update([$studentupdetail]);
 
