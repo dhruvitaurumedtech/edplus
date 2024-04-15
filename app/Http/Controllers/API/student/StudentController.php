@@ -1343,8 +1343,8 @@ class StudentController extends Controller
         $existingUser = User::where('token', $token)->where('id', $parent_id)->first();
         if ($existingUser) {
 
-            $student_details = Parents::join('users', 'users.id', '=', 'parents.student_id')
-                ->join('institute_detail', 'institute_detail.user_id', '=', 'parents.student_id')
+            $student_details = Parents::join('users', 'users.id', '=', 'parents.student_id', 'left')
+                ->join('institute_detail', 'institute_detail.user_id', '=', 'parents.student_id', 'left')
                 ->select('users.*', 'institute_detail.institute_name')
                 ->where('parents.parent_id', $parent_id)
                 ->get();
