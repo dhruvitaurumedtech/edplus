@@ -88,7 +88,8 @@ class BannerApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
-            'status' => 'required'
+            'status' => 'required',
+            'id'=>'required'
         ]);
 
         if ($validator->fails()) {
@@ -111,11 +112,11 @@ class BannerApiController extends Controller
             if ($existingUser) {
                 $user_id = $request->user_id;
                 $institute_id = $request->institute_id;
-                $banner_image = $request->banner_image;
-                $url = $request->url;
                 $status = $request->status;
-
-                $bannerad = Banner_model::where('user_id', $user_id)->where('institute_id', $institute_id)->update([
+                $id = $request->id;
+                $bannerad = Banner_model::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->where('id', $id)->update([
                     'status' => $status
                 ]);
 
@@ -154,9 +155,8 @@ class BannerApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
-            'url' => 'required',
             'banner_image' => 'required',
-            'banner_id' => 'required'
+            'id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -180,14 +180,13 @@ class BannerApiController extends Controller
                 $user_id = $request->user_id;
                 $institute_id = $request->institute_id;
                 $url = $request->url;
-                $banner_id = $request->banner_id;
-
+                $id = $request->id;
                 if ($request->hasFile('banner_image')) {
                     $banner_image = $request->file('banner_image');
                     $imagePath = $banner_image->store('banner_image', 'public');
                 }
 
-                $bannerad = Banner_model::where('id', $banner_id)
+                $bannerad = Banner_model::where('id', $id)
                     ->update([
                         'banner_image' => $imagePath,
                         'url' => $url
@@ -291,6 +290,53 @@ class BannerApiController extends Controller
                     'message' => 'Invalid token.',
                 ]);
             }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'data' => array('error' => $e->getMessage()),
+            ], 500);
+        }
+    }
+
+    public function banner_delete(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        try {
+            $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+            if ($existingUser) {
+                
+            $remove = Banner_model::where('id', $request->id)->delete();
+
+            return response()->json([
+                'success' => 200,
+                'message' => 'Delete Successfully',
+                'data' => []
+            ], 200);
+           
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
         } catch (\Exception $e) {
             return response()->json([
                 'success' => 500,
