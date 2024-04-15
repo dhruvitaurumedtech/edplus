@@ -56,7 +56,7 @@ class StudentAttendance extends Controller
 
                 return response()->json([
                     'success' => 200,
-                    'message' => 'Exams List',
+                    'message' => 'Attendance',
                     'data' => $attenlist
                 ], 200);
             } else {
