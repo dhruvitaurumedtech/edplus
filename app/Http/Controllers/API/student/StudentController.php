@@ -1254,12 +1254,17 @@ class StudentController extends Controller
         $institute_id = $request->institute_id;
         $batch_id = $request->batch_id;
         $subject_ids = $request->subject_id;
+        $board_id = $request->board_id;
+        $medium_id = $request->medium_id;
+        $standard_id = $request->standard_id;
 
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $query = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
                 ->leftJoin('standard', 'students_details.standard_id', '=', 'standard.id')
+                ->leftJoin('board', 'students_details.board_id', '=', 'board.id')
+                ->leftJoin('medium', 'students_details.medium_id', '=', 'medium.id')
                 ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
                 ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
                 ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
@@ -1267,6 +1272,9 @@ class StudentController extends Controller
                 ->where('students_details.user_id', $user_id)
                 ->where('students_details.batch_id', $batch_id)
                 ->where('students_details.institute_id', $institute_id)
+                ->where('students_details.board_id', $board_id)
+                ->where('students_details.medium_id', $medium_id)
+                ->where('students_details.standard_id', $standard_id)
                 ->whereNull('students_details.deleted_at');
 
             if ($subject_ids) {
