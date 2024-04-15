@@ -36,13 +36,14 @@ class StudentAttendance extends Controller
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
             if ($existingUser) {
                 
-                $stdetails = Attendance_model::join('subject','subject.id','attendance','attendance.student_id')
+                    $stdetails = Attendance_model::join('subject','subject.id','attendance','attendance.student_id')
                     ->where('attendance.institute_id', $institute_id)
                     ->where('attendance.student_id', $user_id)
                     ->where('attendance.created_at','like','%'.$adate.'%')
                     ->whereNull('attendance.deleted_at')
                     ->select('attendance.*','subject.name')
                     ->get();
+
                 $attenlist = [];
                 if (!empty($stdetails)) {
                     foreach ($stdetails as $stdetail) {
