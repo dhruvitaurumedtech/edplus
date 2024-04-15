@@ -1326,4 +1326,40 @@ class StudentController extends Controller
             ], 400);
         }
     }
+    public function child_detail(Request $request)
+    {
+        $parent_id = $request->parent_id;
+        // $user_id = $request->user_id;
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $existingUser = User::where('token', $token)->where('id', $parent_id)->first();
+        if ($existingUser) {
+
+            $student_details = Parents::join('users', 'users.id', '=', 'parents.student_id')
+                ->join('institute_detail', 'institute_detail.user_id', '=', 'parents.student_id')
+                ->select('users.*', 'institute_detail.name as institute_name')
+                ->where('parents.parent_id', $parent_id)
+                ->get()
+                ->toarray();
+            foreach ($student_details as $value) {
+                $response[] = [
+                    'student_name' => $value->firstname . ' ' . $value->lastname,
+                    'email' => $value->email,
+                    'institute_name' => $value->institute_name
+                ];
+            }
+            return response()->json([
+                'success' => 200,
+                'message' => 'Student Fetch Successfully',
+                'data' => $response
+            ], 200);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
+    }
 }
