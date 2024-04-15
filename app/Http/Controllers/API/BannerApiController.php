@@ -15,7 +15,7 @@ class BannerApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'banner_image' => 'required',
-            'url' => 'required'
+            //'url' => 'required'
         ]);
 
         if ($validator->fails()) {
