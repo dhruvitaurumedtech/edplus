@@ -11,6 +11,6 @@ class Institute_detail extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'institute_detail';
     protected $fillable = [
-        'unique_id', 'user_id', 'institute_name', 'address', 'contact_no', 'email', 'about_us', 'logo', 'country', 'state', 'city', 'pincode', 'open_time', 'close_time', 'gst_number', 'gst_slab', 'website_link', 'instagram_link', 'facebook_link', 'whatsaap_link', 'youtube_link', 'status'
+        'unique_id', 'user_id', 'institute_name', 'address', 'contact_no', 'email', 'about_us', 'logo', 'country', 'state', 'city', 'pincode', 'open_time', 'close_time', 'gst_number', 'gst_slab', 'website_link', 'instagram_link', 'facebook_link', 'whatsaap_link', 'youtube_link', 'status', 'academatic_year'
     ];
 }
