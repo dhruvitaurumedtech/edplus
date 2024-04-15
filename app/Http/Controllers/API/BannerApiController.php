@@ -265,7 +265,7 @@ class BannerApiController extends Controller
                         'id' => $bnDT->id,
                         'user_id' => $bnDT->user_id,
                         'institute_id' => $bnDT->institute_id,
-                        'banner_image' => url('$bnDT->banner_image'),
+                        'banner_image' => url() . $bnDT->banner_image,
                         'url' => $bnDT->url,
                         'status' => $bnDT->status
                     );
