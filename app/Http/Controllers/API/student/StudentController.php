@@ -1348,18 +1348,25 @@ class StudentController extends Controller
                 ->select('users.*', 'institute_detail.institute_name')
                 ->where('parents.parent_id', $parent_id)
                 ->get();
-            foreach ($student_details as $value) {
-                $response[] = [
-                    'student_name' => $value->firstname . ' ' . $value->lastname,
-                    'email' => $value->email,
-                    'institute_name' => $value->institute_name
-                ];
+            if (!empty($student_details)) {
+                foreach ($student_details as $value) {
+                    $response[] = [
+                        'student_name' => $value->firstname . ' ' . $value->lastname,
+                        'email' => $value->email,
+                        'institute_name' => $value->institute_name
+                    ];
+                }
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Student Fetch Successfully',
+                    'data' => $response
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => 400,
+                    'message' => 'Data Not Found',
+                ], 400);
             }
-            return response()->json([
-                'success' => 200,
-                'message' => 'Student Fetch Successfully',
-                'data' => $response
-            ], 200);
         } else {
             return response()->json([
                 'status' => 400,
