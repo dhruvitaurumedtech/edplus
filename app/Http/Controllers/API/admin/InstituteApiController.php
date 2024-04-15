@@ -1414,8 +1414,9 @@ class InstituteApiController extends Controller
                     ->where('medium_id', $request->medium_id)
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
-                    ->first();
-
+                    ->toSql();
+                    print_r($insdelQY);exit;
+                    
                 if (!empty($studentdtls)) {
 
                     $studentupdetail = [
