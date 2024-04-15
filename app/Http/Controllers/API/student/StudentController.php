@@ -134,14 +134,14 @@ class StudentController extends Controller
 
                 //join with
                 $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($user_id) {
-                    $query->select('institute_id')
-                        ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
-                        ->where('end_academic_year', '>=', today())
-                        ->from('students_details')
-                        ->whereNull('deleted_at');
-                })->paginate($perPage);
+                    ->whereIn('id', function ($query) use ($user_id) {
+                        $query->select('institute_id')
+                            ->where('student_id', $user_id)
+                            ->where('status', '=', '1')
+                            ->where('end_academic_year', '>=', today())
+                            ->from('students_details')
+                            ->whereNull('deleted_at');
+                    })->paginate($perPage);
                 $join_with = [];
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
@@ -1300,26 +1300,31 @@ class StudentController extends Controller
             }
 
             $student_data = $query->get()->toArray();
+            if (!empty($student_data)) {
+                foreach ($student_data as $value) {
+                    $student_response[] = [
+                        'student_id' => $value['id'],
+                        'student_name' => $value['firstname'] . ' ' . $value['lastname'],
 
-
-            foreach ($student_data as $value) {
-                $student_response[] = [
-                    'student_id' => $value['id'],
-                    'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-
-                    'attendance' => $value['attendance'] . ''
+                        'attendance' => $value['attendance'] . ''
+                    ];
+                }
+                $base = [
+                    'standard' => $student_data[0]['standard_name'],
+                    'stream' => $student_data[0]['stream_name'] . '',
+                    'data' => $student_response,
                 ];
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Student Fetch Successfully',
+                    'data' => $base
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => 400,
+                    'message' => 'Data Not Found',
+                ], 400);
             }
-            $base = [
-                'standard' => $student_data[0]['standard_name'],
-                'stream' => $student_data[0]['stream_name'] . '',
-                'data' => $student_response,
-            ];
-            return response()->json([
-                'success' => 200,
-                'message' => 'Student Fetch Successfully',
-                'data' => $base
-            ], 200);
         } else {
             return response()->json([
                 'status' => 400,
