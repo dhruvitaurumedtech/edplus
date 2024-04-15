@@ -137,7 +137,7 @@ class StudentController extends Controller
                     $query->select('institute_id')
                         ->where('student_id', $user_id)
                         ->where('status', '=', '1')
-                        ->where('end_academic_year', '<=', today())
+                        ->where('end_academic_year', '>=', today())
                         ->from('students_details')
                         ->whereNull('deleted_at');
                 })->paginate($perPage);
@@ -900,10 +900,14 @@ class StudentController extends Controller
 
                 //
                 $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
+                    ->join('board', 'board.id', '=', 'students_details.board_id')
+                    ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                     ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                     ->where('students_details.student_id', $student_id)
-                    ->where('students_details.status', '=', '1')->select('standard.name as standard', 'medium.name as medium')->first();
-                //parents
+                    ->where('students_details.status', '=', '1')
+                    ->select('standard.name as standard', 'medium.name as medium','board.name as board','stream.name as stream')->first();
+                
+                    //parents
                 $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                     ->where('parents.student_id', $student_id)->get();
                 $parents_dt = [];
@@ -930,8 +934,8 @@ class StudentController extends Controller
                     'image' => $img . '',
                     'dob' => $studentUser->dob,
                     'address' => $studentUser->address,
-                    'standard' => $sdtls ? $sdtls->standard : '',
-                    'medium' => $sdtls ? $sdtls->medium : '',
+                    'standard' => $sdtls ? $sdtls->standard.'('.$sdtls->stream.')' : '',
+                    'medium' => $sdtls ? $sdtls->medium.'('.$sdtls->board.')' : '',
                     'school' => $studentUser->school_name,
                     'area' => $studentUser->area,
                     'institutes' => $institutes,
