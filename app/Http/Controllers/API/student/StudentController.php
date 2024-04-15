@@ -908,7 +908,8 @@ class StudentController extends Controller
                     $parents_dt[] = array(
                         'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
                         'email' => $parentsDT->email,
-                        'mobile' => $parentsDT->mobile
+                        'mobile' => $parentsDT->mobile,
+                        'relation' => $parentsDT->relation
                     );
                 }
                 //
