@@ -163,7 +163,7 @@ Route::middleware('auth')->group(function () {
     Route::post('topic-save', [TopicController::class, 'topic_save'])->name('topic.save');
     Route::post('topic-list', [TopicController::class, 'topic_list']);
 
-    Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list'])->name('videolimit.list');//uploded video time limit
+    Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list'])->name('videolimit.list'); //uploded video time limit
     Route::post('video-timelimit-save', [Videotimelimitcontroller::class, 'save'])->name('videolimit.save');
     Route::post('video-timelimit-edit', [Videotimelimitcontroller::class, 'edit']);
     Route::post('video-timelimit-update', [Videotimelimitcontroller::class, 'update']);
@@ -211,6 +211,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/announcement/edit', [AnnouncementController::class, 'edit']);
     Route::post('announcement/update', [AnnouncementController::class, 'update']);
     Route::post('announcement/delete', [AnnouncementController::class, 'destroy']);
+    Route::resource('banner-sizes', 'App\Http\Controllers\BannerSizeController');
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
