@@ -1345,7 +1345,7 @@ class StudentController extends Controller
 
             $student_details = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.user_id', '=', 'parents.student_id')
-                ->select('users.*', 'institute_detail.name as institute_name')
+                ->select('users.*', 'institute_detail.institute_name')
                 ->where('parents.parent_id', $parent_id)
                 ->get()
                 ->toarray();
