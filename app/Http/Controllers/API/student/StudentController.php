@@ -136,7 +136,7 @@ class StudentController extends Controller
                 $joininstitute = Institute_detail::where('status', 'active')->whereIn('id', function ($query) use ($user_id) {
                     $query->select('institute_id')
                         ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
+                        ->where('status', '=', 'active')
                         ->where('end_academic_year', '>=', today())
                         ->from('students_details')
                         ->whereNull('deleted_at');
