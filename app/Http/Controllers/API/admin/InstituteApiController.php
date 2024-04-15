@@ -1411,16 +1411,15 @@ class InstituteApiController extends Controller
 
                 $insdelQY = Standard_sub::where('board_id', $request->board_id)
                     ->where('medium_id', $request->medium_id)
-                    ->where('class_id', $request->class_id)
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
-                    ->tosql();
-                    print_r($request->board_id);
-                    print_r($request->medium_id);
-                    print_r($request->class_id);
-                    print_r($request->standard_id);
-                    print_r($request->institute_id);
-                    print_r($insdelQY);exit;
+                    ->first();
+                    // print_r($request->board_id);
+                    // print_r($request->medium_id);
+                    // print_r($request->class_id);
+                    // print_r($request->standard_id);
+                    // print_r($request->institute_id);
+                    // print_r($insdelQY);exit;
                 if (!empty($studentdtls)) {
                     
                     $studentupdetail = [
