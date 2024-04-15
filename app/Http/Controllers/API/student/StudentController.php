@@ -1278,14 +1278,14 @@ class StudentController extends Controller
                 ->where('students_details.standard_id', $standard_id)
                 ->whereNull('students_details.deleted_at');
 
-            
-                // if ($subject_ids) {
-                // $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
-                //     $query->select('id')
-                //         ->from('subject')
-                //         ->whereIn('id', explode(',', $subject_ids));
-                // });
-            }
+
+            // if ($subject_ids) {
+            // $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
+            //     $query->select('id')
+            //         ->from('subject')
+            //         ->whereIn('id', explode(',', $subject_ids));
+            // });
+            // }
 
             $student_data = $query->get()->toArray();
 
