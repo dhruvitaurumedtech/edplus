@@ -1388,12 +1388,7 @@ class InstituteApiController extends Controller
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
-                if ($request->stream_id == null) {
-                    $stream_id = '';
-                } else {
-                    $stream_id = $request->stream_id;
-                }
-
+                
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -1408,11 +1403,11 @@ class InstituteApiController extends Controller
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
-                if ($request->stream_id == null) {
-                    $stream_id = '';
-                } else {
-                    $stream_id = $request->stream_id;
-                }
+                // if ($request->stream_id != null) {
+                //     $stream_id = $request->stream_id;
+                // } else {
+                //     $stream_id = null;
+                // }
 
                 $insdelQY = Standard_sub::where('board_id', $request->board_id)
                     ->where('medium_id', $request->medium_id)
@@ -1422,8 +1417,7 @@ class InstituteApiController extends Controller
                     ->first();
                 if (!empty($studentdtls)) {
 
-                    $studentdetail = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $institute_id)->update([
+                    $studentupdetail = [
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
                             'student_id' => $student_id,
@@ -1432,11 +1426,19 @@ class InstituteApiController extends Controller
                             'medium_id' => $request->medium_id,
                             'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
-                            'stream_id' => $stream_id,
+                            'stream_id' => $request->stream_id,
                             'subject_id' => $request->subject_id,
                             'batch_id' => $batch_id,
                             'status' => '1',
-                        ]);
+                        ];
+
+                        if ($request->stream_id == 'null') {
+                            unset($studentupdetail['stream_id']);
+                        }
+
+                        $studentdetail = Student_detail::where('student_id', $student_id)
+                        ->where('institute_id', $institute_id)->update([$studentupdetail]);
+
                     if (!empty($studentdetail) && !empty($request->first_name)) {
                         //student detail update
                         $student_details = User::find($student_id);
@@ -1483,8 +1485,9 @@ class InstituteApiController extends Controller
                     $student_id = $request->user_id;
                     //print_r($student_id);exit;
                     if (!empty($student_id)) {
+                        
 
-                        $studentdetail = Student_detail::create([
+                        $studentdetail = [
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
                             'student_id' => $student_id,
@@ -1494,10 +1497,17 @@ class InstituteApiController extends Controller
                             'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
                             'batch_id' => $batch_id,
-                            //'stream_id' => $stream_id,
+                            'stream_id' => $request->stream_id,
                             'subject_id' => $request->subject_id,
                             'status' => '0',
-                        ]);
+                        ];
+                        
+                        if ($request->stream_id == 'null') {
+                            
+                            unset($studentdetail['stream_id']);
+                        }
+                        
+                        $studentdetailadd = Student_detail::create($studentdetail);
 
                         return response()->json([
                             'status' => 200,
