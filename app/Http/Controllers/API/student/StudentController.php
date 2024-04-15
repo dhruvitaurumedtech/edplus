@@ -462,8 +462,8 @@ class StudentController extends Controller
                 $boards = [];
 
                 $institutedeta = Institute_detail::where('id', $institute_id)
-                ->select('id', 'institute_name', 'address', 'about_us')->first();
-                
+                    ->select('id', 'institute_name', 'address', 'about_us')->first();
+
                 $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
                     ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
 
@@ -906,9 +906,9 @@ class StudentController extends Controller
                     ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                     ->where('students_details.student_id', $student_id)
                     ->where('students_details.status', '=', '1')
-                    ->select('standard.name as standard', 'medium.name as medium','board.name as board','stream.name as stream')->first();
-                
-                    //parents
+                    ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
+
+                //parents
                 $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                     ->where('parents.student_id', $student_id)->get();
                 $parents_dt = [];
@@ -935,8 +935,8 @@ class StudentController extends Controller
                     'image' => $img . '',
                     'dob' => $studentUser->dob,
                     'address' => $studentUser->address,
-                    'standard' => $sdtls ? $sdtls->standard.'('.$sdtls->stream.')' : '',
-                    'medium' => $sdtls ? $sdtls->medium.'('.$sdtls->board.')' : '',
+                    'standard' => $sdtls ? $sdtls->standard . '(' . $sdtls->stream . ')' : '',
+                    'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
                     'school' => $studentUser->school_name,
                     'area' => $studentUser->area,
                     'institutes' => $institutes,
@@ -1280,7 +1280,7 @@ class StudentController extends Controller
                 ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id', 'students_details.batch_id')
                 // , 'students_details.subject_id'
                 ->where('students_details.user_id', $user_id)
-                ->where('students_details.batch_id', $batch_id)
+                // ->where('students_details.batch_id', $batch_id)
                 ->where('students_details.institute_id', $institute_id)
                 ->where('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
@@ -1288,13 +1288,16 @@ class StudentController extends Controller
                 ->whereNull('students_details.deleted_at');
 
 
-            // if ($subject_ids) {
-            // $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
-            //     $query->select('id')
-            //         ->from('subject')
-            //         ->whereIn('id', explode(',', $subject_ids));
-            // });
-            // }
+            if (!empty($subject_ids)) {
+                $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
+                    $query->select('id')
+                        ->from('subject')
+                        ->whereIn('id', explode(',', $subject_ids));
+                });
+            }
+            if (!empty($batch_id)) {
+                $query->where('students_details.batch_id', $batch_id);
+            }
 
             $student_data = $query->get()->toArray();
 
