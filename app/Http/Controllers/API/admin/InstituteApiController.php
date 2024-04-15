@@ -1482,6 +1482,13 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
+                        $data = user::where('id',$student_id)->update([
+                            'firstname' => $request->first_name,
+                            'lastname' => $request->last_name,
+                            'dob' => $request->date_of_birth,
+                            'address' => $request->address,
+                            'mobile' => $request->mobile_no,
+                        ]);
                     }
                     $student_id = $request->user_id;
                     //print_r($student_id);exit;
