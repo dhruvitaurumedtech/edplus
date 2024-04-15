@@ -17,6 +17,8 @@ use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\BannerApiController;
+use App\Http\Controllers\API\student\StudentAttendance;
+use App\Models\Student_detail;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
@@ -44,6 +46,8 @@ Route::post('/student/profile-edit-student', [StudentController::class, 'student
 Route::post('/student/exams-student', [StudentController::class, 'exams_list'])->name('exams_list.get');
 Route::post('/student/remove-institute-student', [StudentController::class, 'remove_institute'])->name('remove_institute.get');
 Route::post('/student/exam-result-student', [StudentController::class, 'exam_result'])->name('exam_result.get');
+Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data'])->name('attendance_data.get');
+
 
 Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
