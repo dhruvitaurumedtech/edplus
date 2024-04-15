@@ -104,6 +104,10 @@
                                     </tbody>
                                 </table>
                             </div>
+                            <div class="d-flex justify-content-end">
+                                {!! $bannerSizes->withQueryString()->links('pagination::bootstrap-5') !!}
+
+                            </div>
                         </div>
                     </div>
                 </div>
