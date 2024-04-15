@@ -1268,7 +1268,8 @@ class StudentController extends Controller
                 ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
                 ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
                 ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
-                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id', 'students_details.batch_id', 'students_details.subject_id')
+                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id', 'students_details.batch_id')
+                // , 'students_details.subject_id'
                 ->where('students_details.user_id', $user_id)
                 ->where('students_details.batch_id', $batch_id)
                 ->where('students_details.institute_id', $institute_id)
@@ -1277,13 +1278,14 @@ class StudentController extends Controller
                 ->where('students_details.standard_id', $standard_id)
                 ->whereNull('students_details.deleted_at');
 
-            if ($subject_ids) {
-                $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
-                    $query->select('id')
-                        ->from('subject')
-                        ->whereIn('id', explode(',', $subject_ids));
-                });
-            }
+
+            // if ($subject_ids) {
+            // $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
+            //     $query->select('id')
+            //         ->from('subject')
+            //         ->whereIn('id', explode(',', $subject_ids));
+            // });
+            // }
 
             $student_data = $query->get()->toArray();
 
