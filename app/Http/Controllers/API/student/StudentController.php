@@ -133,15 +133,17 @@ class StudentController extends Controller
                 }
 
                 //join with
+                
                 $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($user_id) {
                     $query->select('institute_id')
                         ->where('student_id', $user_id)
                         ->where('status', '=', '1')
-                        ->where('end_academic_year', '>=', today())
+                        ->where('end_academic_year', '>=', now())
                         ->from('students_details')
                         ->whereNull('deleted_at');
-                })->paginate($perPage);
+                })
+                ->where('end_academic_year', '>=', now())->paginate($perPage);
                 $join_with = [];
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
