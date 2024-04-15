@@ -83,12 +83,16 @@
                                             <td>{{ $bannerSize->width }}</td>
                                             <td>{{ $bannerSize->height }}</td>
                                             <td>
-                                                <a href="{{ route('banner-sizes.edit', $bannerSize->id) }}" class="btn btn-sm btn-primary editButton">Edit</a>
-                                                <form action="{{ route('banner-sizes.destroy', $bannerSize->id) }}" method="POST" class="d-inline">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this banner size?')">Delete</button>
-                                                </form>
+
+                                                <div class="d-flex">
+                                                    <!-- @canButton('edit', 'Institute_for') -->
+                                                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $bannerSize->id }}" value="Edit">&nbsp;&nbsp;
+                                                    <!-- @endCanButton -->
+                                                    &nbsp;&nbsp;
+                                                    <!-- @canButton('delete', 'Institute_for') -->
+                                                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $bannerSize->id }}" value="Delete">
+                                                    <!-- @endCanButton -->
+                                                </div>
                                             </td>
                                         </tr>
                                         @endforeach
@@ -97,6 +101,59 @@
                             </div>
                         </div>
                     </div>
+                    <script>
+                        document.querySelectorAll('.editButton').forEach(function(button) {
+                            button.addEventListener('click', function() {
+                                var institute_id = this.getAttribute('data-user-id');
+
+                                axios.post('banner-sizes/edit', {
+                                        institute_id: institute_id
+                                    })
+                                    .then(response => {
+                                        var reponse_data = response.data.Institute_for_model;
+                                        var iconSrc = '{{ asset('
+                                        ') }}' + reponse_data.icon;
+                                        $('#institute_id').val(reponse_data.id);
+                                        $('#name').val(reponse_data.name);
+                                        $('#icon_update').attr('src', iconSrc);
+                                        $('#old_icon').val(reponse_data.icon);
+                                        $('#status').val(reponse_data.status);
+                                        $('#usereditModal').modal('show');
+                                    })
+                                    .catch(error => {
+                                        console.error(error);
+                                    });
+                            });
+                        });
+                        document.querySelectorAll('.deletebutton').forEach(function(button) {
+                            button.addEventListener('click', function(event) {
+                                event.preventDefault();
+                                var institute_id = this.getAttribute('data-user-id');
+
+                                Swal.fire({
+                                    title: 'Are you sure want to delete?',
+                                    icon: 'warning',
+                                    showCancelButton: true,
+                                    confirmButtonColor: '#d33',
+                                    cancelButtonColor: '#3085d6',
+                                    confirmButtonText: 'Yes, delete it!'
+                                }).then((result) => {
+                                    if (result.isConfirmed) {
+                                        axios.post('banner-sizes.destroy', {
+                                                institute_id: institute_id
+                                            })
+                                            .then(response => {
+                                                location.reload(true);
+
+                                            })
+                                            .catch(error => {
+                                                console.error(error);
+                                            });
+                                    }
+                                });
+                            });
+                        });
+                    </script>
                 </div>
             </div>
             @include('layouts/footer_new')

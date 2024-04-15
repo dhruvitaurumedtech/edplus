@@ -333,7 +333,7 @@ class InstituteApiController extends Controller
             //acedamic year
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
-            $nextYear = date("Y", strtotime($nextYearDate));
+            $nextYear = date("d-m-Y", strtotime($nextYearDate));
             $dateString = $currentDate . " / " . $nextYear;
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
@@ -358,7 +358,8 @@ class InstituteApiController extends Controller
                 'city' => $request->input('city'),
                 'pincode' => $request->input('pincode'),
                 'status' => 'active',
-                'academatic_year' => $dateString
+                'start_academic_year' => $currentDate,
+                'end_academic_year' => $nextYear
             ]);
             $lastInsertedId = $instituteDetail->id;
             $institute_name = $instituteDetail->institute_name;
@@ -1388,7 +1389,7 @@ class InstituteApiController extends Controller
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
-                
+
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -1414,29 +1415,29 @@ class InstituteApiController extends Controller
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
                     ->first();
-                    
-                if (!empty($studentdtls)) {
-                    
-                    $studentupdetail = [
-                            'user_id' => $user_id,
-                            'institute_id' => $request->institute_id,
-                            'student_id' => $student_id,
-                            'institute_for_id' => $insdelQY->institute_for_id,
-                            'board_id' =>  $request->board_id,
-                            'medium_id' => $request->medium_id,
-                            'class_id' => $insdelQY->class_id,
-                            'standard_id' => $request->standard_id,
-                            'stream_id' => $request->stream_id,
-                            'subject_id' => $request->subject_id,
-                            'batch_id' => $batch_id,
-                            'status' => '1',
-                        ];
 
-                        if ($request->stream_id == 'null') {
-                            unset($studentupdetail['stream_id']);
-                        }
-                        
-                        $studentdetail = Student_detail::where('student_id', $student_id)
+                if (!empty($studentdtls)) {
+
+                    $studentupdetail = [
+                        'user_id' => $user_id,
+                        'institute_id' => $request->institute_id,
+                        'student_id' => $student_id,
+                        'institute_for_id' => $insdelQY->institute_for_id,
+                        'board_id' =>  $request->board_id,
+                        'medium_id' => $request->medium_id,
+                        'class_id' => $insdelQY->class_id,
+                        'standard_id' => $request->standard_id,
+                        'stream_id' => $request->stream_id,
+                        'subject_id' => $request->subject_id,
+                        'batch_id' => $batch_id,
+                        'status' => '1',
+                    ];
+
+                    if ($request->stream_id == 'null') {
+                        unset($studentupdetail['stream_id']);
+                    }
+
+                    $studentdetail = Student_detail::where('student_id', $student_id)
                         ->where('institute_id', $institute_id)->update([$studentupdetail]);
 
                     if (!empty($studentdetail) && !empty($request->first_name)) {
@@ -1485,7 +1486,7 @@ class InstituteApiController extends Controller
                     $student_id = $request->user_id;
                     //print_r($student_id);exit;
                     if (!empty($student_id)) {
-                        
+
 
                         $studentdetail = [
                             'user_id' => $user_id,
@@ -1501,12 +1502,12 @@ class InstituteApiController extends Controller
                             'subject_id' => $request->subject_id,
                             'status' => '0',
                         ];
-                        
+
                         if ($request->stream_id == 'null') {
-                            
+
                             unset($studentdetail['stream_id']);
                         }
-                        
+
                         $studentdetailadd = Student_detail::create($studentdetail);
 
                         return response()->json([

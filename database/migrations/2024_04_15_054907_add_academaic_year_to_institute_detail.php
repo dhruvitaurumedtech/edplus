@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('institute_detail', function (Blueprint $table) {
-            $table->string('academatic_year')->nullable()->after('status');
+            $table->string('end_academic_year')->nullable()->after('status');
+            $table->string('start_academic_year')->nullable()->after('status');
         });
     }
 
