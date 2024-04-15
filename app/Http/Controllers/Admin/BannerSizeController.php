@@ -13,13 +13,13 @@ class BannerSizeController extends Controller
      */
     public function index()
     {
-        $bannerSizes = BannerSize::all();
+        $bannerSizes = BannerSize::paginate(10);
         return view('banner-sizes.create', compact('bannerSizes'));
     }
 
     public function create()
     {
-        $bannerSizes = BannerSize::all();
+        $bannerSizes = BannerSize::paginate(10);
         return view('banner-sizes.create', compact('bannerSizes'));
     }
 
