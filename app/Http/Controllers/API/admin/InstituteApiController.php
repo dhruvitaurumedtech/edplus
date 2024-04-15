@@ -330,6 +330,11 @@ class InstituteApiController extends Controller
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
             //institute_detail
+            //acedamic year
+            $currentDate = date("d-m-Y");
+            $nextYearDate = date("d-m-Y", strtotime("+1 year"));
+            $nextYear = date("Y", strtotime($nextYearDate));
+            $dateString = $currentDate . " / " . $nextYear;
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
                 // 'youtube_link' => $request->input('youtube_link'),
@@ -352,7 +357,8 @@ class InstituteApiController extends Controller
                 'state' => $request->input('state'),
                 'city' => $request->input('city'),
                 'pincode' => $request->input('pincode'),
-                'status' => 'active'
+                'status' => 'active',
+                'academatic_year' => $dateString
             ]);
             $lastInsertedId = $instituteDetail->id;
             $institute_name = $instituteDetail->institute_name;
