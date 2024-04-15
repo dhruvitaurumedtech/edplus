@@ -86,6 +86,7 @@ Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->n
 Route::post('/banner/banner-status-update', [BannerApiController::class, 'update_status'])->name('update_status');
 Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
 Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])->name('banner_list');
+Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete');
 
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
