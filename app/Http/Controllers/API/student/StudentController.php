@@ -137,6 +137,7 @@ class StudentController extends Controller
                     $query->select('institute_id')
                         ->where('student_id', $user_id)
                         ->where('status', '=', '1')
+                        ->where('end_academic_year', '<=', now())
                         ->from('students_details')
                         ->whereNull('deleted_at');
                 })->paginate($perPage);
@@ -459,7 +460,9 @@ class StudentController extends Controller
                 $institute_data = [];
                 $boards = [];
 
-                $institutedeta = Institute_detail::where('id', $institute_id)->select('id', 'institute_name', 'address', 'about_us')->first();
+                $institutedeta = Institute_detail::where('id', $institute_id)
+                ->select('id', 'institute_name', 'address', 'about_us')->first();
+                
                 $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
                     ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
 
