@@ -1347,8 +1347,7 @@ class StudentController extends Controller
                 ->join('institute_detail', 'institute_detail.user_id', '=', 'parents.student_id')
                 ->select('users.*', 'institute_detail.institute_name')
                 ->where('parents.parent_id', $parent_id)
-                ->get()
-                ->toarray();
+                ->get();
             foreach ($student_details as $value) {
                 $response[] = [
                     'student_name' => $value->firstname . ' ' . $value->lastname,
