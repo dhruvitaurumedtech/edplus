@@ -1488,7 +1488,7 @@ class InstituteApiController extends Controller
                             'class_id' => $insdelQY->class_id,
                             'standard_id' => $request->standard_id,
                             'batch_id' => $batch_id,
-                            //'stream_id' => $stream_id,
+                            'stream_id' => $stream_id,
                             'subject_id' => $request->subject_id,
                             'status' => '0',
                         ]);
