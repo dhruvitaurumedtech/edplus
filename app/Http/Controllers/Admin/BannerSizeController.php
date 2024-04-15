@@ -14,12 +14,13 @@ class BannerSizeController extends Controller
     public function index()
     {
         $bannerSizes = BannerSize::all();
-        return view('banner-sizes.index', compact('bannerSizes'));
+        return view('banner-sizes.create', compact('bannerSizes'));
     }
 
     public function create()
     {
-        return view('banner-sizes.create');
+        $bannerSizes = BannerSize::all();
+        return view('banner-sizes.create', compact('bannerSizes'));
     }
 
     public function store(Request $request)
@@ -44,12 +45,12 @@ class BannerSizeController extends Controller
     {
         $bannerSize = BannerSize::findOrFail($id);
         $bannerSize->update($request->all());
-        return redirect()->route('banner-sizes.index')->with('success', 'Banner size updated successfully.');
+        return redirect()->route('banner-sizes.create')->with('success', 'Banner size updated successfully.');
     }
 
     public function destroy($id)
     {
         BannerSize::findOrFail($id)->delete();
-        return redirect()->route('banner-sizes.index')->with('success', 'Banner size deleted successfully.');
+        return redirect()->route('banner-sizes.create')->with('success', 'Banner size deleted successfully.');
     }
 }

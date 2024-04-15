@@ -211,7 +211,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/announcement/edit', [AnnouncementController::class, 'edit']);
     Route::post('announcement/update', [AnnouncementController::class, 'update']);
     Route::post('announcement/delete', [AnnouncementController::class, 'destroy']);
-    Route::resource('banner-sizes', 'App\Http\Controllers\BannerSizeController');
+    Route::resource('banner-sizes', 'App\Http\Controllers\Admin\BannerSizeController');
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
