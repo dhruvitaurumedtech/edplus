@@ -36,6 +36,15 @@
                     });
                 }, 3000);
             </script>
+            <div class="row">
+                <div class="col-md-10 offset-md-1">
+                    @if (session('success'))
+                    <div class="alert alert-success">
+                        {{ session('success') }}
+                    </div>
+                    @endif
+                </div>
+            </div>
             <div class="dashboard-content side-content">
 
                 <div class="row">
@@ -46,22 +55,22 @@
                                 @csrf
                                 <div class="form-group">
                                     <label for="size">Size</label>
-                                    <input type="text" class="form-control" id="size" name="size" required>
+                                    <input type="text" class="form-control" name="size" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="width">Width</label>
-                                    <input type="number" class="form-control" id="width" name="width" required>
+                                    <input type="number" class="form-control" name="width" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="height">Height</label>
-                                    <input type="number" class="form-control" id="height" name="height" required>
+                                    <input type="number" class="form-control" name="height" required>
                                 </div>
                                 <button type="submit" class="btn btn-primary">Create</button>
                             </form>
 
                         </div>
                     </div>
-                    <div class="col-lg-6">
+                    <div class="col-lg-7">
                         <div class="institute-form">
                             <h2>BannerSize List</h2>
                             <div class="card-body">
@@ -85,13 +94,9 @@
                                             <td>
 
                                                 <div class="d-flex">
-                                                    <!-- @canButton('edit', 'Institute_for') -->
-                                                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $bannerSize->id }}" value="Edit">&nbsp;&nbsp;
-                                                    <!-- @endCanButton -->
+                                                    <button class="btn btn-primary editButton" data-banner-id="{{ $bannerSize->id }}">Edit</button>
                                                     &nbsp;&nbsp;
-                                                    <!-- @canButton('delete', 'Institute_for') -->
-                                                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $bannerSize->id }}" value="Delete">
-                                                    <!-- @endCanButton -->
+                                                    <button class="btn btn-danger deleteButton" data-banner-id="{{ $bannerSize->id }}">Delete</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -101,59 +106,96 @@
                             </div>
                         </div>
                     </div>
-                    <script>
-                        document.querySelectorAll('.editButton').forEach(function(button) {
-                            button.addEventListener('click', function() {
-                                var institute_id = this.getAttribute('data-user-id');
-
-                                axios.post('banner-sizes/edit', {
-                                        institute_id: institute_id
-                                    })
-                                    .then(response => {
-                                        var reponse_data = response.data.Institute_for_model;
-                                        var iconSrc = '{{ asset('
-                                        ') }}' + reponse_data.icon;
-                                        $('#institute_id').val(reponse_data.id);
-                                        $('#name').val(reponse_data.name);
-                                        $('#icon_update').attr('src', iconSrc);
-                                        $('#old_icon').val(reponse_data.icon);
-                                        $('#status').val(reponse_data.status);
-                                        $('#usereditModal').modal('show');
-                                    })
-                                    .catch(error => {
-                                        console.error(error);
-                                    });
-                            });
-                        });
-                        document.querySelectorAll('.deletebutton').forEach(function(button) {
-                            button.addEventListener('click', function(event) {
-                                event.preventDefault();
-                                var institute_id = this.getAttribute('data-user-id');
-
-                                Swal.fire({
-                                    title: 'Are you sure want to delete?',
-                                    icon: 'warning',
-                                    showCancelButton: true,
-                                    confirmButtonColor: '#d33',
-                                    cancelButtonColor: '#3085d6',
-                                    confirmButtonText: 'Yes, delete it!'
-                                }).then((result) => {
-                                    if (result.isConfirmed) {
-                                        axios.post('banner-sizes.destroy', {
-                                                institute_id: institute_id
-                                            })
-                                            .then(response => {
-                                                location.reload(true);
-
-                                            })
-                                            .catch(error => {
-                                                console.error(error);
-                                            });
-                                    }
-                                });
-                            });
-                        });
-                    </script>
                 </div>
             </div>
-            @include('layouts/footer_new')
+        </div>
+        @include('layouts/footer_new')
+        <script type="text/javascript">
+            $(document).ready(function() {
+
+                document.querySelectorAll('.editButton').forEach(function(button) {
+                    button.addEventListener('click', function() {
+                        var bannerId = this.getAttribute('data-banner-id');
+
+                        axios.post('/banner-sizes/edit', {
+                                banner_id: bannerId
+                            })
+                            .then(response => {
+                                var response_data = response.data.bannerSize;
+                                console.log(response_data.size);
+                                $('#id').val(response_data.id);
+                                $('#size').val(response_data.size);
+                                $('#width').val(response_data.width);
+                                $('#height').val(response_data.height);
+                                $('#usereditModal').modal('show');
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    });
+                });
+            });
+            document.querySelectorAll('.deletebutton').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var bannerId = this.getAttribute('data-banner-id');
+
+                    Swal.fire({
+                        title: 'Are you sure want to delete?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#3085d6',
+                        confirmButtonText: 'Yes, delete it!'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            axios.post("{{ url('banner-sizes/destroy') }}", {
+                                    bannerId: bannerId
+                                })
+                                .then(response => {
+                                    location.reload(true);
+
+                                })
+                                .catch(error => {
+                                    console.error(error);
+                                });
+                        }
+                    });
+                });
+            });
+        </script>
+        <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="usereditModalLabel">Edit banner_size </h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form action="{{ url('banner-sizes/update') }}" method="POST">
+                            @csrf
+                            <div class="form-group">
+                                <input type="hidden" name="id" id="id">
+                                <label for="size">Size</label>
+                                <input type="text" class="form-control" id="size" name="size" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="width">Width</label>
+                                <input type="number" class="form-control" id="width" name="width" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="height">Height</label>
+                                <input type="number" class="form-control" id="height" name="height" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update</button>
+                        </form>
+                    </div>
+                </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    </div>

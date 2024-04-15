@@ -35,22 +35,28 @@ class BannerSizeController extends Controller
         return view('banner-sizes.show', compact('bannerSize'));
     }
 
-    public function edit($id)
+    public function edit(Request $request)
     {
-        $bannerSize = BannerSize::findOrFail($id);
-        return view('banner-sizes.edit', compact('bannerSize'));
+        $bannerSize = BannerSize::find($request->banner_id);
+
+        if (!$bannerSize) {
+            return response()->json(['error' => 'Banner size not found'], 404);
+        }
+
+        return response()->json(['bannerSize' => $bannerSize]);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        $bannerSize = BannerSize::findOrFail($id);
+        $bannerSize = BannerSize::findOrFail($request->id);
         $bannerSize->update($request->all());
-        return redirect()->route('banner-sizes.create')->with('success', 'Banner size updated successfully.');
+        return redirect('banner-sizes/create')->with('success', 'Banner size updated successfully.');
     }
 
-    public function destroy($id)
+    public function destroy(Request $request)
     {
-        BannerSize::findOrFail($id)->delete();
-        return redirect()->route('banner-sizes.create')->with('success', 'Banner size deleted successfully.');
+
+        BannerSize::findOrFail($request->bannerId)->delete();
+        return redirect('banner-sizes/create')->with('success', 'Banner size deleted successfully.');
     }
 }

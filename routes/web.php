@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AnnouncementController;
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\BannerSizeController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\PermissionController;
@@ -212,6 +213,9 @@ Route::middleware('auth')->group(function () {
     Route::post('announcement/update', [AnnouncementController::class, 'update']);
     Route::post('announcement/delete', [AnnouncementController::class, 'destroy']);
     Route::resource('banner-sizes', 'App\Http\Controllers\Admin\BannerSizeController');
+    Route::post('/banner-sizes/edit', [BannerSizeController::class, 'edit']);
+    Route::post('/banner-sizes/update', [BannerSizeController::class, 'update']);
+    Route::post('banner-sizes/destroy', [BannerSizeController::class, 'destroy']);
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
