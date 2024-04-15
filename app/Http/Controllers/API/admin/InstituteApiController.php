@@ -1502,7 +1502,7 @@ class InstituteApiController extends Controller
                             'status' => '0',
                         ];
                         
-                        if ($request->stream_id == 'null') {
+                        if ($request->stream_id === null || $request->stream_id === 'null') {
                             
                             unset($studentdetail['stream_id']);
                         }
