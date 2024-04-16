@@ -43,7 +43,7 @@ class VideoController extends Controller
         } elseif ($request->parent_category_id == '3') {
             $extensions = ['pdf'];
         }
-        print_r($extensions);
+        print_r(implode(',', $extensions));
         exit;
 
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:5242880', function ($input) use ($request) {
