@@ -29,51 +29,37 @@ class VideoController extends Controller
 
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
 
-
-        if ($check->category_id == $request->parent_category_id) {
-
-            if ($request->parent_category_id == '1' || $request->parent_category_id == '2') {
-                $extension = 'mp4,mov,avi';
-            } else {
-                $extension = 'pdf';
-            }
-        } else {
+        if (!$check || $check->category_id != $request->parent_category_id) {
             return response()->json([
-                'success' => 400,
+                'success' => false,
                 'message' => 'Please Select Correct Category'
             ], 400);
         }
 
-        // $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
-        //     return $input->parent_category_id == '1' || $input->parent_category_id == '2';
-        // });
-        $videoValidator = \Validator::make($request->all(), [
-            'topic_video_pdf' => 'sometimes|required|mimes:mp4,mov,avi|max:5242880',
-        ]);
+        // Determine file extension based on parent_category_id
+        $extension = $request->parent_category_id == '1' || $request->parent_category_id == '3' ? 'mp4,mov,avi' : 'pdf';
 
-        // Validation rules for PDF files
-        $pdfValidator = \Validator::make($request->all(), [
-            'topic_video_pdf' => 'sometimes|required|mimes:pdf|max:5242880',
-        ]);
-
-        // Check if parent_category_id indicates video or PDF upload
-        $isVideo = $request->parent_category_id == '1' || $request->parent_category_id == '3';
-
+        // Validate the file based on its type
+        $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
+            return $input->parent_category_id == '1' || $input->parent_category_id == '2';
+        });
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => 400,
+                'success' => false,
                 'message' => 'Upload Fail',
                 'error' => $validator->errors()
             ], 400);
         }
 
+        // Handle file upload
         if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
-            $videoPath = $request->file('topic_video_pdf')->store('videos', 'public');
-        } elseif (!$isVideo && $request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
-            $pdfPath = $request->file('topic_video_pdf')->store('pdfs', 'public');
+            $path = $request->parent_category_id == '1' || $request->parent_category_id == '2' ?
+                $request->file('topic_video_pdf')->store('videos', 'public') :
+                $request->file('topic_video_pdf')->store('pdfs', 'public');
         }
 
+        // Create topic record in the database
         $topic = Topic_model::create([
             'user_id' => $request->input('user_id'),
             'institute_id' => $request->input('institute_id'),
@@ -85,12 +71,12 @@ class VideoController extends Controller
             'topic_description' => $request->input('topic_description'),
             'topic_name' => $request->input('topic_name'),
             'video_category_id' => $request->input('category_id'),
-            'topic_video' => isset($videoPath) ? asset($videoPath) : null
+            'topic_video' => isset($path) ? asset($path) : null
         ]);
 
         return response()->json([
-            'success' => 200,
-            'message' => 'Topic and video uploaded successfully',
+            'success' => true,
+            'message' => 'Topic and file uploaded successfully',
             'topic' => $topic
         ]);
     }
