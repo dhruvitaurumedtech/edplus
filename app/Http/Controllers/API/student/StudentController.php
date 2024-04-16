@@ -789,10 +789,13 @@ class StudentController extends Controller
                     ->whereRaw("FIND_IN_SET($subject_id,subjects)")
                     ->select('*')
                     ->get();
-
-                echo "<pre>";
-                print_r($batch_list);
-                exit;
+                $$batch_response = [];
+                foreach ($batch_list as $value) {
+                    $batch_response[] = [
+                        'batch_id' => $value->id,
+                        'batch_name' => $value->batch_name,
+                    ];
+                }
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -819,11 +822,15 @@ class StudentController extends Controller
                     }
                     $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                 }
+                $response = [
+                    'batch_list' => $batch_response,
+                    'topics' => $category,
+                ];
 
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
-                    'data' => $category,
+                    'data' => $response,
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
