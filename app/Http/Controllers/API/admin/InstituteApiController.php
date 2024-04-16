@@ -32,6 +32,7 @@ use App\Models\Batches_model;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use App\Models\VideoCategory;
+use Carbon\Carbon;
 use PDO;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
@@ -998,7 +999,9 @@ class InstituteApiController extends Controller
 
             //announcement
             $announcement = [];
-            $announcement_list = announcements_model::where('institute_id', $institute_id)->get()->toarray();
+            $fifteenDaysAgo = Carbon::now()->subDays(15);
+
+            $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
             foreach ($announcement_list as $value) {
                 $announcement = [
                     'title' => $value['title'],
