@@ -1001,8 +1001,8 @@ class InstituteApiController extends Controller
             $announcement_list = announcements_model::where('institute_id', $institute_id)->get()->toarray();
             foreach ($announcement_list as $value) {
                 $announcement = [
-                    'announcement_title' => $value['title'],
-                    'announcement_message' => $value['detail']
+                    'title' => $value['title'],
+                    'message' => $value['detail']
                 ];
             }
 
