@@ -43,8 +43,6 @@ class VideoController extends Controller
         } elseif ($request->parent_category_id == '3') {
             $extensions = ['pdf'];
         }
-        print_r($request->parent_category_id);
-        exit;
 
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:5242880', function ($input) use ($request) {
             return $request->parent_category_id == '1' || $request->parent_category_id == '3';
@@ -64,7 +62,9 @@ class VideoController extends Controller
             if ($request->parent_category_id == '1') {
                 $path = $request->file('topic_video_pdf')->store('videos', 'public');
             } elseif ($request->parent_category_id == '3') {
-                $path = $request->file('topic_video_pdf')->store('pdfs', 'public');
+                if (implode(',', $extensions) == 'pdf') {
+                    $path = $request->file('topic_video_pdf')->store('pdfs', 'public');
+                }
             }
         }
 
