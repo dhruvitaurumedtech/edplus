@@ -145,7 +145,7 @@ class VideoController extends Controller
             // Check if validation fails
             if ($validator->fails()) {
                 return response()->json([
-                    'success' => false,
+                    'success' => 400,
                     'message' => 'Validation failed',
                     'errors' => $validator->errors(),
                 ], 400);
@@ -157,8 +157,8 @@ class VideoController extends Controller
                     ->count();
                 if ($existingRecordsCount >= 4) {
                     return response()->json([
-                        'success' => false,
-                        'message' => 'Four records with the same batch_id and subject_id already exist',
+                        'success' => 400,
+                        'message' => 'Four records with the same Batch and Subject already exist',
                     ], 400);
                 }
             }
