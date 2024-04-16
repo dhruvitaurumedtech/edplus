@@ -37,11 +37,11 @@ class VideoController extends Controller
         }
 
         // Determine file extension based on parent_category_id
-        $extension = $request->parent_category_id == '1' || $request->parent_category_id == '3' ? 'mp4,mov,avi' : 'pdf';
+        $extension = $request->parent_category_id == '1'  ? 'mp4,mov,avi' : 'pdf';
 
         // Validate the file based on its type
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
-            return $input->parent_category_id == '1' || $input->parent_category_id == '3';
+            return $input->parent_category_id == '1';
         });
 
         if ($validator->fails()) {
@@ -54,7 +54,7 @@ class VideoController extends Controller
 
         // Handle file upload
         if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
-            $path = $request->parent_category_id == '1' || $request->parent_category_id == '3' ?
+            $path = $request->parent_category_id == '1' ?
                 $request->file('topic_video_pdf')->store('videos', 'public') :
                 $request->file('topic_video_pdf')->store('pdfs', 'public');
         }
