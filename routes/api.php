@@ -102,3 +102,4 @@ Route::post('/institute/institute-profile', [InstituteApiController::class, 'ins
 Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
 Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
+Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);
