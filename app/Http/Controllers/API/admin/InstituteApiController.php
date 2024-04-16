@@ -2780,7 +2780,7 @@ class InstituteApiController extends Controller
                     ->where('institute_id', $request->institute_id)
                     ->where('board_id', $request->board_id)
                     ->where('standard_id', $request->standard_id)->get()->toarray();
-
+                $batch_response = [];
                 foreach ($batchlist as $value) {
                     $batch_response[] = [
                         'id' => $value['id'],
