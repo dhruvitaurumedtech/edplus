@@ -786,7 +786,7 @@ class StudentController extends Controller
 
                 $batch_list = Batches_model::where('institute_id', $institute_id)
                     ->where('user_id', $user_id)
-                    ->whereRaw("FIND_IN_SET($subject_id,subject_id)")
+                    ->whereRaw("FIND_IN_SET($subject_id,subjects)")
                     ->get();
 
                 echo "<pre>";
