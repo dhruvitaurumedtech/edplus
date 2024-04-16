@@ -36,12 +36,18 @@ class VideoController extends Controller
             ], 400);
         }
 
-        // Determine file extension based on parent_category_id
-        $extension = $request->parent_category_id == '1' ? 'mp4,mov,avi' : ($request->parent_category_id == '3' ? 'pdf' : '');
-
         // Validate the file based on its type
-        $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
-            return $input->parent_category_id == '1' || $input->parent_category_id == '3';
+        $extensions = [];
+        if ($request->parent_category_id == '1') {
+            $extensions = ['mp4', 'mov', 'avi'];
+        } elseif ($request->parent_category_id == '3') {
+            $extensions = ['pdf'];
+        }
+        echo $extensions;
+        exit;
+
+        $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:5242880', function ($input) use ($request) {
+            return $request->parent_category_id == '1' || $request->parent_category_id == '3';
         });
 
         if ($validator->fails()) {
@@ -54,10 +60,12 @@ class VideoController extends Controller
 
         // Handle file upload
         if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
-            $path = $request->parent_category_id == '1' ?
-                $request->file('topic_video_pdf')->store('videos', 'public') : ($request->parent_category_id == '3' ?
-                    $request->file('topic_video_pdf')->store('pdfs', 'public') :
-                    null);
+            $path = '';
+            if ($request->parent_category_id == '1') {
+                $path = $request->file('topic_video_pdf')->store('videos', 'public');
+            } elseif ($request->parent_category_id == '3') {
+                $path = $request->file('topic_video_pdf')->store('pdfs', 'public');
+            }
         }
 
         // Create topic record in the database
