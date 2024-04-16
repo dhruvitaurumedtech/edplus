@@ -163,19 +163,22 @@ class VideoController extends Controller
                 }
             }
             // video_assignbatch::whereIn('b')
-            $VideoAssignToBatch = VideoAssignToBatch::create([
-                'video_id' => $video_id,
-                'standard_id' => $standard_id,
-                'chapter_id' => $chapter_id,
-                'subject_id' => $subject_id
-            ]);
             foreach ($batch_ids as $value) {
-                $assign_video_sub = VideoAssignToBatch_Sub::create([
-                    'video_assign_id' => $VideoAssignToBatch->id,
+                $VideoAssignToBatch = VideoAssignToBatch::create([
+                    'video_id' => $video_id,
                     'batch_id' => $value,
-                    'subject_id' => $subject_id,
+                    'standard_id' => $standard_id,
+                    'chapter_id' => $chapter_id,
+                    'subject_id' => $subject_id
                 ]);
             }
+            // foreach ($batch_ids as $value) {
+            //     $assign_video_sub = VideoAssignToBatch_Sub::create([
+            //         'video_assign_id' => $VideoAssignToBatch->id,
+            //         'batch_id' => $value,
+            //         'subject_id' => $subject_id,
+            //     ]);
+            // }
 
             return response()->json([
                 'success' => 400,

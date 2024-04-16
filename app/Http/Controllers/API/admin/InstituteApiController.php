@@ -2756,7 +2756,6 @@ class InstituteApiController extends Controller
             'board_id' => 'required',
             'standard_id' => 'required',
         ]);
-
         if ($validator->fails()) {
             $errorMessages = array_values($validator->errors()->all());
             return response()->json([
@@ -2765,17 +2764,13 @@ class InstituteApiController extends Controller
                 'errors' => $errorMessages,
             ], 400);
         }
-
         $token = $request->header('Authorization');
-
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-
                 $batchlist = Batches_model::where('user_id', $request->user_id)
                     ->where('institute_id', $request->institute_id)
                     ->where('board_id', $request->board_id)
@@ -2787,7 +2782,6 @@ class InstituteApiController extends Controller
                         'batch_name' => $value['batch_name']
                     ];
                 }
-
                 return response()->json([
                     'status' => '200',
                     'message' => 'Batch Fetch Successfully',

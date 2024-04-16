@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('video_assignbatch', function (Blueprint $table) {
             $table->id();
-
             $table->unsignedBigInteger('video_id');
             $table->foreign('video_id')->references('id')->on('topic');
+            $table->unsignedBigInteger('batch_id');
+            $table->foreign('batch_id')->references('id')->on('batches');
             $table->unsignedBigInteger('standard_id');
             $table->foreign('standard_id')->references('id')->on('standard');
             $table->unsignedBigInteger('chapter_id');
