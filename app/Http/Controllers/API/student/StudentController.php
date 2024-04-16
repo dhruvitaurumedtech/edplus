@@ -822,10 +822,16 @@ class StudentController extends Controller
                     }
                     $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                 }
-                $response = [
-                    'batch_list' => $batch_response,
-                    'topics' => $category,
-                ];
+                if (!empty($chapter_id)) {
+                    $response = [
+                        'batch_list' => $batch_response,
+                        'topics' => $category,
+                    ];
+                } else {
+                    $response = [
+                        'topics' => $category,
+                    ];
+                }
 
                 return response()->json([
                     'status' => 200,
@@ -1095,15 +1101,15 @@ class StudentController extends Controller
                             ->where('exam.institute_id', $stdetail->institute_id)
                             ->orWhere('exam.stream_id', $stdetail->stream_id)
                             ->whereIN('exam.subject_id', $subjectIds)
-                            
-                            ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name','institute_detail.end_academic_year')
+
+                            ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
                             ->get();
 
                         foreach ($exams as $examsDT) {
                             $examlist[] = array(
-                                'institute_id'=>$examsDT->institute_id,
+                                'institute_id' => $examsDT->institute_id,
                                 'institute_name' => $examsDT->institute_name,
-                                'exam_id'=>$examsDT->id,
+                                'exam_id' => $examsDT->id,
                                 'exam_title' => $examsDT->exam_title,
                                 'total_mark' => $examsDT->total_mark,
                                 'exam_type' => $examsDT->exam_type,
@@ -1229,11 +1235,11 @@ class StudentController extends Controller
             $existingUser = User::where('token', $token)->where('id', $student_id)->first();
             if ($existingUser) {
 
-                $stdetails = Exam_Model::join('institute_detail','institute_detail.id','=','exam.institute_id')
-                ->where('exam.id', $exam_id)
-                ->where('institute_detail.end_academic_year', '>=', now())
-                ->first();
-                
+                $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+                    ->where('exam.id', $exam_id)
+                    ->where('institute_detail.end_academic_year', '>=', now())
+                    ->first();
+
                 $result = [];
                 if (!empty($stdetails)) {
 
