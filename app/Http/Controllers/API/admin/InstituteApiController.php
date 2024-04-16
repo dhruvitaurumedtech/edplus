@@ -32,6 +32,7 @@ use App\Models\Batches_model;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use App\Models\VideoCategory;
+use Carbon\Carbon;
 use PDO;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
@@ -998,9 +999,20 @@ class InstituteApiController extends Controller
 
             //announcement
             $announcement = [];
+            $fifteenDaysAgo = Carbon::now()->subDays(15);
+
+            $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
+            foreach ($announcement_list as $value) {
+                $announcement = [
+                    'title' => $value['title'],
+                    'message' => $value['detail']
+                ];
+            }
+
             $response = [
                 'banner' => $banner_array,
                 'board' => $board_array,
+                'announcement' => $announcement
             ];
             return response()->json([
                 'success' => 200,
@@ -2744,7 +2756,6 @@ class InstituteApiController extends Controller
             'board_id' => 'required',
             'standard_id' => 'required',
         ]);
-
         if ($validator->fails()) {
             $errorMessages = array_values($validator->errors()->all());
             return response()->json([
@@ -2753,29 +2764,24 @@ class InstituteApiController extends Controller
                 'errors' => $errorMessages,
             ], 400);
         }
-
         $token = $request->header('Authorization');
-
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-
                 $batchlist = Batches_model::where('user_id', $request->user_id)
                     ->where('institute_id', $request->institute_id)
                     ->where('board_id', $request->board_id)
                     ->where('standard_id', $request->standard_id)->get()->toarray();
-
+                $batch_response = [];
                 foreach ($batchlist as $value) {
                     $batch_response[] = [
                         'id' => $value['id'],
                         'batch_name' => $value['batch_name']
                     ];
                 }
-
                 return response()->json([
                     'status' => '200',
                     'message' => 'Batch Fetch Successfully',
