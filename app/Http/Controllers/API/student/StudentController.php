@@ -803,7 +803,7 @@ class StudentController extends Controller
                     ->where('student_id', $user_id)->first();
                     $std_batchidd = $batchID->batch_id;
 
-                    $vidasbt = VideoAssignToBatch::where('batch_id',$std_batchidd)->select('video_id')->pluck()->array();
+                    $vidasbt = VideoAssignToBatch::where('batch_id',$std_batchidd)->select('video_id')->pluck('video_id')->toArray();
                     $std_batchid = $vidasbt->video_id;
 
                 }
