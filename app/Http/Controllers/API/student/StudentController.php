@@ -1087,6 +1087,7 @@ class StudentController extends Controller
                         $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                             ->join('standard', 'standard.id', '=', 'exam.standard_id')
                             ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+                            ->where('institute_detail.end_academic_year', '>=', now())
                             ->where('exam.board_id', $stdetail->board_id)
                             ->where('exam.medium_id', $stdetail->medium_id)
                             //->where('exam.class_id', $stdetail->class_id)
@@ -1094,7 +1095,7 @@ class StudentController extends Controller
                             ->where('exam.institute_id', $stdetail->institute_id)
                             ->orWhere('exam.stream_id', $stdetail->stream_id)
                             ->whereIN('exam.subject_id', $subjectIds)
-                            ->where('institute_detail.end_academic_year', '>=', now())
+                            
                             ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name','institute_detail.end_academic_year')
                             ->get();
 
@@ -1250,7 +1251,7 @@ class StudentController extends Controller
                         $result[] = array(
                             'subject' => $resulttQY->subjectname,
                             'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
-                            'total_marks' => $resulttQY->total_marks,
+                            'total_marks' => $resulttQY->total_mark,
                             'achiveddmarks_marks' => $resulttQY->mark,
                             'date' => $resulttQY->exam_date,
                             'class_highest' => $highestMarks
