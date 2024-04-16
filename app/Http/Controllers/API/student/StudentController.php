@@ -813,11 +813,11 @@ class StudentController extends Controller
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
                         ->where('topic.subject_id', $subject_id)
                         //->where('topic.chapter_id', $chapter_id)
-                        ->when($chapter_id, function ($query, $chapter_id) {
-                            return $query->where('topic.chapter_id', $chapter_id);
+                        ->when($chapter_id, function ($topicqry, $chapter_id) {
+                            return $topicqry->where('topic.chapter_id', $chapter_id);
                         })
-                        ->when($std_batchid, function ($query, $std_batchid) {
-                            return $query->whereIN('topic.id', $std_batchid);
+                        ->when($std_batchid, function ($topicqry, $std_batchid) {
+                            return $topicqry->whereIN('topic.id', $std_batchid);
                         })
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->vid)
