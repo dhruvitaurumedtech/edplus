@@ -2519,15 +2519,6 @@ class InstituteApiController extends Controller
             'email'=>'required',
             'address'=>'required',
             'contact_no'=>'required',
-            'open_time'=>'required',
-            'close_time'=>'required',
-            'gst_number'=>'required',
-            'gst_slab'=>'required',
-            'website_link'=>'required',
-            'instagram_link'=>'required',
-            'facebook_link'=>'required',
-            'whatsaap_link'=>'required',
-            'youtube_link'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -2557,7 +2548,10 @@ class InstituteApiController extends Controller
                     $institutedt->contact_no = $request->contact_no;
                     $institutedt->email = $request->email;
                     $institutedt->about_us = $request->about_us;
-                    $institutedt->logo = $request->logo;
+                    //$institutedt->about_us = $request->country;
+                    //$institutedt->state = $request->state;
+                    //$institutedt->city = $request->city;
+                    //$institutedt->pincode = $request->pincode;                 
                     $institutedt->open_time = $request->open_time;
                     $institutedt->close_time = $request->close_time;
                     $institutedt->gst_number = $request->gst_number;
@@ -2569,8 +2563,19 @@ class InstituteApiController extends Controller
                     $institutedt->youtube_link = $request->youtube_link;
                     $institutedt->start_academic_year = $request->start_academic_year;
                     $institutedt->end_academic_year = $request->end_academic_year;
-                    $institutedt->save();
+                    
+                    $imagePath = null;
+                    if ($request->hasFile('logo')) {
+                        $logo_image = $request->file('logo');
+                        $imagePath = $logo_image->store('logo', 'public');
+                    }
 
+                    if ($imagePath !== null) {
+                        $institutedt->logo = $imagePath;
+                    }
+
+                    $institutedt->save();
+                
                     return response()->json([
                         'status' => 400,
                         'message' => 'Record Update Successfully!.',
