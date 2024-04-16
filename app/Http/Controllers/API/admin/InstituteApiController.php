@@ -1075,7 +1075,6 @@ class InstituteApiController extends Controller
                 //batch list
                 $batchqY = Batches_model::join('board','board.id','=','batches.board_id')
                 ->join('medium','medium.id','=','batches.medium_id')
-                ->join('medium','medium.id','=','batches.medium_id')
                 ->leftjoin('stream','stream.id','=','batches.stream_id')
                 ->where('batches.institute_id', $institute_id)
                 ->where('batches.standard', $standard_value->id)
