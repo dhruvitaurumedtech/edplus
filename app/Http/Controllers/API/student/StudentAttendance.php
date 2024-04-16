@@ -50,7 +50,8 @@ class StudentAttendance extends Controller
                        $attenlist[]=array('id'=>$stdetail->id,
                        'subject_id'=>$stdetail->subject_id,
                        'subject_name'=>$stdetail->name,
-                       'attendance'=>$stdetail->attendance,);
+                       'attendance'=>$stdetail->attendance,
+                        'date'=>$stdetail->date,);
                     }
                 }
 
