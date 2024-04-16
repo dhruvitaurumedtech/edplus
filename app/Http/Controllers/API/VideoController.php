@@ -150,7 +150,18 @@ class VideoController extends Controller
                     'errors' => $validator->errors(),
                 ], 400);
             }
-
+            $batch_ids = explode(",", $batch_id);
+            foreach ($batch_ids as $batch_id_value) {
+                $existingRecordsCount = VideoAssignToBatch_Sub::where('batch_id', $batch_id_value)
+                    ->where('subject_id', $subject_id)
+                    ->count();
+                if ($existingRecordsCount >= 4) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Four records with the same batch_id and subject_id already exist',
+                    ], 400);
+                }
+            }
             // video_assignbatch::whereIn('b')
             $VideoAssignToBatch = VideoAssignToBatch::create([
                 'video_id' => $video_id,
@@ -158,7 +169,6 @@ class VideoController extends Controller
                 'chapter_id' => $chapter_id,
                 'subject_id' => $subject_id
             ]);
-            $batch_ids = explode(",", $batch_id);
             foreach ($batch_ids as $value) {
                 $assign_video_sub = VideoAssignToBatch_Sub::create([
                     'video_assign_id' => $VideoAssignToBatch->id,
