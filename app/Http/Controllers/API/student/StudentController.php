@@ -10,6 +10,7 @@ use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
 use App\Models\announcements_model;
 use App\Models\Attendance_model;
+use App\Models\Batches_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
@@ -133,17 +134,17 @@ class StudentController extends Controller
                 }
 
                 //join with
-                
+
                 $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($user_id) {
-                    $query->select('institute_id')
-                        ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
-                        ->from('students_details')
-                        ->whereNull('deleted_at');
-                })
-                ->where('end_academic_year', '>=', now())
-               ->paginate($perPage); // ->where('end_academic_year', '>=', now())
+                    ->whereIn('id', function ($query) use ($user_id) {
+                        $query->select('institute_id')
+                            ->where('student_id', $user_id)
+                            ->where('status', '=', '1')
+                            ->from('students_details')
+                            ->whereNull('deleted_at');
+                    })
+                    ->where('end_academic_year', '>=', now())
+                    ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                 $join_with = [];
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
@@ -783,7 +784,18 @@ class StudentController extends Controller
                     })
                     ->get();
 
-                //  echo "<pre>";print_r($catgry);exit;
+                $batch_list = Batches_model::where('institute_id', $institute_id)
+                    ->where('user_id', $user_id)
+                    ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                    ->select('*')
+                    ->get();
+                $batch_response = [];
+                foreach ($batch_list as $value) {
+                    $batch_response[] = [
+                        'batch_id' => $value->id,
+                        'batch_name' => $value->batch_name,
+                    ];
+                }
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -810,11 +822,15 @@ class StudentController extends Controller
                     }
                     $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                 }
+                $response = [
+                    'batch_list' => $batch_response,
+                    'topics' => $category,
+                ];
 
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
-                    'data' => $category,
+                    'data' => $response,
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([

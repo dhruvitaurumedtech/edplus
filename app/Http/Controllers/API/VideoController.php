@@ -121,6 +121,10 @@ class VideoController extends Controller
         $batch_id = $request->batch_id;
         $video_id = $request->video_id;
         $user_id = $request->user_id;
+        $standard_id = $request->standard_id;
+        $chapter_id = $request->chapter_id;
+        $subject_id = $request->subject_id;
+
         $token = $request->header('Authorization');
 
         if (strpos($token, 'Bearer ') === 0) {
@@ -156,7 +160,7 @@ class VideoController extends Controller
                 ], 400);
             }
 
-
+            // video_assignbatch::whereIn('b')
             $data = VideoAssignToBatch::create([
                 'batch_id' => $batch_id,
                 'video_id' => $video_id,
