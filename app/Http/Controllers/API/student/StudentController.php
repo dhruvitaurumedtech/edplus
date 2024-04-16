@@ -10,6 +10,7 @@ use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
 use App\Models\announcements_model;
 use App\Models\Attendance_model;
+use App\Models\Batches_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
 use App\Models\Dobusinesswith_Model;
@@ -133,16 +134,16 @@ class StudentController extends Controller
                 }
 
                 //join with
-                
+
                 $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($user_id) {
-                    $query->select('institute_id')
-                        ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
-                        ->from('students_details')
-                        ->whereNull('deleted_at');
-                })
-               ->paginate($perPage); // ->where('end_academic_year', '>=', now())
+                    ->whereIn('id', function ($query) use ($user_id) {
+                        $query->select('institute_id')
+                            ->where('student_id', $user_id)
+                            ->where('status', '=', '1')
+                            ->from('students_details')
+                            ->whereNull('deleted_at');
+                    })
+                    ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                 $join_with = [];
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
@@ -782,7 +783,19 @@ class StudentController extends Controller
                     })
                     ->get();
 
-                //  echo "<pre>";print_r($catgry);exit;
+                $batch_list = Batches_model::where('institute_id', $institute_id)
+                    ->where('chapter_id', $chapter_id)
+                    ->where('user_id', $user_id)
+                    ->whereIn('subjects', function ($query) {
+                        $query->select('subjects')
+                            ->from('subjects')
+                            ->groupBy('subjects');
+                    })
+                    ->get();
+
+                echo "<pre>";
+                print_r($batch_list);
+                exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
