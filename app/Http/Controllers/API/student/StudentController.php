@@ -30,6 +30,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\VideoCategory;
 use App\Models\Medium_model;
+use App\Models\VideoAssignToBatch;
 use Illuminate\Auth\Events\Verified;
 
 
@@ -796,11 +797,16 @@ class StudentController extends Controller
                         'batch_name' => $value->batch_name,
                     ];
                 }
+                $std_batchid = '';
+                if($existingUser->role_type == 6){
+                    $batchID = Student_detail::where('institute_id', $institute_id)
+                    ->where('student_id', $user_id)->first();
+                    $std_batchidd = $batchID->batch_id;
 
-                // if($existingUser->role_type == 6){
-                //     $batchID = Student_detail::where('institute_id', $institute_id)
-                //     ->where('student_id', $user_id)->first();
-                // }
+                    $vidasbt = VideoAssignToBatch::where('batch_id',$std_batchidd)->select('video_id')->pluck()->array();
+                    $std_batchid = $vidasbt->video_id;
+
+                }
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -809,6 +815,9 @@ class StudentController extends Controller
                         //->where('topic.chapter_id', $chapter_id)
                         ->when($chapter_id, function ($query, $chapter_id) {
                             return $query->where('topic.chapter_id', $chapter_id);
+                        })
+                        ->when($std_batchid, function ($query, $std_batchid) {
+                            return $query->whereIN('topic.id', $std_batchid);
                         })
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->vid)
