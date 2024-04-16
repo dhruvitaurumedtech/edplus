@@ -2518,6 +2518,7 @@ class InstituteApiController extends Controller
             'institute_name'=>'required',
             'email'=>'required',
             'address'=>'required',
+            'contact_no'=>'required',
             'open_time'=>'required',
             'close_time'=>'required',
             'gst_number'=>'required',
@@ -2551,11 +2552,35 @@ class InstituteApiController extends Controller
                 $institute_id = $request->institute_id;
                 $institutedt = Institute_detail::find($institute_id);
                 if ($institutedt) {
-                    
+                    $institutedt->institute_name = $request->institute_name;
+                    $institutedt->address = $request->address;
+                    $institutedt->contact_no = $request->contact_no;
+                    $institutedt->email = $request->email;
+                    $institutedt->about_us = $request->about_us;
+                    $institutedt->logo = $request->logo;
+                    $institutedt->open_time = $request->open_time;
+                    $institutedt->close_time = $request->close_time;
+                    $institutedt->gst_number = $request->gst_number;
+                    $institutedt->gst_slab = $request->gst_slab;
+                    $institutedt->website_link = $request->website_link;
+                    $institutedt->instagram_link = $request->instagram_link;
+                    $institutedt->facebook_link = $request->facebook_link;
+                    $institutedt->whatsaap_link = $request->whatsaap_link;
+                    $institutedt->youtube_link = $request->youtube_link;
+                    $institutedt->start_academic_year = $request->start_academic_year;
+                    $institutedt->end_academic_year = $request->end_academic_year;
+                    $institutedt->save();
+
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Record Update Successfully!.',
+                        'data'=>[]
+                    ]);
                 }else{
                     return response()->json([
                         'status' => 400,
                         'message' => 'Record not found.',
+                        'data'=>[]
                     ]);
                 }
             } catch (\Exception $e) {
