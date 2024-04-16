@@ -127,17 +127,22 @@ class VideoController extends Controller
             $token = substr($token, 7);
         }
 
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $validator = \Validator::make($request->all(), [
                 'batch_id' => 'required|exists:batches,id',
                 'video_id' => [
                     'required',
                     'exists:topic,id',
-                    Rule::unique('video_assign_to_batches')->where(function ($query) use ($request) {
-                        return $query->where('batch_id', $request->batch_id)
-                            ->where('video_id', $request->video_id);
-                    }),
+                    function ($attribute, $value, $fail) use ($request) {
+                        $existingRecord = VideoAssignToBatch::where('batch_id', $request->batch_id)
+                            ->where('video_id', $value)
+                            ->exists();
+
+                        if ($existingRecord) {
+                            $fail('The combination of batch_id and video_id already exists.');
+                        }
+                    },
                 ],
                 'user_id'  => 'required',
             ]);
