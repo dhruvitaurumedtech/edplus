@@ -1071,10 +1071,38 @@ class InstituteApiController extends Controller
                         'subject_value' => $subject_value->name,
                     ];
                 }
+
+                //batch list
+                $batchqY = Batches_model::join('board','board.id','=','batches.board_id')
+                ->join('medium','medium.id','=','batches.medium_id')
+                ->join('medium','medium.id','=','batches.medium_id')
+                ->leftjoin('stream','stream.id','=','batches.stream_id')
+                ->where('batches.institute_id', $institute_id)
+                ->where('batches.standard', $standard_value->id)
+                ->where('batches.user_id', $user_id)
+                ->select('board.name as board','medium.name as medium','stream.name as stream')->get();
+                $batchesDT = [];  
+                foreach($batchqY as $batDT){
+                    $subids = explode(",",$batDT->subjects);
+                    $batSubQY = Subject_model::whereIN('id',$subids)->get();
+                    $subects = [];
+                    foreach($batSubQY as $batDt){
+                        $subects[] = array('id'=>$batDt->id,'subject_name'=>$batDt->name);
+                    }
+
+                    $batchesDT[] = array('id'=>$batDT->id,
+                                'batch_name'=>$batDT->batch_name,
+                                'board'=>$batDT->board,
+                                'medium'=>$batDT->medium,
+                                'stream'=>$batDT->stream,
+                                'subjects'=>$subects);
+                }
+
                 $standard_array[] = [
                     'id' => $standard_value->id,
                     'standard_name' => $standard_value->name,
                     'subject' => $subject_array,
+                    'batches'=>$batchesDT
                     // Include banner_array inside board_array
                 ];
             }
