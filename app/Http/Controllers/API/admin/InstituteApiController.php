@@ -2496,7 +2496,6 @@ class InstituteApiController extends Controller
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => $value['logo']
 
-
                 ];
             }
             return response()->json([
@@ -2511,7 +2510,68 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+//institute profile edit
+    public function institute_profile_edit(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'institute_name'=>'required',
+            'email'=>'required',
+            'address'=>'required',
+            'open_time'=>'required',
+            'close_time'=>'required',
+            'gst_number'=>'required',
+            'gst_slab'=>'required',
+            'website_link'=>'required',
+            'instagram_link'=>'required',
+            'facebook_link'=>'required',
+            'whatsaap_link'=>'required',
+            'youtube_link'=>'required',
+        ]);
 
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+                $user_id = $request->user_id;
+                $institute_id = $request->institute_id;
+                $institutedt = Institute_detail::find($institute_id);
+                if ($institutedt) {
+                    
+                }else{
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Record not found.',
+                    ]);
+                }
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
     //category list for add do business with 
     public function category_list(Request $request)
     {
@@ -2688,7 +2748,5 @@ class InstituteApiController extends Controller
             ]);
         }
     }
-    public function change_profile()
-    {
-    }
+    
 }

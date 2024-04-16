@@ -155,7 +155,7 @@ class BannerApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
-            'banner_image' => 'required',
+            //'banner_image' => 'required',
             'id' => 'required'
         ]);
 
