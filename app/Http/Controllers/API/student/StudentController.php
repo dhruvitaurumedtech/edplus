@@ -797,6 +797,11 @@ class StudentController extends Controller
                     ];
                 }
 
+                // if($existingUser->role_type == 6){
+                //     $batchID = Student_detail::where('institute_id', $institute_id)
+                //     ->where('student_id', $user_id)->first();
+                // }
+
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
