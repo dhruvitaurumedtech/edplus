@@ -158,7 +158,7 @@ class VideoController extends Controller
                 if ($record) {
                     return response()->json([
                         'success' => 400,
-                        'message' => 'Already Assign Video This Batch',
+                        'message' => 'Already Assign Video This Batch!',
                     ], 400);
                 }
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
