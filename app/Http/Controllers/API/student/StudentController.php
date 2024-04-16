@@ -787,11 +787,7 @@ class StudentController extends Controller
                 $batch_list = Batches_model::where('institute_id', $institute_id)
                     ->where('chapter_id', $chapter_id)
                     ->where('user_id', $user_id)
-                    ->whereIn('subjects', function ($query) {
-                        $query->select('subjects')
-                            ->from('batches')
-                            ->groupBy('subjects');
-                    })
+                    ->whereRaw("FIND_IN_SET($subject_id,subject_id)")
                     ->get();
 
                 echo "<pre>";
