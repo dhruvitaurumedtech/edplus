@@ -99,7 +99,7 @@ Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 Route::post('/institute/student_list', [StudentController::class, 'student_list']);
 Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
-Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'change_profile']);
+Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
 Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
 Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);

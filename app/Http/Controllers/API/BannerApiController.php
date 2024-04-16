@@ -155,7 +155,7 @@ class BannerApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
-            'banner_image' => 'required',
+            //'banner_image' => 'required',
             'id' => 'required'
         ]);
 
@@ -181,27 +181,30 @@ class BannerApiController extends Controller
                 $institute_id = $request->institute_id;
                 $url = $request->url;
                 $id = $request->id;
+
+                $imagePath = null;
                 if ($request->hasFile('banner_image')) {
                     $banner_image = $request->file('banner_image');
                     $imagePath = $banner_image->store('banner_image', 'public');
                 }
+                    $updateData = ['url' => $url];
+                    if ($imagePath !== null) {
+                        $updateData['banner_image'] = $imagePath;
+                    }
 
-                $bannerad = Banner_model::where('id', $id)
-                    ->update([
-                        'banner_image' => $imagePath,
-                        'url' => $url
-                    ]);
+                    $bannerad = Banner_model::where('id', $id)
+                        ->update($updateData);
 
                 if ($bannerad) {
                     return response()->json([
                         'success' => 200,
-                        'message' => 'Status Update Successfully',
+                        'message' => 'Update Successfully',
                         'data' => []
                     ], 200);
                 } else {
                     return response()->json([
                         'success' => 500,
-                        'message' => 'Status Not Update Successfully',
+                        'message' => 'Not Update Successfully',
                         'data' => []
                     ], 200);
                 }
