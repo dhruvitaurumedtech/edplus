@@ -37,7 +37,7 @@ class VideoController extends Controller
         }
 
         // Determine file extension based on parent_category_id
-        $extension = $request->parent_category_id == '1' || $request->parent_category_id == '3' ? 'mp4,mov,avi' : 'pdf';
+        $extension = $request->parent_category_id == '1' && $request->parent_category_id == '3' || $request->parent_category_id == '2' ? 'mp4,mov,avi' : 'pdf';
 
         // Validate the file based on its type
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
