@@ -789,7 +789,7 @@ class StudentController extends Controller
                     ->where('user_id', $user_id)
                     ->whereIn('subjects', function ($query) {
                         $query->select('subjects')
-                            ->from('subjects')
+                            ->from('batches')
                             ->groupBy('subjects');
                     })
                     ->get();
