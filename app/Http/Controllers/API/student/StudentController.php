@@ -1095,7 +1095,7 @@ class StudentController extends Controller
                             ->orWhere('exam.stream_id', $stdetail->stream_id)
                             ->whereIN('exam.subject_id', $subjectIds)
                             ->where('institute_detail.end_academic_year', '>=', now())
-                            ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name')
+                            ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name','institute_detail.end_academic_year')
                             ->get();
 
                         foreach ($exams as $examsDT) {
