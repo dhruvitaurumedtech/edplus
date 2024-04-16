@@ -57,7 +57,7 @@ class VideoController extends Controller
         ]);
 
         // Check if parent_category_id indicates video or PDF upload
-        $isVideo = $request->parent_category_id == '1' || $request->parent_category_id == '2';
+        $isVideo = $request->parent_category_id == '1' || $request->parent_category_id == '3';
 
 
         if ($validator->fails()) {
