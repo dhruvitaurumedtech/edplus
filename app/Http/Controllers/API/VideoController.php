@@ -152,7 +152,7 @@ class VideoController extends Controller
             }
             $batch_ids = explode(",", $batch_id);
             foreach ($batch_ids as $batch_id_value) {
-                $existingRecordsCount = VideoAssignToBatch_Sub::where('batch_id', $batch_id_value)
+                $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
                     ->count();
                 if ($existingRecordsCount >= 4) {
