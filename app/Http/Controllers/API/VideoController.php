@@ -139,19 +139,6 @@ class VideoController extends Controller
                 'standard_id' => 'required',
                 'chapter_id' => 'required',
                 'subject_id' => 'required',
-                'video_id' => [
-                    'required',
-                    'exists:topic,id',
-                    function ($attribute, $value, $fail) use ($request) {
-                        $existingRecord = VideoAssignToBatch::where('batch_id', $request->batch_id)
-                            ->where('video_id', $value)
-                            ->exists();
-
-                        if ($existingRecord) {
-                            $fail('The combination of batch_id and video_id already exists.');
-                        }
-                    },
-                ],
                 'user_id'  => 'required',
             ]);
 
