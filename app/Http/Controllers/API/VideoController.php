@@ -9,6 +9,7 @@ use App\Models\Topic_model;
 use App\Models\User;
 use App\Models\VideoAssignToBatch;
 use App\Models\VideoCategory;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 
 class VideoController extends Controller
@@ -130,7 +131,14 @@ class VideoController extends Controller
         if ($existingUser) {
             $validator = \Validator::make($request->all(), [
                 'batch_id' => 'required|exists:batches,id',
-                'video_id' => 'required|exists:topic,id',
+                'video_id' => [
+                    'required',
+                    'exists:topic,id',
+                    Rule::unique('video_assign_to_batches')->where(function ($query) use ($request) {
+                        return $query->where('batch_id', $request->batch_id)
+                            ->where('video_id', $request->video_id);
+                    }),
+                ],
                 'user_id'  => 'required',
             ]);
 
