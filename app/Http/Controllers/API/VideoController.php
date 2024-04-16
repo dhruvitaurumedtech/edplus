@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Dobusinesswith_sub;
 use App\Models\Topic_model;
+use App\Models\User;
+use App\Models\VideoAssignToBatch;
 use App\Models\VideoCategory;
 use Illuminate\Http\Request;
 
@@ -112,5 +114,50 @@ class VideoController extends Controller
             );
         }
         return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
+    }
+    public function videoassign(Request $request)
+    {
+        $batch_id = $request->batch_id;
+        $video_id = $request->video_id;
+        $user_id = $request->user_id;
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            $validator = \Validator::make($request->all(), [
+                'batch_id' => 'required|exists:batches,id',
+                'video_id' => 'required|exists:topic,id',
+                'user_id'  => 'required',
+            ]);
+
+            // Check if validation fails
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Validation failed',
+                    'errors' => $validator->errors(),
+                ], 400);
+            }
+
+
+            $data = VideoAssignToBatch::create([
+                'batch_id' => $batch_id,
+                'video_id' => $video_id,
+            ]);
+            return response()->json([
+                'success' => 400,
+                'message' => 'Video Assign Batch Successfully',
+                'topic' => $data
+            ], 400);
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
     }
 }
