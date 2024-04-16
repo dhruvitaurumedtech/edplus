@@ -789,7 +789,7 @@ class StudentController extends Controller
                     ->whereRaw("FIND_IN_SET($subject_id,subjects)")
                     ->select('*')
                     ->get();
-                $$batch_response = [];
+                $batch_response = [];
                 foreach ($batch_list as $value) {
                     $batch_response[] = [
                         'batch_id' => $value->id,
