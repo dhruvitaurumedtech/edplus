@@ -44,9 +44,21 @@ class VideoController extends Controller
             ], 400);
         }
 
-        $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
-            return $input->parent_category_id == '1' || $input->parent_category_id == '2';
-        });
+        // $validator->sometimes('topic_video_pdf', 'required|mimes:' . $extension . '|max:5242880', function ($input) {
+        //     return $input->parent_category_id == '1' || $input->parent_category_id == '2';
+        // });
+        $videoValidator = \Validator::make($request->all(), [
+            'topic_video_pdf' => 'sometimes|required|mimes:mp4,mov,avi|max:5242880',
+        ]);
+
+        // Validation rules for PDF files
+        $pdfValidator = \Validator::make($request->all(), [
+            'topic_video_pdf' => 'sometimes|required|mimes:pdf|max:5242880',
+        ]);
+
+        // Check if parent_category_id indicates video or PDF upload
+        $isVideo = $request->parent_category_id == '1' || $request->parent_category_id == '2';
+
 
         if ($validator->fails()) {
             return response()->json([
@@ -58,6 +70,8 @@ class VideoController extends Controller
 
         if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
             $videoPath = $request->file('topic_video_pdf')->store('videos', 'public');
+        } elseif (!$isVideo && $request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
+            $pdfPath = $request->file('topic_video_pdf')->store('pdfs', 'public');
         }
 
         $topic = Topic_model::create([
