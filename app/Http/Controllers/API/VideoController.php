@@ -158,7 +158,7 @@ class VideoController extends Controller
 
 
             $data = VideoAssignToBatch::create([
-                'batch_id' => implode(',', $batch_id),
+                'batch_id' => $batch_id,
                 'video_id' => $video_id,
             ]);
             return response()->json([
