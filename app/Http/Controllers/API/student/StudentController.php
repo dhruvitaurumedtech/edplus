@@ -1251,7 +1251,7 @@ class StudentController extends Controller
                         $result[] = array(
                             'subject' => $resulttQY->subjectname,
                             'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
-                            'total_marks' => $resulttQY->total_marks,
+                            'total_marks' => $resulttQY->total_mark,
                             'achiveddmarks_marks' => $resulttQY->mark,
                             'date' => $resulttQY->exam_date,
                             'class_highest' => $highestMarks
