@@ -804,7 +804,7 @@ class StudentController extends Controller
                     $std_batchidd = $batchID->batch_id;
 
                     $vidasbt = VideoAssignToBatch::where('batch_id',$std_batchidd)->select('video_id')->pluck('video_id')->toArray();
-                    $std_batchid = $vidasbt->video_id;
+                    $std_batchid = $vidasbt;
 
                 }
 
