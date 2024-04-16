@@ -11,26 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('video_assignbatch', function (Blueprint $table) {
+        Schema::create('video_assign_to_batch_sub', function (Blueprint $table) {
             $table->id();
-
-            $table->unsignedBigInteger('video_id');
-            $table->foreign('video_id')->references('id')->on('topic');
-            $table->unsignedBigInteger('standard_id');
-            $table->foreign('standard_id')->references('id')->on('standard');
-            $table->unsignedBigInteger('chapter_id');
-            $table->foreign('chapter_id')->references('id')->on('chapters');
+            $table->unsignedBigInteger('video_assign_id');
+            $table->foreign('video_assign_id')->references('id')->on('video_assignbatch');
+            $table->unsignedBigInteger('batch_id');
+            $table->foreign('batch_id')->references('id')->on('batches');
             $table->unsignedBigInteger('subject_id');
             $table->foreign('subject_id')->references('id')->on('subject');
             $table->timestamps();
             $table->softDeletes();
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('video_assignbatch');
+        Schema::dropIfExists('video_assign_to_batch_sub');
     }
 };

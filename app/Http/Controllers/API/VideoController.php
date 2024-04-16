@@ -8,6 +8,7 @@ use App\Models\Dobusinesswith_sub;
 use App\Models\Topic_model;
 use App\Models\User;
 use App\Models\VideoAssignToBatch;
+use App\Models\VideoAssignToBatch_Sub;
 use App\Models\VideoCategory;
 use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
@@ -135,6 +136,9 @@ class VideoController extends Controller
         if ($existingUser) {
             $validator = \Validator::make($request->all(), [
                 'batch_id' => 'required|exists:batches,id',
+                'standard_id' => 'required',
+                'chapter_id' => 'required',
+                'subject_id' => 'required',
                 'video_id' => [
                     'required',
                     'exists:topic,id',
@@ -161,14 +165,24 @@ class VideoController extends Controller
             }
 
             // video_assignbatch::whereIn('b')
-            $data = VideoAssignToBatch::create([
-                'batch_id' => $batch_id,
+            $VideoAssignToBatch = VideoAssignToBatch::create([
                 'video_id' => $video_id,
+                'standard_id' => $standard_id,
+                'chapter_id' => $chapter_id,
+                'subject_id' => $subject_id
             ]);
+            $batch_ids = explode(",", $batch_id);
+            foreach ($batch_ids as $value) {
+                $assign_video_sub = VideoAssignToBatch_Sub::create([
+                    'video_assign_id' => $VideoAssignToBatch->id,
+                    'batch_id' => $value,
+                    'subject_id' => $subject_id,
+                ]);
+            }
+
             return response()->json([
                 'success' => 400,
                 'message' => 'Video Assign Batch Successfully',
-                'topic' => $data
             ], 400);
         } else {
             return response()->json([
