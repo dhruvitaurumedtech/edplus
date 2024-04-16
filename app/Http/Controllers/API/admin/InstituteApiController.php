@@ -1077,9 +1077,9 @@ class InstituteApiController extends Controller
                 ->join('medium','medium.id','=','batches.medium_id')
                 ->leftjoin('stream','stream.id','=','batches.stream_id')
                 ->where('batches.institute_id', $institute_id)
-                ->where('batches.standard', $standard_value->id)
+                ->where('batches.standard_id', $standard_value->id)
                 ->where('batches.user_id', $user_id)
-                ->select('board.name as board','medium.name as medium','stream.name as stream')->get();
+                ->select('batches.*','board.name as board','medium.name as medium','stream.name as stream')->get();
                 $batchesDT = [];  
                 foreach($batchqY as $batDT){
                     $subids = explode(",",$batDT->subjects);
