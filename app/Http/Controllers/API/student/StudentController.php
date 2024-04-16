@@ -142,6 +142,7 @@ class StudentController extends Controller
                         ->from('students_details')
                         ->whereNull('deleted_at');
                 })
+                ->where('end_academic_year', '>=', now())
                ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                 $join_with = [];
                 foreach ($joininstitute as $value) {
