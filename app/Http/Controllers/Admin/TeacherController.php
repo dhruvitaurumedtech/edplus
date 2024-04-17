@@ -3,6 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner_model;
+use App\Models\Base_table;
+use App\Models\Institute_detail;
+use App\Models\Search_history;
+use App\Models\Subject_model;
+use App\Models\Teacher_model;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -19,7 +25,7 @@ class TeacherController extends Controller
         }
 
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
+            'teacher_id' => 'required|integer',
             'per_page' => 'required|integer',
         ]);
 
@@ -34,13 +40,11 @@ class TeacherController extends Controller
 
         try {
 
-            $user_id = $request->user_id;
+            $teacher_id = $request->teacher_id;
             $search_keyword = $request->search;
             $perPage = $request->input('per_page', 10);
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
-
-                //banner
 
                 $banners = Banner_model::where('status', 'active')
                     ->whereIn('user_id', explode(',', '1'))
@@ -61,6 +65,9 @@ class TeacherController extends Controller
                         $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                             ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
                     })->paginate($perPage);
+                // echo "<pre>";
+                // print_r($allinstitute);
+                // exit;
 
                 $search_list = [];
                 foreach ($allinstitute as $value) {
@@ -73,7 +80,7 @@ class TeacherController extends Controller
                 }
 
                 //student search history
-                $searchhistory = Search_history::where('user_id', $user_id)->paginate($perPage);
+                $searchhistory = Search_history::where('user_id', $teacher_id)->paginate($perPage);
                 $searchhistory_list = [];
                 foreach ($searchhistory as $value) {
                     // Check if the title already exists in the $searchhistory_list array
@@ -90,9 +97,10 @@ class TeacherController extends Controller
                 }
 
                 //requested institute
-                $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
-                    ->where('students_details.student_id', $user_id)
-                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')->paginate($perPage);
+                $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
+                    ->where('teacher_detail.status', '!=', '1')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')->paginate($perPage);
 
                 $requested_institute = [];
                 foreach ($requestnstitute as $value) {
@@ -107,16 +115,20 @@ class TeacherController extends Controller
 
                 //join with
 
-                $joininstitute = Institute_detail::where('status', 'active')
-                    ->whereIn('id', function ($query) use ($user_id) {
-                        $query->select('institute_id')
-                            ->where('student_id', $user_id)
-                            ->where('status', '=', '1')
-                            ->from('students_details')
-                            ->whereNull('deleted_at');
-                    })
-                    ->where('end_academic_year', '>=', now())
-                    ->paginate($perPage); // ->where('end_academic_year', '>=', now())
+                $joininstitute = Institute_detail::where('institute_detail.status', 'active')
+                    ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->where('teacher_detail.status', '1')
+                    ->whereNull('teacher_detail.deleted_at')
+                    ->where('institute_detail.end_academic_year', '>=', now())
+                    ->whereNull('institute_detail.deleted_at')
+                    ->select('institute_detail.*')
+                    ->paginate($perPage);
+
+
+                // echo "<pre>";
+                // print_r($joininstitute);
+                // exit; // ->where('end_academic_year', '>=', now())
                 $join_with = [];
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
@@ -127,18 +139,18 @@ class TeacherController extends Controller
                     );
                 }
 
-                $parentsdt = Parents::where('student_id', $user_id)->get();
+                // $parentsdt = Parents::where('student_id', $user_id)->get();
 
-                $veryfy = [];
-                foreach ($parentsdt as $checkvery) {
-                    $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
-                }
-                if ($parentsdt->isEmpty()) {
+                // $veryfy = [];
+                // foreach ($parentsdt as $checkvery) {
+                //     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
+                // }
+                // if ($parentsdt->isEmpty()) {
 
-                    $studentparents = '0';
-                } else {
-                    $studentparents = '1';
-                }
+                //     $studentparents = '0';
+                // } else {
+                //     $studentparents = '1';
+                // }
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
@@ -148,8 +160,8 @@ class TeacherController extends Controller
                         'searchhistory_list' => $searchhistory_list,
                         'requested_institute' => $requested_institute,
                         'join_with' => $join_with,
-                        'parents_detail' => $studentparents,
-                        'parents_verification' => $veryfy
+                        // 'parents_detail' => $studentparents,
+                        // 'parents_verification' => $veryfy
                     ),
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
@@ -235,7 +247,7 @@ class TeacherController extends Controller
         $validator = \Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
-            'mobile_no' => 'required',
+            'mobile' => 'required',
             'email' => 'required',
             'qualification' => 'required',
             'employee_type' => 'required',
@@ -244,7 +256,7 @@ class TeacherController extends Controller
             'standard_id' => 'required',
             'stream_id' => 'required',
             'subject_id' => 'required',
-            'user_id' => 'required',
+            'teacher_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -263,10 +275,45 @@ class TeacherController extends Controller
                 $token = substr($token, 7);
             }
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            $teacher_id = $request->input('teacher_id');
+            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
-                // Add teacher logic here
+
+                $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
+                foreach ($subject as $value) {
+                    $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
+                    foreach ($base_table_response as $value2) {
+                        Teacher_model::create([
+                            'institute_id' => $request->institute_id,
+                            'teacher_id' => $request->teacher_id,
+                            'institute_for_id' => $value2['institute_for'],
+                            'board_id' => $value2['board'],
+                            'medium_id' => $value2['medium'],
+                            'class_id' => $value2['institute_for_class'],
+                            'standard_id' => $value2['standard'],
+                            'stream_id' => $value2['stream'],
+                            'subject_id' => $value['id'],
+                            'status' => '1',
+                        ]);
+                    }
+                }
+                $student_details = User::where('id', $request->teacher_id)->update([
+                    'firstname' => $request->firstname,
+                    'lastname' => $request->lastname,
+                    'address' => $request->address,
+                    'email' => $request->email,
+                    'mobile' => $request->mobile,
+                    'employee_type' => $request->employee_type,
+                    'qualification' => $request->qualification,
+                ]);
+
+
+                if (!$student_details) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'User not found',
+                    ], 404);
+                }
                 return response()->json([
                     'success' => true,
                     'message' => 'Teacher added successfully',

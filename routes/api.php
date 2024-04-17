@@ -107,6 +107,6 @@ Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);
 
 
 //teacher
-Route::post('/teacher/homescreen-student', [TeacherController::class, 'homescreen_teacher']);
-Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
+Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
+// Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
 Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
