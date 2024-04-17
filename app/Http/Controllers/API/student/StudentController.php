@@ -543,7 +543,7 @@ class StudentController extends Controller
 
                 $bannerss = Banner_model::where('status', 'active')
                     ->Where('institute_id', $institute_id)
-                    ->Where('user_id', $user_id)
+                    //->Where('user_id', $user_id)
                     ->paginate(10);
 
                 if ($bannerss->isEmpty()) {
@@ -573,6 +573,7 @@ class StudentController extends Controller
 
                 $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
                 $announcQY = announcements_model::where('institute_id', $institute_id)
+                ->where('batch_id', $existingUser->batch_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
                 ->get();
                 foreach ($announcQY as $announcDT) {
@@ -622,6 +623,7 @@ class StudentController extends Controller
                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
                         ->where('institute_id', $stdetail->institute_id)
+                        ->where('batch_id', $stdetail->batch_id)
                         ->where('exam.board_id', $stdetail->board_id)
                         ->where('exam.medium_id', $stdetail->medium_id)
                         //->where('exam.class_id', $stdetail->class_id)
@@ -1129,6 +1131,7 @@ class StudentController extends Controller
                             //->where('exam.class_id', $stdetail->class_id)
                             ->where('exam.standard_id', $stdetail->standard_id)
                             ->where('exam.institute_id', $stdetail->institute_id)
+                            ->where('exam.batch_id', $stdetail->batch_id)
                             ->orWhere('exam.stream_id', $stdetail->stream_id)
                             ->whereIN('exam.subject_id', $subjectIds)
 
