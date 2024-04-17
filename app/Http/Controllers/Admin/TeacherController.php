@@ -17,7 +17,6 @@ use App\Models\Teacher_model;
 use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
@@ -289,13 +288,10 @@ class TeacherController extends Controller
                 $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
                 foreach ($subject as $value) {
-                    $batch_list = "SELECT * FROM batches WHERE FIND_IN_SET($value->id, subjects)";
-                    $results = DB::select($batch_list);
+                    $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                        ->select('*')->get()->toarray();
 
-                    echo "<pre>";
-                    print_r($results);
-                    exit;
-                    foreach ($results as $values_batch) {
+                    foreach ($batch_list as $values_batch) {
                         Batch_assign_teacher_model::create([
                             'teacher_id' => $request->teacher_id,
                             'batch_id' => $values_batch['id'],
