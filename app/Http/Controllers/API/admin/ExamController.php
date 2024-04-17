@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batches_model;
 use App\Models\board;
 use App\Models\Class_model;
 use App\Models\Exam_Model;
@@ -127,12 +128,14 @@ class ExamController extends Controller
                 ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
                 ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
                 ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
                 ->select(
                     'board.name as board_name',
                     'medium.name as medium_name',
                     'standard.name as standard_name',
                     'stream.name as stream_name',
                     'subject.name as subject_name',
+                    'batches.batch_name',
                     'exam.*'
                 )
                 ->where('exam.institute_id', $request->institute_id)
@@ -160,6 +163,7 @@ class ExamController extends Controller
                         'medium' => $value->medium_name,
                         //'class' => $value->class_name,
                         'standard' => $value->standard_name,
+                        'batch_name'=>$value->batch_name,
                         'stream' => $value->stream_name . '',
                         'subject' => $value->subject_name,
                     ];
@@ -245,6 +249,7 @@ class ExamController extends Controller
                     //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
+                    'batch_id'=>'required',
                     //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
@@ -264,6 +269,7 @@ class ExamController extends Controller
                     $exam = Exam_Model::find($exam_id);
                     $exam->user_id = $validatedData['user_id'];
                     $exam->institute_id = $validatedData['institute_id'];
+                    $exam->batch_id = $validatedData['batch_id'];
                     $exam->exam_title = $validatedData['exam_title'];
                     $exam->total_mark = $validatedData['total_mark'];
                     $exam->exam_type = $validatedData['exam_type'];
@@ -327,6 +333,7 @@ class ExamController extends Controller
                     //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
+                    'batch_id' => 'required',
                     //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
@@ -336,6 +343,7 @@ class ExamController extends Controller
                     $exam_update->update([
                         'user_id' => $request->user_id,
                         'institute_id' => $request->institute_id,
+                        'batch_id'=>$request->batch_id,
                         'exam_title' => $request->exam_title,
                         'total_mark' => $request->total_mark,
                         'exam_type' => $request->exam_type,
@@ -363,6 +371,7 @@ class ExamController extends Controller
                         Exam_Model::create([
                             'user_id' => $request->user_id,
                             'institute_id' => $request->institute_id,
+                            'batch_id'=>$request->batch_id,
                             'exam_title' => $request->exam_title,
                             'total_mark' => $request->total_mark,
                             'exam_type' => $request->exam_type,
@@ -499,6 +508,16 @@ class ExamController extends Controller
                 ];
             }
 
+            $batches = Batches_model::where('institute_id', $institute_id)
+                ->where('user_id', $user_id)->get();
+            $batches_list = [];
+            foreach ($batches as $batches_value) {
+                $batches_list[] = [
+                    'id' => $batches_value['id'],
+                    'batch_name' => $batches_value['batch_name'],
+                ];
+            }
+
             $response_data = [
                 'institute_for' => $institute_for_list,
                 'board' => $board_list,
@@ -506,7 +525,8 @@ class ExamController extends Controller
                 'class_list' => $class_list,
                 'standard_list' => $standard_list,
                 'stream_list' => $stream_list,
-                'subject_list' => $subject_list
+                'subject_list' => $subject_list,
+                'batches_list' => $batches_list
 
             ];
             return response()->json([

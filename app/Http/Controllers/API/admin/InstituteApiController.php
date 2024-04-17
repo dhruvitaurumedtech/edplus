@@ -2125,6 +2125,7 @@ class InstituteApiController extends Controller
                     $subjectq = Subject_model::where('id', $anoouncmnt->subject_id)->first();
                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
+                    $batchnm = Batches_model::where('id', $anoouncmnt->batch_id)->first();
 
                     $roles = [];
                     $roledsid = explode(",", $anoouncmnt->role_type);
@@ -2141,6 +2142,8 @@ class InstituteApiController extends Controller
                         'detail' => $anoouncmnt->detail,
                         'subject_id' => $subjectq->id,
                         'subject' => $subjectq->name,
+                        'batch_id' => $batchnm->id,
+                        'batch_name' => $batchnm->batch_name,
                         'standard_id' => $standardtq->id,
                         'standard' => $standardtq->name,
                         'board_id' => $boarddt->id,
