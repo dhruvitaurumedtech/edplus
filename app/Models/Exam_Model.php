@@ -13,7 +13,7 @@ class Exam_Model extends Model
 
     protected $table = 'exam';
     protected $fillable = [
-        'id', 'user_id', 'institute_id', 'exam_title', 'total_mark', 'exam_type', 'exam_date', 'start_time', 'end_time',
+        'id', 'user_id', 'institute_id','batch_id', 'exam_title', 'total_mark', 'exam_type', 'exam_date', 'start_time', 'end_time',
         'institute_for_id', 'board_id', 'medium_id', 'class_id', 'standard_id', 'stream_id', 'subject_id'
     ];
 }

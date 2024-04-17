@@ -13,7 +13,7 @@ class Student_detail extends Model
     protected $fillable = [
         'user_id','institute_id','student_id', 'institute_for_id', 'board_id', 
         'medium_id', 'class_id', 'standard_id',
-        'stream_id', 'subject_id', 'status',
+        'stream_id', 'subject_id','batch_id', 'status',
         'created_at', 'updated_at'
     ];
 }
