@@ -2020,6 +2020,7 @@ class InstituteApiController extends Controller
             $title = $request->title;
             $detail = $request->detail;
             $standard_id = $request->standard_id;
+            $batch_id = $request->batch_id;
 
             if ($stream_id == 'null') {
                 $stream_idd = null;
@@ -2029,6 +2030,7 @@ class InstituteApiController extends Controller
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
                 'institute_id' => $institute_id,
+                'batch_id' => $batch_id,
                 'board_id' => $board_id,
                 'medium_id' => $medium_id,
                 //'institute_for_id' => $institute_for_id,
@@ -2127,7 +2129,8 @@ class InstituteApiController extends Controller
                     $roledsid = explode(",", $anoouncmnt->role_type);
                     $roqy = Role::whereIN('id', $roledsid)->get();
                     foreach ($roqy as $rolDT) {
-                        $roles[] = array('id' => $rolDT->id, 'name' => $rolDT->role_name);
+                        $roles[] = array('id' => $rolDT->id, 
+                        'name' => $rolDT->role_name);
                     }
 
                     $announcementDT[] = array(

@@ -64,6 +64,7 @@ class ExamController extends Controller
                     $exam = new Exam_Model;
                     $exam->user_id = $validatedData['user_id'];
                     $exam->institute_id = $validatedData['institute_id'];
+                    $exam->batch_id = $validatedData['batch_id'];
                     $exam->exam_title = $validatedData['exam_title'];
                     $exam->total_mark = $validatedData['total_mark'];
                     $exam->exam_type = $validatedData['exam_type'];
