@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('institute_id');
             $table->unsignedBigInteger('teacher_id')->nullable();
             $table->foreign('teacher_id')->references('id')->on('users');
+            $table->unsignedBigInteger('batch_id')->nullable();
+            $table->foreign('batch_id')->references('id')->on('batches');
             $table->unsignedBigInteger('institute_for_id')->nullable();
             $table->foreign('institute_for_id')->references('id')->on('institute_for');
             $table->unsignedBigInteger('board_id')->nullable();
