@@ -168,10 +168,8 @@ class TeacherController extends Controller
         }
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function teaher_add_institute_request(Request $request)
+
+    public function teacher_add_institute_request(Request $request)
     {
         $validator = \Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
@@ -231,43 +229,60 @@ class TeacherController extends Controller
         }
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function add_teacher(Request $request)
     {
-        //
-    }
+        $validator = \Validator::make($request->all(), [
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'mobile_no' => 'required',
+            'email' => 'required',
+            'qualification' => 'required',
+            'employee_type' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            'stream_id' => 'required',
+            'subject_id' => 'required',
+            'user_id' => 'required',
+        ]);
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
-    }
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
+        try {
+            $token = $request->header('Authorization');
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+            $user_id = $request->input('user_id');
+            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            if ($existingUser) {
+                // Add teacher logic here
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Teacher added successfully',
+                ], 200);
+            } else {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Something went wrong',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

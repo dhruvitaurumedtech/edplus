@@ -2525,7 +2525,6 @@ class InstituteApiController extends Controller
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => url($value['logo']),
                     'cover_photo' => url($value['cover_photo'])
-
                 ];
             }
             return response()->json([
@@ -2603,6 +2602,7 @@ class InstituteApiController extends Controller
                     if ($imagePath !== null) {
                         $institutedt->logo = $imagePath;
                     }
+                    $imagePath2 = null;
                     if ($request->hasFile('cover_photo')) {
                         $logo_image = $request->file('cover_photo');
                         $imagePath2 = $logo_image->store('cover_photo', 'public');
@@ -2613,7 +2613,7 @@ class InstituteApiController extends Controller
                     $institutedt->save();
 
                     return response()->json([
-                        'status' => 400,
+                        'status' => 200,
                         'message' => 'Record Update Successfully!.',
                         'data' => []
                     ]);
