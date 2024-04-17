@@ -48,6 +48,7 @@ class ExamController extends Controller
                     'board_id' => 'required',
                     'medium_id' => 'required',
                     //'class_id' => 'required',
+                    'batch_id'=>'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
