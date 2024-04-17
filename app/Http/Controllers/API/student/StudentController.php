@@ -110,7 +110,7 @@ class StudentController extends Controller
 
                         $searchhistory_list[] = [
                             'id' => $value->id,
-                            'institute_id' => $value->institute_id,
+                            'institute_id' => intval($value->institute_id),
                             'user_id' => $value->user_id,
                             'title' => $value->title,
                         ];
