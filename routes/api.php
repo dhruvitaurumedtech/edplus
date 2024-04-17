@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BannerController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -103,3 +104,8 @@ Route::post('/institute/institute-profile-edit', [InstituteApiController::class,
 Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
 Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);
+
+
+//teacher
+Route::post('/teacher/homescreen-student', [TeacherController::class, 'homescreen_teacher']);
+Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teaher_add_institute_request']);

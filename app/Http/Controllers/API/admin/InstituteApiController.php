@@ -1193,6 +1193,7 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         // echo "<pre>";print_r($existingUser);exit;
         if ($existingUser) {
+
             $institute_id = $request->institute_id;
             $request_list = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
@@ -2598,11 +2599,16 @@ class InstituteApiController extends Controller
                         $logo_image = $request->file('logo');
                         $imagePath = $logo_image->store('logo', 'public');
                     }
-
                     if ($imagePath !== null) {
                         $institutedt->logo = $imagePath;
                     }
-
+                    if ($request->hasFile('cover_photo')) {
+                        $logo_image = $request->file('cover_photo');
+                        $imagePath2 = $logo_image->store('cover_photo', 'public');
+                    }
+                    if ($imagePath2 !== null) {
+                        $institutedt->cover_photo = $imagePath2;
+                    }
                     $institutedt->save();
 
                     return response()->json([
