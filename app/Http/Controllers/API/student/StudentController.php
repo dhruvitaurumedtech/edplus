@@ -834,6 +834,7 @@ class StudentController extends Controller
                                     "chapter_id" => $topval->chapter_id,
                                     "chapter_name" => $topval->chname
                                 );
+                                $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                             }
 
                         }else{
@@ -847,11 +848,12 @@ class StudentController extends Controller
                                 "chapter_id" => $topval->chapter_id,
                                 "chapter_name" => $topval->chname
                             );
+                            $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
 
                         
                     }
-                    $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+                    //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                 }
                 if (!empty($chapter_id)) {
                     $response = [
@@ -1238,8 +1240,6 @@ class StudentController extends Controller
     //exam result
     public function exam_result(Request $request)
     {
-
-
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'exam_id' => 'required',
