@@ -353,7 +353,7 @@ class TeacherController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required|integer',
-            'user_id' => 'required'
+            'teacher_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -372,8 +372,8 @@ class TeacherController extends Controller
                 $token = substr($token, 7);
             }
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            $teacher_id = $request->input('teacher_id');
+            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
 
                 $institute_id = $request->institute_id;
