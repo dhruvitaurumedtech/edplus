@@ -70,7 +70,6 @@ class StudentController extends Controller
             if ($existingUser) {
 
                 //banner
-
                 $banners = Banner_model::where('status', 'active')
                     ->whereIn('user_id', explode(',', '1'))
                     ->paginate($perPage);
@@ -573,7 +572,9 @@ class StudentController extends Controller
 
 
                 $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
-                $announcQY = announcements_model::where('institute_id', $institute_id)->get();
+                $announcQY = announcements_model::where('institute_id', $institute_id)
+                ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->get();
                 foreach ($announcQY as $announcDT) {
                     $announcement[] = array(
                         'title' => $announcDT->title,
@@ -581,7 +582,6 @@ class StudentController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-
 
                 $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
                     ->join('subject', 'subject.id', '=', 'exam.subject_id')
