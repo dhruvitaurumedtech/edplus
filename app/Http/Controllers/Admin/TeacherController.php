@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\announcements_model;
 use App\Models\Banner_model;
 use App\Models\Base_table;
+use App\Models\Batch_assign_teacher_model;
 use App\Models\Batches_model;
 use App\Models\board;
 use App\Models\Institute_detail;
@@ -283,8 +284,13 @@ class TeacherController extends Controller
             $teacher_id = $request->input('teacher_id');
             $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
-                Batches_model::where('institute_id', $request->institute_id)->where('user_id', $request->teacher_id)->get()->toarray();
-
+                $batch_list = Batches_model::where('institute_id', $request->institute_id)->where('user_id', $request->teacher_id)->get()->toarray();
+                foreach ($batch_list as $values_batch) {
+                    Batch_assign_teacher_model::create([
+                        'teacher_id' => $request->teacher_id,
+                        'batch_id' => $values_batch->id,
+                    ]);
+                }
                 $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
                 foreach ($subject as $value) {
                     $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
