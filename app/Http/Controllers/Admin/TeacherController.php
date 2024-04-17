@@ -288,6 +288,8 @@ class TeacherController extends Controller
                 $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
                 foreach ($subject as $value) {
+                    echo $value->id;
+                    exit;
                     $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
                         ->select('*')->get()->toarray();
 
