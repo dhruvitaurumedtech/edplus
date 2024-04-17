@@ -2523,7 +2523,8 @@ class InstituteApiController extends Controller
                     'facebook_link' => $value['facebook_link'] . '',
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
-                    'logo' => url($value['logo'])
+                    'logo' => url($value['logo']),
+                    'cover_photo' => url($value['cover_photo'])
 
                 ];
             }
