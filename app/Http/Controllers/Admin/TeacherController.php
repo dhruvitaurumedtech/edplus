@@ -284,14 +284,13 @@ class TeacherController extends Controller
             $teacher_id = $request->input('teacher_id');
             $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
-                $batch_list = Batches_model::where('institute_id', $request->institute_id)->where('user_id', $request->teacher_id)->get()->toarray();
-                echo "<pre>";
-                print_r($batch_list);
-                exit;
+                $batch_list = Batches_model::where('institute_id', $request->institute_id)->where('user_id', $request->teacher_id)
+                    ->select('*')->get()->toarray();
+
                 foreach ($batch_list as $values_batch) {
                     Batch_assign_teacher_model::create([
                         'teacher_id' => $request->teacher_id,
-                        'batch_id' => $values_batch->id,
+                        'batch_id' => $values_batch['id'],
                     ]);
                 }
                 $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
