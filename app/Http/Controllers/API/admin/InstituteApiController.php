@@ -1011,9 +1011,9 @@ class InstituteApiController extends Controller
             // }
 
             $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
-            ->where('created_at', '>=', $fifteenDaysAgo)
-            ->orderBy('created_at', 'desc')->get()
-            ->toarray();
+                ->where('created_at', '>=', $fifteenDaysAgo)
+                ->orderBy('created_at', 'desc')->get()
+                ->toarray();
             foreach ($announcement_list as $value) {
                 $announcement = [
                     'title' => $value['title'],
@@ -2149,7 +2149,7 @@ class InstituteApiController extends Controller
                             'name' => $rolDT->role_name
                         );
                     }
-                       
+
                     $announcementDT[] = array(
                         'id' => $anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
@@ -2277,7 +2277,7 @@ class InstituteApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
-            
+
         ]);
 
         if ($validator->fails()) {
@@ -2335,7 +2335,7 @@ class InstituteApiController extends Controller
                                 ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                         });
                     })
-                    ->select('students_details.*','batches.batch_name', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->select('students_details.*', 'batches.batch_name', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
                     ->orderByDesc('students_details.created_at')
                     ->paginate($perPage);
 
@@ -2348,8 +2348,8 @@ class InstituteApiController extends Controller
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,
                         'standard' => $stdDT->standard,
-                        'batch_id'=>$stdDT->batch_id,
-                        'batch_name'=>$stdDT->batch_name,
+                        'batch_id' => $stdDT->batch_id,
+                        'batch_name' => $stdDT->batch_name,
                     );
                 }
 

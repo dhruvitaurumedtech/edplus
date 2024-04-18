@@ -107,12 +107,18 @@ class VideoController extends Controller
             ->whereNull('do_business_with.deleted_at')
             ->select('do_business_with.name', 'do_business_with.id as did', 'do_business_with.status', 'video_categories.name as cname', 'video_categories.id as cid')
             ->get();
+        echo "<pre>";
+        print_r($categories);
+        exit;
 
         $videocat = [];
         foreach ($categories as $catvalu) {
             $videocat[] = array(
-                'id' => $catvalu->did, 'name' => $catvalu->name,
-                'parent_category_id' => $catvalu->cid, 'parent_category_name' => $catvalu->cname, 'status' => $catvalu->status
+                'id' => $catvalu->did,
+                'name' => $catvalu->name,
+                'parent_category_id' => $catvalu->cid,
+                'parent_category_name' => $catvalu->cname,
+                'status' => $catvalu->status
             );
         }
         return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
