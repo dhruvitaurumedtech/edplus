@@ -499,10 +499,18 @@ class TeacherController extends Controller
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                     ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
+                    ->leftJoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+
                     ->where('teacher_detail.teacher_id', $teacher_id)
                     ->where('teacher_detail.institute_id', $institute_id)
                     ->whereNull('teacher_detail.deleted_at')
-                    ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name', 'teacher_assign_batch.batch_id')
+                    ->select(
+                        'board.name as board_name',
+                        'standard.name as standard_name',
+                        'medium.name as medium_name',
+                        'teacher_assign_batch.batch_id',
+                        'batches.batch_name'
+                    )
                     ->get()
                     ->toArray();
 
@@ -517,10 +525,7 @@ class TeacherController extends Controller
                 //     ->get()->toaaray();
                 $teacher_response = [];
                 foreach ($teacher_data as $value) {
-                    $batch_response = Batches_model::whereIn('id', $value['batch_id'])->get()->toarray();
-                    echo "<pre>";
-                    print_r($batch_response);
-                    exit;
+
                     $teacher_response = [
                         'board' => $value['board_name'],
                         'standard' => $value['standard_name'],
