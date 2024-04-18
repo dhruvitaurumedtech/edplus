@@ -29,6 +29,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Base_table;
 use App\Models\Batches_model;
+use App\Models\Common_announcement;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use App\Models\VideoCategory;
@@ -1001,11 +1002,22 @@ class InstituteApiController extends Controller
             $announcement = [];
             $fifteenDaysAgo = Carbon::now()->subDays(15);
 
-            $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
+            // $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
+            // foreach ($announcement_list as $value) {
+            //     $announcement = [
+            //         'title' => $value['title'],
+            //         'message' => $value['detail']
+            //     ];
+            // }
+
+            $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
+            ->where('created_at', '>=', $fifteenDaysAgo)
+            ->orderBy('created_at', 'desc')->get()
+            ->toarray();
             foreach ($announcement_list as $value) {
                 $announcement = [
-                    'title' => $value['title'],
-                    'message' => $value['detail']
+                    //'title' => $value['title'],
+                    'announcement' => $value['announcement']
                 ];
             }
 
