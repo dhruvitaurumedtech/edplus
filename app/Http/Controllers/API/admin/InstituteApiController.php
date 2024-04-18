@@ -2669,7 +2669,7 @@ class InstituteApiController extends Controller
         }
     }
     //category list for add do business with 
-    public function do_business_with_category(Request $request)
+    public function category_list(Request $request)
     {
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
