@@ -2131,8 +2131,10 @@ class InstituteApiController extends Controller
                     $roledsid = explode(",", $anoouncmnt->role_type);
                     $roqy = Role::whereIN('id', $roledsid)->get();
                     foreach ($roqy as $rolDT) {
-                        $roles[] = array('id' => $rolDT->id, 
-                        'name' => $rolDT->role_name);
+                        $roles[] = array(
+                            'id' => $rolDT->id,
+                            'name' => $rolDT->role_name
+                        );
                     }
 
                     $announcementDT[] = array(
@@ -2530,7 +2532,7 @@ class InstituteApiController extends Controller
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => url($value['logo']),
-                    'cover_photo' => url($value['cover_photo'])
+                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : '')
                 ];
             }
             return response()->json([

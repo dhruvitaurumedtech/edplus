@@ -437,9 +437,7 @@ class TeacherController extends Controller
                 'data' => array('errors' => $errorMessages),
             ], 400);
         }
-
         try {
-
             $token = $request->header('Authorization');
 
             if (strpos($token, 'Bearer ') === 0) {
