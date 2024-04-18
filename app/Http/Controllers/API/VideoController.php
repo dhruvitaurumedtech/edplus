@@ -107,6 +107,9 @@ class VideoController extends Controller
             ->whereNull('do_business_with.deleted_at')
             ->select('do_business_with.name', 'do_business_with.id as did', 'do_business_with.status', 'video_categories.name as cname', 'video_categories.id as cid')
             ->get();
+        echo "<pre>";
+        print_r($categories);
+        exit;
 
         $videocat = [];
         foreach ($categories as $catvalu) {
