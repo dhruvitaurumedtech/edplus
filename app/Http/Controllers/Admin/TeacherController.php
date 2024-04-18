@@ -498,7 +498,7 @@ class TeacherController extends Controller
                 $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                    ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.id')
+                    ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
                     ->where('teacher_detail.teacher_id', $teacher_id)
                     ->where('teacher_detail.institute_id', $institute_id)
                     ->whereNull('teacher_detail.deleted_at')
