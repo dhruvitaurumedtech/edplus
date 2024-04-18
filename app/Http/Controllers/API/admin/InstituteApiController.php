@@ -2301,6 +2301,7 @@ class InstituteApiController extends Controller
                     ->join('board', 'board.id', 'students_details.board_id')
                     ->join('medium', 'medium.id', 'students_details.medium_id')
                     ->join('standard', 'standard.id', 'students_details.standard_id')
+                    ->leftjoin('batches', 'batches.id', 'students_details.batch_id')
                     ->where('students_details.user_id', $user_id)
                     ->where('students_details.institute_id', $institute_id)
                     ->when($board, function ($query, $board) {
@@ -2322,7 +2323,7 @@ class InstituteApiController extends Controller
                                 ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                         });
                     })
-                    ->select('students_details.*', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->select('students_details.*','batches.batch_name', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
                     ->orderByDesc('students_details.created_at')
                     ->paginate($perPage);
 
@@ -2334,7 +2335,9 @@ class InstituteApiController extends Controller
                         'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,
-                        'standard' => $stdDT->standard
+                        'standard' => $stdDT->standard,
+                        'batch_id'=>$stdDT->batch_id,
+                        'batch_name'=>$stdDT->batch_name
                     );
                 }
 
