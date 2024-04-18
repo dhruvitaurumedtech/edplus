@@ -1016,7 +1016,7 @@ class InstituteApiController extends Controller
             ->toarray();
             foreach ($announcement_list as $value) {
                 $announcement = [
-                    //'title' => $value['title'],
+                    'title' => $value['title'],
                     'announcement' => $value['announcement']
                 ];
             }
@@ -2698,7 +2698,8 @@ class InstituteApiController extends Controller
 
                 $cat_array = [];
                 foreach ($vcategory as $cat_value) {
-                    $cat_array[] = array('id' => $cat_value->id, 'name' => $cat_value->name);
+                    $cat_array[] = array('id' => $cat_value->id,
+                     'name' => $cat_value->name);
                 }
                 return response()->json([
                     'status' => '200',
