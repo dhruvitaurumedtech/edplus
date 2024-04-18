@@ -494,7 +494,7 @@ class TeacherController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-                $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+                $teacher_response = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                     ->where('teacher_detail.teacher_id', $teacher_id)
