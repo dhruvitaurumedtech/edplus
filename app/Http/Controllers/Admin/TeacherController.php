@@ -494,13 +494,15 @@ class TeacherController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-                $teacher_data = Teacher_model::join('board.id', '=', 'teacher_detail.board_id', 'left')
-                    ->join('medium.id', '=', 'teacher_detail.medium_id', 'left')
-                    ->join('standard.id', '=', 'teacher_detail.standard_id', 'left')
+                $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+                    ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                    ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                     ->where('teacher_detail.teacher_id', $teacher_id)
                     ->where('teacher_detail.institute_id', $institute_id)
-                    ->select('board.name as board_name,standard.name as standard_name,medium.name as medium_name')
-                    ->get()->toarray();
+                    ->whereNull('teacher_detail.deleted_at')
+                    ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name')
+                    ->get()->toArray();
+
                 $$teacher_response = [];
                 foreach ($teacher_data as $value) {
                     $teacher_response = [
