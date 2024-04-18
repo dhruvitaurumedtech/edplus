@@ -308,12 +308,31 @@ class StudentController extends Controller
                         $userId = $user->id;
     
                         // Create a parent record associated with the user
-                        $parnsad = Parents::create([
-                            'student_id' => $student_id,
-                            'parent_id' => $userId,
-                            'relation' => $parentData['relation'],
-                            'verify' => '0',
-                        ]);
+                        if(!empty($userId)){
+                            $parnsad = Parents::create([
+                                'student_id' => $student_id,
+                                'parent_id' => $userId,
+                                'relation' => $parentData['relation'],
+                                'verify' => '0',
+                            ]);
+
+                            if(empty($parnsad->id)){
+                                User::where('id',$userId)->delete();
+                            }else{
+                                return response()->json([
+                                    'success' => 500,
+                                    'message' => 'Something went wrongg',
+                                    'data' => [],
+                                ], 500);
+                            }
+                        }else{
+                            return response()->json([
+                                'success' => 500,
+                                'message' => 'Something went wronggg',
+                                'data' => [],
+                            ], 500);
+                        }
+                        
                         
                         $data = [
                             'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
