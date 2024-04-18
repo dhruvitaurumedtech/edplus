@@ -88,7 +88,9 @@ class StudentController extends Controller
                     ->where(function ($query) use ($search_keyword) {
                         $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                             ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
-                    })->paginate($perPage);
+                    })
+                    ->orderByDesc('created_at')
+                    ->paginate($perPage);
 
                 $search_list = [];
                 foreach ($allinstitute as $value) {
@@ -120,7 +122,9 @@ class StudentController extends Controller
                 //requested institute
                 $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
                     ->where('students_details.student_id', $user_id)
-                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')->paginate($perPage);
+                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
+                    ->orderByDesc('institute_detail.created_at')
+                    ->paginate($perPage);
 
                 $requested_institute = [];
                 foreach ($requestnstitute as $value) {
@@ -155,14 +159,15 @@ class StudentController extends Controller
                     );
                 }
 
-                $parentsdt = Parents::where('student_id', $user_id)->get();
+                $parentsdt = Parents::where('student_id', $user_id)
+                ->orderByDesc('created_at')
+                ->get();
 
                 $veryfy = [];
                 foreach ($parentsdt as $checkvery) {
                     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
                 }
                 if ($parentsdt->isEmpty()) {
-
                     $studentparents = '0';
                 } else {
                     $studentparents = '1';
@@ -290,44 +295,64 @@ class StudentController extends Controller
                 foreach ($parents as $parentData) {
                     // Create a user for each parent
                     $tomail = $parentData['email'];
-                    $user = User::create([
-                        'firstname' => $parentData['firstname'],
-                        'lastname' => $parentData['lastname'],
-                        'email' => $parentData['email'],
-                        'mobile' => $parentData['mobile'],
-                        'role_type' => '5'
-                    ]);
+                    if($parentData['firstname'] == '' || $parentData['lastname'] == '' || $parentData['email'] == '' || $parentData['mobile'] == '' || $parentData['relation'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'Requied field are missing',
+                        ], 400);
+                    }else{
+                        $user = User::create([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5'
+                        ]);
+    
+                        // Retrieve the ID of the newly created user
+                        $userId = $user->id;
+    
+                        // Create a parent record associated with the user
+                        if(!empty($userId)){
+                            $parnsad = Parents::create([
+                                'student_id' => $student_id,
+                                'parent_id' => $userId,
+                                'relation' => $parentData['relation'],
+                                'verify' => '0',
+                            ]);
 
-                    // Retrieve the ID of the newly created user
-                    $userId = $user->id;
-
-                    // Create a parent record associated with the user
-                    $parnsad = Parents::create([
-                        'student_id' => $student_id,
-                        'parent_id' => $userId,
-                        'relation' => $parentData['relation'],
-                        'verify' => '0',
-                    ]);
-                    $messageContent = "hi";
-                    // Mail::to($tomail)->send('emails.forgot');
-                    // Mail::to($tomail)->send(new WelcomeMail());
-                    $data = [
-                        'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
-                        'email' => $tomail,
-                        'id' => $parnsad->id
-                        // Add any other data you want to pass to the email
-                    ];
-
-                    Mail::to($tomail)->send(new WelcomeMail($data));
-                    // Mail::to('recipient@example.com')->send(new WelcomeMail());
-
-                    // Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
-                    //     $message->to($tomail);
-                    //     $message->subject('Reset Password');
-                    //   });
+                            if(empty($parnsad->id)){
+                                User::where('id',$userId)->delete();
+                            }else{
+                                return response()->json([
+                                    'success' => 500,
+                                    'message' => 'Something went wrongg',
+                                    'data' => [],
+                                ], 500);
+                            }
+                        }else{
+                            return response()->json([
+                                'success' => 500,
+                                'message' => 'Something went wronggg',
+                                'data' => [],
+                            ], 500);
+                        }
+                        
+                        $data = [
+                            'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
+                            'email' => $tomail,
+                            'id' => $parnsad->id
+                        ];
+    
+                        Mail::to($tomail)->send(new WelcomeMail($data));
+                    }
+                    
+                    
                 }
 
-                return response()->json(['success' => 200, 'message' => 'Parent details uploaded successfully', 'data' => []], 200);
+                return response()->json(['success' => 200, 
+                'message' => 'Parent details uploaded successfully',
+                 'data' => []], 200);
             } else {
                 return response()->json([
                     'status' => 400,
@@ -578,6 +603,7 @@ class StudentController extends Controller
                 $announcQY = announcements_model::where('institute_id', $institute_id)
                 ->where('batch_id', $existingUser->batch_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->orderByDesc('created_at')
                 ->get();
                 foreach ($announcQY as $announcDT) {
                     $announcement[] = array(
@@ -814,7 +840,9 @@ class StudentController extends Controller
                         })
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->vid)
-                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')->get();
+                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+                        ->orderByDesc('topic.created_at')
+                        ->get();
                     foreach ($topicqry as $topval) {
 
                         if ($existingUser->role_type == 6) {
@@ -1139,6 +1167,7 @@ class StudentController extends Controller
                             ->whereIN('exam.subject_id', $subjectIds)
 
                             ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
+                            ->orderByDesc('exam.created_at')
                             ->get();
 
                         foreach ($exams as $examsDT) {

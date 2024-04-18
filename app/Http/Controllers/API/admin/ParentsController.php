@@ -81,6 +81,7 @@ class ParentsController extends Controller
         }  
     }
 
+    //pending work in below
     public function parents_child_homescreen(Request $request){
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
