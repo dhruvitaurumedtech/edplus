@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\announcements_model;
 use App\Models\Banner_model;
 use App\Models\Base_table;
+use App\Models\Batch_assign_teacher_model;
+use App\Models\Batches_model;
 use App\Models\board;
 use App\Models\Institute_detail;
 use App\Models\Search_history;
@@ -12,6 +15,7 @@ use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\User;
+use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 
 class TeacherController extends Controller
@@ -282,7 +286,18 @@ class TeacherController extends Controller
             if ($existingUser) {
 
                 $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
+
                 foreach ($subject as $value) {
+                    $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                        ->select('*')->get()->toarray();
+
+                    foreach ($batch_list as $values_batch) {
+                        Batch_assign_teacher_model::create([
+                            'teacher_id' => $request->teacher_id,
+                            'batch_id' => $values_batch['id'],
+                        ]);
+                    }
+
                     $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                     foreach ($base_table_response as $value2) {
                         Teacher_model::create([
@@ -338,7 +353,7 @@ class TeacherController extends Controller
     {
         $validator = \Validator::make($request->all(), [
             'institute_id' => 'required|integer',
-            'user_id' => 'required'
+            'teacher_id' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -357,8 +372,8 @@ class TeacherController extends Controller
                 $token = substr($token, 7);
             }
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+            $teacher_id = $request->input('teacher_id');
+            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
             if ($existingUser) {
 
                 $institute_id = $request->institute_id;
@@ -392,6 +407,117 @@ class TeacherController extends Controller
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
                     'data' => array('institute_data' => $institutedetaa),
+                ], 200, [], JSON_NUMERIC_CHECK);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'Invalid token.',
+                ], 400);
+            }
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => 500,
+                'message' => 'Something went wrong',
+                'data' => array('error' => $e->getMessage()),
+            ], 500);
+        }
+    }
+    public function teacher_added_detail(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'teacher_id' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'data' => array('errors' => $errorMessages),
+            ], 400);
+        }
+
+        try {
+
+            $token = $request->header('Authorization');
+
+            if (strpos($token, 'Bearer ') === 0) {
+                $token = substr($token, 7);
+            }
+
+            $teacher_id = $request->input('teacher_id');
+            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
+            if ($existingUser) {
+                $teacher_id = $request->teacher_id;
+                $institute_id = $request->institute_id;
+
+
+                //banner
+
+                $bannerss = Banner_model::where('status', 'active')
+                    ->Where('institute_id', $institute_id)
+                    ->Where('user_id', $teacher_id)
+                    ->paginate(10);
+
+                if ($bannerss->isEmpty()) {
+
+                    $banners = Banner_model::where('status', 'active')
+                        ->Where('user_id', '1')
+                        ->paginate(10);
+                } else {
+                    $banners = $bannerss;
+                }
+                $banners_data = [];
+
+                foreach ($banners as $value) {
+                    $imgpath = asset($value->banner_image);
+                    $banners_data[] = array(
+                        'id' => $value->id,
+                        'banner_image' => $imgpath,
+                    );
+                }
+
+                $todays_lecture = [];
+                $subjects = [];
+                $result = [];
+                $announcement = [];
+                $examlist = [];
+
+
+                $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
+                $announcQY = announcements_model::where('institute_id', $institute_id)
+                    ->whereRaw("FIND_IN_SET('4', role_type)")
+                    ->get();
+                foreach ($announcQY as $announcDT) {
+                    $announcement[] = array(
+                        'title' => $announcDT->title,
+                        'desc' => $announcDT->detail,
+                        'time' => $announcDT->created_at
+                    );
+                }
+                $teacher_data = Teacher_model::join('board.id', '=', 'teacher_detail.board_id', 'left')
+                    ->join('medium.id', '=', 'teacher_detail.medium_id', 'left')
+                    ->join('standard.id', '=', 'teacher_detail.standard_id', 'left')
+                    ->where('teacher_id', $teacher_id)
+                    ->where('institute_id', $institute_id)
+                    ->select('board.name as board_name,standard.name as standard_name,medium.name as medium_name')
+                    ->get()->toarray();
+                foreach ($teacher_data as $value) {
+                    $standard_get = [];
+                }
+
+                $studentdata = array(
+                    'banners_data' => $banners_data,
+                    'todays_lecture' => $todays_lecture,
+                    'announcement' => $announcement,
+                );
+
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Successfully fetch data.',
+                    'data' => $studentdata,
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
