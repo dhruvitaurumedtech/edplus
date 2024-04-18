@@ -2538,7 +2538,7 @@ class InstituteApiController extends Controller
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => url($value['logo']),
-                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : '')
+                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png'))
                 ];
             }
             return response()->json([

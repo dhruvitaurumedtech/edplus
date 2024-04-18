@@ -505,7 +505,8 @@ class TeacherController extends Controller
                 // echo "<pre>";
                 // print_r($teacher_data);
                 // exit;
-                $teacher_data = [];
+                // $teacher_data = [];
+                $teacher_response = [];
                 foreach ($teacher_data as $value) {
                     $teacher_response = [
                         'board' => $value['board_name'],
