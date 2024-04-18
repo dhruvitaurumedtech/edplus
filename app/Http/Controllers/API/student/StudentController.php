@@ -294,11 +294,37 @@ class StudentController extends Controller
                 // print_r($parents);exit;
                 foreach ($parents as $parentData) {
                     // Create a user for each parent
+                    $emilfin = user::where('email',$parentData['email'])->first();
                     $tomail = $parentData['email'];
-                    if($parentData['firstname'] == '' || $parentData['lastname'] == '' || $parentData['email'] == '' || $parentData['mobile'] == '' || $parentData['relation'] == ''){
+                    if($parentData['firstname'] == ''){
                         return response()->json([
                             'status' => 400,
-                            'message' => 'Requied field are missing',
+                            'message' => 'firstname Requied field are missing',
+                        ], 400);
+                    }elseif($parentData['lastname'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'lastname Requied field are missing',
+                        ], 400);
+                    }elseif($parentData['email'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'email Requied field are missing',
+                        ], 400);
+                    }elseif($parentData['mobile'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'mobile Requied field are missing',
+                        ], 400);
+                    }elseif($parentData['relation'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'relation Requied field are missing',
+                        ], 400);
+                    }elseif(!empty($emilfin)){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'email is already exist',
                         ], 400);
                     }else{
                         $user = User::create([
