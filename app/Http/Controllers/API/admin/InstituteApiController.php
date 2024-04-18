@@ -2136,7 +2136,7 @@ class InstituteApiController extends Controller
                             'name' => $rolDT->role_name
                         );
                     }
-
+                       
                     $announcementDT[] = array(
                         'id' => $anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
@@ -2144,8 +2144,8 @@ class InstituteApiController extends Controller
                         'detail' => $anoouncmnt->detail,
                         'subject_id' => $subjectq->id,
                         'subject' => $subjectq->name,
-                        'batch_id' => $batchnm->id,
-                        'batch_name' => $batchnm->batch_name,
+                        'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
+                        'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
                         'standard_id' => $standardtq->id,
                         'standard' => $standardtq->name,
                         'board_id' => $boarddt->id,
@@ -2264,6 +2264,7 @@ class InstituteApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
+            
         ]);
 
         if ($validator->fails()) {
@@ -2291,6 +2292,7 @@ class InstituteApiController extends Controller
                 $board = $request->board_id;
                 $medium = $request->medium_id;
                 $standard = $request->standard_id;
+                $batch_id = $request->batch_id;
                 $searchkeyword = $request->searchkeyword;
                 $perPage = $request->input('per_page', 10);
 
@@ -2308,6 +2310,9 @@ class InstituteApiController extends Controller
                     })
                     ->when($standard, function ($query, $standard) {
                         return $query->where('students_details.standard_id', $standard);
+                    })
+                    ->when($batch_id, function ($query, $batch_id) {
+                        return $query->where('students_details.batch_id', $batch_id);
                     })
                     ->when($searchkeyword, function ($query, $searchkeyword) {
                         return $query->where(function ($query) use ($searchkeyword) {
