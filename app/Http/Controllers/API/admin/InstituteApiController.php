@@ -2563,8 +2563,8 @@ class InstituteApiController extends Controller
                     'close_time' => $value['close_time'] . '',
                     'gst_number' => $value['gst_number'] . '',
                     'gst_slab' => $value['gst_slab'] . '',
-                    'start_academic_year' => $value['start_academic_year'],
-                    'end_academic_year' => $value['end_academic_year'],
+                    'start_academic_year' => $value['start_academic_year'] . '',
+                    'end_academic_year' => $value['end_academic_year'] . '',
 
                 ];
             }
