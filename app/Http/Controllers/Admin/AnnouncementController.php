@@ -32,9 +32,6 @@ class AnnouncementController extends Controller
         }
         // echo "<pre>";print_r($response);exit;
 
-
-
-
         return view('announcement/create', compact('institute_list', 'teachers', 'response'));
     }
 

@@ -2852,4 +2852,60 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+
+    public function edit_subject(Request $request){
+        
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'medium'=>'required',
+            'board_id' => 'required',
+            'standard_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+                $batchlist = Batches_model::where('user_id', $request->user_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->where('board_id', $request->board_id)
+                    ->where('standard_id', $request->standard_id)->get()->toarray();
+                $batch_response = [];
+                foreach ($batchlist as $value) {
+                    $batch_response[] = [
+                        'id' => $value['id'],
+                        'batch_name' => $value['batch_name']
+                    ];
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Batch Fetch Successfully',
+                    'data' => $batch_response
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    
+    }
 }
