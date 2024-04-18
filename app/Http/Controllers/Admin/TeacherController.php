@@ -499,7 +499,7 @@ class TeacherController extends Controller
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                     ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-                    ->leftJoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+                    ->Rightjoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
 
                     ->where('teacher_detail.teacher_id', $teacher_id)
                     ->where('teacher_detail.institute_id', $institute_id)

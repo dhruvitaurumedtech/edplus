@@ -62,7 +62,8 @@
                   <th style="width: 10px">
                     <Sr class="No">No</Sr>
                   </th>
-                  <th style="width: 400px">Name</th>
+                  <th style="width: 400px">firstname</th>
+                  <th style="width: 400px">lastname</th>
                   <th style="width: 400px">Email</th>
                   <th style="width: 400px">Mobile</th>
                   <th style="width: 400px">Status</th>
@@ -74,7 +75,8 @@
                 @foreach($institute as $value)
                 <tr>
                   <td>{{$i}}</td>
-                  <td>{{$value->firstname.' '.$value->lastname}}</td>
+                  <td>{{$value->firstname}}</td>
+                  <td>{{$value->lastname}}</td>
                   <td>{{$value->email}}</td>
                   <td>{{$value->mobile}}</td>
                   <td>{{$value->status}}</td>
@@ -126,10 +128,19 @@
                     </div>
                   </div>
                   <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
                     <div class="col-sm-10">
                       <input type="hidden" name="user_id" id="user_id">
-                      <input type="text" id="name" name="name" class="form-control" placeholder="Name">
+                      <input type="text" id="firstname" name="firstname" class="form-control" placeholder="firstname">
+                      @error('name')
+                      <div class="alert alert-danger">{{ $message }}</div>
+                      @enderror
+                    </div>
+                  </div>
+                  <div class="form-group row">
+                    <label for="inputEmail3" class="col-sm-2 col-form-label">lastname</label>
+                    <div class="col-sm-10">
+                      <input type="text" id="lastname" name="lastname" class="form-control" placeholder="lastname">
                       @error('name')
                       <div class="alert alert-danger">{{ $message }}</div>
                       @enderror
@@ -174,7 +185,8 @@
 
                 $('#user_id').val(reponse_data.id);
                 $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.name);
+                $('#firstname').val(reponse_data.firstname);
+                $('#lastname').val(reponse_data.lastname);
                 $('#email').val(reponse_data.email);
                 $('#mobile').val(reponse_data.mobile);
                 $('#usereditModal').modal('show');

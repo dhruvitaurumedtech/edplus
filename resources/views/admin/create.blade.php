@@ -72,7 +72,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
               <div class="col-sm-10">
-                <input type="text" id="firstname" name="firstname" class="form-control" placeholder="Name">
+                <input type="text" id="firstname" name="firstname" class="form-control" placeholder="first name">
                 @error('firstname')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -81,7 +81,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">lastname</label>
               <div class="col-sm-10">
-                <input type="text" id="lastname" name="lastname" class="form-control" placeholder="Name">
+                <input type="text" id="lastname" name="lastname" class="form-control" placeholder="last name">
                 @error('lastname')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
