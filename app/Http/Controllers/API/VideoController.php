@@ -109,10 +109,16 @@ class VideoController extends Controller
             ->get();
 
         $videocat = [];
+        echo "<pre>";
+        print_r($categories);
+        exit;
         foreach ($categories as $catvalu) {
             $videocat[] = array(
-                'id' => $catvalu->did, 'name' => $catvalu->name,
-                'parent_category_id' => $catvalu->cid, 'parent_category_name' => $catvalu->cname, 'status' => $catvalu->status
+                'id' => $catvalu->did,
+                'name' => $catvalu->name,
+                'parent_category_id' => $catvalu->cid,
+                'parent_category_name' => $catvalu->cname,
+                'status' => $catvalu->status
             );
         }
         return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
