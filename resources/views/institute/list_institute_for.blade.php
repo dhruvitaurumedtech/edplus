@@ -19,6 +19,7 @@
 
       <!-- Sub MAIN -->
       <div class="link-dir">
+
         <h1 class="display-4">Institute For List</h1>
         <ul>
           <li><a href="index.php">Home</a></li>

@@ -1015,8 +1015,10 @@ class InstituteApiController extends Controller
                 ->orderBy('created_at', 'desc')->get()
                 ->toarray();
             foreach ($announcement_list as $value) {
-                $announcement [] = array( 'title' => $value['title'],
-                'announcement' => $value['announcement']);
+                $announcement[] = array(
+                    'title' => $value['title'],
+                    'announcement' => $value['announcement']
+                );
             }
 
             $response = [
@@ -2552,7 +2554,18 @@ class InstituteApiController extends Controller
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => url($value['logo']),
-                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png'))
+                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png')),
+                    'country' => $value['country'] . '',
+                    'state' => $value['state'] . '',
+                    'city' => $value['city'] . '',
+                    'pincode' => $value['pincode'] . '',
+                    'open_time' => $value['open_time'] . '',
+                    'close_time' => $value['close_time'] . '',
+                    'gst_number' => $value['gst_number'] . '',
+                    'gst_slab' => $value['gst_slab'] . '',
+                    'start_academic_year' => $value['start_academic_year'] . '',
+                    'end_academic_year' => $value['end_academic_year'] . '',
+
                 ];
             }
             return response()->json([
@@ -2696,8 +2709,10 @@ class InstituteApiController extends Controller
 
                 $cat_array = [];
                 foreach ($vcategory as $cat_value) {
-                    $cat_array[] = array('id' => $cat_value->id,
-                     'name' => $cat_value->name);
+                    $cat_array[] = array(
+                        'id' => $cat_value->id,
+                        'name' => $cat_value->name
+                    );
                 }
                 return response()->json([
                     'status' => '200',
