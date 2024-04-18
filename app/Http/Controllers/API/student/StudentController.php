@@ -284,6 +284,7 @@ class StudentController extends Controller
             if ($existingUser) {
                 // Iterate over each parent in the request
                 $parents = json_decode($request->parents, true);
+                print_r($parents);exit;
                 foreach ($parents as $parentData) {
                     // Create a user for each parent
                     $tomail = $parentData['email'];
