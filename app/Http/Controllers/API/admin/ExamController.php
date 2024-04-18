@@ -141,6 +141,7 @@ class ExamController extends Controller
                 ->where('exam.institute_id', $request->institute_id)
                 ->where('exam.user_id', $request->user_id)
                 ->wherenull('exam.deleted_at')
+                ->orderByDesc('exam.created_at')
                 ->get()->toarray();
             if (!empty($exam_list)) {
                 $exam_list_array = [];

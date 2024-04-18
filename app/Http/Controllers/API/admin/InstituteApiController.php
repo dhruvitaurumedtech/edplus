@@ -2323,6 +2323,7 @@ class InstituteApiController extends Controller
                         });
                     })
                     ->select('students_details.*', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->orderByDesc('students_details.created_at')
                     ->paginate($perPage);
 
                 $stulist = [];

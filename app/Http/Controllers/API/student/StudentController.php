@@ -88,7 +88,9 @@ class StudentController extends Controller
                     ->where(function ($query) use ($search_keyword) {
                         $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                             ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
-                    })->paginate($perPage);
+                    })
+                    ->orderByDesc('created_at')
+                    ->paginate($perPage);
 
                 $search_list = [];
                 foreach ($allinstitute as $value) {
@@ -120,7 +122,9 @@ class StudentController extends Controller
                 //requested institute
                 $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
                     ->where('students_details.student_id', $user_id)
-                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')->paginate($perPage);
+                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
+                    ->orderByDesc('institute_detail.created_at')
+                    ->paginate($perPage);
 
                 $requested_institute = [];
                 foreach ($requestnstitute as $value) {
@@ -155,14 +159,15 @@ class StudentController extends Controller
                     );
                 }
 
-                $parentsdt = Parents::where('student_id', $user_id)->get();
+                $parentsdt = Parents::where('student_id', $user_id)
+                ->orderByDesc('created_at')
+                ->get();
 
                 $veryfy = [];
                 foreach ($parentsdt as $checkvery) {
                     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
                 }
                 if ($parentsdt->isEmpty()) {
-
                     $studentparents = '0';
                 } else {
                     $studentparents = '1';
@@ -333,12 +338,10 @@ class StudentController extends Controller
                             ], 500);
                         }
                         
-                        
                         $data = [
                             'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
                             'email' => $tomail,
                             'id' => $parnsad->id
-                           
                         ];
     
                         Mail::to($tomail)->send(new WelcomeMail($data));
@@ -600,6 +603,7 @@ class StudentController extends Controller
                 $announcQY = announcements_model::where('institute_id', $institute_id)
                 ->where('batch_id', $existingUser->batch_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->orderByDesc('created_at')
                 ->get();
                 foreach ($announcQY as $announcDT) {
                     $announcement[] = array(
@@ -836,7 +840,9 @@ class StudentController extends Controller
                         })
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->vid)
-                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')->get();
+                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+                        ->orderByDesc('topic.created_at')
+                        ->get();
                     foreach ($topicqry as $topval) {
 
                         if ($existingUser->role_type == 6) {
@@ -1161,6 +1167,7 @@ class StudentController extends Controller
                             ->whereIN('exam.subject_id', $subjectIds)
 
                             ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
+                            ->orderByDesc('exam.created_at')
                             ->get();
 
                         foreach ($exams as $examsDT) {

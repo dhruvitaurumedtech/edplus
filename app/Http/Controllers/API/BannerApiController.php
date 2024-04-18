@@ -259,8 +259,10 @@ class BannerApiController extends Controller
                     $imagePath = $banner_image->store('banner_image', 'public');
                 }
 
-                $bannerad = Banner_model::where('user_id', $user_id)->where('institute_id', $institute_id)
-                    ->get();
+                $bannerad = Banner_model::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->orderByDesc('created_at')
+                ->get();
                 $banners = [];
                 foreach ($bannerad as $bnDT) {
                     $banners[] = array(
