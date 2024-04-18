@@ -14,6 +14,7 @@ use App\Models\Search_history;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
+use App\Models\TeacherAssignBatch;
 use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
@@ -497,17 +498,34 @@ class TeacherController extends Controller
                 $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                    ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
+                    ->leftJoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+
                     ->where('teacher_detail.teacher_id', $teacher_id)
                     ->where('teacher_detail.institute_id', $institute_id)
                     ->whereNull('teacher_detail.deleted_at')
-                    ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name')
-                    ->get()->toArray();
-                // echo "<pre>";
-                // print_r($teacher_data);
-                // exit;
+                    ->select(
+                        'board.name as board_name',
+                        'standard.name as standard_name',
+                        'medium.name as medium_name',
+                        'teacher_assign_batch.batch_id',
+                        'batches.batch_name'
+                    )
+                    ->get()
+                    ->toArray();
+
+                echo "<pre>";
+                print_r($teacher_data);
+                exit;
                 // $teacher_data = [];
+
+                // TeacherAssignBatch::join('batches.id', '=', 'teacher_assign_batch.batch_id')
+                //     ->where('teacher_assign_batch.teacher_id', $teacher_id)
+                //     ->select('batches.batch_name')
+                //     ->get()->toaaray();
                 $teacher_response = [];
                 foreach ($teacher_data as $value) {
+
                     $teacher_response = [
                         'board' => $value['board_name'],
                         'standard' => $value['standard_name'],
