@@ -494,21 +494,28 @@ class TeacherController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-                // $teacher_data = Teacher_model::join('board.id', '=', 'teacher_detail.board_id', 'left')
-                //     ->join('medium.id', '=', 'teacher_detail.medium_id', 'left')
-                //     ->join('standard.id', '=', 'teacher_detail.standard_id', 'left')
-                //     ->where('teacher_id', $teacher_id)
-                //     ->where('institute_id', $institute_id)
-                //     ->select('board.name as board_name,standard.name as standard_name,medium.name as medium_name')
-                //     ->get()->toarray();
-                // foreach ($teacher_data as $value) {
-                //     $standard_get = [];
-                // }
+                $teacher_data = Teacher_model::join('board.id', '=', 'teacher_detail.board_id', 'left')
+                    ->join('medium.id', '=', 'teacher_detail.medium_id', 'left')
+                    ->join('standard.id', '=', 'teacher_detail.standard_id', 'left')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->where('teacher_detail.institute_id', $institute_id)
+                    ->select('board.name as board_name,standard.name as standard_name,medium.name as medium_name')
+                    ->get()->toarray();
+                $$teacher_response = [];
+                foreach ($teacher_data as $value) {
+                    $teacher_response = [
+                        'board' => $value['board_name'],
+                        'standard' => $value['standard_name'],
+                        'medium' => $value['medium_name']
+
+                    ];
+                }
 
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
                     'announcement' => $announcement,
+                    'class_detail' => $teacher_response,
                 );
 
 
