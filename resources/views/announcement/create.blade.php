@@ -304,6 +304,7 @@
                                     $('#anouncement_id').val(result.id);
                                     $('#announcement').val(result.announcement);
                                     $('#title').val(result.title);
+                                    
                                     const institute_id_result = institute_id.split(',');
                                     for (let institute of institute_id_result) {
                                         $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);
