@@ -503,7 +503,9 @@ class TeacherController extends Controller
                     ->where('teacher_detail.institute_id', $institute_id)
                     ->whereNull('teacher_detail.deleted_at')
                     ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name', 'teacher_assign_batch.batch_id')
-                    ->get()->toArray();
+                    ->get()
+                    ->toArray();
+
                 echo "<pre>";
                 print_r($teacher_data);
                 exit;
