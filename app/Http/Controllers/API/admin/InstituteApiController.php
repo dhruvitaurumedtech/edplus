@@ -1010,7 +1010,7 @@ class InstituteApiController extends Controller
             //     ];
             // }
 
-            $announcement_list = Common_announcement::where('institute_id', $institute_id)
+            $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
             ->where('created_at', '>=', $fifteenDaysAgo)
             ->orderBy('created_at', 'desc')->get()
             ->toarray();
