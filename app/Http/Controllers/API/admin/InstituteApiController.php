@@ -2554,7 +2554,12 @@ class InstituteApiController extends Controller
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
                     'logo' => url($value['logo']),
-                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png'))
+                    'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png')),
+                    'country' => $value['country'],
+                    'state' => $value['state'],
+                    'city' => $value['city'],
+                    'pincode' => $value['pincode'],
+
                 ];
             }
             return response()->json([
@@ -2698,8 +2703,10 @@ class InstituteApiController extends Controller
 
                 $cat_array = [];
                 foreach ($vcategory as $cat_value) {
-                    $cat_array[] = array('id' => $cat_value->id,
-                     'name' => $cat_value->name);
+                    $cat_array[] = array(
+                        'id' => $cat_value->id,
+                        'name' => $cat_value->name
+                    );
                 }
                 return response()->json([
                     'status' => '200',
