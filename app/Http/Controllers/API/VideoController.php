@@ -109,9 +109,6 @@ class VideoController extends Controller
             ->get();
 
         $videocat = [];
-        echo "<pre>";
-        print_r($categories);
-        exit;
         foreach ($categories as $catvalu) {
             $videocat[] = array(
                 'id' => $catvalu->did,
