@@ -290,44 +290,47 @@ class StudentController extends Controller
                 foreach ($parents as $parentData) {
                     // Create a user for each parent
                     $tomail = $parentData['email'];
-                    $user = User::create([
-                        'firstname' => $parentData['firstname'],
-                        'lastname' => $parentData['lastname'],
-                        'email' => $parentData['email'],
-                        'mobile' => $parentData['mobile'],
-                        'role_type' => '5'
-                    ]);
-
-                    // Retrieve the ID of the newly created user
-                    $userId = $user->id;
-
-                    // Create a parent record associated with the user
-                    $parnsad = Parents::create([
-                        'student_id' => $student_id,
-                        'parent_id' => $userId,
-                        'relation' => $parentData['relation'],
-                        'verify' => '0',
-                    ]);
-                    $messageContent = "hi";
-                    // Mail::to($tomail)->send('emails.forgot');
-                    // Mail::to($tomail)->send(new WelcomeMail());
-                    $data = [
-                        'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
-                        'email' => $tomail,
-                        'id' => $parnsad->id
-                        // Add any other data you want to pass to the email
-                    ];
-
-                    Mail::to($tomail)->send(new WelcomeMail($data));
-                    // Mail::to('recipient@example.com')->send(new WelcomeMail());
-
-                    // Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
-                    //     $message->to($tomail);
-                    //     $message->subject('Reset Password');
-                    //   });
+                    if($parentData['firstname'] == '' || $parentData['lastname'] == '' || $parentData['email'] == '' || $parentData['mobile'] == '' || $parentData['relation'] == ''){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'Requied field are missing',
+                        ], 400);
+                    }else{
+                        $user = User::create([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5'
+                        ]);
+    
+                        // Retrieve the ID of the newly created user
+                        $userId = $user->id;
+    
+                        // Create a parent record associated with the user
+                        $parnsad = Parents::create([
+                            'student_id' => $student_id,
+                            'parent_id' => $userId,
+                            'relation' => $parentData['relation'],
+                            'verify' => '0',
+                        ]);
+                        
+                        $data = [
+                            'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
+                            'email' => $tomail,
+                            'id' => $parnsad->id
+                           
+                        ];
+    
+                        Mail::to($tomail)->send(new WelcomeMail($data));
+                    }
+                    
+                    
                 }
 
-                return response()->json(['success' => 200, 'message' => 'Parent details uploaded successfully', 'data' => []], 200);
+                return response()->json(['success' => 200, 
+                'message' => 'Parent details uploaded successfully',
+                 'data' => []], 200);
             } else {
                 return response()->json([
                     'status' => 400,
