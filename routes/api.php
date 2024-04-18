@@ -80,7 +80,7 @@ Route::post('/institute/announcements-list', [InstituteApiController::class, 'an
 Route::post('/institute/add-timetable', [InstituteApiController::class, 'add_time_table'])->name('add_time_table');
 Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
 Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
-Route::post('/institute/category-list', [InstituteApiController::class, 'do_business_with_category']);
+Route::post('/institute/do-business-with-category', [InstituteApiController::class, 'do_business_with_category']);
 Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
 //banner controller
 Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
