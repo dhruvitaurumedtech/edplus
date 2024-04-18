@@ -2337,7 +2337,7 @@ class InstituteApiController extends Controller
                         'standard_id' => $stdDT->standard_id,
                         'standard' => $stdDT->standard,
                         'batch_id'=>$stdDT->batch_id,
-                        'batch_name'=>$stdDT->batch_name
+                        'batch_name'=>$stdDT->batch_name,
                     );
                 }
 
