@@ -2115,6 +2115,7 @@ class InstituteApiController extends Controller
                         $query->where('standard_id', $standard_id);
                     });
                 })
+                ->orderByDesc('created_at')
                 ->get();
 
             if (!empty($anoouncmntdt)) {
