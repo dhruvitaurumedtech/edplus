@@ -1982,7 +1982,7 @@ class InstituteApiController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             //'institute_for_id' => 'required',
-            'class_id' => 'required',
+            //'class_id' => 'required',
             //'stream_id' => 'required',
             'subject_id' => 'required',
             'role_type' => 'required',
@@ -2014,7 +2014,7 @@ class InstituteApiController extends Controller
             $board_id = $request->board_id;
             $medium_id = $request->medium_id;
             // $institute_for_id = $request->institute_for_id;
-            $class_id = $request->class_id;
+            //$class_id = $request->class_id;
             $stream_id = $request->stream_id;
             $subject_id = $request->subject_id;
             $role_type = $request->role_type;
@@ -2035,7 +2035,7 @@ class InstituteApiController extends Controller
                 'board_id' => $board_id,
                 'medium_id' => $medium_id,
                 //'institute_for_id' => $institute_for_id,
-                'class_id' => $class_id,
+                //'class_id' => $class_id,
                 'stream_id' => $stream_idd,
                 'subject_id' => $subject_id,
                 'role_type' => $role_type,
