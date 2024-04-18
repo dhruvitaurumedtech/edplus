@@ -2,6 +2,7 @@
 <link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+<link rel="stylesheet" href="{{asset('javascript/common.js')}}" />
 
 </head>
 
@@ -142,12 +143,13 @@
 
                     <td>
                       <div class="d-flex">
+
                         @canButton('edit', 'Institute_for')
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn btn-primary institute_for_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Institute_for')
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger institute_for_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>
                   </tr>
@@ -161,16 +163,10 @@
 
             </div>
           </div>
-
-
-
-
-
-
         </div>
       </div>
 
-      @include('layouts/footer_new')
+
       <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -233,89 +229,4 @@
       </div>
     </div>
   </div>
-
-  <script>
-    document.querySelectorAll('.editButton').forEach(function(button) {
-      button.addEventListener('click', function() {
-        var institute_id = this.getAttribute('data-user-id');
-
-        axios.post('/institute-for/edit', {
-            institute_id: institute_id
-          })
-          .then(response => {
-            var reponse_data = response.data.Institute_for_model;
-            var iconSrc = '{{ asset('
-            ') }}' + reponse_data.icon;
-            $('#institute_id').val(reponse_data.id);
-            $('#name').val(reponse_data.name);
-            $('#icon_update').attr('src', iconSrc);
-            $('#old_icon').val(reponse_data.icon);
-            $('#status').val(reponse_data.status);
-            $('#usereditModal').modal('show');
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      });
-    });
-    document.querySelectorAll('.deletebutton').forEach(function(button) {
-      button.addEventListener('click', function(event) {
-        event.preventDefault();
-        var institute_id = this.getAttribute('data-user-id');
-
-        Swal.fire({
-          title: 'Are you sure want to delete?',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            axios.post('/institute-for/delete', {
-                institute_id: institute_id
-              })
-              .then(response => {
-                location.reload(true);
-
-              })
-              .catch(error => {
-                console.error(error);
-              });
-          }
-        });
-      });
-    });
-  </script>
-
-  <script>
-    function previewFile_create() {
-      $("#icon_create").show();
-      const preview = document.getElementById("icon_create");
-      const fileInput = document.querySelector("input[type=file]");
-      const file = fileInput.files[0];
-      const reader = new FileReader();
-
-      reader.addEventListener("load", () => {
-        preview.src = reader.result;
-      }, false);
-
-      if (file) {
-        reader.readAsDataURL(file);
-      }
-    }
-
-    function previewFile_update(inputElement) {
-      const preview = document.getElementById("icon_update");
-      const file = inputElement.files[0];
-      const reader = new FileReader();
-
-      reader.addEventListener("load", () => {
-        preview.src = reader.result;
-      }, false);
-
-      if (file) {
-        reader.readAsDataURL(file);
-      }
-    }
-  </script>
+  @include('layouts/footer_new')

@@ -56,7 +56,7 @@
             <thead>
               <tr>
                 <th style="width: 10px">
-                  <Sr class="No"></Sr>
+                  <Sr class="No">No</Sr>
                 </th>
                 <th style="width: 400px">Name</th>
                 <th style="width: 400px">Email</th>
@@ -173,10 +173,10 @@
               })
               .then(response => {
                 var reponse_data = response.data.userDT;
-
+                console.log(reponse_data);
                 $('#user_id').val(reponse_data.id);
                 $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.name);
+                $('#name').val(reponse_data.firstname);
                 $('#email').val(reponse_data.email);
                 $('#mobile').val(reponse_data.mobile);
                 $('#usereditModal').modal('show');
