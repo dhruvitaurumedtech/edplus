@@ -437,9 +437,7 @@ class TeacherController extends Controller
                 'data' => array('errors' => $errorMessages),
             ], 400);
         }
-
         try {
-
             $token = $request->header('Authorization');
 
             if (strpos($token, 'Bearer ') === 0) {
@@ -496,21 +494,32 @@ class TeacherController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-                $teacher_data = Teacher_model::join('board.id', '=', 'teacher_detail.board_id', 'left')
-                    ->join('medium.id', '=', 'teacher_detail.medium_id', 'left')
-                    ->join('standard.id', '=', 'teacher_detail.standard_id', 'left')
-                    ->where('teacher_id', $teacher_id)
-                    ->where('institute_id', $institute_id)
-                    ->select('board.name as board_name,standard.name as standard_name,medium.name as medium_name')
-                    ->get()->toarray();
+                $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+                    ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                    ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->where('teacher_detail.institute_id', $institute_id)
+                    ->whereNull('teacher_detail.deleted_at')
+                    ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name')
+                    ->get()->toArray();
+                // echo "<pre>";
+                // print_r($teacher_data);
+                // exit;
+                $teacher_data = [];
                 foreach ($teacher_data as $value) {
-                    $standard_get = [];
+                    $teacher_response = [
+                        'board' => $value['board_name'],
+                        'standard' => $value['standard_name'],
+                        'medium' => $value['medium_name']
+
+                    ];
                 }
 
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
                     'announcement' => $announcement,
+                    'class_detail' => $teacher_response,
                 );
 
 
