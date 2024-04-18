@@ -349,17 +349,16 @@ class StudentController extends Controller
 
                             if(empty($parnsad->id)){
                                 User::where('id',$userId)->delete();
-                            }else{
                                 return response()->json([
                                     'success' => 500,
-                                    'message' => 'Something went wrongg',
+                                    'message' => 'Data not added Successfuly',
                                     'data' => [],
                                 ], 500);
                             }
                         }else{
                             return response()->json([
                                 'success' => 500,
-                                'message' => 'Something went wronggg',
+                                'message' => 'Data not added Successfuly',
                                 'data' => [],
                             ], 500);
                         }
