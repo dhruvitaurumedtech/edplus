@@ -494,7 +494,7 @@ class TeacherController extends Controller
                         'time' => $announcDT->created_at
                     );
                 }
-                $teacher_response = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+                $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
                     ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                     ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                     ->where('teacher_detail.teacher_id', $teacher_id)
@@ -502,10 +502,10 @@ class TeacherController extends Controller
                     ->whereNull('teacher_detail.deleted_at')
                     ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name')
                     ->get()->toArray();
-                echo "<pre>";
-                print_r($teacher_response);
-                exit;
-                $$teacher_response = [];
+                // echo "<pre>";
+                // print_r($teacher_data);
+                // exit;
+                $teacher_data = [];
                 foreach ($teacher_data as $value) {
                     $teacher_response = [
                         'board' => $value['board_name'],
