@@ -2136,7 +2136,7 @@ class InstituteApiController extends Controller
                             'name' => $rolDT->role_name
                         );
                     }
-
+                       print_r('texst');exit; 
                     $announcementDT[] = array(
                         'id' => $anoouncmnt->id,
                         'date' => $anoouncmnt->created_at,
