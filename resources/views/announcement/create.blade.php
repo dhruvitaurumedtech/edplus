@@ -106,6 +106,13 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
+                                                <label for="exampleInputtitle">Title : </label>
+                                                <input type="text" class="form-control" name="title">
+                                                @error('title')
+                                                <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Announcement : </label>
                                                 <textarea class="form-control" name="announcement"></textarea>
                                                 @error('announcement')
@@ -132,6 +139,7 @@
                                 <table class="table table-bordered table-responsive">
                                     <thead>
                                         <tr>
+                                            <th style="width: 200px">Title </th>
                                             <th style="width: 200px">Announcement </th>
                                             <th style="width: 200px">Institute</th>
                                             <th style="width: 500px">Teacher</th>
@@ -142,6 +150,7 @@
 
                                         @foreach($response as $values)
                                         <tr>
+                                            <td>{{$values['title']}}</td>
                                             <td>{{$values['announcement']}}</td>
                                             <td>
                                                 @foreach($values['institute_show'] as $institute)
@@ -248,6 +257,13 @@
                                                 </div>
                                             </div>
                                             <div class="col-md-12">
+                                                <label for="exampleInputtitle">Title : </label>
+                                                <input type="text" class="form-control"  name="title" id="title">
+                                                @error('title')
+                                                <div class="text-danger">{{ $message }}</div>
+                                                @enderror
+                                            </div>
+                                            <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Announcement : </label>
                                                 <textarea class="form-control" name="announcement" id="announcement"></textarea>
                                                 @error('announcement')
@@ -282,10 +298,12 @@
                             .then(response => {
                                 var response_data = response.data.announcement;
                                 for (let result of response_data) {
+                                    
                                     var institute_id = result.institute_id;
                                     var teacher_id = result.teacher_id;
                                     $('#anouncement_id').val(result.id);
                                     $('#announcement').val(result.announcement);
+                                    $('#title').val(result.title);
                                     const institute_id_result = institute_id.split(',');
                                     for (let institute of institute_id_result) {
                                         $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);

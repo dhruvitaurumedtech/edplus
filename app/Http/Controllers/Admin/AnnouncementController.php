@@ -24,6 +24,7 @@ class AnnouncementController extends Controller
             $teacher_response = User::whereIn('id', explode(',', $value['teacher_id']))->get()->toarray();
             $response[] = [
                 'id' => $value['id'],
+                'title' => $value['title'],
                 'announcement' => $value['announcement'],
                 'institute_show' => $institute_response,
                 'teacher_show' => $teacher_response,
@@ -59,6 +60,7 @@ class AnnouncementController extends Controller
         $announcement = Common_announcement::create([
             'institute_id' => implode(",", $request->institute_id),
             'teacher_id' => implode(",", $request->teacher_id),
+            'title'=>$request->title,
             'announcement' => $request->announcement,
         ]);
 
@@ -97,6 +99,7 @@ class AnnouncementController extends Controller
         $announcement->update([
             'institute_id' => implode(",", $request->institute_id),
             'teacher_id' => implode(",", $request->teacher_id),
+            'title'=>$request->title,
             'announcement' => $request->announcement,
         ]);
 
