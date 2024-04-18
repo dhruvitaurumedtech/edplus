@@ -65,7 +65,9 @@
                                     <label for="height">Height</label>
                                     <input type="number" class="form-control" name="height" required>
                                 </div>
-                                <button type="submit" class="btn btn-primary">Create</button>
+                                <div class="flex mb-5">
+                                    <button type="submit" class="btn btn-primary" style="float: right;">Create</button>
+                                </div>
                             </form>
 
                         </div>
