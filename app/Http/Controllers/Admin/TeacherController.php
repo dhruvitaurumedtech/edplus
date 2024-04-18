@@ -502,7 +502,9 @@ class TeacherController extends Controller
                     ->whereNull('teacher_detail.deleted_at')
                     ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name')
                     ->get()->toArray();
-
+                echo "<pre>";
+                print_r($teacher_response);
+                exit;
                 $$teacher_response = [];
                 foreach ($teacher_data as $value) {
                     $teacher_response = [
