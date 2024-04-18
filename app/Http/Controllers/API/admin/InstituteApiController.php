@@ -1015,10 +1015,8 @@ class InstituteApiController extends Controller
                 ->orderBy('created_at', 'desc')->get()
                 ->toarray();
             foreach ($announcement_list as $value) {
-                $announcement = [
-                    'title' => $value['title'],
-                    'announcement' => $value['announcement']
-                ];
+                $announcement [] = array( 'title' => $value['title'],
+                'announcement' => $value['announcement']);
             }
 
             $response = [
