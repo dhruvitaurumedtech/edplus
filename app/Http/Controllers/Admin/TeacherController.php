@@ -504,9 +504,9 @@ class TeacherController extends Controller
                     ->whereNull('teacher_detail.deleted_at')
                     ->select('board.name as board_name', 'standard.name as standard_name', 'medium.name as medium_name', 'teacher_assign_batch.batch_id')
                     ->get()->toArray();
-                // echo "<pre>";
-                // print_r($teacher_data);
-                // exit;
+                echo "<pre>";
+                print_r($teacher_data);
+                exit;
                 // $teacher_data = [];
 
                 // TeacherAssignBatch::join('batches.id', '=', 'teacher_assign_batch.batch_id')
