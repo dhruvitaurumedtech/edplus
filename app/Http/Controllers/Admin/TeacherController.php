@@ -9,6 +9,7 @@ use App\Models\Base_table;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Batches_model;
 use App\Models\board;
+use App\Models\Common_announcement;
 use App\Models\Institute_detail;
 use App\Models\Search_history;
 use App\Models\Subject_model;
@@ -145,6 +146,12 @@ class TeacherController extends Controller
                         'logo' => asset($value->logo),
                     );
                 }
+                $announcement = Common_announcement::whereRaw("FIND_IN_SET($value->teacher_id, tecaher_id)")
+                    ->select('*')->get()->toarray();
+                echo "<pre>";
+                print_r($announcement);
+                exit;
+
 
                 // $parentsdt = Parents::where('student_id', $user_id)->get();
 
