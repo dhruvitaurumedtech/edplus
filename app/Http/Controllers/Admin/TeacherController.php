@@ -148,9 +148,11 @@ class TeacherController extends Controller
                 }
                 $announcement = Common_announcement::whereRaw("FIND_IN_SET($request->teacher_id, teacher_id)")
                     ->select('*')->get()->toarray();
-                echo "<pre>";
-                print_r($announcement);
-                exit;
+                foreach ($announcement as $value) {
+                    $announcement_response[] = [
+                        'announcement' => $value['announcement']
+                    ];
+                }
 
 
                 // $parentsdt = Parents::where('student_id', $user_id)->get();
@@ -174,6 +176,7 @@ class TeacherController extends Controller
                         'searchhistory_list' => $searchhistory_list,
                         'requested_institute' => $requested_institute,
                         'join_with' => $join_with,
+                        'announcement' => $announcement_response
                         // 'parents_detail' => $studentparents,
                         // 'parents_verification' => $veryfy
                     ),
