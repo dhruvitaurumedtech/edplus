@@ -1215,9 +1215,7 @@ class InstituteApiController extends Controller
             if (!empty($request_list)) {
 
                 $user_data = User::whereIN('id', $request_list)->get();
-                echo "<pre>";
-                print_r($user_data);
-                exit;
+
                 $response = [];
                 foreach ($user_data as $value2) {
                     if (!empty($value2['image'])) {
