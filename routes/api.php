@@ -33,8 +33,8 @@ Route::group(['middleware' => ['web']], function () {
     Route::post('/auth/reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 });
 Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
-Route::post('/institute/video_category', [VideoController::class, 'video_category'])->name('video_category.get');
-Route::post('/institute/category-list', [InstituteApiController::class, 'category_list']);
+Route::post('/institute/category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
+Route::post('/institute/video-category-list', [VideoController::class, 'video_category']);
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
 Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
