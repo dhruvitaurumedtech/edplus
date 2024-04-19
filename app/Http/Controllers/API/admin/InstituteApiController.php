@@ -2070,6 +2070,7 @@ class InstituteApiController extends Controller
                     'message' => 'Data not added.',
                 ]);
             }
+
         } else {
             return response()->json([
                 'status' => 400,
@@ -2536,6 +2537,7 @@ class InstituteApiController extends Controller
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
+                    'icon'=>$board_value->icon,
                     'medium' => $medium_array,
 
                     // Include banner_array inside board_array
