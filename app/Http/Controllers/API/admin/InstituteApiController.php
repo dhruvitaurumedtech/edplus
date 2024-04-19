@@ -2021,7 +2021,7 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-
+        print_r('hi');exit;
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
