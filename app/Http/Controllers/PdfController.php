@@ -79,7 +79,7 @@ class PdfController extends Controller
 
             return response()->json([
                 'success' => 400,
-                'message' => 'Video Assign Batch Successfully',
+                'message' => 'PDF Assign Batch Successfully',
             ], 400);
         } else {
             return response()->json([
