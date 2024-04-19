@@ -50,7 +50,7 @@ class PdfController extends Controller
                 $record = PdfAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
                     ->get();
-                if ($record) {
+                if (!empty($record)) {
                     return response()->json([
                         'success' => 400,
                         'message' => 'Already Assign PDF This Batch!',
