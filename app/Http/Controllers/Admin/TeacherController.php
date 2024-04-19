@@ -146,6 +146,8 @@ class TeacherController extends Controller
                         'logo' => asset($value->logo),
                     );
                 }
+                $query = Common_announcement::whereRaw("FIND_IN_SET($value->teacher_id, teacher_id)")->toSql();
+                print_r($query);
                 $announcement = Common_announcement::whereRaw("FIND_IN_SET($value->teacher_id, teacher_id)")
                     ->select('*')->get()->toarray();
                 echo "<pre>";
