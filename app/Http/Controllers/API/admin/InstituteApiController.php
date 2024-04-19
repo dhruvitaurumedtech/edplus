@@ -1017,7 +1017,8 @@ class InstituteApiController extends Controller
             foreach ($announcement_list as $value) {
                 $announcement[] = array(
                     'title' => $value['title'],
-                    'announcement' => $value['announcement']
+                    'announcement' => $value['announcement'],
+                    'created_at' => $value['created_at']
                 );
             }
 
@@ -1993,6 +1994,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
+            'batch_id'=>'required',
             //'institute_for_id' => 'required',
             //'class_id' => 'required',
             //'stream_id' => 'required',
@@ -2040,6 +2042,7 @@ class InstituteApiController extends Controller
             } else {
                 $stream_idd = $request->stream_id;
             }
+            
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
                 'institute_id' => $institute_id,
@@ -2068,6 +2071,7 @@ class InstituteApiController extends Controller
                     'message' => 'Data not added.',
                 ]);
             }
+
         } else {
             return response()->json([
                 'status' => 400,
@@ -2534,6 +2538,7 @@ class InstituteApiController extends Controller
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
+                    'icon'=>$board_value->icon,
                     'medium' => $medium_array,
 
                     // Include banner_array inside board_array
@@ -2854,7 +2859,7 @@ class InstituteApiController extends Controller
     }
 
     public function edit_subject(Request $request){
-        
+
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
