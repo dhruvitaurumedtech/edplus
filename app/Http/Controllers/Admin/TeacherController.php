@@ -148,6 +148,7 @@ class TeacherController extends Controller
                 }
                 $announcement = Common_announcement::whereRaw("FIND_IN_SET($request->teacher_id, teacher_id)")
                     ->select('*')->get()->toarray();
+                $announcement_response = [];
                 foreach ($announcement as $value) {
                     $announcement_response[] = [
                         'announcement' => $value['announcement']
