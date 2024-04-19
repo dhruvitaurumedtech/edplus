@@ -1208,13 +1208,14 @@ class InstituteApiController extends Controller
         if ($existingUser) {
 
             $institute_id = $request->institute_id;
-            $request_list = Student_detail::where('institute_id', $institute_id)
+            $student_id = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
                 ->pluck('student_id');
 
-            if (!empty($request_list)) {
+            if (!empty($student_id)) {
 
-                $user_data = User::whereIN('id', $request_list)->get();
+                $user_data = User::whereIN('id', $student_id)->get();
+
                 $response = [];
                 foreach ($user_data as $value2) {
                     if (!empty($value2['image'])) {
@@ -2001,7 +2002,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
-            'batch_id'=>'required',
+            'batch_id' => 'required',
             //'institute_for_id' => 'required',
             //'class_id' => 'required',
             //'stream_id' => 'required',
@@ -2028,7 +2029,7 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        
+
         if ($existingUser) {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
@@ -2049,7 +2050,7 @@ class InstituteApiController extends Controller
             } else {
                 $stream_idd = $request->stream_id;
             }
-            
+
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
                 'institute_id' => $institute_id,
@@ -2078,7 +2079,6 @@ class InstituteApiController extends Controller
                     'message' => 'Data not added.',
                 ]);
             }
-
         } else {
             return response()->json([
                 'status' => 400,
@@ -2113,105 +2113,105 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            try{
-            //$student_id = $request->student_id;
-            $user_id = $request->user_id;
-            $institute_id = $request->institute_id;
-            $board_id = $request->board_id;
-            $standard_id = $request->standard_id;
-            $searchData = $request->searchData;
+            try {
+                //$student_id = $request->student_id;
+                $user_id = $request->user_id;
+                $institute_id = $request->institute_id;
+                $board_id = $request->board_id;
+                $standard_id = $request->standard_id;
+                $searchData = $request->searchData;
 
-            $anoouncmntdt = announcements_model::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
-                ->when($searchData, function ($query, $searchData) {
-                    return $query->where(function ($query) use ($searchData) {
-                        $query->where('title', 'like', '%' . $searchData . '%')
-                            ->orWhere('detail', 'like', '%' . $searchData . '%');
-                    });
-                })
-                ->when($board_id, function ($query, $board_id) {
-                    return $query->where(function ($query) use ($board_id) {
-                        $query->where('board_id', $board_id);
-                    });
-                })
-                ->when($standard_id, function ($query, $standard_id) {
-                    return $query->where(function ($query) use ($standard_id) {
-                        $query->where('standard_id', $standard_id);
-                    });
-                })
-                ->orderByDesc('created_at')
-                ->get();
+                $anoouncmntdt = announcements_model::where('user_id', $user_id)
+                    ->where('institute_id', $institute_id)
+                    ->when($searchData, function ($query, $searchData) {
+                        return $query->where(function ($query) use ($searchData) {
+                            $query->where('title', 'like', '%' . $searchData . '%')
+                                ->orWhere('detail', 'like', '%' . $searchData . '%');
+                        });
+                    })
+                    ->when($board_id, function ($query, $board_id) {
+                        return $query->where(function ($query) use ($board_id) {
+                            $query->where('board_id', $board_id);
+                        });
+                    })
+                    ->when($standard_id, function ($query, $standard_id) {
+                        return $query->where(function ($query) use ($standard_id) {
+                            $query->where('standard_id', $standard_id);
+                        });
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
 
-            if (!empty($anoouncmntdt)) {
+                if (!empty($anoouncmntdt)) {
 
-                $announcementDT = [];
-                foreach ($anoouncmntdt as $anoouncmnt) {
+                    $announcementDT = [];
+                    foreach ($anoouncmntdt as $anoouncmnt) {
 
-                    $subary = explode(",",$anoouncmnt->subject_id);
-                    $batinsd = explode(",",$anoouncmnt->batch_id);
-                    $subjectq = Subject_model::whereIN('id', $subary)->get();
-                    $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
-                    $boarddt = board::where('id', $anoouncmnt->board_id)->first();
-                    $batchnm = Batches_model::whereIN('id', $batinsd)->get();
+                        $subary = explode(",", $anoouncmnt->subject_id);
+                        $batinsd = explode(",", $anoouncmnt->batch_id);
+                        $subjectq = Subject_model::whereIN('id', $subary)->get();
+                        $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
+                        $boarddt = board::where('id', $anoouncmnt->board_id)->first();
+                        $batchnm = Batches_model::whereIN('id', $batinsd)->get();
 
-                    $subjctslist = [];
-                    foreach($subjectq as $subnms){
-                        $subjctslist[] = array('id'=>$subnms->id,'name'=>$subnms->name);
-                    }
+                        $subjctslist = [];
+                        foreach ($subjectq as $subnms) {
+                            $subjctslist[] = array('id' => $subnms->id, 'name' => $subnms->name);
+                        }
 
-                    $batchslist = [];
-                    foreach($batchnm as $btcnmms){
-                        $batchslist[] = array('id'=>$btcnmms->id,'name'=>$btcnmms->batch_name);
-                    }
+                        $batchslist = [];
+                        foreach ($batchnm as $btcnmms) {
+                            $batchslist[] = array('id' => $btcnmms->id, 'name' => $btcnmms->batch_name);
+                        }
 
-                    $roles = [];
-                    $roledsid = explode(",", $anoouncmnt->role_type);
-                    $roqy = Role::whereIN('id', $roledsid)->get();
-                    foreach ($roqy as $rolDT) {
-                        $roles[] = array(
-                            'id' => $rolDT->id,
-                            'name' => $rolDT->role_name
+                        $roles = [];
+                        $roledsid = explode(",", $anoouncmnt->role_type);
+                        $roqy = Role::whereIN('id', $roledsid)->get();
+                        foreach ($roqy as $rolDT) {
+                            $roles[] = array(
+                                'id' => $rolDT->id,
+                                'name' => $rolDT->role_name
+                            );
+                        }
+
+                        $announcementDT[] = array(
+                            'id' => $anoouncmnt->id,
+                            'date' => $anoouncmnt->created_at,
+                            'title' => $anoouncmnt->title,
+                            'detail' => $anoouncmnt->detail,
+                            //'subject_id' => $subjectq->id,
+
+                            //'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
+                            //'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
+
+                            'standard_id' => $standardtq->id,
+                            'standard' => $standardtq->name,
+                            'board_id' => $boarddt->id,
+                            'board' => $boarddt->name,
+                            'role' => $roles,
+                            'batches' => $batchslist,
+                            'subject' => $subjctslist,
+
                         );
                     }
-
-                    $announcementDT[] = array(
-                        'id' => $anoouncmnt->id,
-                        'date' => $anoouncmnt->created_at,
-                        'title' => $anoouncmnt->title,
-                        'detail' => $anoouncmnt->detail,
-                        //'subject_id' => $subjectq->id,
-                        
-                        //'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
-                        //'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
-                        
-                        'standard_id' => $standardtq->id,
-                        'standard' => $standardtq->name,
-                        'board_id' => $boarddt->id,
-                        'board' => $boarddt->name,
-                        'role' => $roles,
-                        'batches'=>$batchslist,
-                        'subject' => $subjctslist,
-
-                    );
+                    return response()->json([
+                        'status' => 200,
+                        'message' => 'Successfully fetch Data.',
+                        'data' => $announcementDT
+                    ], 200, [], JSON_NUMERIC_CHECK);
+                } else {
+                    return response()->json([
+                        'status' => 400,
+                        'message' => 'Data not found.',
+                    ], 400, [], JSON_NUMERIC_CHECK);
                 }
+            } catch (\Exception $e) {
                 return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch Data.',
-                    'data' => $announcementDT
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Data not found.',
-                ], 400, [], JSON_NUMERIC_CHECK);
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Server Error',
-                'error' => $e->getMessage(),
-            ], 500);
-        }  
         } else {
             return response()->json([
                 'status' => 400,
@@ -2569,7 +2569,7 @@ class InstituteApiController extends Controller
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
-                    'icon'=>$board_value->icon,
+                    'icon' => $board_value->icon,
                     'medium' => $medium_array,
 
                     // Include banner_array inside board_array
@@ -2889,12 +2889,13 @@ class InstituteApiController extends Controller
         }
     }
 
-    public function edit_subject(Request $request){
+    public function edit_subject(Request $request)
+    {
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
-            'medium'=>'required',
+            'medium' => 'required',
             'board_id' => 'required',
             'standard_id' => 'required',
         ]);
@@ -2942,6 +2943,5 @@ class InstituteApiController extends Controller
                 'message' => 'Invalid token.',
             ]);
         }
-    
     }
 }
