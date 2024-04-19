@@ -1177,6 +1177,7 @@ class StudentController extends Controller
                     })
                     ->whereNull('deleted_at')
                     ->get();
+                    
                 $examlist = [];
                 if (!empty($stdetails)) {
                     foreach ($stdetails as $stdetail) {
