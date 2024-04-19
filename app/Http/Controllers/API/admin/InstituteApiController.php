@@ -2041,6 +2041,7 @@ class InstituteApiController extends Controller
             } else {
                 $stream_idd = $request->stream_id;
             }
+            
             $addannounc = announcements_model::create([
                 'user_id' => $user_id,
                 'institute_id' => $institute_id,
