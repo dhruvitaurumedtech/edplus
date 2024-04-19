@@ -1472,6 +1472,13 @@ class InstituteApiController extends Controller
                     ->where('institute_id', $institute_id)
                     ->first();
 
+                    if(empty($insdelQY)){
+                        return response()->json([
+                            'status' => 400,
+                            'message' => 'institute are not working for this standard Please Select Currect Data.',
+                            'data'=>[]
+                        ], 400, [], JSON_NUMERIC_CHECK);
+                    }
                 if (!empty($studentdtls)) {
 
                     $studentupdetail = [
