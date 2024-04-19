@@ -9,6 +9,7 @@ use App\Models\Base_table;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Batches_model;
 use App\Models\board;
+use App\Models\Common_announcement;
 use App\Models\Institute_detail;
 use App\Models\Search_history;
 use App\Models\Subject_model;
@@ -145,6 +146,15 @@ class TeacherController extends Controller
                         'logo' => asset($value->logo),
                     );
                 }
+                $announcement = Common_announcement::whereRaw("FIND_IN_SET($request->teacher_id, teacher_id)")
+                    ->select('*')->get()->toarray();
+                $announcement_response = [];
+                foreach ($announcement as $value) {
+                    $announcement_response[] = [
+                        'announcement' => $value['announcement']
+                    ];
+                }
+
 
                 // $parentsdt = Parents::where('student_id', $user_id)->get();
 
@@ -167,6 +177,7 @@ class TeacherController extends Controller
                         'searchhistory_list' => $searchhistory_list,
                         'requested_institute' => $requested_institute,
                         'join_with' => $join_with,
+                        'announcement' => $announcement_response
                         // 'parents_detail' => $studentparents,
                         // 'parents_verification' => $veryfy
                     ),
