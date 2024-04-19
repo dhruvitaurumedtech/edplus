@@ -1017,7 +1017,8 @@ class InstituteApiController extends Controller
             foreach ($announcement_list as $value) {
                 $announcement[] = array(
                     'title' => $value['title'],
-                    'announcement' => $value['announcement']
+                    'announcement' => $value['announcement'],
+                    'created_at' => $value['created_at']
                 );
             }
 
@@ -2858,7 +2859,7 @@ class InstituteApiController extends Controller
     }
 
     public function edit_subject(Request $request){
-        
+
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
