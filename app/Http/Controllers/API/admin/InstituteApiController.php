@@ -1208,13 +1208,13 @@ class InstituteApiController extends Controller
         if ($existingUser) {
 
             $institute_id = $request->institute_id;
-            $request_list = Student_detail::where('institute_id', $institute_id)
+            $student_id = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
                 ->pluck('student_id');
 
-            if (!empty($request_list)) {
+            if (!empty($student_id)) {
 
-                $user_data = User::whereIN('id', $request_list)->get();
+                $user_data = User::whereIN('id', $student_id)->get();
 
                 $response = [];
                 foreach ($user_data as $value2) {

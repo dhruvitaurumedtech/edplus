@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="{{asset('front_asset/css/style.css')}}" />
   <link rel="stylesheet" href="{{asset('front_asset/css/responsive.css')}}" />
 </head>
+hui
 
 <body class="bg-gray">
   <div class="page-wrapper ">
