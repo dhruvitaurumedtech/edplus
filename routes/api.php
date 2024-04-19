@@ -19,6 +19,7 @@ use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\student\StudentAttendance;
+use App\Http\Controllers\PdfController;
 use App\Models\Student_detail;
 
 Route::post('/auth/register', [AuthController::class, 'register']);
@@ -104,6 +105,7 @@ Route::post('/institute/institute-profile-edit', [InstituteApiController::class,
 Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
 Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);
+Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
 
 
 //teacher
