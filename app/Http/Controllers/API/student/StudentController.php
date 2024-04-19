@@ -658,7 +658,7 @@ class StudentController extends Controller
 
 
                 $subdta = Student_detail::where('student_id', $user_id)
-                    ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+                ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
 
                 if (!empty($subdta)) {
                     $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
@@ -1161,7 +1161,7 @@ class StudentController extends Controller
             if (strpos($token, 'Bearer ') === 0) {
                 $token = substr($token, 7);
             }
-            //$institute_id = $request->institute_id;
+            $institute_id = $request->institute_id;
             $student_id = $request->user_id;
 
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
@@ -1172,8 +1172,12 @@ class StudentController extends Controller
                 // ->first();
 
                 $stdetails = Student_detail::where('student_id', $student_id)
+                    ->when($institute_id, function($query,$institute_id){
+                        return $query->where('institute_id',$institute_id);
+                    })
                     ->whereNull('deleted_at')
                     ->get();
+                    
                 $examlist = [];
                 if (!empty($stdetails)) {
                     foreach ($stdetails as $stdetail) {

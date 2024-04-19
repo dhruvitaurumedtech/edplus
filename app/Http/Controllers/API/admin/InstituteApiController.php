@@ -2139,10 +2139,22 @@ class InstituteApiController extends Controller
                 $announcementDT = [];
                 foreach ($anoouncmntdt as $anoouncmnt) {
 
-                    $subjectq = Subject_model::where('id', $anoouncmnt->subject_id)->first();
+                    $subary = explode(",",$anoouncmnt->subject_id);
+                    $batinsd = explode(",",$anoouncmnt->batch_id);
+                    $subjectq = Subject_model::whereIN('id', $subary)->get();
                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
-                    $batchnm = Batches_model::where('id', $anoouncmnt->batch_id)->first();
+                    $batchnm = Batches_model::whereIN('id', $batinsd)->get();
+
+                    $subjctslist = [];
+                    foreach($subjectq as $subnms){
+                        $subjctslist[] = array('id'=>$subnms->id,'name'=>$subnms->name);
+                    }
+
+                    $batchslist = [];
+                    foreach($batchnm as $btcnmms){
+                        $batchslist[] = array('id'=>$btcnmms->id,'name'=>$btcnmms->batch_name);
+                    }
 
                     $roles = [];
                     $roledsid = explode(",", $anoouncmnt->role_type);
@@ -2159,15 +2171,19 @@ class InstituteApiController extends Controller
                         'date' => $anoouncmnt->created_at,
                         'title' => $anoouncmnt->title,
                         'detail' => $anoouncmnt->detail,
-                        'subject_id' => $subjectq->id,
-                        'subject' => $subjectq->name,
-                        'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
-                        'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
+                        //'subject_id' => $subjectq->id,
+                        
+                        //'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
+                        //'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
+                        
                         'standard_id' => $standardtq->id,
                         'standard' => $standardtq->name,
                         'board_id' => $boarddt->id,
                         'board' => $boarddt->name,
-                        'role' => $roles
+                        'role' => $roles,
+                        'batches'=>$batchslist,
+                        'subject' => $subjctslist,
+
                     );
                 }
                 return response()->json([
