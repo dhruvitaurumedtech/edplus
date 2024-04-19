@@ -151,7 +151,10 @@ class TeacherController extends Controller
                 $announcement_response = [];
                 foreach ($announcement as $value) {
                     $announcement_response[] = [
-                        'announcement' => $value['announcement']
+                        'date' => !empty($value['created_at']) ? date('d-m-y', strtotime($value['created_at'])) : '',
+                        'title' => !empty($value['title']) ? $value['title'] : '',
+                        'announcement' => !empty($value['announcement']) ? $value['announcement'] : '',
+
                     ];
                 }
 
