@@ -36,7 +36,7 @@ class ExamController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             try {
-                $validatedData = $request->validate([
+                $validatedData = \Validator::make($request->all(), [
                     'user_id' => 'required',
                     'institute_id' => 'required',
                     'exam_title' => 'required|string|max:255',
@@ -53,33 +53,43 @@ class ExamController extends Controller
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
-                $exam_data = Exam_Model::where('user_id', $validatedData['user_id'])
-                    ->where('institute_id', $validatedData['institute_id'])
-                    ->where('standard_id', $validatedData['standard_id'])
-                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $validatedData['exam_date'])->format('Y-m-d'))
-                    ->where('start_time', $validatedData['start_time'])
-                    ->where('end_time', $validatedData['end_time'])
+
+                if ($validatedData->fails()) {
+                    $errorMessages = array_values($validatedData->errors()->all());
+                    return response()->json([
+                        'success' => 400,
+                        'message' => 'Validation error',
+                        'data' => array('errors' => $errorMessages),
+                    ], 400);
+                }
+
+                $exam_data = Exam_Model::where('user_id', $request->user_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->where('standard_id', $request->standard_id)
+                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d'))
+                    ->where('start_time', $request->start_time)
+                    ->where('end_time', $request->end_time)
                     ->get()->toArray();
 
 
                 if (empty($exam_data)) {
                     $exam = new Exam_Model;
-                    $exam->user_id = $validatedData['user_id'];
-                    $exam->institute_id = $validatedData['institute_id'];
-                    $exam->batch_id = $validatedData['batch_id'];
-                    $exam->exam_title = $validatedData['exam_title'];
-                    $exam->total_mark = $validatedData['total_mark'];
-                    $exam->exam_type = $validatedData['exam_type'];
-                    $exam->exam_date = Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']);
-                    $exam->start_time = $validatedData['start_time'];
-                    $exam->end_time = $validatedData['end_time'];
+                    $exam->user_id = $request->user_id;
+                    $exam->institute_id = $request->institute_id;
+                    $exam->batch_id = $request->batch_id;
+                    $exam->exam_title = $request->exam_title;
+                    $exam->total_mark = $request->total_mark;
+                    $exam->exam_type = $request->exam_type;
+                    $exam->exam_date = Carbon::createFromFormat('d-m-Y', $request->exam_date);
+                    $exam->start_time = $request->start_time;
+                    $exam->end_time = $request->end_time;
                     //$exam->institute_for_id = $validatedData['institute_for_id'];
-                    $exam->board_id = $validatedData['board_id'];
-                    $exam->medium_id = $validatedData['medium_id'];
+                    $exam->board_id = $request->board_id;
+                    $exam->medium_id = $request->medium_id;
                     //$exam->class_id = $validatedData['class_id'];
-                    $exam->standard_id = $validatedData['standard_id'];
-                    $exam->stream_id = (!empty($validatedData['stream_id'])) ? $validatedData['stream_id'] : '';
-                    $exam->subject_id = $validatedData['subject_id'];
+                    $exam->standard_id = $request->standard_id;
+                    $exam->stream_id = (!empty($request->stream_id)) ? $request->stream_id : '';
+                    $exam->subject_id = $request->subject_id;
                     $exam->save();
                     if (!empty($exam->id)) {
                         return response()->json([
@@ -223,14 +233,17 @@ class ExamController extends Controller
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
+        
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
+            
             $exam_id = $request->input('exam_id');
             $examlist = DB::table('exam')
                 ->where('exam.id', $exam_id)
                 ->wherenull('exam.deleted_at')
                 ->get()->toarray();
+                
             if (!$examlist) {
                 return response()->json([
                     'status' => 400,
@@ -238,7 +251,7 @@ class ExamController extends Controller
                 ], 400);
             } else {
                 
-                $validatedData = $request->validate([
+                $validatedData = \Validator::make($request->all(), [
                     'user_id' => 'required',
                     'institute_id' => 'required',
                     'exam_title' => 'required|string|max:255',
@@ -255,12 +268,22 @@ class ExamController extends Controller
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
-                $exam_data = Exam_Model::where('user_id', $validatedData['user_id'])
-                    ->where('institute_id', $validatedData['institute_id'])
-                    ->where('standard_id', $validatedData['standard_id'])
-                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $validatedData['exam_date'])->format('Y-m-d'))
-                    ->where('start_time', $validatedData['start_time'])
-                    ->where('end_time', $validatedData['end_time'])
+                
+                if ($validatedData->fails()) {
+                    $errorMessages = array_values($validatedData->errors()->all());
+                    return response()->json([
+                        'success' => 400,
+                        'message' => 'Validation error',
+                        'data' => array('errors' => $errorMessages),
+                    ], 400);
+                }
+
+                $exam_data = Exam_Model::where('user_id', $request->user_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->where('standard_id', $request->standard_id)
+                    ->where('exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d'))
+                    ->where('start_time', $request->start_time)
+                    ->where('end_time', $request->end_time)
                     ->whereNot('id', $exam_id)
                     ->get()->toArray();
 
@@ -268,22 +291,22 @@ class ExamController extends Controller
                 if (empty($exam_data)) {
                     
                     $exam = Exam_Model::find($exam_id);
-                    $exam->user_id = $validatedData['user_id'];
-                    $exam->institute_id = $validatedData['institute_id'];
-                    $exam->batch_id = $validatedData['batch_id'];
-                    $exam->exam_title = $validatedData['exam_title'];
-                    $exam->total_mark = $validatedData['total_mark'];
-                    $exam->exam_type = $validatedData['exam_type'];
-                    $exam->exam_date = Carbon::createFromFormat('d-m-Y', $validatedData['exam_date']);
-                    $exam->start_time = $validatedData['start_time'];
-                    $exam->end_time = $validatedData['end_time'];
+                    $exam->user_id = $request->user_id;
+                    $exam->institute_id = $request->institute_id;
+                    $exam->batch_id = $request->batch_id;
+                    $exam->exam_title = $request->exam_title;
+                    $exam->total_mark = $request->total_mark;
+                    $exam->exam_type = $request->exam_type;
+                    $exam->exam_date = Carbon::createFromFormat('d-m-Y', $request->exam_date);
+                    $exam->start_time = $request->start_time;
+                    $exam->end_time = $request->end_time;
                     //$exam->institute_for_id = $validatedData['institute_for_id'];
-                    $exam->board_id = $validatedData['board_id'];
-                    $exam->medium_id = $validatedData['medium_id'];
+                    $exam->board_id = $request->board_id;
+                    $exam->medium_id = $request->medium_id;
                     //$exam->class_id = $validatedData['class_id'];
-                    $exam->standard_id = $validatedData['standard_id'];
+                    $exam->standard_id = $request->standard_id;
                     $exam->stream_id = $request->stream_id;
-                    $exam->subject_id = $validatedData['subject_id'];
+                    $exam->subject_id = $request->subject_id;
                     $exam->save();
                     if (!empty($exam->id)) {
                         return response()->json([

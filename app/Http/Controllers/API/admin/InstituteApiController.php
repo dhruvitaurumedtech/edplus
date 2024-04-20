@@ -1479,8 +1479,9 @@ class InstituteApiController extends Controller
                         'data' => []
                     ], 400, [], JSON_NUMERIC_CHECK);
                 }
+                
                 if (!empty($studentdtls)) {
-
+                    
                     $studentupdetail = [
                         'user_id' => $user_id,
                         'institute_id' => $request->institute_id,
@@ -1495,14 +1496,14 @@ class InstituteApiController extends Controller
                         'batch_id' => $batch_id,
                         'status' => '1',
                     ];
-
+                   
                     if ($request->stream_id == 'null') {
-                        unset($studentupdetail['stream_id']);
+                        $studentupdetail['stream_id'] = null;
                     }
-
+                    
                     $studentdetail = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $institute_id)->update([$studentupdetail]);
-
+                        ->where('institute_id', $institute_id)
+                        ->update($studentupdetail);
                     if (!empty($studentdetail) && !empty($request->first_name)) {
                         //student detail update
                         $student_details = User::find($student_id);
@@ -1566,9 +1567,9 @@ class InstituteApiController extends Controller
                             'status' => '0',
                         ];
 
+                       
                         if ($request->stream_id == 'null') {
-
-                            unset($studentdetail['stream_id']);
+                            $studentupdetail['stream_id'] = null;
                         }
 
                         $studentdetailadd = Student_detail::create($studentdetail);
