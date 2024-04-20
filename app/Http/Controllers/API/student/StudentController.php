@@ -858,7 +858,6 @@ class StudentController extends Controller
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
-                        ->join('video_assignbatch', 'video_assignbatch.video_id', '=', 'topic.id')
                         ->where('topic.subject_id', $subject_id)
                         //->where('topic.chapter_id', $chapter_id)
                         ->when($chapter_id, function ($query, $chapter_id) {
@@ -894,7 +893,8 @@ class StudentController extends Controller
                                     "subject_id" => $topval->subject_id,
                                     "subject_name" => $topval->sname,
                                     "chapter_id" => $topval->chapter_id,
-                                    "chapter_name" => $topval->chname
+                                    "chapter_name" => $topval->chname,
+                                    "status" => True
                                 );
                                 $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                             }
@@ -907,7 +907,8 @@ class StudentController extends Controller
                                 "subject_id" => $topval->subject_id,
                                 "subject_name" => $topval->sname,
                                 "chapter_id" => $topval->chapter_id,
-                                "chapter_name" => $topval->chname
+                                "chapter_name" => $topval->chname,
+                                "status" => false,
                             );
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
