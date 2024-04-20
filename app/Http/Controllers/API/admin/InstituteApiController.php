@@ -1195,7 +1195,59 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+    public function get_reject_request_list(Request $request)
+    {
+        $token = $request->header('Authorization');
 
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        // echo "<pre>";print_r($existingUser);exit;
+        if ($existingUser) {
+
+            $institute_id = $request->institute_id;
+            $student_id = Student_detail::where('institute_id', $institute_id)
+                ->where('status', '2')
+                ->pluck('student_id');
+
+            if (!empty($student_id)) {
+
+                $user_data = User::whereIN('id', $student_id)->get();
+
+                $response = [];
+                foreach ($user_data as $value2) {
+                    if (!empty($value2['image'])) {
+                        $image = asset($value2['image']);
+                    } else {
+                        $image = asset('default.jpg');
+                    }
+                    $response[] = [
+                        'student_id' => $value2['id'],
+                        'name' => $value2['firstname'] . ' ' . $value2['lastname'],
+                        'photo' => $image,
+                    ];
+                }
+
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Fetch student Reject list.',
+                    'data' => $response,
+                ], 200, [], JSON_NUMERIC_CHECK);
+            } else {
+                return response()->json([
+                    'status' => 400,
+                    'message' => 'No data Found.',
+                ]);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
     public function get_reject_request(Request $request)
     {
         $token = $request->header('Authorization');
