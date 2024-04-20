@@ -53,10 +53,8 @@
                   </tr>
                 </thead>
                 <tbody>
-                
                   @php $i=1 @endphp
                   @foreach($banner_list as $value)
-                  {{ print_r($value->id); }}
                   <tr>
                     <td>{{$i}}</td>
                     @if(auth::user()->role_type == '3')
