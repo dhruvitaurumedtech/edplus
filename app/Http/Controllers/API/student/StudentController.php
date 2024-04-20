@@ -956,7 +956,7 @@ class StudentController extends Controller
             ], 400);
         }
 
-        try {
+       
             $token = $request->header('Authorization');
 
             if (strpos($token, 'Bearer ') === 0) {
@@ -965,8 +965,8 @@ class StudentController extends Controller
 
 
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser->token) {
-
+            if ($existingUser) {
+                try {
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                 } else {
@@ -1060,19 +1060,21 @@ class StudentController extends Controller
                     'message' => 'Successfully fetch data.',
                     'data' => $userdetail,
                 ], 200, [], JSON_NUMERIC_CHECK);
+               
+                } catch (\Exception $e) {
+                    return response()->json([
+                        'success' => 500,
+                        'message' => 'Something went wrong',
+                        'data' => array('error' => $e->getMessage()),
+                    ], 500);
+                }
             } else {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Invalid token.',
                 ], 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
-        }
+        
     }
 
     public function student_edit_profile(Request $request)

@@ -1441,11 +1441,12 @@ class InstituteApiController extends Controller
                     $institute_id = $request->institute_id;
                     $user_id = $request->user_id;
                 }
+
                 $batch_id = $request->batch_id;
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
-
+                
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
