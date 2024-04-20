@@ -2957,6 +2957,7 @@ class InstituteApiController extends Controller
             'medium' => 'required',
             'board_id' => 'required',
             'standard_id' => 'required',
+            'subject_id'=> 'required',
         ]);
         if ($validator->fails()) {
             $errorMessages = array_values($validator->errors()->all());
@@ -2973,21 +2974,26 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-                $batchlist = Batches_model::where('user_id', $request->user_id)
-                    ->where('institute_id', $request->institute_id)
-                    ->where('board_id', $request->board_id)
-                    ->where('standard_id', $request->standard_id)->get()->toarray();
-                $batch_response = [];
-                foreach ($batchlist as $value) {
-                    $batch_response[] = [
-                        'id' => $value['id'],
-                        'batch_name' => $value['batch_name']
-                    ];
+                $subsub = Subject_sub::where('user_id',$request->user_id)
+                ->where('institute_id',$request->institute_id)
+                //->whereRow("FIND_IN_SET($request->subject_id, subject_id)")
+                ->delete();
+                if($subsub){
+
+                    $subjectsids = explode(",",$request->subject_id);
+                    
+                        foreach($subjectsids as $subjids){
+                            $subcts = Subject_sub::create(['user_id'=>$request->user_id,
+                            'institute_id'=>$request->institute_id,
+                            'subject_id'=>$subjids]);
+                        }
+                    
                 }
+                
                 return response()->json([
                     'status' => '200',
-                    'message' => 'Batch Fetch Successfully',
-                    'data' => $batch_response
+                    'message' => 'Updated Successfully',
+                    'data' => []
                 ]);
             } catch (\Exception $e) {
                 return response()->json([

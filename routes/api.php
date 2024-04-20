@@ -84,6 +84,7 @@ Route::post('/institute/students_list', [InstituteApiController::class, 'institu
 Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
 Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
 Route::post('/institute/Subject-List', [InstituteApiController::class, 'subjectList']);
+Route::post('/institute/Subject-edit', [InstituteApiController::class, 'edit_subject']);
 //banner controller
 Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
 Route::post('/banner/banner-status-update', [BannerApiController::class, 'update_status'])->name('update_status');
