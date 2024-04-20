@@ -2923,7 +2923,7 @@ class InstituteApiController extends Controller
                     $batch_response = [];
                     foreach ($subjctlist as $svalue) {
                         $batch_response[] = [
-                            'id' => $svalue['id'],
+                            'id' => $svalue['subject_id'],
                             'name' => $svalue['name']
                         ];
                     }
