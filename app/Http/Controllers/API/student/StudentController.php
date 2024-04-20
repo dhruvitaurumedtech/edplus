@@ -160,8 +160,8 @@ class StudentController extends Controller
                 }
 
                 $parentsdt = Parents::where('student_id', $user_id)
-                ->orderByDesc('created_at')
-                ->get();
+                    ->orderByDesc('created_at')
+                    ->get();
 
                 $veryfy = [];
                 foreach ($parentsdt as $checkvery) {
@@ -294,39 +294,39 @@ class StudentController extends Controller
                 // print_r($parents);exit;
                 foreach ($parents as $parentData) {
                     // Create a user for each parent
-                    $emilfin = user::where('email',$parentData['email'])->first();
+                    $emilfin = user::where('email', $parentData['email'])->first();
                     $tomail = $parentData['email'];
-                    if($parentData['firstname'] == ''){
+                    if ($parentData['firstname'] == '') {
                         return response()->json([
                             'status' => 400,
                             'message' => 'firstname Requied field are missing',
                         ], 400);
-                    }elseif($parentData['lastname'] == ''){
+                    } elseif ($parentData['lastname'] == '') {
                         return response()->json([
                             'status' => 400,
                             'message' => 'lastname Requied field are missing',
                         ], 400);
-                    }elseif($parentData['email'] == ''){
+                    } elseif ($parentData['email'] == '') {
                         return response()->json([
                             'status' => 400,
                             'message' => 'email Requied field are missing',
                         ], 400);
-                    }elseif($parentData['mobile'] == ''){
+                    } elseif ($parentData['mobile'] == '') {
                         return response()->json([
                             'status' => 400,
                             'message' => 'mobile Requied field are missing',
                         ], 400);
-                    }elseif($parentData['relation'] == ''){
+                    } elseif ($parentData['relation'] == '') {
                         return response()->json([
                             'status' => 400,
                             'message' => 'relation Requied field are missing',
                         ], 400);
-                    }elseif(!empty($emilfin)){
+                    } elseif (!empty($emilfin)) {
                         return response()->json([
                             'status' => 400,
                             'message' => 'email is already exist',
                         ], 400);
-                    }else{
+                    } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
@@ -334,12 +334,12 @@ class StudentController extends Controller
                             'mobile' => $parentData['mobile'],
                             'role_type' => '5'
                         ]);
-    
+
                         // Retrieve the ID of the newly created user
                         $userId = $user->id;
-    
+
                         // Create a parent record associated with the user
-                        if(!empty($userId)){
+                        if (!empty($userId)) {
                             $parnsad = Parents::create([
                                 'student_id' => $student_id,
                                 'parent_id' => $userId,
@@ -347,37 +347,37 @@ class StudentController extends Controller
                                 'verify' => '0',
                             ]);
 
-                            if(empty($parnsad->id)){
-                                User::where('id',$userId)->delete();
+                            if (empty($parnsad->id)) {
+                                User::where('id', $userId)->delete();
                                 return response()->json([
                                     'success' => 500,
                                     'message' => 'Data not added Successfuly',
                                     'data' => [],
                                 ], 500);
                             }
-                        }else{
+                        } else {
                             return response()->json([
                                 'success' => 500,
                                 'message' => 'Data not added Successfuly',
                                 'data' => [],
                             ], 500);
                         }
-                        
+
                         $data = [
                             'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
                             'email' => $tomail,
                             'id' => $parnsad->id
                         ];
-    
+
                         Mail::to($tomail)->send(new WelcomeMail($data));
                     }
-                    
-                    
                 }
 
-                return response()->json(['success' => 200, 
-                'message' => 'Parent details uploaded successfully',
-                 'data' => []], 200);
+                return response()->json([
+                    'success' => 200,
+                    'message' => 'Parent details uploaded successfully',
+                    'data' => []
+                ], 200);
             } else {
                 return response()->json([
                     'status' => 400,
@@ -626,10 +626,10 @@ class StudentController extends Controller
 
                 $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
                 $announcQY = announcements_model::where('institute_id', $institute_id)
-                ->where('batch_id', $existingUser->batch_id)
-                ->whereRaw("FIND_IN_SET('6', role_type)")
-                ->orderByDesc('created_at')
-                ->get();
+                    ->where('batch_id', $existingUser->batch_id)
+                    ->whereRaw("FIND_IN_SET('6', role_type)")
+                    ->orderByDesc('created_at')
+                    ->get();
                 foreach ($announcQY as $announcDT) {
                     $announcement[] = array(
                         'title' => $announcDT->title,
@@ -658,7 +658,7 @@ class StudentController extends Controller
 
 
                 $subdta = Student_detail::where('student_id', $user_id)
-                ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+                    ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
 
                 if (!empty($subdta)) {
                     $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
@@ -868,6 +868,9 @@ class StudentController extends Controller
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
                         ->get();
+                    // echo "<pre>";
+                    // print_r($topicqry);
+                    // exit;
                     foreach ($topicqry as $topval) {
 
                         if ($existingUser->role_type == 6) {
@@ -890,7 +893,8 @@ class StudentController extends Controller
                                     "subject_id" => $topval->subject_id,
                                     "subject_name" => $topval->sname,
                                     "chapter_id" => $topval->chapter_id,
-                                    "chapter_name" => $topval->chname
+                                    "chapter_name" => $topval->chname,
+                                    "status" => True
                                 );
                                 $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                             }
@@ -903,7 +907,8 @@ class StudentController extends Controller
                                 "subject_id" => $topval->subject_id,
                                 "subject_name" => $topval->sname,
                                 "chapter_id" => $topval->chapter_id,
-                                "chapter_name" => $topval->chname
+                                "chapter_name" => $topval->chname,
+                                "status" => false,
                             );
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
@@ -956,17 +961,17 @@ class StudentController extends Controller
             ], 400);
         }
 
-       
-            $token = $request->header('Authorization');
 
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
+        $token = $request->header('Authorization');
+
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
 
 
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                try {
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                 } else {
@@ -1060,21 +1065,19 @@ class StudentController extends Controller
                     'message' => 'Successfully fetch data.',
                     'data' => $userdetail,
                 ], 200, [], JSON_NUMERIC_CHECK);
-               
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'success' => 500,
-                        'message' => 'Something went wrong',
-                        'data' => array('error' => $e->getMessage()),
-                    ], 500);
-                }
-            } else {
+            } catch (\Exception $e) {
                 return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                    'success' => 500,
+                    'message' => 'Something went wrong',
+                    'data' => array('error' => $e->getMessage()),
+                ], 500);
             }
-        
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ], 400);
+        }
     }
 
     public function student_edit_profile(Request $request)
@@ -1174,12 +1177,12 @@ class StudentController extends Controller
                 // ->first();
 
                 $stdetails = Student_detail::where('student_id', $student_id)
-                    ->when($institute_id, function($query,$institute_id){
-                        return $query->where('institute_id',$institute_id);
+                    ->when($institute_id, function ($query, $institute_id) {
+                        return $query->where('institute_id', $institute_id);
                     })
                     ->whereNull('deleted_at')
                     ->get();
-                    
+
                 $examlist = [];
                 if (!empty($stdetails)) {
                     foreach ($stdetails as $stdetail) {
