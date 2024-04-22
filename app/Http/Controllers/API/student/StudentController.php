@@ -1406,12 +1406,12 @@ class StudentController extends Controller
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
             $query = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
-                ->leftJoin('standard', 'students_details.standard_id', '=', 'standard.id')
-                ->leftJoin('board', 'students_details.board_id', '=', 'board.id')
-                ->leftJoin('medium', 'students_details.medium_id', '=', 'medium.id')
-                ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
-                ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
-                ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
+                ->join('standard', 'students_details.standard_id', '=', 'standard.id')
+                ->join('board', 'students_details.board_id', '=', 'board.id')
+                ->join('medium', 'students_details.medium_id', '=', 'medium.id')
+                ->join('stream', 'students_details.stream_id', '=', 'stream.id')
+                ->join('attendance', 'students_details.student_id', '=', 'attendance.student_id')
+                ->join('batches', 'students_details.batch_id', '=', 'batches.id')
                 ->select(
                     'users.*',
                     'students_details.student_id',
