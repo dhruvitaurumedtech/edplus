@@ -916,6 +916,7 @@ class StudentController extends Controller
                     //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                 }
                 if (!empty($chapter_id)) {
+
                     $response = [
                         'batch_list' => $batch_response,
                         'topics' => $category,
