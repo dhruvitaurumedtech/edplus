@@ -15,7 +15,7 @@
             <div class="link-dir">
                 <h1 class="display-4">Student </h1>
                 <ul>
-                    <li><a href="index.php">Home</a></li>
+                    <li><a href="{{url('dashboard')}}">Home</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
                     <li><a href="javascript:void(0)">Institute</a></li>
                     <li><a href="javascript:void(0)">/</a></li>

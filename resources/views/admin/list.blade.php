@@ -17,7 +17,7 @@
       <div class="link-dir">
         <h1 class="display-4">Institute List</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Admin</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -56,7 +56,7 @@
             <a href="{{url('create/admin')}}" class="btn btn-success" style="float: right;">Create Admin</a>
           </div>
           <!-- /.card-header -->
-          <table class="table table-responsive-sm table-bordered institute-table mt-4">
+          <table class="table table-responsive table-bordered institute-table mt-4">
             <thead>
               <tr>
                 <th style="width: 10px">

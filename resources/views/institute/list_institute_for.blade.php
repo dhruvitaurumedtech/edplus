@@ -16,7 +16,7 @@
 
         <h1 class="display-4">Institute For List</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -110,7 +110,7 @@
                 </div>
               </form>
 
-              <table class="table table-responsive-sm table-bordered institute-table mt-4">
+              <table class="table table-responsive table-bordered institute-table mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">

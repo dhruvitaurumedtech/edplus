@@ -20,7 +20,7 @@
         <h1 class="display-4">Topic List
         </h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -36,6 +36,7 @@
           });
         }, 3000);
       </script>
+
       <div class="row">
         <div class="col-md-10 offset-md-1">
           @if (session('success'))
@@ -45,6 +46,7 @@
           @endif
         </div>
       </div>
+
       <div class="dashboard-content side-content">
 
         <div class="row">
@@ -55,7 +57,7 @@
                 @csrf
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="standard_id">Standard : </label>
                     <select class="form-control" name="standard_id" id="standard_id">
                       <option value=" ">Select Option</option>
@@ -64,19 +66,19 @@
                       @endforeach
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="subject">Subject : </label>
                     <select class="form-control" name="subject" id="subject" on>
                       <option value=" ">Select Option</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="subject">chapter : </label>
                     <select class="form-control" name="chapter_id" id="chapter_id" on>
                       <option value=" ">Select Option</option>
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="subject">Institute : </label>
                     <select class="form-control" name="institute_id" id="institute_id" on>
                       <option value="">Select Option</option>
@@ -91,21 +93,21 @@
                   </a>
                   <br>
                   <div id="container">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_no">Topic no : </label>
                       <input type="text" name="topic_no[]" id="topic_no" class="form-control" placeholder="Enter Topic no">
                       @error('topic_no')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_name">Topic Name : </label>
                       <input type="text" name="topic_name[]" id="topic_name" class="form-control" placeholder="Enter Topic Name">
                       @error('topic_name')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_name">Video Category: </label>
                       <select class="form-control" name="video_category[]">
                         <option>Select Option</option>
@@ -118,7 +120,7 @@
                       @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_image">Video Upload: </label>
                       <input type="file" name="topic_video[]" id="topic_video" class="form-control" placeholder="Select Chapter Image" multiple>
                       @error('chapter_image')
@@ -126,14 +128,15 @@
                       @enderror
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
+                  <button type="submit" class="btn btn-success mt-3" style="float: right;">Submit</button>
               </form>
               <br>
               <br>
             </div>
           </div>
         </div>
-        <div class="row">
+
+        <div class="row mt-4">
           <div class="col-lg-12">
             <div class="institute-form">
               <h3 class="card-title">Chapter</h3>
@@ -189,9 +192,11 @@
           <!--  -->
         </div>
       </div>
-      @include('layouts/footer_new')
-
-
+      
+    </div>
+    @include('layouts/footer_new')
+  </div>
+</body>
       <!-- view chapters -->
       <div class="modal fade" id="chaptersModal" tabindex="-1" aria-labelledby="chaptersModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -221,6 +226,7 @@
         </div>
       </div>
       <!-- end chapter view -->
+      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
       <script>
         //view chapter
         document.querySelectorAll('.viewButton').forEach(function(button) {
@@ -262,7 +268,6 @@
           });
         });
       </script>
-      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
       <script>
         $(document).ready(function() {
@@ -328,7 +333,7 @@
               x++; // Increment field counter
               // Add input field
               $(container).append(
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_no">Topic No : </label>' +
                 '<input type="text" name="topic_no[]" id="topic_no" class="form-control" placeholder="Enter Topic No">' +
                 '@error('
@@ -336,7 +341,7 @@
                 '<div class="text-danger">{{ $message }}</div>' +
                 '@enderror' +
                 '</div>' +
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_name">Topic Name : </label>' +
                 '<input type="text" name="topic_name[]" id="topic_name" class="form-control" placeholder="Enter Topic Name">' +
                 '@error('
@@ -344,7 +349,7 @@
                 '<div class="text-danger">{{ $message }}</div>' +
                 '@enderror' +
                 '</div>' +
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_name">Video Category : </label>' +
                 '<select class="form-control" name="video_category[]' + x + '">' +
                 '<option>Select Option</option>' +
@@ -358,7 +363,7 @@
                 '@enderror' +
                 '</div>' +
 
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_image">Video Upload : </label>' +
                 '<input type="file" name="topic_video[]" id="topic_video" class="form-control" placeholder="Select Video Upload" multiple>' +
                 '@error('

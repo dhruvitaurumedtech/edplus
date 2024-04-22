@@ -37,7 +37,7 @@ class VideoController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'Please Select Correct Category',
-                'data'=>[]
+                'data' => []
             ], 400);
         }
 
@@ -158,12 +158,13 @@ class VideoController extends Controller
             foreach ($batch_ids as $batch_id_value) {
                 $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
-                    ->get();
-                if ($record) {
+                    ->where('video_id', $video_id)
+                    ->count();
+                if ($record == 1) {
                     return response()->json([
                         'success' => 400,
                         'message' => 'Already Assign Video This Batch!',
-                        'data'=>[]
+                        'data' => []
                     ], 400);
                 }
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
@@ -173,7 +174,7 @@ class VideoController extends Controller
                     return response()->json([
                         'success' => 400,
                         'message' => 'Four records with the same Batch and Subject already exist',
-                        'data'=>[]
+                        'data' => []
                     ], 400);
                 }
             }
@@ -198,13 +199,13 @@ class VideoController extends Controller
             return response()->json([
                 'success' => 200,
                 'message' => 'Video Assign Batch Successfully',
-                'data'=>[]
+                'data' => []
             ], 200);
         } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
-                'data'=>[]
+                'data' => []
             ]);
         }
     }
