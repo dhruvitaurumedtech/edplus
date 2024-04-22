@@ -704,10 +704,14 @@ class StudentController extends Controller
 
                 //total attend lecture
                 $totalattendlec = [];
-                $totalattlec = Attendance_model::where('institute_id', $institute_id)
-                    ->where('student_id', $user_id)->where('attendance', 'P')->count();
-                $totalattendlec = array('total_lectures' => '170', 'attend_lectures' => $totalattlec, 'miss_lectures' => '7');
+                $cumnth = date('Y-m');
 
+                $totalattlec = Attendance_model::where('institute_id',$institute_id)
+                ->where('student_id',$user_id)
+                ->where('created_at','like','%'.$cumnth.'%')
+                ->where('attendance','P')->count();
+                $totalattendlec = array('total_lectures'=>'170','attend_lectures'=>$totalattlec,'miss_lectures'=>'7');
+                
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
