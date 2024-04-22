@@ -1210,7 +1210,7 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             $student_id = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
-                ->where('created_at', '>=', Carbon::now()->subDays(15))
+                ->where('created_at', '>=', Carbon::now()->subDays(0))
                 ->pluck('student_id');
 
             if (!empty($student_id)) {
