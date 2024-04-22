@@ -120,4 +120,8 @@
       </div>
 
     </div>
+    
     @include('layouts/footer_new')
+
+  </div>
+</body>

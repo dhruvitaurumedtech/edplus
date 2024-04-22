@@ -8,7 +8,7 @@
   <div class="dashboard">
     @include('layouts/header-sidebar')
     <!-- MAIN -->
-    <div class="dashboard-app">
+    < class="dashboard-app">
       @include('layouts/header-topbar')
       <!-- /.content-header -->
       <script>
@@ -28,12 +28,8 @@
           <li><a href="{{url('institute-list')}}">Institute List</a></li>
         </ul>
       </div>
-
-      <!-- /.card-header -->
-      <!-- form start -->
-
-      <div class="dashboard-content side-content">
-        <div class="row">
+      
+      <div class="row">
           <div class="col-md-10 offset-md-1">
             @if (session('success'))
             <div class="alert alert-success">
@@ -42,6 +38,12 @@
             @endif
           </div>
         </div>
+
+      <!-- /.card-header -->
+      <!-- form start -->
+     
+      <div class="dashboard-content side-content">
+       
 
         <div class="col-lg-12 mt-5 institute-form">
           <div class="create-title-btn">
