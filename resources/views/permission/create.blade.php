@@ -15,7 +15,6 @@
 </head>
 
 <body>
-
     <div class="dashboard">
 
         @include('layouts/header-sidebar')
@@ -43,7 +42,7 @@
                         <form class="s-chapter-form" action="{{url('permission/insert')}}" method="post">
                             <input type="hidden" name="role_id" value="{{ $id }}">
                             @csrf
-                            <table class="table table-bordered table-responsive institute-table">
+                            <table class="table table-bordered table-responsive-sm institute-table">
                                 <thead>
                                     <tr>
                                         <th style="width: 100px">Menu Name</th>
