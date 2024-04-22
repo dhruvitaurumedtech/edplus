@@ -1210,6 +1210,7 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             $student_id = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '2')
+                ->where('created_at', '>=', Carbon::now()->subDays(15))
                 ->pluck('student_id');
 
             if (!empty($student_id)) {
@@ -1248,6 +1249,7 @@ class InstituteApiController extends Controller
             ]);
         }
     }
+
     public function get_reject_request(Request $request)
     {
         $token = $request->header('Authorization');
@@ -1479,9 +1481,9 @@ class InstituteApiController extends Controller
                         'data' => []
                     ], 400, [], JSON_NUMERIC_CHECK);
                 }
-                
+
                 if (!empty($studentdtls)) {
-                    
+
                     $studentupdetail = [
                         'user_id' => $user_id,
                         'institute_id' => $request->institute_id,
@@ -1496,11 +1498,11 @@ class InstituteApiController extends Controller
                         'batch_id' => $batch_id,
                         'status' => '1',
                     ];
-                   
+
                     if ($request->stream_id == 'null') {
                         $studentupdetail['stream_id'] = null;
                     }
-                    
+
                     $studentdetail = Student_detail::where('student_id', $student_id)
                         ->where('institute_id', $institute_id)
                         ->update($studentupdetail);
@@ -1567,7 +1569,7 @@ class InstituteApiController extends Controller
                             'status' => '0',
                         ];
 
-                       
+
                         if ($request->stream_id == 'null') {
                             $studentupdetail['stream_id'] = null;
                         }
@@ -2890,74 +2892,15 @@ class InstituteApiController extends Controller
         }
     }
 
-    public function subjectList(Request $request){
-        
-            $validator = \Validator::make($request->all(), [
-                'user_id' => 'required',
-                'institute_id' => 'required',
-                'board_id' => 'required',
-                'medium_id' => 'required',
-                'standard_id' => 'required',
-            ]);
-            if ($validator->fails()) {
-                $errorMessages = array_values($validator->errors()->all());
-                return response()->json([
-                    'success' => 400,
-                    'message' => 'Validation error',
-                    'errors' => $errorMessages,
-                ], 400);
-            }
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                try {
-                    $subjctlist = Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
-                        ->join('base_table','base_table.id','=','subject.base_table_id')
-                        ->where('subject_sub.user_id', $request->user_id)
-                        ->where('subject_sub.institute_id', $request->institute_id)
-                        ->where('base_table.board', $request->board_id)
-                        ->where('base_table.standard', $request->standard_id)->get()->toarray();
-                    $batch_response = [];
-                    foreach ($subjctlist as $svalue) {
-                        $batch_response[] = [
-                            'id' => $svalue['subject_id'],
-                            'name' => $svalue['name']
-                        ];
-                    }
-                    return response()->json([
-                        'status' => '200',
-                        'message' => 'Data Fetch Successfully',
-                        'data' => $batch_response
-                    ]);
-                } catch (\Exception $e) {
-                    return response()->json([
-                        'success' => 500,
-                        'message' => 'Server Error',
-                        'error' => $e->getMessage(),
-                    ], 500);
-                }
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ]);
-            }
-        
-    }
-
-    public function edit_subject(Request $request)
+    public function subjectList(Request $request)
     {
 
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
-            'medium' => 'required',
             'board_id' => 'required',
+            'medium_id' => 'required',
             'standard_id' => 'required',
-            'subject_id'=> 'required',
         ]);
         if ($validator->fails()) {
             $errorMessages = array_values($validator->errors()->all());
@@ -2974,22 +2917,82 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
             try {
-                $subsub = Subject_sub::where('user_id',$request->user_id)
-                ->where('institute_id',$request->institute_id)
-                //->whereRow("FIND_IN_SET($request->subject_id, subject_id)")
-                ->delete();
-                if($subsub){
-
-                    $subjectsids = explode(",",$request->subject_id);
-                    
-                        foreach($subjectsids as $subjids){
-                            $subcts = Subject_sub::create(['user_id'=>$request->user_id,
-                            'institute_id'=>$request->institute_id,
-                            'subject_id'=>$subjids]);
-                        }
-                    
+                $subjctlist = Subject_sub::join('subject', 'subject.id', '=', 'subject_sub.subject_id')
+                    ->join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                    ->where('subject_sub.user_id', $request->user_id)
+                    ->where('subject_sub.institute_id', $request->institute_id)
+                    ->where('base_table.board', $request->board_id)
+                    ->where('base_table.standard', $request->standard_id)->get()->toarray();
+                $batch_response = [];
+                foreach ($subjctlist as $svalue) {
+                    $batch_response[] = [
+                        'id' => $svalue['subject_id'],
+                        'name' => $svalue['name']
+                    ];
                 }
-                
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $batch_response
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
+    public function edit_subject(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'medium' => 'required',
+            'board_id' => 'required',
+            'standard_id' => 'required',
+            'subject_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+                $subsub = Subject_sub::where('user_id', $request->user_id)
+                    ->where('institute_id', $request->institute_id)
+                    //->whereRow("FIND_IN_SET($request->subject_id, subject_id)")
+                    ->delete();
+                if ($subsub) {
+
+                    $subjectsids = explode(",", $request->subject_id);
+
+                    foreach ($subjectsids as $subjids) {
+                        $subcts = Subject_sub::create([
+                            'user_id' => $request->user_id,
+                            'institute_id' => $request->institute_id,
+                            'subject_id' => $subjids
+                        ]);
+                    }
+                }
+
                 return response()->json([
                     'status' => '200',
                     'message' => 'Updated Successfully',
