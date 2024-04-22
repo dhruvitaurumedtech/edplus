@@ -1431,6 +1431,7 @@ class StudentController extends Controller
                 ->where('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
                 ->where('students_details.standard_id', $standard_id)
+                ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at');
 
 
