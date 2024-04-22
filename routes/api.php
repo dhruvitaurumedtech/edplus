@@ -62,6 +62,7 @@ Route::post('/institute/get-homescreen-first', [InstituteApiController::class, '
 Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
 Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
 Route::post('/institute/get-reject-request-list', [InstituteApiController::class, 'get_reject_request_list'])->name('reject.request_list.get');
+Route::post('/institute/get-reject-list', [InstituteApiController::class, 'get_reject_list'])->name('reject.request_list.get');
 
 Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request');
 Route::post('/institute/fetch_student_detail', [InstituteApiController::class, 'fetch_student_detail'])->name('fetch_student_detail');
