@@ -49,6 +49,7 @@ class PdfController extends Controller
             foreach ($batch_ids as $batch_id_value) {
                 $record = PdfAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
+                    ->where('pdf_id', $pdf_id)
                     ->count();
                 if ($record > 0) {
                     return response()->json([
@@ -80,6 +81,7 @@ class PdfController extends Controller
             return response()->json([
                 'success' => 400,
                 'message' => 'PDF Assign Batch Successfully',
+
             ], 400);
         } else {
             return response()->json([
