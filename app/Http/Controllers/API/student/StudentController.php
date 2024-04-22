@@ -1409,7 +1409,7 @@ class StudentController extends Controller
                 ->where('students_details.user_id', $user_id)
                 // ->where('students_details.batch_id', $batch_id)
                 ->where('students_details.institute_id', $institute_id)
-                ->where('students_details.board_id', $board_id)
+                ->orwhere('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
                 ->where('students_details.standard_id', $standard_id)
                 ->whereNull('students_details.deleted_at');
@@ -1419,7 +1419,7 @@ class StudentController extends Controller
                 $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
                     $query->select('id')
                         ->from('subject')
-                        ->whereIn('id', explode(',', $subject_ids));
+                        ->orwhereIn('id', explode(',', $subject_ids));
                 });
             }
             if (!empty($batch_id)) {
@@ -1432,7 +1432,7 @@ class StudentController extends Controller
                     $student_response[] = [
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                        
+
 
                         'attendance' => $value['attendance'] . ''
                     ];
