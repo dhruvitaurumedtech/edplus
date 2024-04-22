@@ -4,7 +4,7 @@
   <div class="dashboard">
     @include('layouts/header-sidebar')
     <!-- MAIN -->
-    < class="dashboard-app">
+    <div class="dashboard-app">
       @include('layouts/header-topbar')
       <!-- /.content-header -->
       <script>
@@ -17,7 +17,7 @@
       <div class="link-dir">
         <h1 class="display-4">Institute List</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -41,7 +41,7 @@
       <div class="dashboard-content side-content">
 
 
-        <div class="col-lg-12 mt-5 institute-form">
+        <div class="col-lg-12 mt-3 institute-form">
           <div class="create-title-btn">
             <h4 class="mb-0">List of Role</h4>
             <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
@@ -50,7 +50,7 @@
             @endCanButton
 
           </div>
-          <table class="table table-responsive-sm table-bordered institute-table mt-4">
+          <table class="table table-responsive table-bordered institute-table mt-4">
             <thead>
               <tr>
                 <th style="width: 10px">
@@ -92,127 +92,134 @@
           </table>
         </div>
 
-        <div class="d-flex justify-content-end">
+        <div class="d-flex justify-content-end mt-3">
           {!! $institute_list->withQueryString()->links('pagination::bootstrap-5') !!}
 
         </div>
 
       </div>
+
       @include('layouts/footer_new')
-      <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="usereditModalLabel">Role </h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <form method="post" action="{{ url('admin/update') }}">
-                @csrf
-                <div class="card-body">
-                  <div class="form-group row">
-                    <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
-                    <div class="col-sm-10">
-                      <select class="form-control" name="role_type" id="role_type">
-                        <option value="">Select Role</option>
-                        <option value="2">Admin</option>
-                        <option value="3">Institute</option>
-                      </select>
-                      @error('role_type')
-                      <div class="alert alert-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-10">
-                      <input type="hidden" name="user_id" id="user_id">
-                      <input type="text" id="name" name="name" class="form-control" placeholder="Name">
-                      @error('name')
-                      <div class="alert alert-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
-                    <div class="col-sm-10">
-                      <input type="email" class="form-control" id="email" name="email" placeholder="Email">
-                      @error('email')
-                      <div class="alert alert-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="form-group row">
-                    <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
-                    <div class="col-sm-10">
-                      <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
-                    </div>
-                  </div>
+    </div>
 
-                  <hr>
-                  <div class="">
-                    <button type="submit" class="btn btn-info" style="float:right">Update</button>
-                  </div>
-              </form>
-            </div>
+  </div>
+</body>
 
-          </div>
-        </div>
+<div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="usereditModalLabel">Role </h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
       </div>
-      <script>
-        document.querySelectorAll('.editButton').forEach(function(button) {
-          button.addEventListener('click', function() {
-            var user_id = this.getAttribute('data-user-id');
+      <div class="modal-body">
+        <form method="post" action="{{ url('admin/update') }}">
+          @csrf
+          <div class="card-body">
+            <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
+              <div class="col-sm-10">
+                <select class="form-control" name="role_type" id="role_type">
+                  <option value="">Select Role</option>
+                  <option value="2">Admin</option>
+                  <option value="3">Institute</option>
+                </select>
+                @error('role_type')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="hidden" name="user_id" id="user_id">
+                <input type="text" id="name" name="name" class="form-control" placeholder="Name">
+                @error('name')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+              <div class="col-sm-10">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                @error('email')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div>
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <div class="col-sm-10">
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
+              </div>
+            </div>
 
-            axios.post('/admin/edit', {
-                user_id: user_id
-              })
-              .then(response => {
-                var reponse_data = response.data.userDT;
-                console.log(reponse_data);
-                $('#user_id').val(reponse_data.id);
-                $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.firstname);
-                $('#email').val(reponse_data.email);
-                $('#mobile').val(reponse_data.mobile);
-                $('#usereditModal').modal('show');
-              })
-              .catch(error => {
-                console.error(error);
-              });
-          });
+            <hr>
+            <div class="">
+              <button type="submit" class="btn btn-info" style="float:right">Update</button>
+            </div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('.editButton').forEach(function(button) {
+    button.addEventListener('click', function() {
+      var user_id = this.getAttribute('data-user-id');
+
+      axios.post('/admin/edit', {
+          user_id: user_id
+        })
+        .then(response => {
+          var reponse_data = response.data.userDT;
+          console.log(reponse_data);
+          $('#user_id').val(reponse_data.id);
+          $('#role_type').val(reponse_data.role_type);
+          $('#name').val(reponse_data.firstname);
+          $('#email').val(reponse_data.email);
+          $('#mobile').val(reponse_data.mobile);
+          $('#usereditModal').modal('show');
+        })
+        .catch(error => {
+          console.error(error);
         });
-        document.querySelectorAll('.deletebutton').forEach(function(button) {
-          button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default form submission
+    });
+  });
+  document.querySelectorAll('.deletebutton').forEach(function(button) {
+    button.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent the default form submission
 
-            var user_id = this.getAttribute('data-user-id');
+      var user_id = this.getAttribute('data-user-id');
 
-            // Show SweetAlert confirmation
-            Swal.fire({
-              title: 'Are you sure?',
-              text: 'You won\'t be able to revert this!',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#3085d6',
-              confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                axios.post('/admin/delete', {
-                    user_id: user_id
-                  })
-                  .then(response => {
-                    location.reload(true);
+      // Show SweetAlert confirmation
+      Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          axios.post('/admin/delete', {
+              user_id: user_id
+            })
+            .then(response => {
+              location.reload(true);
 
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
+            })
+            .catch(error => {
+              console.error(error);
             });
-          });
-        });
-      </script>
+        }
+      });
+    });
+  });
+</script>
