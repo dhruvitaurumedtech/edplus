@@ -1,97 +1,110 @@
-@include('layouts/header')
-<div class="content-wrapper">
-  <!-- Content Header (Page header) -->
-  <div class="content-header">
-    <div class="container-fluid">
-      <div class="row mb-2">
-        <div class="col-sm-6">
-          <h1 class="m-0">Admin</h1>
-        </div><!-- /.col -->
-        <div class="col-sm-6">
-          <ol class="breadcrumb float-sm-right">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item active">Admin</li>
-          </ol>
-        </div><!-- /.col -->
-      </div><!-- /.row -->
-    </div><!-- /.container-fluid -->
-  </div>
-  <!-- /.content-header -->
-  <div class="row">
-    <div class="col-md-8 offset-md-2">
-      @if (session('success'))
-      <div class="alert alert-success">
-        {{ session('success') }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+</head>
+
+<body>
+  <div class="dashboard">
+    @include('layouts/header-sidebar')
+    <!-- MAIN -->
+    <div class="dashboard-app">
+      @include('layouts/header-topbar')
+      <!-- /.content-header -->
+      <script>
+        window.setTimeout(function() {
+          $(".alert-success").slideUp(500, function() {
+            $(this).remove();
+          });
+        }, 3000);
+      </script>
+      <div class="link-dir">
+        <h1 class="display-4">Institute List</h1>
+        <ul>
+          <li><a href="index.php">Home</a></li>
+          <li><a href="javascript:void(0)">/</a></li>
+          <li><a href="javascript:void(0)">Admin</a></li>
+          <li><a href="javascript:void(0)">/</a></li>
+          <li><a href="{{url('institute-list')}}">Admin List</a></li>
+        </ul>
       </div>
-      @endif
-    </div>
-  </div>
 
-  <script>
-    window.setTimeout(function() {
-      $(".alert-success").slideUp(500, function() {
-        $(this).remove();
-      });
-    }, 3000);
-  </script>
-  <!-- Main content -->
+      <!-- /.card-header -->
+      <!-- form start -->
 
-  <section class="content">
-    <div class="container-fluid">
       <div class="row">
-        <div class="col-md-12">
-          <div class="card">
-            <div class="card-header">
-              <h3 class="card-title">Admin List</h3>
-              <a href="{{url('create/admin')}}" class="btn btn-success" style="float: right;">Create Admin</a>
-            </div>
-            <!-- /.card-header -->
-            <div class="card-body">
-              <table class="table table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th style="width: 10px">
-                      <Sr class="No"></Sr>
-                    </th>
-                    <th style="width: 400px">Name</th>
-                    <th style="width: 400px">Email</th>
-                    <th style="width: 400px">Mobile</th>
-                    <th style="width: 400px">Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @php $i=1 @endphp
-                  @foreach($users as $value)
-                  <tr>
-                    <td>{{$i}}</td>
-                    <td>{{$value->firstname.' '.$value->lastname}}</td>
-                    <td>{{$value->email}}</td>
-                    <td>{{$value->mobile}}</td>
-                    <td>{{$value->status}}</td>
-                    <td>
-                      <div class="d-flex">
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        &nbsp;&nbsp;
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                      </div>
-                  </tr>
-                  @php $i++ @endphp
-                  @endforeach
-                </tbody>
-              </table>
-            </div>
-
-            <div class="d-flex justify-content-end">
-              {!! $users->withQueryString()->links('pagination::bootstrap-5') !!}
-
-            </div>
+        <div class="col-md-10 offset-md-1">
+          @if (session('success'))
+          <div class="alert alert-success">
+            {{ session('success') }}
           </div>
+          @endif
+        </div>
+      </div>
+
+      <script>
+        window.setTimeout(function() {
+          $(".alert-success").slideUp(500, function() {
+            $(this).remove();
+          });
+        }, 3000);
+      </script>
+      <!-- Main content -->
+
+      <div class="dashboard-content side-content">
+
+
+        <div class="col-lg-12 institute-form">
+          <div class="create-title-btn">
+            <h4 class="mb-0">List of Institute</h4>
+            <a href="{{url('create/admin')}}" class="btn btn-success" style="float: right;">Create Admin</a>
+          </div>
+          <!-- /.card-header -->
+          <table class="table table-responsive-sm table-bordered institute-table mt-4">
+            <thead>
+              <tr>
+                <th style="width: 10px">
+                  <Sr class="No"></Sr>
+                </th>
+                <th style="width: 400px">Name</th>
+                <th style="width: 400px">Email</th>
+                <th style="width: 400px">Mobile</th>
+                <th style="width: 400px">Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @php $i=1 @endphp
+              @foreach($users as $value)
+              <tr>
+                <td>{{$i}}</td>
+                <td>{{$value->firstname.' '.$value->lastname}}</td>
+                <td>{{$value->email}}</td>
+                <td>{{$value->mobile}}</td>
+                <td>{{$value->status}}</td>
+                <td>
+                  <div class="d-flex">
+                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                    &nbsp;&nbsp;
+                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                  </div>
+              </tr>
+              @php $i++ @endphp
+              @endforeach
+            </tbody>
+          </table>
+        </div>
+
+        <div class="d-flex justify-content-end">
+          {!! $users->withQueryString()->links('pagination::bootstrap-5') !!}
 
         </div>
-  </section>
+      </div>
 
-</div>
+    </div>
+  </div>
+</body>
+
 <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
@@ -209,4 +222,4 @@
     });
   });
 </script>
-@include('layouts/footer ')
+@include('layouts/footer_new')
