@@ -231,3 +231,95 @@
     </div>
   </div>
   @include('layouts/footer_new')
+
+  <script>
+    $(document).ready(function() {
+      $('.institute_for_editButton').click(function() {
+        var institute_id = $(this).data('user-id');
+
+        $.ajax({
+          url: '/institute-for/edit',
+          method: 'POST',
+          data: {
+            institute_id: institute_id
+          },
+          success: function(response) {
+            var reponse_data = response.Institute_for_model;
+            var iconSrc = '{{ asset('
+            ') }}' + reponse_data.icon;
+            $('#institute_id').val(reponse_data.id);
+            $('#name').val(reponse_data.name);
+            $('#icon_update').attr('src', iconSrc);
+            $('#old_icon').val(reponse_data.icon);
+            $('#status').val(reponse_data.status);
+            $('#usereditModal').modal('show');
+          },
+          error: function(error) {
+            console.error(error);
+          }
+        });
+      });
+    });
+
+  
+  
+
+    document.querySelectorAll('.institute_for_deletebutton').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+        var institute_id = this.getAttribute('data-user-id');
+
+        Swal.fire({
+          title: 'Are you sure want to delete?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post('/institute-for/delete', {
+                institute_id: institute_id
+              })
+              .then(response => {
+                location.reload(true);
+
+              })
+              .catch(error => {
+                console.error(error);
+              });
+          }
+        });
+      });
+    });
+
+    function previewFile_create() {
+      $("#icon_create").show();
+      const preview = document.getElementById("icon_create");
+      const fileInput = document.querySelector("input[type=file]");
+      const file = fileInput.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        preview.src = reader.result;
+      }, false);
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    }
+
+    function previewFile_update(inputElement) {
+      const preview = document.getElementById("icon_update");
+      const file = inputElement.files[0];
+      const reader = new FileReader();
+
+      reader.addEventListener("load", () => {
+        preview.src = reader.result;
+      }, false);
+
+      if (file) {
+        reader.readAsDataURL(file);
+      }
+    }
+  </script>
