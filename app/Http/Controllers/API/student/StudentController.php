@@ -707,6 +707,7 @@ class StudentController extends Controller
                 $totalattlec = Attendance_model::where('institute_id',$institute_id)
                 ->where('student_id',$user_id)->where('attendance','P')->count();
                 $totalattendlec = array('total_lectures'=>'170','attend_lectures'=>$totalattlec,'miss_lectures'=>'7');
+                
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
