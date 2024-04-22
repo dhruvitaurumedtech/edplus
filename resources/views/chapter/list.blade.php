@@ -19,7 +19,7 @@
       <div class="link-dir">
         <h1 class="display-4">Chapter List</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -55,7 +55,7 @@
                 @csrf
                 <!-- /.card-header -->
                 <div class="card-body">
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="standard_id">Standard : </label>
                     <select class="form-control" name="standard_id" id="standard_id" onchange="getsubject()">
                       <option value=" ">Select Option</option>
@@ -64,7 +64,7 @@
                       @endforeach
                     </select>
                   </div>
-                  <div class="col-md-6">
+                  <div class="col-md-12">
                     <label for="subject">Subject : </label>
                     <select class="form-control" name="subject" id="subject" on>
                       <option value=" ">Select Option</option>
@@ -76,14 +76,14 @@
                   </a>
                   <br>
                   <div id="container">
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_no">Chapter Number : </label>
                       <input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">
                       @error('chapter_no')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_name">Chapter Name : </label>
                       <input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">
                       @error('chapter_name')
@@ -91,7 +91,7 @@
                       @enderror
                     </div>
 
-                    <div class="col-md-6">
+                    <div class="col-md-12">
                       <label for="chapter_image">Chapter Image : </label>
                       <input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">
                       @error('chapter_image')
@@ -160,7 +160,9 @@
         </div>
 
       </div>
-      @include('layouts/footer_new')
+    </div>
+    @include('layouts/footer_new')
+  </div>
       <!-- view chapters -->
       <div class="modal fade" id="chaptersModal" tabindex="-1" aria-labelledby="chaptersModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -279,7 +281,7 @@
               x++; // Increment field counter
               // Add input field
               $(container).append(
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_no">Chapter Number : </label>' +
                 '<input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">' +
                 '@error('
@@ -287,7 +289,7 @@
                 '<div class="text-danger">{{ $message }}</div>' +
                 '@enderror' +
                 '</div>' +
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_name">Chapter Name : </label>' +
                 '<input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">' +
                 '@error('
@@ -296,7 +298,7 @@
                 '@enderror' +
                 '</div>' +
 
-                '<div class="col-md-6">' +
+                '<div class="col-md-12">' +
                 '<label for="chapter_image">Chapter Image : </label>' +
                 '<input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">' +
                 '@error('
@@ -311,3 +313,4 @@
           });
         });
       </script>
+</body>

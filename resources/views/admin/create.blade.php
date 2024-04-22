@@ -36,7 +36,7 @@
       <div class="link-dir">
         <h1 class="display-4">Admin</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -52,9 +52,10 @@
         }
       </script>
       <!-- Main content -->
-      <div class="col-md-12">
-        <form class="s-chapter-form" method="post" id="myForm" action="{{ url('store/admin') }}">
+      <div class="dashboard-content side-content">
+        <form class="s-chapter-form institute-form" method="post" id="myForm" action="{{ url('store/admin') }}">
           @csrf
+          <h4 class="mb-3">Create Admin</h4>
           <div class="card-body">
             <div class="form-group row">
               <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>

@@ -20,7 +20,7 @@
       <div class="link-dir">
         <h1 class="display-4">subject List</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -226,6 +226,10 @@
         </section>
       </div>
 
+      @include('layouts/footer_new')
+    </div>
+  </div>
+      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
       <script>
         document.querySelectorAll('.editButton').forEach(function(button) {
           button.addEventListener('click', function() {
@@ -278,7 +282,6 @@
           });
         });
       </script>
-      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
       <script>
         $(document).ready(function() {
@@ -339,4 +342,4 @@
           });
         });
       </script>
-      @include('layouts/footer ')
+</body>

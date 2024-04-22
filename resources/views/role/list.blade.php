@@ -20,7 +20,7 @@
       <div class="link-dir">
         <h1 class="display-4">Role</h1>
         <ul>
-          <li><a href="index.php">Home</a></li>
+          <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Settings</a></li>
           <li><a href="javascript:void(0)">/</a></li>
@@ -48,7 +48,7 @@
 
         <div class="row">
           <!-- table -->
-          <div class="col-lg-12 mt-5">
+          <div class="col-lg-12 mt-3 institute-form">
             <div class="create-title-btn">
               <h4 class="mb-0">List of Role</h4>
               <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
@@ -61,7 +61,7 @@
               </div>
 
             </div>
-            <table class="table table-responsive-sm table-bordered institute-table mt-4">
+            <table class="table table-responsive table-bordered institute-table mt-4">
               <thead>
                 <tr>
                   <th scope="col">No</th>
