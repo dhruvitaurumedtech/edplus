@@ -244,4 +244,6 @@
               });
             });
           </script>
-          @include('layouts/footer')
+        </div>
+      </div>
+      @include('layouts/footer_new')
