@@ -217,19 +217,4 @@
             });
           });
         });
-
-
-
-        // document.querySelectorAll('.studentlist').forEach(function(button) {
-        //   button.addEventListener('click', function() {
-        //     var institute_id = this.getAttribute('data-institute-id');
-        //     axios.post('/student/list', {
-        //       institute_id: institute_id
-        //       })
-
-        //       .catch(function(error) {
-        //         console.error(error);
-        //       });
-        //   });
-        // });
       </script>
