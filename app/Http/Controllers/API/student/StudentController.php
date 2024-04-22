@@ -1431,6 +1431,7 @@ class StudentController extends Controller
                 ->where('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
                 ->where('students_details.standard_id', $standard_id)
+                ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at');
 
 
@@ -1438,11 +1439,11 @@ class StudentController extends Controller
                 $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
                     $query->select('id')
                         ->from('subject')
-                        ->orwhereIn('id', explode(',', $subject_ids));
+                        ->whereIn('id', explode(',', $subject_ids));
                 });
             }
             if (!empty($batch_id)) {
-                $query->orwhere('students_details.batch_id', $batch_id);
+                $query->where('students_details.batch_id', $batch_id);
             }
 
             $student_data = $query->get()->toArray();
@@ -1452,9 +1453,10 @@ class StudentController extends Controller
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
                         'attendance' => $value['attendance'] . '',
-                        'photo' => !empty($value['image']) ? url($value['image']) :  '',
+                        'photo' => !empty($value['image']) ? url($value['image']) : url('no-image.png'),
                         'board_name' => $value['board_name'] . '',
-                        'medium_name' => $value['medium_name'] . ''
+                        'medium_name' => $value['medium_name'] . '',
+
 
 
                     ];
