@@ -105,7 +105,7 @@
 
               <form action="#">
                 <div class="search-box">
-                  <input type="search" name="search" placeholder="Search">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
                   <i class="fas fa-search"></i>
                 </div>
               </form>
@@ -122,7 +122,7 @@
                     <th>Action</th>
                   </tr>
                 </thead>
-                <tbody>
+                <tbody class="myTable">
                   @php $i=1 @endphp
                   @foreach($institute_for as $value)
                   <tr>

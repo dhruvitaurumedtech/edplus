@@ -86,6 +86,12 @@
           <div class="col-md-6">
             <div class="institute-form">
               <h3 class="card-title">Stream List</h3>
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
               <!-- @canButton('add', 'Stream')
               <a href="{{url('stream-create')}}" class="btn btn-success" style="float: right;">Create Stream </a>
               @endCanButton -->
@@ -102,7 +108,7 @@
                       <th>Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="myTable">
                     @php $i=1 @endphp
                     @foreach($straemlist as $value)
                     <tr>

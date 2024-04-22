@@ -101,9 +101,16 @@
           </div>
           <div class="col-md-7">
             <div class="institute-form">
+              <h3 class="card-title">Do Business With</h3>
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
               <!-- /.card-header -->
               <div class="card-body">
-                <table class="table table-bordered table-responsive">
+                <table class="table table-bordered ">
                   <thead>
                     <tr>
                       <th style="width: 10px">
@@ -115,7 +122,7 @@
                       <th>Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="myTable">
                     @php $i=1 @endphp
                     @foreach($do_business_with as $value)
                     <tr>

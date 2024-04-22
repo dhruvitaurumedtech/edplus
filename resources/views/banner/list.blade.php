@@ -91,7 +91,7 @@
                   </div>
                   <!-- /.card-header -->
                   <div class="card-body">
-                    <table class="table table-bordered table-responsive">
+                    <table class="table table-bordered">
                       <thead>
                         <tr>
                           <th style="width: 10px">

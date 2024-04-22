@@ -94,6 +94,12 @@
           <div class="col-md-6">
             <div class="institute-form">
               <h3 class="card-title">Class List</h3>
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
               <!-- /.card-header -->
               <div class="card-body">
                 <table class="table table-bordered table-responsive">
@@ -108,7 +114,7 @@
                       <th>Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="myTable">
                     @php $i=1 @endphp
                     @foreach($classlist as $value)
                     <tr>
