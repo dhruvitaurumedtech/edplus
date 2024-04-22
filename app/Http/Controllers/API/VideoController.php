@@ -159,7 +159,7 @@ class VideoController extends Controller
                 $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
                     ->count();
-                if ($record == 0) {
+                if ($record == 1) {
                     return response()->json([
                         'success' => 400,
                         'message' => 'Already Assign Video This Batch!',
