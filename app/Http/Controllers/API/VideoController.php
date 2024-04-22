@@ -35,8 +35,9 @@ class VideoController extends Controller
 
         if (!$check || $check->category_id != $request->parent_category_id) {
             return response()->json([
-                'success' => false,
-                'message' => 'Please Select Correct Category'
+                'success' => 400,
+                'message' => 'Please Select Correct Category',
+                'data'=>[]
             ], 400);
         }
 
@@ -54,7 +55,7 @@ class VideoController extends Controller
 
         if ($validator->fails()) {
             return response()->json([
-                'success' => false,
+                'success' => 400,
                 'message' => 'Upload Fail',
                 'error' => $validator->errors()
             ], 400);
@@ -88,7 +89,7 @@ class VideoController extends Controller
         ]);
 
         return response()->json([
-            'success' => true,
+            'success' => 200,
             'message' => 'Topic and file uploaded successfully',
             'topic' => $topic
         ]);
@@ -162,6 +163,7 @@ class VideoController extends Controller
                     return response()->json([
                         'success' => 400,
                         'message' => 'Already Assign Video This Batch!',
+                        'data'=>[]
                     ], 400);
                 }
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
@@ -171,6 +173,7 @@ class VideoController extends Controller
                     return response()->json([
                         'success' => 400,
                         'message' => 'Four records with the same Batch and Subject already exist',
+                        'data'=>[]
                     ], 400);
                 }
             }
@@ -193,13 +196,15 @@ class VideoController extends Controller
             // }
 
             return response()->json([
-                'success' => 400,
+                'success' => 200,
                 'message' => 'Video Assign Batch Successfully',
-            ], 400);
+                'data'=>[]
+            ], 200);
         } else {
             return response()->json([
                 'status' => 400,
                 'message' => 'Invalid token.',
+                'data'=>[]
             ]);
         }
     }
