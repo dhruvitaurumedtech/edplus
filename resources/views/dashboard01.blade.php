@@ -212,8 +212,8 @@
             </div>
           </div>
         </div>
-      </div><!-- Sub Main Col END -->
-    </div><!-- MAIN row END -->
+      </div>
+    </div>
     @include('layouts/footer_new')
 
   </div>
