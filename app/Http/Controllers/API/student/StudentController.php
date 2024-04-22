@@ -701,13 +701,20 @@ class StudentController extends Controller
                         );
                     }
                 }
+
+                //total attend lecture
+                $totalattendlec = [];
+                $totalattlec = Attendance_model::where('institute_id',$institute_id)
+                ->where('subject_id',$user_id)->where('attendance','P')->count();
+                $totalattendlec = array('total_lectures'=>'170','attend_lectures'=>$totalattlec,'miss_lectures'=>'7');
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
                     'announcement' => $announcement,
                     'upcoming_exams' => $examlist,
                     'subjects' => $subjects,
-                    'result' => $result
+                    'result' => $result,
+                    'attendance'=>$totalattendlec
                 );
 
 
