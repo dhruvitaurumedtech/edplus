@@ -912,19 +912,16 @@ class StudentController extends Controller
                             );
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
-                    }
-                    //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
-                }
-                if (!empty($chapter_id)) {
 
-                    $batch_response = [
-                        'batch_list' => $batch_response,
-                    ];
-                    $response = array_merge($batch_response, $category);
-                } else {
-                    $response = [
-                        'topics' => $category,
-                    ];
+                        if (!empty($chapter_id)) {
+                            $batch_response = [
+                                'batch_list' => $batch_response,
+                            ];
+                            $response = array_merge($batch_response, $category);
+                        } else {
+                            $response = $category; // Assign $category directly to $response
+                        }
+                    }
                 }
 
                 return response()->json([
