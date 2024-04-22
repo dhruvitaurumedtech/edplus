@@ -56,7 +56,7 @@
               </div>
 
             </div>
-            <table class="table table-responsive table-responsive-sm table-bordered institute-table mt-4">
+            <table class="table table-bordered institute-table mt-4">
               <thead>
                 <tr>
                   <th scope="col">No</th>   
