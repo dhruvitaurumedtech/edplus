@@ -181,7 +181,7 @@ class AuthController extends Controller
                     ]);
 
                 if ($existingUser->role_type == 3) {
-                    $instituteid = Institute_detail::where('student_id', $user->id)->select('id')->first();
+                    $instituteid = Institute_detail::where('user_id', $user->id)->select('id')->first();
                     if (empty($instituteid)) {
                         $institute_id = null;
                     } else {

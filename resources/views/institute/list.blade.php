@@ -1,10 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
-</head>
-
 <body>
 
   <div class="dashboard">
@@ -47,7 +40,7 @@
         </div>
         <div class="row">
           <!-- table -->
-          <div class="col-lg-12 mt-5">
+          <div class="col-lg-12 mt-5 institute-form">
             <div class="create-title-btn">
               <h4 class="mb-0">List of Role</h4>
               <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->

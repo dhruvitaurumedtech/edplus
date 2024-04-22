@@ -187,7 +187,7 @@ Route::middleware('auth')->group(function () {
     Route::post('video-category-delete', [VideoCategoryController::class, 'delete'])->name('videocategory.delete');
 
     //student
-    Route::post('/student/list', [StudentsController::class, 'list_student'])->name('student.list');
+    Route::post('/student/list', [StudentsController::class, 'list_s\tudent'])->name('student.list');
     Route::post('/student/create', [StudentsController::class, 'create_student'])->name('student.create');
     Route::post('/student/save', [StudentsController::class, 'save_student'])->name('student.save');
     Route::post('/student/edit', [StudentsController::class, 'edit_student'])->name('student.edit');

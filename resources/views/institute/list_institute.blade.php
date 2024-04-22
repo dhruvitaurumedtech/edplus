@@ -1,14 +1,10 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
 </head>
 
 <body>
   <div class="dashboard">
     @include('layouts/header-sidebar')
     <!-- MAIN -->
-    <div class="dashboard-app">
+    < class="dashboard-app">
       @include('layouts/header-topbar')
       <!-- /.content-header -->
       <script>
@@ -29,21 +25,23 @@
         </ul>
       </div>
 
+      <div class="row">
+        <div class="col-md-10 offset-md-1">
+          @if (session('success'))
+          <div class="alert alert-success">
+            {{ session('success') }}
+          </div>
+          @endif
+        </div>
+      </div>
+
       <!-- /.card-header -->
       <!-- form start -->
 
       <div class="dashboard-content side-content">
-        <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
-          </div>
-        </div>
 
-        <div class="col-lg-12 mt-5">
+
+        <div class="col-lg-12 mt-5 institute-form">
           <div class="create-title-btn">
             <h4 class="mb-0">List of Role</h4>
             <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
@@ -217,19 +215,4 @@
             });
           });
         });
-
-
-
-        // document.querySelectorAll('.studentlist').forEach(function(button) {
-        //   button.addEventListener('click', function() {
-        //     var institute_id = this.getAttribute('data-institute-id');
-        //     axios.post('/student/list', {
-        //       institute_id: institute_id
-        //       })
-
-        //       .catch(function(error) {
-        //         console.error(error);
-        //       });
-        //   });
-        // });
       </script>
