@@ -56,10 +56,10 @@
               </div>
 
             </div>
-            <table class="table table-responsive table-bordered institute-table mt-4">
+            <table class="table table-bordered institute-table mt-4">
               <thead>
                 <tr>
-                  <th scope="col">No</th>
+                  <th scope="col">No</th>   
                   <th scope="col">Role Name</th>
                   <th scope="col">Action</th>
                 </tr>

@@ -154,7 +154,7 @@
             <div class="col-lg-12">
               <h3>Announcement List</h3>
 
-              <table class="table table-responsive-lg">
+              <table class="table table-responsive-sm table-responsive">
                 <thead class="thead-primary-color">
                   <tr>
                     <th>No</th>

@@ -49,7 +49,7 @@
               @endCanButton
 
             </div>
-            <table class="table table-responsive table-bordered institute-table mt-4">
+            <table class="table table-responsive table-responsive-sm table-bordered institute-table mt-4">
               <thead>
                 <tr>
                   <th style="width: 10px">
