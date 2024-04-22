@@ -1428,7 +1428,7 @@ class StudentController extends Controller
                 ->where('students_details.user_id', $user_id)
                 // ->where('students_details.batch_id', $batch_id)
                 ->where('students_details.institute_id', $institute_id)
-                ->orwhere('students_details.board_id', $board_id)
+                ->where('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
                 ->where('students_details.standard_id', $standard_id)
                 ->whereNull('students_details.deleted_at');
@@ -1442,7 +1442,7 @@ class StudentController extends Controller
                 });
             }
             if (!empty($batch_id)) {
-                $query->where('students_details.batch_id', $batch_id);
+                $query->orwhere('students_details.batch_id', $batch_id);
             }
 
             $student_data = $query->get()->toArray();
