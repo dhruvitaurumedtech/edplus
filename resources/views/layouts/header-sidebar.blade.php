@@ -1,3 +1,8 @@
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
+<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+
 <div class="dashboard-nav">
     <nav class="dashboard-nav-list">
 
@@ -20,7 +25,7 @@
         @foreach ($menu as $value)
         <div class="dashboard-nav-dropdown {{ isActiveMenu($value) }}">
             <a href="{{ isset($value['url']) && Route::has($value['url']) ? url($value['url']) : '#' }}" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ isActiveLink($value['url']) }}">
-                <i class="fas fa-graduation-cap"></i>  {{ $value['menu_name'] }}
+                <i class="fas fa-graduation-cap"></i> {{ $value['menu_name'] }}
             </a>
             @if (!empty($value['submenus']))
             <div class="dashboard-nav-dropdown-menu " style="{{ isActiveMenu($value) ? 'display: block;' : '' }}">

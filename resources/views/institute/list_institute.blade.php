@@ -1,7 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
 </head>
 
 <body>
@@ -28,22 +24,22 @@
           <li><a href="{{url('institute-list')}}">Institute List</a></li>
         </ul>
       </div>
-      
+
       <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
+        <div class="col-md-10 offset-md-1">
+          @if (session('success'))
+          <div class="alert alert-success">
+            {{ session('success') }}
           </div>
+          @endif
         </div>
+      </div>
 
       <!-- /.card-header -->
       <!-- form start -->
-     
+
       <div class="dashboard-content side-content">
-       
+
 
         <div class="col-lg-12 mt-5 institute-form">
           <div class="create-title-btn">

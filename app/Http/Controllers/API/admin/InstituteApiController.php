@@ -1628,7 +1628,9 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-
+            echo "<pre>";
+            print_r($existingUser);
+            exit;
             $institute_id = $request->institute_id;
 
             $instituteDTS = Institute_detail::where('id', $institute_id)->first();
