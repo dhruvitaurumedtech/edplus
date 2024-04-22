@@ -56,7 +56,7 @@
             <a href="{{url('create/admin')}}" class="btn btn-success" style="float: right;">Create Admin</a>
           </div>
           <!-- /.card-header -->
-          <table class="table table-responsive table-bordered institute-table mt-4">
+          <table class="table table-responsive-sm table-responsive table-bordered institute-table mt-4">
             <thead>
               <tr>
                 <th style="width: 10px">
