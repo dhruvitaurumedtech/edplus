@@ -2373,7 +2373,10 @@ class InstituteApiController extends Controller
                                 ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                         });
                     })
-                    ->select('students_details.*', 'batches.batch_name', 'users.firstname', 'users.lastname', 'board.name as board', 'medium.name as medium', 'standard.name as standard')
+                    ->select('students_details.*', 'batches.batch_name',
+                     'users.firstname', 'users.lastname', 'users.image',
+                     'board.name as board', 'medium.name as medium',
+                      'standard.name as standard')
                     ->orderByDesc('students_details.created_at')
                     ->paginate($perPage);
 
@@ -2382,6 +2385,7 @@ class InstituteApiController extends Controller
                     $stulist[] = array(
                         'id' => $stdDT->student_id,
                         'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
+                        'image'=>$stdDT->image,
                         'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,

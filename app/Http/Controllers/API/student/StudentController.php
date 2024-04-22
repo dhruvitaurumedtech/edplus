@@ -1432,6 +1432,7 @@ class StudentController extends Controller
                     $student_response[] = [
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                        
 
                         'attendance' => $value['attendance'] . ''
                     ];
