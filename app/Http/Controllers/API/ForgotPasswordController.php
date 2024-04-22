@@ -24,22 +24,25 @@ class ForgotPasswordController extends Controller
 
   public function submitForgetPasswordForm(Request $request): JsonResponse
   {
+   
     if ($request->validate([
       'email' => 'required|email|exists:users',
     ])) {
       // $token = $request->header('Authorization');
-      // print_r($token);
+       //print_r($token);
       $existingUser = User::where('email', $request->email)->first();
-      DB::table('password_resets')->insert([
+      
+      $abc = DB::table('password_resets')->insert([
         'email' => $request->email,
         'token' => $existingUser->token,
         'created_at' => Carbon::now()
       ]);
+      
       Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
         $message->to($request->email);
         $message->subject('Reset Password');
       });
-
+      
       return response()->json([
         'status' => 200,
         'message' => 'We have e-mailed your password reset link!'

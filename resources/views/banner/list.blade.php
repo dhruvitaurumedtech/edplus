@@ -1,7 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
 </head>
 
 <body>

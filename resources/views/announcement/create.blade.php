@@ -1,8 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
 </head>
 
 <body>
@@ -258,7 +253,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputtitle">Title : </label>
-                                                <input type="text" class="form-control"  name="title" id="title">
+                                                <input type="text" class="form-control" name="title" id="title">
                                                 @error('title')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -298,13 +293,13 @@
                             .then(response => {
                                 var response_data = response.data.announcement;
                                 for (let result of response_data) {
-                                    
+
                                     var institute_id = result.institute_id;
                                     var teacher_id = result.teacher_id;
                                     $('#anouncement_id').val(result.id);
                                     $('#announcement').val(result.announcement);
                                     $('#title').val(result.title);
-                                    
+
                                     const institute_id_result = institute_id.split(',');
                                     for (let institute of institute_id_result) {
                                         $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);

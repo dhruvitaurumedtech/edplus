@@ -1,8 +1,3 @@
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
 </head>
 
 <body>
@@ -107,7 +102,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Time Limit (Hour) : </label>
-                                                <input type="text" name="time" class="form-control"> 
+                                                <input type="text" name="time" class="form-control">
                                                 @error('time')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -249,7 +244,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Time Limit (Hour) : </label>
-                                                <input type="text" name="time" id="time" class="form-control"> 
+                                                <input type="text" name="time" id="time" class="form-control">
                                                 @error('time')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -281,7 +276,7 @@
                             .then(response => {
                                 var response_data = response.data.times;
                                 for (let result of response_data) {
-                                    
+
                                     var institute_id = result.institute_id;
                                     var teacher_id = result.teacher_id;
                                     $('#id').val(result.id);
