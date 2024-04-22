@@ -158,6 +158,7 @@ class VideoController extends Controller
             foreach ($batch_ids as $batch_id_value) {
                 $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $subject_id)
+                    ->where('video_id', $video_id)
                     ->count();
                 if ($record == 1) {
                     return response()->json([

@@ -701,13 +701,21 @@ class StudentController extends Controller
                         );
                     }
                 }
+
+                //total attend lecture
+                $totalattendlec = [];
+                $totalattlec = Attendance_model::where('institute_id', $institute_id)
+                    ->where('student_id', $user_id)->where('attendance', 'P')->count();
+                $totalattendlec = array('total_lectures' => '170', 'attend_lectures' => $totalattlec, 'miss_lectures' => '7');
+
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
                     'announcement' => $announcement,
                     'upcoming_exams' => $examlist,
                     'subjects' => $subjects,
-                    'result' => $result
+                    'result' => $result,
+                    'attendance' => $totalattendlec
                 );
 
 
@@ -1404,7 +1412,18 @@ class StudentController extends Controller
                 ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
                 ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
                 ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
-                ->select('users.*', 'students_details.student_id', 'standard.name as standard_name', 'stream.name as stream_name', 'attendance.attendance', 'students_details.standard_id', 'students_details.stream_id', 'students_details.batch_id')
+                ->select(
+                    'users.*',
+                    'students_details.student_id',
+                    'standard.name as standard_name',
+                    'stream.name as stream_name',
+                    'attendance.attendance',
+                    'students_details.standard_id',
+                    'students_details.stream_id',
+                    'students_details.batch_id',
+                    'board.name as board_name',
+                    'medium.name as medium_name'
+                )
                 // , 'students_details.subject_id'
                 ->where('students_details.user_id', $user_id)
                 // ->where('students_details.batch_id', $batch_id)
@@ -1419,11 +1438,11 @@ class StudentController extends Controller
                 $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
                     $query->select('id')
                         ->from('subject')
-                        ->whereIn('id', explode(',', $subject_ids));
+                        ->orwhereIn('id', explode(',', $subject_ids));
                 });
             }
             if (!empty($batch_id)) {
-                $query->where('students_details.batch_id', $batch_id);
+                $query->orwhere('students_details.batch_id', $batch_id);
             }
 
             $student_data = $query->get()->toArray();
@@ -1432,9 +1451,12 @@ class StudentController extends Controller
                     $student_response[] = [
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                        
+                        'attendance' => $value['attendance'] . '',
+                        'photo' => !empty($value['image']) ? url($value['image']) :  '',
+                        'board_name' => $value['board_name'] . '',
+                        'medium_name' => $value['medium_name'] . ''
 
-                        'attendance' => $value['attendance'] . ''
+
                     ];
                 }
                 $base = [
