@@ -82,7 +82,7 @@ class StudentController extends Controller
                         'banner_image' => $imgpath,
                     );
                 }
-                $perPage = 10;
+                //$perPage = 10;
                 //student searched response 
                 $allinstitute = Institute_detail::where('status', 'active')
                     ->where(function ($query) use ($search_keyword) {
