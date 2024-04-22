@@ -1439,11 +1439,11 @@ class StudentController extends Controller
                 $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
                     $query->select('id')
                         ->from('subject')
-                        ->orwhereIn('id', explode(',', $subject_ids));
+                        ->whereIn('id', explode(',', $subject_ids));
                 });
             }
             if (!empty($batch_id)) {
-                $query->orwhere('students_details.batch_id', $batch_id);
+                $query->where('students_details.batch_id', $batch_id);
             }
 
             $student_data = $query->get()->toArray();
