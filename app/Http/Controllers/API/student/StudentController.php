@@ -1452,7 +1452,7 @@ class StudentController extends Controller
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
                         'attendance' => $value['attendance'] . '',
-                        'photo' => url($value['image']) . '',
+                        'photo' => !empty($value['image']) ? url($value['image']) :  '',
                         'board_name' => $value['board_name'] . '',
                         'medium_name' => $value['medium_name'] . ''
 
