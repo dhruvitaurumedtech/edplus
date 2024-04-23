@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
   <div class="dashboard">
@@ -117,7 +118,7 @@
                         <td>{{$value->institute_name}}</td>
                         <td>{{$value->url}}</td>
                         @endif
-                        <td><img src="{{asset($value->banner_image) }}" alt="banner" style="width:100px;height:100px;"></td>
+                        <td><img src="{{asset($value->banner_image) }}" alt="banner" class="img-resize mt-3"></td>
                         <td>@if($value->status == 'active')
                           <input type="button" value="Active" class="btn btn-success">
                           @else
@@ -177,7 +178,7 @@
                             @enderror
                           </div>
                           <div class="col-md-3">
-                            <img src="" id="banner_image" alt="banner" class="mt-4" style="width:100px;height:100px;">
+                            <img src="" id="banner_image" alt="banner" class="img-resize mt-3">
                           </div>
                           <div class="col-md-12">
                             <label for="exampleInputEmail1">status : </label>
@@ -211,14 +212,19 @@
         document.querySelectorAll('.editButton').forEach(function(button) {
           button.addEventListener('click', function() {
             var banner_id = this.getAttribute('data-user-id');
+            var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
             axios.post('/banner/edit', {
                 banner_id: banner_id
               })
               .then(response => {
+
                 var reponse_data = response.data.banner_list;
-                var iconSrc = '{{ asset('
-                ') }}' + reponse_data.banner_image;
+                var iconSrc = baseUrl + '/' + reponse_data.banner_image;
+
+                // var iconSrc = '{{ asset('
+                // ') }}' + reponse_data.banner_image;
                 $('#banner_id').val(reponse_data.id);
                 $('#banner_image').attr('src', iconSrc);
                 $('#old_banner_image').val(reponse_data.banner_image);

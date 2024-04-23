@@ -1,0 +1,24 @@
+
+
+@media (min-width: 2304px)  {
+    .nav-profile-text {
+        padding-right: 4rem;
+    }
+}
+
+@media (max-width: 1440px)  {
+    
+}
+
+@media (max-width: 991px)  {
+    .side-content .col-lg-6 .institute-form{
+        margin-top: 50px;
+    }
+}
+
+@media (max-width: 768px)  {
+    .eschool-logo-img {
+        max-width: 160px;
+    }
+
+}

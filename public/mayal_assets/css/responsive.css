@@ -1,0 +1,98 @@
+@media (min-width: 2304px) {
+    .nav-profile-text {
+        padding-right: 4rem;
+    }
+}
+
+@media (max-width: 1440px) {}
+
+@media (max-width: 991px) {
+    .side-content .col-lg-6 .institute-form {
+        margin-top: 50px;
+    }
+
+    .dashboard-nav {
+        display: none;
+        position: fixed;
+        top: 70px;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        z-index: 1070;
+    }
+
+    .dashboard-nav.mobile-show {
+        display: block;
+    }
+
+    .dashboard-nav header .menu-toggle {
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+    }
+}
+
+@media (min-width: 992px) {
+    .dashboard-toolbar {
+        /* left: 238px; */
+    }
+
+    .dashboard-compact .dashboard-toolbar {
+        left: 0;
+    }
+
+    .dashboard-app {
+        margin-left: 238px;
+    }
+
+    .dashboard-compact .dashboard-app {
+        margin-left: 0;
+    }
+
+}
+
+@media (max-width: 768px) {
+    .eschool-logo-img {
+        max-width: 160px;
+    }
+
+    .dashboard-content {
+        padding: 15px 15px;
+    }
+
+    .link-dir {
+        -webkit-box-orient: vertical;
+        -webkit-box-direction: reverse;
+        -ms-flex-direction: column-reverse;
+        flex-direction: column-reverse;
+        gap: 15px;
+        padding: 20px;
+    }
+
+}
+
+
+@media (max-width: 576px) {
+    .login-form form {
+        width: 400px;
+    }
+
+    .login-form form .logo1 img {
+        width: 180px;
+    }
+
+}
+
+@media (max-width: 450px) {
+    .login-form form {
+        width: 300px;
+    }
+
+}
+
+@media (max-width: 400px) {
+    .inner-list-search {
+        flex-wrap: wrap;
+    }
+
+}
