@@ -1500,7 +1500,7 @@ class InstituteApiController extends Controller
                         'status' => '1',
                     ];
 
-                    if ($request->stream_id == 'null') {
+                    if ($request->stream_id == 'null' || $request->stream_id == '') {
                         $studentupdetail['stream_id'] = null;
                     }
 
@@ -1571,7 +1571,7 @@ class InstituteApiController extends Controller
                         ];
 
 
-                        if ($request->stream_id == 'null') {
+                        if ($request->stream_id == 'null' || $request->stream_id == '') {
                             $studentupdetail['stream_id'] = null;
                         }
 

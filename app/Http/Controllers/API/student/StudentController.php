@@ -150,6 +150,7 @@ class StudentController extends Controller
                     ->where('end_academic_year', '>=', now())
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                 $join_with = [];
+                print_r($joininstitute);exit;
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
                         'id' => $value->id,
