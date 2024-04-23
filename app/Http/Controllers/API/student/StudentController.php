@@ -151,6 +151,7 @@ class StudentController extends Controller
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                     
                     echo $joininstitute->toSql();exit;
+                    
                     $join_with = [];
                 
                 print_r($joininstitute);exit;
