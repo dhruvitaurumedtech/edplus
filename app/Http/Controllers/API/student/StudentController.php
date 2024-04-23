@@ -140,25 +140,26 @@ class StudentController extends Controller
                 //join with
 
                 $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($user_id) {
-                    $query->select('institute_id')
-                        ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
-                        ->from('students_details')
-                        ->whereNull('deleted_at');
-                })
-                ->where('end_academic_year', '>=', now())
-                ->toSql();
+                    ->whereIn('id', function ($query) use ($user_id) {
+                        $query->select('institute_id')
+                            ->where('student_id', $user_id)
+                            ->where('status', '=', '1')
+                            ->from('students_details')
+                            ->whereNull('deleted_at');
+                    })
+                    ->where('end_academic_year', '>=', now())
+                    ->toSql();
 
                 print_r(now());
                 print_r($user_id);
                 exit;
 
-                    
-                echo $joininstitute->toSql();exit;
+
+                echo $joininstitute->toSql();
+                exit;
                 $join_with = [];
-                
-                
+
+
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
                         'id' => $value->id,
@@ -1024,7 +1025,7 @@ class StudentController extends Controller
                     $subjectids = Subject_model::whereIN('id', $subids)->get();
                     $subs = [];
                     foreach ($subjectids as $subDT) {
-                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name,'image'=>asset($subDT->image));
+                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
                     }
                     $institutes[] = array(
                         'id' => $value->id,
@@ -1423,14 +1424,14 @@ class StudentController extends Controller
                 ->leftJoin('board', 'students_details.board_id', '=', 'board.id')
                 ->leftJoin('medium', 'students_details.medium_id', '=', 'medium.id')
                 ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
-                ->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
+                //->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
                 ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
                 ->select(
                     'users.*',
                     'students_details.student_id',
                     'standard.name as standard_name',
                     'stream.name as stream_name',
-                    'attendance.attendance',
+                    //'attendance.attendance',
                     'students_details.standard_id',
                     'students_details.stream_id',
                     'students_details.batch_id',
@@ -1460,18 +1461,17 @@ class StudentController extends Controller
             }
 
             $student_data = $query->get()->toArray();
+
             if (!empty($student_data)) {
                 foreach ($student_data as $value) {
+                    $atttbl = Attendance_model::where('student_id', $value['id'])->orderbydesc('updated_at')->limit(1)->first();
                     $student_response[] = [
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                        'attendance' => $value['attendance'] . '',
+                        'attendance' => !empty($atttbl->attendance) ? $atttbl->attendance : '',
                         'photo' => !empty($value['image']) ? url($value['image']) : url('no-image.png'),
                         'board_name' => $value['board_name'] . '',
                         'medium_name' => $value['medium_name'] . '',
-
-
-
                     ];
                 }
                 $base = [
