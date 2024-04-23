@@ -150,7 +150,7 @@ class StudentController extends Controller
                     ->where('end_academic_year', '>=', now())
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                 $join_with = [];
-                print_r($joininstitute);exit;
+                
                 
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
@@ -1017,7 +1017,7 @@ class StudentController extends Controller
                     $subjectids = Subject_model::whereIN('id', $subids)->get();
                     $subs = [];
                     foreach ($subjectids as $subDT) {
-                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name,'image'=>$subDT->image);
+                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name,'image'=>asset($subDT->image));
                     }
                     $institutes[] = array(
                         'id' => $value->id,
