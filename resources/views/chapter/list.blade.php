@@ -110,7 +110,7 @@
               <div class="institute-form">
                 <h3 class="card-title">Chapter</h3>
 
-                <table class="table table-bordered table-responsive">
+                <table class="table table-js table-bordered table-responsive">
                   <thead>
                     <tr>
                       <th style="width: 10px">No</th>
@@ -174,7 +174,7 @@
               </button>
             </div>
             <div class="modal-body">
-              <table class="table table-bordered table-responsive">
+              <table class="table table-js table-bordered table-responsive">
                 <thead>
                   <tr>
                     <th>Chapter No.</th>

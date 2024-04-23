@@ -72,11 +72,11 @@
 
                         </div>
                     </div>
-                    <div class="col-lg-7">
+                    <div class="col-lg-7 mt-4">
                         <div class="institute-form">
                             <h3>BannerSize List</h3>
                             <div class="card-body">
-                                <table class="table table-responsive-sm">
+                                <table class="table table-js table-responsive-sm">
                                     <thead>
                                         <tr>
                                             <th>ID</th>

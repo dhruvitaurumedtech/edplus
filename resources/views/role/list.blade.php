@@ -55,7 +55,7 @@
               </div>
 
             </div>
-            <table class="table table-bordered institute-table mt-4">
+            <table class="table table-bordered institute-table mt-4 table-responsive-sm">
               <thead>
                 <tr>
                   <th scope="col">No</th>
@@ -103,6 +103,7 @@
       </div><!-- Sub Main Col END -->
     </div><!-- MAIN row END -->
     @include('layouts/footer_new')
+    
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -132,7 +133,6 @@
         </div>
       </div>
     </div>
-
 
     <script>
       document.querySelectorAll('.editButton').forEach(function(button) {

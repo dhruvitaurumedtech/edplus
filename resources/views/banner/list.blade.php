@@ -85,27 +85,27 @@
                 </form>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-lg-6">
               <div class="">
                 <div class="card institute-form">
 
                   <!-- /.card-header -->
-                  <table class="table table-bordered table-responsive table-responsive-sm">
+                  <table class="table table-js table-bordered">
                     <thead>
                       <tr>
-                        <th style="width: 10px">
+                        <th>
                           <Sr class="No">No</Sr>
                         </th>
                         @if(auth::user()->role_type == '3')
-                        <th style="width: 10px">
+                        <th>
                           <Sr class="No">Institute Name</Sr>
                         </th>
-                        <th style="width: 10px">
+                        <th>
                           <Sr class="No">Url</Sr>
                         </th>
                         @endif
-                        <th style="width: 200px">Banner_image</th>
-                        <th style="width: 500px">Status</th>
+                        <th>Banner_image</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -283,3 +283,7 @@
         }
       </script>
       @include('layouts/footer_new')
+    </div>
+  </div>
+</body>
+</html>

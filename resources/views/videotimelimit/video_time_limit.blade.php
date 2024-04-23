@@ -133,7 +133,7 @@
                                     <i class="fas fa-search"></i>
                                 </div>
                             </form>
-                            <table class="table table-bordered table-responsive mt-4">
+                            <table class="table table-js table-bordered table-responsive mt-4">
                                 <thead>
                                     <tr>
                                         <th style="width: 200px">Time</th>
