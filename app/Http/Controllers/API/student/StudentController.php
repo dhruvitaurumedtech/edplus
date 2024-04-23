@@ -1017,7 +1017,7 @@ class StudentController extends Controller
                     $subjectids = Subject_model::whereIN('id', $subids)->get();
                     $subs = [];
                     foreach ($subjectids as $subDT) {
-                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name,'image'=>$subDT->image);
                     }
                     $institutes[] = array(
                         'id' => $value->id,
