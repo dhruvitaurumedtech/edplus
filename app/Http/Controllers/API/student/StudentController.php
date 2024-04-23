@@ -1449,9 +1449,8 @@ class StudentController extends Controller
             if (!empty($batch_id)) {
                 $query->where('students_details.batch_id', $batch_id);
             }
-            $query->orderBy('students_details.updated_at', 'desc');
 
-            $student_data = $query->first();
+            $student_data = $query->get()->toArray();
             if (!empty($student_data)) {
                 foreach ($student_data as $value) {
                     $student_response[] = [
