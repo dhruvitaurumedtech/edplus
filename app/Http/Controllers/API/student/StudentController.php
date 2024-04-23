@@ -138,7 +138,7 @@ class StudentController extends Controller
                 }
 
                 //join with
-
+                $ctdmy = date('Y-m');
                 $joininstitute = Institute_detail::where('status', 'active')
                     ->whereIn('id', function ($query) use ($user_id) {
                         $query->select('institute_id')
@@ -147,10 +147,10 @@ class StudentController extends Controller
                             ->from('students_details')
                             ->whereNull('deleted_at');
                     })
-                    ->where('end_academic_year', '>=', now())
+                    ->where('end_academic_year', '>=', $ctdmy)
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
                     
-                    echo $joininstitute->toSql();exit;
+                    
                     
                     $join_with = [];
                 
