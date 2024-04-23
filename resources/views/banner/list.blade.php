@@ -283,3 +283,7 @@
         }
       </script>
       @include('layouts/footer_new')
+    </div>
+  </div>
+</body>
+</html>

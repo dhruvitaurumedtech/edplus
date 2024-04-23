@@ -220,3 +220,27 @@ function toggleDropdown() {
     new CheckboxDropdown(checkboxesDropdowns[i]);
   }
 })(jQuery);
+
+
+
+// table responsive js 
+const table = document.querySelector(".table-js");
+
+function updateResponsiveClasses() {
+  if (window.innerWidth >= 1400) {
+    table.classList.add("table-responsive-sm");
+    table.classList.remove("table-responsive");
+  } else if (window.innerWidth < 1400 && window.innerWidth >= 1080) {
+    table.classList.remove("table-responsive-sm");
+    table.classList.add("table-responsive");
+  } else {
+    table.classList.remove("table-responsive");
+    table.classList.remove("table-responsive-sm");
+  }
+}
+
+// Initial update
+updateResponsiveClasses();
+
+// Update on window resize
+window.addEventListener("resize", updateResponsiveClasses);
