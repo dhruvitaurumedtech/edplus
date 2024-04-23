@@ -149,13 +149,7 @@ class StudentController extends Controller
                     })
                     ->where('end_academic_year', '>=', $ctdmy)
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
-
-
-
                 $join_with = [];
-
-
-
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
                         'id' => $value->id,
@@ -1411,6 +1405,7 @@ class StudentController extends Controller
         $board_id = $request->board_id;
         $medium_id = $request->medium_id;
         $standard_id = $request->standard_id;
+        $keyword = $request->search;
 
 
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
@@ -1443,7 +1438,15 @@ class StudentController extends Controller
                 ->where('students_details.standard_id', $standard_id)
                 ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at');
-
+            if (!empty($keyword)) {
+                $query->where(function ($query) use ($keyword) {
+                    $query->where('users.firstname', 'like', "%{$keyword}%")
+                        ->orWhere('users.lastname', 'like', "%{$keyword}%")
+                        ->orWhere('standard.name', 'like', "%{$keyword}%")
+                        ->orWhere('board.name', 'like', "%{$keyword}%")
+                        ->orWhere('medium.name', 'like', "%{$keyword}%");
+                });
+            }
 
             if (!empty($subject_ids)) {
                 $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
