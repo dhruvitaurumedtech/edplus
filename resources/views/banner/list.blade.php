@@ -85,10 +85,9 @@
               </div>
             </div>
             <div class="col-md-6">
-              <div class="institute-form">
-                <div class="card">
-                  <div class="card-header">
-                  </div>
+              <div class="">
+                <div class="card institute-form">
+                  
                   <!-- /.card-header -->
                   <div class="card-body">
                     <table class="table table-bordered">
