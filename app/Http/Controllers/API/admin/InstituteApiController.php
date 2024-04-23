@@ -1094,7 +1094,7 @@ class InstituteApiController extends Controller
                     $subject_array[] = [
                         'id' => $subject_value->id,
                         'subject_value' => $subject_value->name,
-                        'image' =>asset($subject_value->image) ,
+                        'image' => asset($subject_value->image),
                     ];
                 }
 
@@ -1155,38 +1155,41 @@ class InstituteApiController extends Controller
         }
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        // echo "<pre>";print_r($existingUser);exit;
+
         if ($existingUser) {
             $institute_id = $request->institute_id;
             $request_list = Student_detail::where('institute_id', $institute_id)
                 ->where('status', '0')
-                ->get()->toarray();
-            if (!empty($request_list)) {
-                foreach ($request_list as $value) {
-                    $user_data = User::where('id', $value['student_id'])->get()->toarray();
-                    $response = [];
-                    foreach ($user_data as $value2) {
-                        if (!empty($value2['image'])) {
-                            $image = asset($value2['image']);
-                        } else {
-                            $image = asset('default.jpg');
-                        }
-                        $response[] = [
-                            'student_id' => $value2['id'],
-                            'name' => $value2['firstname'] . ' ' . $value2['lastname'],
-                            'photo' => $image,
-                        ];
+                ->get()
+                ->toArray();
+
+            $response = []; // Initialize the response array outside the loop
+            foreach ($request_list as $value) {
+                $user_data = User::where('id', $value['student_id'])->first();
+                if ($user_data) {
+                    if (!empty($user_data->image)) {
+                        $image = asset($user_data->image);
+                    } else {
+                        $image = asset('default.jpg');
                     }
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Fetch student request list.',
-                        'data' => $response,
-                    ], 200, [], JSON_NUMERIC_CHECK);
+                    $response[] = [
+                        'student_id' => $user_data->id,
+                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
+                        'photo' => $image,
+                    ];
                 }
+            }
+
+            if (!empty($response)) {
+                return response()->json([
+                    'status' => 200,
+                    'message' => 'Fetch student request list.',
+                    'data' => $response,
+                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
                     'status' => 400,
-                    'message' => 'No data Found.',
+                    'message' => 'No data found.',
                 ]);
             }
         } else {
@@ -2374,10 +2377,16 @@ class InstituteApiController extends Controller
                                 ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
                         });
                     })
-                    ->select('students_details.*', 'batches.batch_name',
-                     'users.firstname', 'users.lastname', 'users.image',
-                     'board.name as board', 'medium.name as medium',
-                      'standard.name as standard')
+                    ->select(
+                        'students_details.*',
+                        'batches.batch_name',
+                        'users.firstname',
+                        'users.lastname',
+                        'users.image',
+                        'board.name as board',
+                        'medium.name as medium',
+                        'standard.name as standard'
+                    )
                     ->orderByDesc('students_details.created_at')
                     ->paginate($perPage);
 
@@ -2386,7 +2395,7 @@ class InstituteApiController extends Controller
                     $stulist[] = array(
                         'id' => $stdDT->student_id,
                         'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
-                        'image'=>$stdDT->image,
+                        'image' => $stdDT->image,
                         'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,
