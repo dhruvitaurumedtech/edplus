@@ -706,12 +706,12 @@ class StudentController extends Controller
                 $totalattendlec = [];
                 $cumnth = date('Y-m');
 
-                $totalattlec = Attendance_model::where('institute_id',$institute_id)
-                ->where('student_id',$user_id)
-                ->where('created_at','like','%'.$cumnth.'%')
-                ->where('attendance','P')->count();
-                $totalattendlec = array('total_lectures'=>'170','attend_lectures'=>$totalattlec,'miss_lectures'=>'7');
-                
+                $totalattlec = Attendance_model::where('institute_id', $institute_id)
+                    ->where('student_id', $user_id)
+                    ->where('created_at', 'like', '%' . $cumnth . '%')
+                    ->where('attendance', 'P')->count();
+                $totalattendlec = array('total_lectures' => '170', 'attend_lectures' => $totalattlec, 'miss_lectures' => '7');
+
                 $studentdata = array(
                     'banners_data' => $banners_data,
                     'todays_lecture' => $todays_lecture,
@@ -1449,8 +1449,9 @@ class StudentController extends Controller
             if (!empty($batch_id)) {
                 $query->where('students_details.batch_id', $batch_id);
             }
+            $query->orderBy('students_details.updated_at', 'desc');
 
-            $student_data = $query->get()->toArray();
+            $student_data = $query->first();
             if (!empty($student_data)) {
                 foreach ($student_data as $value) {
                     $student_response[] = [

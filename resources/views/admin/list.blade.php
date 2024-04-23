@@ -102,6 +102,7 @@
       </div>
 
     </div>
+    @include('layouts/footer_new')
   </div>
 </body>
 
@@ -222,4 +223,3 @@
     });
   });
 </script>
-@include('layouts/footer_new')

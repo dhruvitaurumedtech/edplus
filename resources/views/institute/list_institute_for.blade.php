@@ -214,7 +214,7 @@
 
                   </div>
                 </div>
-                <div class="d-flex">
+                <div class="d-flex justify-content-end">
                   <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </div>
