@@ -44,6 +44,7 @@
         <div class="row">
           <div class="col-md-5">
             <div class="institute-form">
+              <h3 class="card-title">Create Video Category</h3>
               <!-- /.card-header -->
               <!-- form start -->
               <form method="post" action="{{ url('video-category-save') }}" enctype="multipart/form-data">
@@ -92,7 +93,7 @@
                   <i class="fas fa-search"></i>
                 </div>
               </form>
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">

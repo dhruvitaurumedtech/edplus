@@ -97,7 +97,7 @@
               @endCanButton -->
               <!-- /.card-header -->
 
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">

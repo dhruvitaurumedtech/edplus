@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
   <div class="dashboard">
@@ -84,63 +85,63 @@
                 </form>
               </div>
             </div>
-            <div class="col-md-6">
+            <div class="col-lg-6">
               <div class="">
                 <div class="card institute-form">
-                  
+
                   <!-- /.card-header -->
-                    <table class="table table-bordered table-responsive table-responsive-sm">
-                      <thead>
-                        <tr>
-                          <th style="width: 10px">
-                            <Sr class="No">No</Sr>
-                          </th>
-                          @if(auth::user()->role_type == '3')
-                          <th style="width: 10px">
-                            <Sr class="No">Institute Name</Sr>
-                          </th>
-                          <th style="width: 10px">
-                            <Sr class="No">Url</Sr>
-                          </th>
-                          @endif
-                          <th style="width: 200px">Banner_image</th>
-                          <th style="width: 500px">Status</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        @php $i=1 @endphp
-                        @foreach($banner_list as $value)
-                        <tr>
-                          <td>{{$i}}</td>
-                          @if(auth::user()->role_type == '3')
-                          <td>{{$value->institute_name}}</td>
-                          <td>{{$value->url}}</td>
-                          @endif
-                          <td><img src="{{asset($value->banner_image) }}" alt="banner" style="width:100px;height:100px;"></td>
-                          <td>@if($value->status == 'active')
-                            <input type="button" value="Active" class="btn btn-success">
-                            @else
-                            <input type="button" value="Inactive" class="btn btn-danger">
+                  <table class="table table-js table-bordered">
+                    <thead>
+                      <tr>
+                        <th>
+                          <Sr class="No">No</Sr>
+                        </th>
+                        @if(auth::user()->role_type == '3')
+                        <th>
+                          <Sr class="No">Institute Name</Sr>
+                        </th>
+                        <th>
+                          <Sr class="No">Url</Sr>
+                        </th>
+                        @endif
+                        <th>Banner_image</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      @php $i=1 @endphp
+                      @foreach($banner_list as $value)
+                      <tr>
+                        <td>{{$i}}</td>
+                        @if(auth::user()->role_type == '3')
+                        <td>{{$value->institute_name}}</td>
+                        <td>{{$value->url}}</td>
+                        @endif
+                        <td><img src="{{asset($value->banner_image) }}" alt="banner" class="img-resize mt-3"></td>
+                        <td>@if($value->status == 'active')
+                          <input type="button" value="Active" class="btn btn-success">
+                          @else
+                          <input type="button" value="Inactive" class="btn btn-danger">
 
-                            @endif
-                          </td>
+                          @endif
+                        </td>
 
-                          <td>
-                            <div class="d-flex">
-                              @canButton('edit', 'Banner')
-                              <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                              @endCanButton
-                              &nbsp;&nbsp;
-                              @canButton('delete', 'Banner')
-                              <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                              @endCanButton
-                            </div>
-                        </tr>
-                        @php $i++ @endphp
-                        @endforeach
-                      </tbody>
-                    </table>
+                        <td>
+                          <div class="d-flex">
+                            @canButton('edit', 'Banner')
+                            <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                            @endCanButton
+                            &nbsp;&nbsp;
+                            @canButton('delete', 'Banner')
+                            <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                            @endCanButton
+                          </div>
+                      </tr>
+                      @php $i++ @endphp
+                      @endforeach
+                    </tbody>
+                  </table>
 
                   <div class="d-flex justify-content-end">
                     {!! $banner_list->withQueryString()->links('pagination::bootstrap-5') !!}
@@ -177,7 +178,7 @@
                             @enderror
                           </div>
                           <div class="col-md-3">
-                            <img src="" id="banner_image" alt="banner" class="mt-4" style="width:100px;height:100px;">
+                            <img src="" id="banner_image" alt="banner" class="img-resize mt-3">
                           </div>
                           <div class="col-md-12">
                             <label for="exampleInputEmail1">status : </label>
@@ -211,14 +212,19 @@
         document.querySelectorAll('.editButton').forEach(function(button) {
           button.addEventListener('click', function() {
             var banner_id = this.getAttribute('data-user-id');
+            var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
             axios.post('/banner/edit', {
                 banner_id: banner_id
               })
               .then(response => {
+
                 var reponse_data = response.data.banner_list;
-                var iconSrc = '{{ asset('
-                ') }}' + reponse_data.banner_image;
+                var iconSrc = baseUrl + '/' + reponse_data.banner_image;
+
+                // var iconSrc = '{{ asset('
+                // ') }}' + reponse_data.banner_image;
                 $('#banner_id').val(reponse_data.id);
                 $('#banner_image').attr('src', iconSrc);
                 $('#old_banner_image').val(reponse_data.banner_image);
@@ -277,3 +283,7 @@
         }
       </script>
       @include('layouts/footer_new')
+    </div>
+  </div>
+</body>
+</html>

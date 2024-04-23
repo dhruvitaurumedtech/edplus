@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -67,7 +68,7 @@
                         @enderror
                       </div>
                       <div class="col-md-12">
-                        <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
+                        <img src="" id="icon_create" alt="Icon" class="img-resize mt-3" style="display: none;">
                       </div>
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">status : </label>
@@ -101,7 +102,7 @@
                 </div>
               </form>
               <!-- /.card-header -->
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">
@@ -186,7 +187,7 @@
                         @enderror
                       </div>
                       <div class="col-md-3">
-                        <img src="" id="icon_update" alt="Icon" class="mt-4">
+                        <img src="" id="icon_update" alt="Icon" class="img-resize mt-3">
                       </div>
 
                       <div class="col-md-12">
@@ -220,14 +221,15 @@
         document.querySelectorAll('.editButton').forEach(function(button) {
           button.addEventListener('click', function() {
             var class_id = this.getAttribute('data-user-id');
+            var baseUrl = $('meta[name="base-url"]').attr('content');
 
             axios.post('/class-list/edit', {
                 class_id: class_id
               })
               .then(response => {
                 var reponse_data = response.data.class_list;
-                var iconSrc = '{{ asset('
-                ') }}' + reponse_data.icon;
+                var iconSrc = baseUrl + '/' + reponse_data.icon;
+
 
                 $('#class_id').val(reponse_data.id);
                 $('#old_icon').val(reponse_data.icon);

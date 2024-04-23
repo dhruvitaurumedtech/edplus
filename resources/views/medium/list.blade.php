@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -68,7 +69,7 @@
                         @enderror
                       </div>
                       <div class="col-md-12">
-                        <img src="" id="icon" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
+                        <img src="" id="icon" alt="Icon" class="img-resize mt-3" style="display: none;">
                       </div>
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">status : </label>
@@ -106,7 +107,7 @@
                   <i class="fas fa-search"></i>
                 </div>
               </form>
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">
@@ -189,7 +190,7 @@
                           @enderror
                         </div>
                         <div class="col-md-3">
-                          <img src="" id="editicon" alt="Icon" class="mt-4" style="height:40px;width:40px;">
+                          <img src="" id="editicon" alt="Icon" class="img-resize mt-3">
                         </div>
 
                         <div class="col-md-12">
@@ -223,14 +224,15 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var medium_id = this.getAttribute('data-user-id');
+          var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
           axios.post('/medium/edit', {
               medium_id: medium_id
             })
             .then(response => {
               var reponse_data = response.data.medium_list;
-              var iconSrc = '{{ asset('
-              ') }}' + reponse_data.icon;
+              var iconSrc = baseUrl + '/' + reponse_data.icon;
 
               $('#medium_id').val(reponse_data.id);
               $('#name').val(reponse_data.name);

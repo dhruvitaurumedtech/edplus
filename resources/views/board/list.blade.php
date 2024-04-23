@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+<meta name="base-url" content="{{ url('/') }}">
 
 </head>
 
@@ -46,7 +46,7 @@
         <!-- /.card-header -->
         <!-- form start -->
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="institute-form">
               <form method="post" action="{{ url('board-save') }}" enctype="multipart/form-data">
                 @csrf
@@ -93,7 +93,7 @@
           </div>
 
           <!-- list -->
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="institute-form">
               <h3 class="card-title">Board List</h3>
               <form action="#">
@@ -106,7 +106,7 @@
               <a href="{{url('board-create')}}" class="btn btn-success" style="float: right;">Create Board </a>
               @endCanButton -->
               <!-- /.card-header -->
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">
@@ -124,7 +124,7 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" style="height:50px;"></td>
+                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize mt-3"></td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
@@ -227,6 +227,7 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var board_id = this.getAttribute('data-user-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
 
         axios.post('board-edit', {
             board_id: board_id
@@ -234,8 +235,7 @@
           .then(response => {
 
             var reponse_data = response.data.board_list;
-            var iconSrc = '{{ asset('
-            ') }}' + reponse_data.icon;
+            var iconSrc = baseUrl + '/' + reponse_data.icon;
             $('#board_id').val(reponse_data.id);
             $('#old_icon').val(reponse_data.icon);
 
@@ -314,6 +314,8 @@
       }
     }
   </script>
+
+  
 
 
   @include('layouts/footer_new')
