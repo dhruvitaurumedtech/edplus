@@ -149,6 +149,7 @@ class StudentController extends Controller
                     })
                     ->where('end_academic_year', '>=', now())
                     ->paginate($perPage); // ->where('end_academic_year', '>=', now())
+                    
                     echo $joininstitute->toSql();exit;
                     $join_with = [];
                 
