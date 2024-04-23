@@ -935,6 +935,7 @@ class InstituteApiController extends Controller
             $token = substr($token, 7);
         }
 
+        $perPage = $request->input('per_page', 10);
 
         $existingUser = User::where('token', $token)->where('id', $request->input('user_id'))->first();
 
@@ -1012,8 +1013,7 @@ class InstituteApiController extends Controller
 
             $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
                 ->where('created_at', '>=', $fifteenDaysAgo)
-                ->orderBy('created_at', 'desc')->get()
-                ->toarray();
+                ->orderBy('created_at', 'desc')->paginate($perPage);
             foreach ($announcement_list as $value) {
                 $announcement[] = array(
                     'title' => $value['title'],

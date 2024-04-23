@@ -138,7 +138,7 @@ class StudentController extends Controller
                 }
 
                 //join with
-
+                $ctdmy = date('Y-m');
                 $joininstitute = Institute_detail::where('status', 'active')
                     ->whereIn('id', function ($query) use ($user_id) {
                         $query->select('institute_id')
@@ -150,14 +150,6 @@ class StudentController extends Controller
                     ->where('end_academic_year', '>=', now())
                     ->toSql();
 
-                print_r(now());
-                print_r($user_id);
-                exit;
-
-
-                echo $joininstitute->toSql();
-                exit;
-                $join_with = [];
 
 
                 foreach ($joininstitute as $value) {
