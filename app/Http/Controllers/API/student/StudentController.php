@@ -154,7 +154,7 @@ class StudentController extends Controller
                     
                     $join_with = [];
                 
-                print_r($joininstitute);exit;
+               
                 foreach ($joininstitute as $value) {
                     $join_with[] = array(
                         'id' => $value->id,
