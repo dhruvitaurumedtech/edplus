@@ -46,7 +46,7 @@
         <!-- /.card-header -->
         <!-- form start -->
         <div class="row">
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="institute-form">
               <form method="post" action="{{ url('board-save') }}" enctype="multipart/form-data">
                 @csrf
@@ -93,7 +93,7 @@
           </div>
 
           <!-- list -->
-          <div class="col-md-6">
+          <div class="col-lg-6">
             <div class="institute-form">
               <h3 class="card-title">Board List</h3>
               <form action="#">
@@ -106,7 +106,7 @@
               <a href="{{url('board-create')}}" class="btn btn-success" style="float: right;">Create Board </a>
               @endCanButton -->
               <!-- /.card-header -->
-              <table class="table table-bordered table-responsive mt-4">
+              <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
                     <th style="width: 10px">
@@ -314,6 +314,8 @@
       }
     }
   </script>
+
+  
 
 
   @include('layouts/footer_new')

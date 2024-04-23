@@ -42,7 +42,7 @@
                         <form class="s-chapter-form" action="{{url('permission/insert')}}" method="post">
                             <input type="hidden" name="role_id" value="{{ $id }}">
                             @csrf
-                            <table class="table table-bordered table-responsive-sm institute-table">
+                            <table class="table table-js table-bordered table-responsive-sm institute-table">
                                 <thead>
                                     <tr>
                                         <th style="width: 100px">Menu Name</th>

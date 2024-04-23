@@ -170,7 +170,7 @@
                 <h3 class="card-title">Subject List</h3>
               </div>
               <div class="card-body">
-                <table class="table table-bordered table-responsive">
+                <table class="table table-js table-bordered table-responsive">
                   <thead>
                     <tr>
                       <th style="width: 10px">

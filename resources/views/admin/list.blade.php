@@ -60,7 +60,7 @@
             </div>
           </div>
           <!-- /.card-header -->
-          <table class="table table-responsive-sm table-responsive table-bordered institute-table mt-4">
+          <table class="table table-js table-responsive-sm table-responsive table-bordered institute-table mt-4">
             <thead>
               <tr>
                 <th style="width: 10px">
