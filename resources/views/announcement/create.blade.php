@@ -130,53 +130,57 @@
                         <div class="institute-form">
                             <h3 class="card-title">Announcement List</h3>
                             <!-- /.card-header -->
-                            <div class="card-body">
-                                <table class="table table-bordered table-responsive">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 200px">Title </th>
-                                            <th style="width: 200px">Announcement </th>
-                                            <th style="width: 200px">Institute</th>
-                                            <th style="width: 500px">Teacher</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                            <form action="#">
+                                <div class="search-box">
+                                    <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </form>
+                            <table class="table table-bordered table-responsive mt-5">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 200px">Title </th>
+                                        <th style="width: 200px">Announcement </th>
+                                        <th style="width: 200px">Institute</th>
+                                        <th style="width: 500px">Teacher</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
 
-                                        @foreach($response as $values)
-                                        <tr>
-                                            <td>{{$values['title']}}</td>
-                                            <td>{{$values['announcement']}}</td>
-                                            <td>
-                                                @foreach($values['institute_show'] as $institute)
-                                                {{$institute['institute_name']}}
-                                                @if (!$loop->last)
-                                                <br>
-                                                @endif
-                                                @endforeach
-                                            </td>
-                                            <td>
-                                                @foreach($values['teacher_show'] as $teacher)
-                                                {{$teacher['firstname']}}
-                                                @if (!$loop->last)
-                                                <br>
-                                                @endif
-                                                @endforeach
-                                            </td>
-                                            <td>
-                                                <div class="d-flex">
-                                                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
-                                                    &nbsp;&nbsp;
-                                                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                    @foreach($response as $values)
+                                    <tr>
+                                        <td>{{$values['title']}}</td>
+                                        <td>{{$values['announcement']}}</td>
+                                        <td>
+                                            @foreach($values['institute_show'] as $institute)
+                                            {{$institute['institute_name']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach($values['teacher_show'] as $teacher)
+                                            {{$teacher['firstname']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            <div class="d-flex">
+                                                <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                &nbsp;&nbsp;
+                                                <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    @endforeach
                                 </tbody>
-                                </table>
-                            </div>
+                            </table>
+                            </tbody>
+                            </table>
 
                             <div class="d-flex justify-content-end">
 
