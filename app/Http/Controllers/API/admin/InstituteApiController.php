@@ -282,6 +282,7 @@ class InstituteApiController extends Controller
 
     public function register_institute(Request $request)
     {
+        
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'institute_for_id' => 'required',
