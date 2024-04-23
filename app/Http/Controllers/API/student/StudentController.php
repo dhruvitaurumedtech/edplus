@@ -150,7 +150,8 @@ class StudentController extends Controller
                 ->where('end_academic_year', '>=', now())
                 ->toSql();
 
-                print_r($joininstitute);
+                print_r(now());
+                print_r($user_id);
                 exit;
 
                     
