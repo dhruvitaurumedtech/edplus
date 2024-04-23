@@ -50,7 +50,7 @@
                 <div class="row">
                     <div class="col-lg-5">
                         <div class="institute-form">
-                            <h2>Create New Banner Size</h2>
+                            <h3>Create New Banner Size</h3>
                             <form action="{{ route('banner-sizes.store') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
@@ -74,7 +74,7 @@
                     </div>
                     <div class="col-lg-7">
                         <div class="institute-form">
-                            <h2>BannerSize List</h2>
+                            <h3>BannerSize List</h3>
                             <div class="card-body">
                                 <table class="table table-responsive-sm">
                                     <thead>

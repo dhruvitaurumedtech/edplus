@@ -43,12 +43,16 @@
 
                 <!-- /.card-header -->
                 <!-- form start -->
+
                 <div class="row">
                     <div class="col-md-6">
+
                         <div class="institute-form">
+                            <h3 class="card-title">Video Time Limit List</h3>
                             <form method="post" action="{{ url('video-timelimit-save') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="card-body">
+
                                     <div class="form-group">
                                         <div class="row">
 

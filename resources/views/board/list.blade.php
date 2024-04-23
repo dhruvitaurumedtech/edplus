@@ -1,4 +1,4 @@
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
+<meta name="base-url" content="{{ url('/') }}">
 
 </head>
 
@@ -124,7 +124,7 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" style="height:50px;"></td>
+                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize mt-3"></td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
@@ -227,6 +227,7 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var board_id = this.getAttribute('data-user-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
 
         axios.post('board-edit', {
             board_id: board_id
@@ -234,8 +235,7 @@
           .then(response => {
 
             var reponse_data = response.data.board_list;
-            var iconSrc = '{{ asset('
-            ') }}' + reponse_data.icon;
+            var iconSrc = baseUrl + '/' + reponse_data.icon;
             $('#board_id').val(reponse_data.id);
             $('#old_icon').val(reponse_data.icon);
 

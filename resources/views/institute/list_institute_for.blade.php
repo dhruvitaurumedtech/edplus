@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -128,7 +129,7 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" style="height: 80px;width:80px" alt="Icon" class="img-resize"></td>
+                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize"></td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
@@ -176,7 +177,7 @@
                 @csrf
                 <div class="card-body">
                   <div class="form-group">
-                    <div class="row">
+                    <div class="row justify-content-center">
                       <div class="col-md-12">
                         <input type="hidden" id="institute_id" name="institute_id">
                         <label for="exampleInputEmail1">Name : </label>
@@ -194,7 +195,7 @@
                         @enderror
                       </div>
                       <div class="col-md-3">
-                        <img src="" id="icon_update" alt="Icon" class="mt-4">
+                        <img src="" id="icon_update" alt="Icon" class="img-resize mt-3">
                       </div>
 
                       <div class="col-md-12">
@@ -213,8 +214,8 @@
 
                   </div>
                 </div>
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                <div class="d-flex">
+                  <button type="submit" class="btn btn-primary">Update</button>
                 </div>
             </div>
           </div>
@@ -225,31 +226,28 @@
     </div>
   </div>
   <script>
-    $(document).ready(function() {
-      $('.institute_for_editButton').click(function() {
-        var institute_id = $(this).data('user-id');
+    document.querySelectorAll('.institute_for_editButton').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var institute_id = this.getAttribute('data-user-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
 
-        $.ajax({
-          url: '/institute-for/edit',
-          method: 'POST',
-          data: {
+        axios.post('/institute-for/edit', {
             institute_id: institute_id
-          },
-          success: function(response) {
-            var reponse_data = response.Institute_for_model;
-            var iconSrc = '{{ asset('
-            ') }}' + reponse_data.icon;
+          })
+          .then(response => {
+            var reponse_data = response.data.Institute_for_model;
+            var iconSrc = baseUrl + '/' + reponse_data.icon;
+
             $('#institute_id').val(reponse_data.id);
             $('#name').val(reponse_data.name);
             $('#icon_update').attr('src', iconSrc);
             $('#old_icon').val(reponse_data.icon);
             $('#status').val(reponse_data.status);
             $('#usereditModal').modal('show');
-          },
-          error: function(error) {
+          })
+          .catch(error => {
             console.error(error);
-          }
-        });
+          });
       });
     });
 
