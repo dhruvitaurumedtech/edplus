@@ -155,8 +155,8 @@ class StudentController extends Controller
                 exit;
 
                     
-                    echo $joininstitute->toSql();exit;
-                    $join_with = [];
+                echo $joininstitute->toSql();exit;
+                $join_with = [];
                 
                 
                 foreach ($joininstitute as $value) {
