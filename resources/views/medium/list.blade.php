@@ -100,6 +100,12 @@
               <a href="{{url('create/medium')}}" class="btn btn-success" style="float: right;">Create Medium</a>
               @endCanButton -->
               <!-- /.card-header -->
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
               <div class="card-body">
                 <table class="table table-bordered table-responsive">
                   <thead>
@@ -113,7 +119,7 @@
                       <th>Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="myTable">
                     @php $i=1 @endphp
                     @foreach($mediumlist as $value)
                     <tr>

@@ -53,7 +53,11 @@
         <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
             <h4 class="mb-0">List of Institute</h4>
-            <a href="{{url('create/admin')}}" class="btn btn-success" style="float: right;">Create Admin</a>
+            <div class="inner-list-search">
+              <input type="search" class="form-control myInput" name="search" placeholder="Search">
+              <a href="{{url('create/admin')}}" class="btn text-white btn-rmv2">Create Admin</a>
+
+            </div>
           </div>
           <!-- /.card-header -->
           <table class="table table-responsive-sm table-responsive table-bordered institute-table mt-4">
@@ -69,7 +73,7 @@
                 <th>Action</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody class="myTable">
               @php $i=1 @endphp
               @foreach($users as $value)
               <tr>

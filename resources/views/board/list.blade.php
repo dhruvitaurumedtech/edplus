@@ -96,6 +96,12 @@
           <div class="col-md-6">
             <div class="institute-form">
               <h3 class="card-title">Board List</h3>
+              <form action="#">
+                <div class="search-box">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  <i class="fas fa-search"></i>
+                </div>
+              </form>
               <!-- @canButton('add', 'Board')
               <a href="{{url('board-create')}}" class="btn btn-success" style="float: right;">Create Board </a>
               @endCanButton -->
@@ -113,7 +119,7 @@
                       <th>Action</th>
                     </tr>
                   </thead>
-                  <tbody>
+                  <tbody class="myTable">
                     @php $i=1 @endphp
                     @foreach($board_list as $value)
                     <tr>
@@ -127,7 +133,6 @@
 
                         @endif
                       </td>
-
                       <td>
                         <div class="d-flex">
                           @canButton('edit', 'Board')

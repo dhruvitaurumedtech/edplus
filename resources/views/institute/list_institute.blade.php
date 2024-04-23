@@ -45,64 +45,65 @@
           <div class="create-title-btn">
             <h4 class="mb-0">List of Role</h4>
             <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
-            @canButton('add', 'Role')
-            <a href="{{url('/create/institute')}}" class="btn btn-success" style="float: right;">Create Institute</a>
-            @endCanButton
+            <div class="inner-list-search">
+              <input type="search" class="form-control myInput" name="search" placeholder="Search">
+              @canButton('add', 'Role')
+              <a href="{{url('/create/institute')}}" class="btn text-white btn-rmv2" style="float: right;">Create Institute</a>
+              @endCanButton
+
+            </div>
+            <table class="table table-responsive table-responsive-sm table-bordered institute-table mt-4">
+              <thead>
+                <tr>
+                  <th style="width: 10px">
+                    <Sr class="No">No</Sr>
+                  </th>
+                  <th style="width: 400px">Name</th>
+                  <th style="width: 400px">Email</th>
+                  <th style="width: 400px">Mobile</th>
+                  <th style="width: 400px">Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody class="myTable">
+                @php $i=1 @endphp
+                @foreach($institute_list as $value)
+                <tr>
+                  <td>{{$i}}</td>
+                  <td>{{$value['institute_name']}}</td>
+                  <td>{{$value['email']}}</td>
+                  <td>{{$value['contact_no']}}</td>
+                  <td>{{$value['status']}}</td>
+                  <td>
+                    <div class="d-flex">
+                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
+                      &nbsp;&nbsp;
+                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
+                      &nbsp;&nbsp;
+                      <form method="post" action="{{url('/student/list')}}">
+                        @csrf
+                        <input type="hidden" name="institute_id" value="{{ $value['id'] }}">
+                        <input type="submit" class="btn btn-warning" value="Student List">
+                      </form>
+                    </div>
+                </tr>
+                @php $i++ @endphp
+                @endforeach
+              </tbody>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-end mt-3">
+            {!! $institute_list->withQueryString()->links('pagination::bootstrap-5') !!}
 
           </div>
-          <table class="table table-responsive table-responsive-sm table-bordered institute-table mt-4">
-            <thead>
-              <tr>
-                <th style="width: 10px">
-                  <Sr class="No">No</Sr>
-                </th>
-                <th style="width: 400px">Name</th>
-                <th style="width: 400px">Email</th>
-                <th style="width: 400px">Mobile</th>
-                <th style="width: 400px">Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-            <tbody>
-              @php $i=1 @endphp
-              @foreach($institute_list as $value)
-              <tr>
-                <td>{{$i}}</td>
-                <td>{{$value['institute_name']}}</td>
-                <td>{{$value['email']}}</td>
-                <td>{{$value['contact_no']}}</td>
-                <td>{{$value['status']}}</td>
-                <td>
-                  <div class="d-flex">
-                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
-                    &nbsp;&nbsp;
-                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
-                    &nbsp;&nbsp;
-                    <form method="post" action="{{url('/student/list')}}">
-                      @csrf
-                      <input type="hidden" name="institute_id" value="{{ $value['id'] }}">
-                      <input type="submit" class="btn btn-warning" value="Student List">
-                    </form>
-                  </div>
-              </tr>
-              @php $i++ @endphp
-              @endforeach
-            </tbody>
-          </table>
-        </div>
-
-        <div class="d-flex justify-content-end mt-3">
-          {!! $institute_list->withQueryString()->links('pagination::bootstrap-5') !!}
 
         </div>
 
+        @include('layouts/footer_new')
       </div>
 
-      @include('layouts/footer_new')
     </div>
-
-  </div>
 </body>
 
 <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">

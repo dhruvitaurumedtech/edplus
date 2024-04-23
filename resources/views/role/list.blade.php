@@ -42,7 +42,6 @@
         </div>
 
         <div class="row">
-          <!-- table -->
           <div class="col-lg-12 mt-3 institute-form">
             <div class="create-title-btn">
               <h4 class="mb-0">List of Role</h4>
@@ -59,7 +58,7 @@
             <table class="table table-bordered institute-table mt-4">
               <thead>
                 <tr>
-                  <th scope="col">No</th>   
+                  <th scope="col">No</th>
                   <th scope="col">Role Name</th>
                   <th scope="col">Action</th>
                 </tr>
