@@ -109,50 +109,49 @@
                 </div>
               </form>
               <!-- /.card-header -->
-              <div class="card-body">
-                <table class="table table-bordered ">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">
-                        <Sr class="No">No</Sr>
-                      </th>
-                      <th style="width: 200px">Name</th>
-                      <th style="width: 200px">Category</th>
-                      <th style="width: 500px">Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody class="myTable">
-                    @php $i=1 @endphp
-                    @foreach($do_business_with as $value)
-                    <tr>
-                      <td>{{$i}}</td>
-                      <td>{{$value->name}}</td>
-                      <td>{{$value->category}}</td>
-                      <td>@if($value->status == 'active')
-                        <input type="button" value="Active" class="btn btn-success">
-                        @else
-                        <input type="button" value="Inactive" class="btn btn-danger">
 
-                        @endif
-                      </td>
+              <table class="table table-bordered mt-4">
+                <thead>
+                  <tr>
+                    <th style="width: 10px">
+                      <Sr class="No">No</Sr>
+                    </th>
+                    <th style="width: 200px">Name</th>
+                    <th style="width: 200px">Category</th>
+                    <th style="width: 500px">Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody class="myTable">
+                  @php $i=1 @endphp
+                  @foreach($do_business_with as $value)
+                  <tr>
+                    <td>{{$i}}</td>
+                    <td>{{$value->name}}</td>
+                    <td>{{$value->category}}</td>
+                    <td>@if($value->status == 'active')
+                      <input type="button" value="Active" class="btn btn-success">
+                      @else
+                      <input type="button" value="Inactive" class="btn btn-danger">
 
-                      <td>
-                        <div class="d-flex">
-                          @canButton('edit', 'Do_business_with')
-                          <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                          @endCanButton
-                          &nbsp;&nbsp;
-                          @canButton('delete', 'Do_business_with')
-                          <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                          @endCanButton
-                        </div>
-                    </tr>
-                    @php $i++ @endphp
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
+                      @endif
+                    </td>
+
+                    <td>
+                      <div class="d-flex">
+                        @canButton('edit', 'Do_business_with')
+                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Do_business_with')
+                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        @endCanButton
+                      </div>
+                  </tr>
+                  @php $i++ @endphp
+                  @endforeach
+                </tbody>
+              </table>
 
               <div class="d-flex justify-content-end">
                 {!! $do_business_with->withQueryString()->links('pagination::bootstrap-5') !!}
