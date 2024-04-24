@@ -26,6 +26,8 @@ class AttendanceController extends Controller
                 'user_id' => 'required|integer',
                 'institute_id' => 'required|integer',
                 'student_id' => 'required|integer',
+                'batch_id' => 'required|integer',
+                'subject_id' => 'required|integer',
                 'status' => 'required|in:P,A',
             ]);
 
@@ -33,6 +35,8 @@ class AttendanceController extends Controller
                 'user_id' => $request->user_id,
                 'institute_id' => $request->institute_id,
                 'student_id' => $request->student_id,
+                'batch_id' => $request->batch_id,
+                'subject_id' => $request->subject_id,
                 'date' => $request->date,
             ])->first();
 
@@ -46,6 +50,8 @@ class AttendanceController extends Controller
                 'user_id' => $request->user_id,
                 'institute_id' => $request->institute_id,
                 'student_id' => $request->student_id,
+                'batch_id' => $request->batch_id,
+                'subject_id' => $request->subject_id,
                 'attendance' => $request->status,
                 'date' => $request->date,
             ]);
