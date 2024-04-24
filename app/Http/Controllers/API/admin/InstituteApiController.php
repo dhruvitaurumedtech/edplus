@@ -1317,7 +1317,7 @@ class InstituteApiController extends Controller
             ->where('students_details.student_id', $student_id)
             ->where('students_details.user_id',$user_id)
             ->where('students_details.institute_id',$institute_id)
-            ->select('users.firstname','users.lastname','users.dob','users.address','users.email','users.mobile',
+            ->select('students_details.*','users.firstname','users.lastname','users.dob','users.address','users.email','users.mobile',
             'board.name as board','medium.name as medium','standard.name as standard','stream.name as stream')
             ->first();
             if ($user_list) {
