@@ -865,7 +865,7 @@ class StudentController extends Controller
                         'batch_name' => $value->batch_name,
                     ];
                 }
-                print_r($catgry);exit;
+                print_r($batch_response);exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
