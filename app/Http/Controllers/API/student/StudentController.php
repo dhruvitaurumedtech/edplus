@@ -852,7 +852,7 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-                    print_r($catgry);exit;
+                    
                 $batch_list = Batches_model::where('institute_id', $institute_id)
                     ->where('user_id', $user_id)
                     ->whereRaw("FIND_IN_SET($subject_id,subjects)")
@@ -865,7 +865,7 @@ class StudentController extends Controller
                         'batch_name' => $value->batch_name,
                     ];
                 }
-
+                print_r($catgry);exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
