@@ -1769,7 +1769,7 @@ class InstituteApiController extends Controller
             $user_id = $request->user_id;
             $exam_id = $request->exam_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-
+            print_r($examdt);exit;
             if (!empty($examdt)) {
                 $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                     ->join('standard', 'standard.id', '=', 'students_details.standard_id')
