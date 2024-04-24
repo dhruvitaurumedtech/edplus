@@ -852,20 +852,21 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-
-                $batch_list = Batches_model::where('institute_id', $institute_id)
-                    ->where('user_id', $user_id)
-                    ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                    ->select('*')
-                    ->get();
                 $batch_response = [];
-                foreach ($batch_list as $value) {
-                    $batch_response[] = [
-                        'batch_id' => $value->id,
-                        'batch_name' => $value->batch_name,
-                    ];
-                }
 
+                if ($existingUser->role_type != 6) {
+                    $batch_list = Batches_model::where('institute_id', $institute_id)
+                        ->where('user_id', $user_id)
+                        ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                        ->select('*')
+                        ->get();
+                    foreach ($batch_list as $value) {
+                        $batch_response[] = [
+                            'batch_id' => $value->id,
+                            'batch_name' => $value->batch_name,
+                        ];
+                    }
+                }
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
