@@ -884,9 +884,6 @@ class StudentController extends Controller
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
                         ->tosql();
-                    echo "<pre>";
-                    print_r($topicqry);
-                    exit;
                     foreach ($topicqry as $topval) {
 
                         if ($existingUser->role_type == 6) {
