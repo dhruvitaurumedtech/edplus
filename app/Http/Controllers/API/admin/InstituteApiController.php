@@ -1309,7 +1309,7 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            $user_list = Student_detail::join('user','user.id','=','students_details.student_id')
+            $user_list = Student_detail::join('users','users.id','=','students_details.student_id')
             ->join('board','board.id','=','students_details.board_id')
             ->join('medium','medium.id','=','students_details.medium_id')
             ->join('standard','standard.id','=','students_details.standard_id')
@@ -1317,7 +1317,7 @@ class InstituteApiController extends Controller
             ->where('students_details.student_id', $student_id)
             ->where('students_details.user_id',$user_id)
             ->where('students_details.institute_id',$institute_id)
-            ->select('user.firstname','user.lastname','user.dob','user.address','user.email','user.mobile',
+            ->select('users.firstname','users.lastname','users.dob','users.address','users.email','users.mobile',
             'board.name as board','medium.name as medium','standard.name as standard','stream.name as stream')
             ->first();
             if ($user_list) {
