@@ -935,7 +935,7 @@ class StudentController extends Controller
                         }
                     }
                 }
-
+                print_r($response);exit;
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
