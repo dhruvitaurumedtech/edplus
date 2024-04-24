@@ -865,8 +865,6 @@ class StudentController extends Controller
                         'batch_name' => $value->batch_name,
                     ];
                 }
-                print_r($batch_response);
-                exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -885,8 +883,6 @@ class StudentController extends Controller
                     // print_r($topicqry);
                     // exit;
                     foreach ($topicqry as $topval) {
-                        print_r($topicqry);
-                        exit;
                         if ($existingUser->role_type == 6) {
                             $batchID = Student_detail::where('institute_id', $institute_id)
                                 ->where('student_id', $user_id)->first();
