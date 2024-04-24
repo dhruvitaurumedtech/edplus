@@ -852,9 +852,7 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-                echo "<pre>";
-                print_r($catgry);
-                exit;
+
 
                 $batch_response = [];
                 if ($existingUser->role_type != 6) {
@@ -871,6 +869,9 @@ class StudentController extends Controller
                         ];
                     }
                 }
+                echo "<pre>";
+                print_r($batch_response);
+                exit;
 
 
                 foreach ($catgry as $catvd) {
