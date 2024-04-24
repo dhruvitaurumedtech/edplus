@@ -869,9 +869,6 @@ class StudentController extends Controller
                         ];
                     }
                 }
-                echo "<pre>";
-                print_r($batch_response);
-                exit;
 
 
                 foreach ($catgry as $catvd) {
@@ -932,7 +929,7 @@ class StudentController extends Controller
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
 
-                        if (!empty($chapter_id)) {
+                        if (!empty($chapter_id) && !empty($batch_response)) {
                             $batch_response = [
                                 'batch_list' => $batch_response,
                             ];
