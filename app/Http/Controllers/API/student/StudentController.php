@@ -852,6 +852,9 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
+                echo "<pre>";
+                print_r($catgry);
+                exit;
 
                 $batch_response = [];
                 if ($existingUser->role_type != 6) {
@@ -936,9 +939,6 @@ class StudentController extends Controller
                         } else {
                             $response = $category; // Assign $category directly to $response
                         }
-                        echo "<pre>";
-                        print_r($response);
-                        exit;
                     }
                 }
 
