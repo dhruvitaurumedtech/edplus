@@ -883,7 +883,7 @@ class StudentController extends Controller
                     // echo "<pre>";
                     // print_r($topicqry);
                     // exit;
-                    $$response = [];
+                    $response = [];
                     foreach ($topicqry as $topval) {
                         if ($existingUser->role_type == 6) {
                             $batchID = Student_detail::where('institute_id', $institute_id)
