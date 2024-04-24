@@ -1480,7 +1480,7 @@ class StudentController extends Controller
 
                     $attendances = [];
                     foreach ($attendance_records as $attendance_record) {
-                        $attendances[] = ['date' => $attendance_record['date'], 'attendance' => $attendance_record['attendance']];
+                        $attendances[] = ['date' => date('d-m-y', strtotime($attendance_record['date'])), 'attendance' => $attendance_record['attendance']];
                     }
 
                     $student_response[] = [
