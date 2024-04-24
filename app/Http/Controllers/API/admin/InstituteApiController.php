@@ -1794,7 +1794,7 @@ class InstituteApiController extends Controller
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
-                        'marks' => (float)$marksofstd->mark,
+                        'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : '',
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,
