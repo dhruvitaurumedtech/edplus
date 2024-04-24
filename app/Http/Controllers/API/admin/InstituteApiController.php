@@ -1786,7 +1786,7 @@ class InstituteApiController extends Controller
                     })
                     ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                     ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
-                    print_r($studentDT);exit;
+                    
                     $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
