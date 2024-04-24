@@ -869,7 +869,9 @@ class StudentController extends Controller
                         ];
                     }
                 }
-
+                echo "<pre>";
+                print_r($catgry);
+                exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
