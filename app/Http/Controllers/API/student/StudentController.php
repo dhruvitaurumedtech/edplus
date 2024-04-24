@@ -884,7 +884,7 @@ class StudentController extends Controller
                     // print_r($topicqry);
                     // exit;
                     foreach ($topicqry as $topval) {
-
+                        print_r($topicqry);exit;
                         if ($existingUser->role_type == 6) {
                             $batchID = Student_detail::where('institute_id', $institute_id)
                                 ->where('student_id', $user_id)->first();
@@ -935,7 +935,7 @@ class StudentController extends Controller
                         }
                     }
                 }
-                print_r($response);exit;
+                
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
