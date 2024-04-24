@@ -1768,6 +1768,7 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             $user_id = $request->user_id;
             $exam_id = $request->exam_id;
+            $batch_id = $request->batch_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
             
             if (!empty($examdt)) {
@@ -1778,6 +1779,7 @@ class InstituteApiController extends Controller
                     ->where('students_details.user_id', $user_id)
                     ->where('students_details.board_id', $examdt->board_id)
                     ->where('students_details.medium_id', $examdt->medium_id)
+                    ->where('students_details.batch_id', $examdt->batch_id)
                     //->where('students_details.class_id', $examdt->class_id)
                     ->where('students_details.standard_id', $examdt->standard_id)
                     //->where('students_details.stream_id', $examdt->stream_id)
@@ -1794,6 +1796,7 @@ class InstituteApiController extends Controller
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
+                        'batch_id'=>$request->batch_id,
                         'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : '',
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
