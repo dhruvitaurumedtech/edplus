@@ -1746,6 +1746,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'exam_id' => 'required',
+            'batch_id'=> 'required',
         ]);
 
         if ($validator->fails()) {
