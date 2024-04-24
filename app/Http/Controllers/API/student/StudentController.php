@@ -869,49 +869,35 @@ class StudentController extends Controller
                         ];
                     }
                 }
-                if (!empty($catgry)) {
-                    foreach ($catgry as $catvd) {
-                        $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
-                            ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
-                            ->where('topic.subject_id', $subject_id)
-                            //->where('topic.chapter_id', $chapter_id)
-                            ->when($chapter_id, function ($query, $chapter_id) {
-                                return $query->where('topic.chapter_id', $chapter_id);
-                            })
-                            ->where('topic.institute_id', $institute_id)
-                            ->where('topic.video_category_id', $catvd->vid)
-                            ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
-                            ->orderByDesc('topic.created_at')
-                            ->tosql();
 
-                        foreach ($topicqry as $topval) {
+                foreach ($catgry as $catvd) {
+                    $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
+                        ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
+                        ->where('topic.subject_id', $subject_id)
+                        //->where('topic.chapter_id', $chapter_id)
+                        ->when($chapter_id, function ($query, $chapter_id) {
+                            return $query->where('topic.chapter_id', $chapter_id);
+                        })
+                        ->where('topic.institute_id', $institute_id)
+                        ->where('topic.video_category_id', $catvd->vid)
+                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+                        ->orderByDesc('topic.created_at')
+                        ->tosql();
 
-                            if ($existingUser->role_type == 6) {
-                                $batchID = Student_detail::where('institute_id', $institute_id)
-                                    ->where('student_id', $user_id)->first();
-                                $std_batchidd = $batchID->batch_id;
+                    foreach ($topicqry as $topval) {
 
-                                $vidasbt = VideoAssignToBatch::where('batch_id', $std_batchidd)
-                                    ->where('video_id', $topval->id)
-                                    ->where('standard_id', $topval->standard_id)
-                                    ->where('chapter_id', $topval->chapter_id)
-                                    ->where('subject_id', $topval->subject_id)
-                                    ->select('id')->first();
-                                if (!empty($vidasbt->id)) {
-                                    $topics[] = array(
-                                        "id" => $topval->id,
-                                        "topic_no" => $topval->topic_no,
-                                        "topic_name" => $topval->topic_name . '',
-                                        "topic_video" => asset($topval->topic_video),
-                                        "subject_id" => $topval->subject_id,
-                                        "subject_name" => $topval->sname,
-                                        "chapter_id" => $topval->chapter_id,
-                                        "chapter_name" => $topval->chname,
-                                        "status" => True
-                                    );
-                                    $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
-                                }
-                            } else {
+                        if ($existingUser->role_type == 6) {
+                            $batchID = Student_detail::where('institute_id', $institute_id)
+                                ->where('student_id', $user_id)->first();
+                            $std_batchidd = $batchID->batch_id;
+
+                            $vidasbt = VideoAssignToBatch::where('batch_id', $std_batchidd)
+                                ->where('video_id', $topval->id)
+                                ->where('standard_id', $topval->standard_id)
+                                ->where('chapter_id', $topval->chapter_id)
+                                ->where('subject_id', $topval->subject_id)
+                                ->select('id')->first();
+                            if (!empty($vidasbt->id)) {
                                 $topics[] = array(
                                     "id" => $topval->id,
                                     "topic_no" => $topval->topic_no,
@@ -921,27 +907,36 @@ class StudentController extends Controller
                                     "subject_name" => $topval->sname,
                                     "chapter_id" => $topval->chapter_id,
                                     "chapter_name" => $topval->chname,
-                                    "status" => false,
+                                    "status" => True
                                 );
                                 $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                             }
+                        } else {
+                            $topics[] = array(
+                                "id" => $topval->id,
+                                "topic_no" => $topval->topic_no,
+                                "topic_name" => $topval->topic_name . '',
+                                "topic_video" => asset($topval->topic_video),
+                                "subject_id" => $topval->subject_id,
+                                "subject_name" => $topval->sname,
+                                "chapter_id" => $topval->chapter_id,
+                                "chapter_name" => $topval->chname,
+                                "status" => false,
+                            );
+                            $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+                        }
 
-                            if (!empty($chapter_id)) {
-                                $batch_response = [
-                                    'batch_list' => $batch_response,
-                                ];
-                                $response = array_merge($batch_response, $category);
-                            } else {
-                                $response = $category; // Assign $category directly to $response
-                            }
+                        if (!empty($chapter_id)) {
+                            $batch_response = [
+                                'batch_list' => $batch_response,
+                            ];
+                            $response = array_merge($batch_response, $category);
+                        } else {
+                            $response = $category; // Assign $category directly to $response
                         }
                     }
-                } else {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'No data Found.',
-                    ], 400);
                 }
+
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
