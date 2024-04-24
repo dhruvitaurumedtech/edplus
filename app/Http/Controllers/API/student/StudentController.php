@@ -923,7 +923,12 @@ class StudentController extends Controller
                             );
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
-
+                        echo "hi";
+                        echo "<pre>";
+                        print_r($chapter_id);
+                        echo "<pre>";
+                        print_r($batch_response);
+                        exit;
                         if (!empty($chapter_id) && !empty($batch_response)) {
                             $batch_response = [
                                 'batch_list' => $batch_response,
