@@ -1757,6 +1757,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'exam_id' => 'required',
+            'batch_id'=> 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1779,16 +1780,19 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             $user_id = $request->user_id;
             $exam_id = $request->exam_id;
+            $batch_id = $request->batch_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-
+            
             if (!empty($examdt)) {
+
                 $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                     ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                     ->where('students_details.institute_id', $institute_id)
                     ->where('students_details.user_id', $user_id)
                     ->where('students_details.board_id', $examdt->board_id)
                     ->where('students_details.medium_id', $examdt->medium_id)
-                    ->where('students_details.class_id', $examdt->class_id)
+                    ->where('students_details.batch_id', $examdt->batch_id)
+                    //->where('students_details.class_id', $examdt->class_id)
                     ->where('students_details.standard_id', $examdt->standard_id)
                     //->where('students_details.stream_id', $examdt->stream_id)
                     ->when($examdt->stream_id, function ($query, $stream_id) {
@@ -1796,14 +1800,16 @@ class InstituteApiController extends Controller
                     })
                     ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                     ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
-                $studentsDET = [];
+                    
+                    $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
                     $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
-                        'marks' => (float)$marksofstd->mark,
+                        'batch_id'=>$request->batch_id,
+                        'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : '',
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,

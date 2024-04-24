@@ -852,7 +852,7 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-
+                    
                 $batch_list = Batches_model::where('institute_id', $institute_id)
                     ->where('user_id', $user_id)
                     ->whereRaw("FIND_IN_SET($subject_id,subjects)")
@@ -865,7 +865,7 @@ class StudentController extends Controller
                         'batch_name' => $value->batch_name,
                     ];
                 }
-
+                print_r($batch_response);exit;
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -884,7 +884,7 @@ class StudentController extends Controller
                     // print_r($topicqry);
                     // exit;
                     foreach ($topicqry as $topval) {
-
+                        print_r($topicqry);exit;
                         if ($existingUser->role_type == 6) {
                             $batchID = Student_detail::where('institute_id', $institute_id)
                                 ->where('student_id', $user_id)->first();
@@ -935,7 +935,7 @@ class StudentController extends Controller
                         }
                     }
                 }
-
+                
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
