@@ -1439,6 +1439,7 @@ class StudentController extends Controller
                 ->where('students_details.board_id', $board_id)
                 ->where('students_details.medium_id', $medium_id)
                 ->where('students_details.standard_id', $standard_id)
+                ->where('students_details.standard_id', $standard_id)
                 ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at');
             if (!empty($keyword)) {
@@ -1467,13 +1468,17 @@ class StudentController extends Controller
 
             if (!empty($student_data)) {
                 foreach ($student_data as $value) {
-                    if (!empty($request->date)) {
+                    if (!empty($request->date && !empty($request->batch_id) && !empty($request->subject_id))) {
                         $attendance_records = Attendance_model::where('student_id', $value['id'])
                             ->whereDate('date', date('Y-m-d', strtotime($request->date)))
+                            ->where('batch_id', $batch_id)
+                            ->where('subject_id', $subject_ids)
                             ->get()
                             ->toArray();
                     } else {
                         $attendance_records = Attendance_model::where('student_id', $value['id'])
+                            ->where('batch_id', $batch_id)
+                            ->where('subject_id', $subject_ids)
                             ->get()
                             ->toArray();
                     }
