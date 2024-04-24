@@ -1781,7 +1781,7 @@ class InstituteApiController extends Controller
                     ->where('students_details.board_id', $examdt->board_id)
                     ->where('students_details.medium_id', $examdt->medium_id)
                     ->where('students_details.batch_id', $examdt->batch_id)
-                    //->where('students_details.class_id', $examdt->class_id)
+                    ->where('students_details.class_id', $examdt->class_id)
                     ->where('students_details.standard_id', $examdt->standard_id)
                     //->where('students_details.stream_id', $examdt->stream_id)
                     ->when($examdt->stream_id, function ($query, $stream_id) {
