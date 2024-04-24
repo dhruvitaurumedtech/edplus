@@ -1461,13 +1461,32 @@ class StudentController extends Controller
 
             $student_data = $query->get()->toArray();
 
+
             if (!empty($student_data)) {
                 foreach ($student_data as $value) {
-                    $atttbl = Attendance_model::where('student_id', $value['id'])->orderbydesc('updated_at')->limit(1)->first();
+                    if (!empty($request->date)) {
+                        $attendance_records = Attendance_model::where('student_id', $value['id'])
+                            ->whereDate('date', date('Y-m-d', strtotime($request->date)))
+                            ->get()
+                            ->toArray();
+                    } else {
+                        $attendance_records = Attendance_model::where('student_id', $value['id'])
+                            ->get()
+                            ->toArray();
+                    }
+                    // echo "<pre>";
+                    // print_r($attendance_records);
+                    // exit;
+
+                    $attendances = [];
+                    foreach ($attendance_records as $attendance_record) {
+                        $attendances[] = ['date' => date('d-m-y', strtotime($attendance_record['date'])), 'attendance' => $attendance_record['attendance']];
+                    }
+
                     $student_response[] = [
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                        'attendance' => !empty($atttbl->attendance) ? $atttbl->attendance : '',
+                        'attendance' => $attendances,
                         'photo' => !empty($value['image']) ? url($value['image']) : url('no-image.png'),
                         'board_name' => $value['board_name'] . '',
                         'medium_name' => $value['medium_name'] . '',
