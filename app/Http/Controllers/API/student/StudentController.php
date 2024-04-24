@@ -853,22 +853,22 @@ class StudentController extends Controller
                     })
                     ->get();
 
-                    $batch_response = [];
-                if ($existingUser->role_type != 6) {  
-                $batch_list = Batches_model::where('institute_id', $institute_id)
-                    ->where('user_id', $user_id)
-                    ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                    ->select('*')
-                    ->get();
-                
-                foreach ($batch_list as $value) {
-                    $batch_response[] = [
-                        'batch_id' => $value->id,
-                        'batch_name' => $value->batch_name,
-                    ];
+                $batch_response = [];
+                if ($existingUser->role_type != 6) {
+                    $batch_list = Batches_model::where('institute_id', $institute_id)
+                        ->where('user_id', $user_id)
+                        ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                        ->select('*')
+                        ->get();
+
+                    foreach ($batch_list as $value) {
+                        $batch_response[] = [
+                            'batch_id' => $value->id,
+                            'batch_name' => $value->batch_name,
+                        ];
+                    }
                 }
-            }
-               
+
 
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -887,7 +887,7 @@ class StudentController extends Controller
                     // print_r($topicqry);
                     // exit;
                     foreach ($topicqry as $topval) {
-                        
+
                         if ($existingUser->role_type == 6) {
                             $batchID = Student_detail::where('institute_id', $institute_id)
                                 ->where('student_id', $user_id)->first();
@@ -936,9 +936,12 @@ class StudentController extends Controller
                         } else {
                             $response = $category; // Assign $category directly to $response
                         }
+                        echo "<pre>";
+                        print_r($response);
+                        exit;
                     }
                 }
-                
+
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
