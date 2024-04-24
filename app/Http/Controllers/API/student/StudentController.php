@@ -930,11 +930,13 @@ class StudentController extends Controller
                         }
 
                         if (!empty($chapter_id) && !empty($batch_response)) {
+                            echo "hi";
                             $batch_response = [
                                 'batch_list' => $batch_response,
                             ];
                             $response = array_merge($batch_response, $category);
                         } else {
+                            echo "else";
                             $response = $category; // Assign $category directly to $response
                         }
                     }
