@@ -182,7 +182,7 @@
 
                         </div>
                       </div>
-                      <div class="card-footer">
+                      <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
                       </div>
                   </div>

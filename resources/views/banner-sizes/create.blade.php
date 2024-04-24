@@ -76,7 +76,7 @@
                         <div class="institute-form">
                             <h3>BannerSize List</h3>
                             <div class="card-body">
-                                <table class="table table-js table-responsive-sm">
+                                <table class="table table-js table-bordered table-responsive mt-4">
                                     <thead>
                                         <tr>
                                             <th>ID</th>

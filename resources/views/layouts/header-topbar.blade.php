@@ -32,3 +32,10 @@
     <a href="#!" class="menu-toggle"><i class="fas fa-bars"></i></a>
     </div>
 </header>
+<script>
+    window.setTimeout(function() {
+        $(".alert-success").slideUp(500, function() {
+            $(this).remove();
+        });
+    }, 3000);
+</script>

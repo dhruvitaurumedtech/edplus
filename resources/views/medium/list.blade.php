@@ -24,13 +24,7 @@
         </ul>
       </div>
 
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
+
       <div class="row">
         <div class="col-md-10 offset-md-1">
           @if (session('success'))
@@ -40,6 +34,8 @@
           @endif
         </div>
       </div>
+
+
       <div class="dashboard-content side-content">
 
         <!-- /.card-header -->
@@ -224,28 +220,34 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var medium_id = this.getAttribute('data-user-id');
-          var baseUrl = $('meta[name="base-url"]').attr('content');
-
+          var csrfToken = '{{ csrf_token() }}';
+          var baseUrl = '{{ url(' / ') }}'; // Correct the URL generation if necessary
 
           axios.post('/medium/edit', {
-              medium_id: medium_id
+              medium_id: medium_id,
+            }, {
+              headers: {
+                'X-CSRF-TOKEN': csrfToken
+              }
             })
             .then(response => {
-              var reponse_data = response.data.medium_list;
-              var iconSrc = baseUrl + '/' + reponse_data.icon;
+              var response_data = response.data.medium_list;
+              console.log(response_data);
+              var iconSrc = baseUrl + '/' + response_data.icon;
 
-              $('#medium_id').val(reponse_data.id);
-              $('#name').val(reponse_data.name);
-              $('#old_icon').val(reponse_data.icon);
+              $('#medium_id').val(response_data.id);
+              $('#name').val(response_data.name);
+              $('#old_icon').val(response_data.icon);
               $('#editicon').attr('src', iconSrc);
-              $('#status').val(reponse_data.status);
+              $('#status').val(response_data.status);
               $('#usereditModal').modal('show');
             })
             .catch(error => {
-              console.error(error);
+              // console.error(error);
             });
         });
       });
+
       document.querySelectorAll('.deletebutton').forEach(function(button) {
         button.addEventListener('click', function(event) {
           event.preventDefault(); // Prevent the default form submission
