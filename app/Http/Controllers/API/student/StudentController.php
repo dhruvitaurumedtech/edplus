@@ -883,7 +883,7 @@ class StudentController extends Controller
                         ->where('topic.video_category_id', $catvd->vid)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
-                        ->get();
+                        ->tosql();
                     echo "<pre>";
                     print_r($topicqry);
                     exit;
@@ -929,14 +929,12 @@ class StudentController extends Controller
                             $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                         }
 
-                        if (!empty($chapter_id) && !empty($batch_response)) {
-                            echo "hi";
+                        if (!empty($chapter_id)) {
                             $batch_response = [
                                 'batch_list' => $batch_response,
                             ];
                             $response = array_merge($batch_response, $category);
                         } else {
-                            echo "else";
                             $response = $category; // Assign $category directly to $response
                         }
                     }
