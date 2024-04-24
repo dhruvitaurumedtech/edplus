@@ -282,7 +282,7 @@ class InstituteApiController extends Controller
 
     public function register_institute(Request $request)
     {
-        
+
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'institute_for_id' => 'required',
@@ -1286,7 +1286,7 @@ class InstituteApiController extends Controller
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'student_id' => 'required|integer',
-            'institute_id'=>'required|integer',
+            'institute_id' => 'required|integer',
         ]);
 
         if ($validator->fails()) {
@@ -1309,23 +1309,34 @@ class InstituteApiController extends Controller
 
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
         if ($existingUser) {
-            $user_list = Student_detail::join('users','users.id','=','students_details.student_id')
-            ->join('board','board.id','=','students_details.board_id')
-            ->join('medium','medium.id','=','students_details.medium_id')
-            ->join('standard','standard.id','=','students_details.standard_id')
-            ->leftjoin('stream','stream.id','=','students_details.stream_id')
-            ->where('students_details.student_id', $student_id)
-            ->where('students_details.user_id',$user_id)
-            ->where('students_details.institute_id',$institute_id)
-            ->select('students_details.*','users.firstname','users.lastname','users.dob','users.address','users.email','users.mobile',
-            'board.name as board','medium.name as medium','standard.name as standard','stream.name as stream')
-            ->first();
+            $user_list = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+                ->join('board', 'board.id', '=', 'students_details.board_id')
+                ->join('medium', 'medium.id', '=', 'students_details.medium_id')
+                ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->where('students_details.student_id', $student_id)
+                ->where('students_details.user_id', $user_id)
+                ->where('students_details.institute_id', $institute_id)
+                ->select(
+                    'students_details.*',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.dob',
+                    'users.address',
+                    'users.email',
+                    'users.mobile',
+                    'board.name as board',
+                    'medium.name as medium',
+                    'standard.name as standard',
+                    'stream.name as stream'
+                )
+                ->first();
             if ($user_list) {
-                $subjids = explode(',',$user_list->subject_id);
-                $subjcts = Subject_model::whereIN('id',$subjids)->get();
+                $subjids = explode(',', $user_list->subject_id);
+                $subjcts = Subject_model::whereIN('id', $subjids)->get();
                 $subjectslist = [];
-                foreach($subjcts as $subDT){
-                    $subjectslist []=array('id'=>$subDT->id,'name'=>$subDT->name,'image'=>$subDT->image);
+                foreach ($subjcts as $subDT) {
+                    $subjectslist[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => $subDT->image);
                 }
 
                 $response_data = [
