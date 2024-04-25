@@ -908,7 +908,8 @@ class StudentController extends Controller
                                     "chapter_name" => $topval->chname,
                                     "status" => True
                                 );
-                                $category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+                                //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+                                $category[] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
                             }
                         } else {
                             $topics[] = array(
@@ -922,7 +923,8 @@ class StudentController extends Controller
                                 "chapter_name" => $topval->chname,
                                 "status" => false,
                             );
-                            $category[$catvd->name] = array('id' => $catvd->id,
+                            //$category[$catvd->name] = array('id' => $catvd->id,
+                            $category[] = array('id' => $catvd->id,
                              'category_name' => $catvd->name,
                               'parent_category_id' => $catvd->vid, 
                               'parent_category_name' => $catvd->vname,
@@ -935,7 +937,7 @@ class StudentController extends Controller
                             ];
                             $response = array_merge($batch_response, $category);
                         } else {
-                            $response = array($category); // Assign $category directly to $response
+                            $response = $category; // Assign $category directly to $response
                         }
                         
                     }
