@@ -81,7 +81,9 @@
                   @error('status')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
-
+                  <div class="d-flex justify-content-end mt-4">
+                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                  </div>
                 </form>
               </div>
             </div>
