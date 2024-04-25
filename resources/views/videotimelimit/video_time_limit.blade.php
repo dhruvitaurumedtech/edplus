@@ -280,7 +280,7 @@
                     button.addEventListener('click', function() {
                         var id = this.getAttribute('data-user-id');
                         var baseUrl = '{{ url('') }}';
-                        axios.post(baseUrl + 'video-timelimit-edit', {
+                        axios.post(baseUrl + '/video-timelimit-edit', {
                                 id: id
                             })
                             .then(response => {
