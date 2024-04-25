@@ -1613,14 +1613,16 @@ class InstituteApiController extends Controller
             $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
                 ->where('institute_for_sub.institute_id', $institute_id)
                 ->where('institute_for_sub.user_id', $user_id)
-                ->select('institute_for.*')->get();
+                ->select('institute_for.*')
+                ->distinct()->get();
             $institute_fors = [];
             foreach ($institute_for as $inst_forsd) {
                 $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
                     ->where('board_sub.institute_id', $institute_id)
                     ->where('board_sub.user_id', $user_id)
                     ->where('board_sub.institute_for_id', $inst_forsd->id)
-                    ->select('board.*')->get();
+                    ->select('board.*')
+                    ->distinct()->get();
                 $boards = [];
                 foreach ($board as $boardsdt) {
                     $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
@@ -1628,7 +1630,8 @@ class InstituteApiController extends Controller
                         ->where('medium_sub.user_id', $user_id)
                         ->where('medium_sub.institute_for_id', $inst_forsd->id)
                         ->where('medium_sub.board_id', $boardsdt->id)
-                        ->select('medium.*')->get();
+                        ->select('medium.*')
+                        ->distinct()->get();
                     $mediums = [];
                     foreach ($medium as $mediumdt) {
                         $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
@@ -1637,7 +1640,8 @@ class InstituteApiController extends Controller
                             ->where('class_sub.institute_for_id', $inst_forsd->id)
                             ->where('class_sub.board_id', $boardsdt->id)
                             ->where('class_sub.medium_id', $mediumdt->id)
-                            ->select('class.*')->get();
+                            ->select('class.*')
+                            ->distinct()->get();
                         $classs = [];
                         foreach ($class as $classdt) {
 
@@ -1648,7 +1652,8 @@ class InstituteApiController extends Controller
                                 ->where('standard_sub.board_id', $boardsdt->id)
                                 ->where('standard_sub.medium_id', $mediumdt->id)
                                 ->where('standard_sub.class_id', $classdt->id)
-                                ->select('standard.*')->get();
+                                ->select('standard.*')
+                                ->distinct()->get();
 
                             $standards = [];
                             foreach ($standard as $standarddt) {
@@ -1660,7 +1665,8 @@ class InstituteApiController extends Controller
                                     ->where('stream_sub.board_id', $boardsdt->id)
                                     ->where('stream_sub.medium_id', $mediumdt->id)
                                     ->where('stream_sub.class_id', $classdt->id)
-                                    ->select('stream.*')->get();
+                                    ->select('stream.*')
+                                    ->distinct()->get();
                                 $streams = [];
                                 foreach ($stream as $streamdt) {
                                     $streams[] = array(
@@ -1681,7 +1687,8 @@ class InstituteApiController extends Controller
                                     ->where('subject_sub.institute_id', $institute_id)
                                     ->where('subject_sub.user_id', $user_id)
                                     ->whereIN('subject.base_table_id', $batableids)
-                                    ->select('subject.*')->get();
+                                    ->select('subject.*')
+                                    ->distinct()->get();
                                 $subjects = [];
                                 foreach ($subject as $subjectdt) {
 
