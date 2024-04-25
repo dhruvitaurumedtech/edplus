@@ -2971,7 +2971,7 @@ class InstituteApiController extends Controller
                     ->where('base_table.board', $request->board_id)
                     ->where('base_table.medium', $request->medium_id)
                     ->where('base_table.standard', $request->standard_id)
-                    ->select('subject')->get();
+                    ->select('subject.*')->get();
                 $allsub_response = [];
                 foreach ($subjctslist as $svalue) {
                     $allsub_response[] = [
