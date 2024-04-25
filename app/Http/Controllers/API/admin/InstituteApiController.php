@@ -2974,7 +2974,7 @@ class InstituteApiController extends Controller
                 $allsub_response = [];
                 foreach ($subjctslist as $svalue) {
                     $allsub_response[] = [
-                        'id' => $svalue['subject_id'],
+                        'id' => $svalue['id'],
                         'name' => $svalue['name'],
                         'image'=> $svalue['image'],
                     ];
