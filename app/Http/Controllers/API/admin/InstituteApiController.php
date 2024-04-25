@@ -2942,6 +2942,63 @@ class InstituteApiController extends Controller
         }
     }
 
+    public function allsubjectList(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            //'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+                $subjctslist = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                    ->where('base_table.board', $request->board_id)
+                    ->where('base_table.medium', $request->medium_id)
+                    ->where('base_table.standard', $request->standard_id)->get()->toarray();
+                $allsub_response = [];
+                foreach ($subjctslist as $svalue) {
+                    $allsub_response[] = [
+                        'id' => $svalue['subject_id'],
+                        'name' => $svalue['name'],
+                        'image'=> $svalue['image'],
+                    ];
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $allsub_response
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
     public function edit_subject(Request $request)
     {
 
