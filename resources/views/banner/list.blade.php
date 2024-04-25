@@ -197,7 +197,7 @@
 
                       </div>
                     </div>
-                    <div class="card-footer">
+                    <div class="d-flex justify-content-end">
                       <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
                     </div>
                 </div>
@@ -206,8 +206,11 @@
             </div>
 
           </div>
+
         </div>
+
       </div>
+      @include('layouts/footer_new')
       <script>
         document.querySelectorAll('.editButton').forEach(function(button) {
           button.addEventListener('click', function() {
@@ -282,7 +285,7 @@
           }
         }
       </script>
-      @include('layouts/footer_new')
+
     </div>
   </div>
 </body>
