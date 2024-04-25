@@ -946,9 +946,8 @@ class StudentController extends Controller
                 }
                 //  $catdata = array('response'=>$category);
                 if (!empty($chapter_id) && !empty($batch_response)) {
-                    // $batch_response = [
-                    //     'batch_list' => $batch_response,
-                    // ];
+                    $batch_response = array('batch_list' => $batch_response,
+                );
                     $response = array_merge($category,$batch_response);
                     
                     
