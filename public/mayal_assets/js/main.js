@@ -12,7 +12,7 @@ function readURL(input, imgControlName) {
 
 $("#imag").change(function () {
   // add your logic to decide which image control you'll use
-  var imgControlName = "#ImgPreview";
+  var imgControlName = ".ImgPreview";
   readURL(this, imgControlName);
   $('.preview1').addClass('it');
   $('.btn-rmv1').addClass('rmv');
@@ -21,7 +21,7 @@ $("#imag").change(function () {
 $("#removeImage1").click(function (e) {
   e.preventDefault();
   $("#imag").val("");
-  $("#ImgPreview").attr("src", "");
+  $(".ImgPreview").attr("src", "");
   $('.preview1').removeClass('it');
   $('.btn-rmv1').removeClass('rmv');
 });

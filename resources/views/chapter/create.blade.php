@@ -61,12 +61,12 @@
                             </select>
                         </div>
                         <h3>Chapter Number</h3>
-                        <div class="search-box-2">
-                            <input type="search" name="search" placeholder="Chapter Number">
+                        <div class="search-box-2 form-group">
+                            <input type="search" name="search" placeholder="Chapter Number" class="form-control">
                         </div>
                         <h3>Chapter Name</h3>
-                        <div class="search-box-2">
-                            <input type="search" name="search" placeholder="Chapter Name">
+                        <div class="search-box-2 form-group">
+                            <input type="search" name="search" placeholder="Chapter Name" class="form-control">
                         </div>
                         <h3>Chapter Image</h3>
                         <!-- <div class="input-group">
@@ -88,7 +88,7 @@
                                     </span>
                                 </div>
                             </div>
-                            <img id="ImgPreview" src="" class="preview1" />
+                            <img id="ImgPreview" src="" class="preview1 ImgPreview" />
                             <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
                         </div>
 
@@ -125,15 +125,14 @@
                 var chapterHtml = `
             <div class="row mt-3 added-chapter">
               <div class="col-lg-12">
-                <form action="#">
-                <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
+               <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
                   <h3>Chapter Number</h3>
-                  <div class="search-box-2">
-                    <input type="search" name="search" placeholder="Chapter Number">
+                  <div class="search-box-2 form-group">
+                    <input type="search" name="search" placeholder="Chapter Number" class="form-control">
                   </div>
                   <h3>Chapter Name</h3>
-                  <div class="search-box-2">
-                    <input type="search" name="search" placeholder="Chapter Name">
+                  <div class="search-box-2 form-group">
+                    <input type="search" name="search" placeholder="Chapter Name" class="form-control">
                   </div>
                   <h3>Chapter Image</h3>
                   <div class="file">
@@ -147,13 +146,11 @@
                         </span>
                       </div>
                     </div>
-                    <img id="ImgPreview" src="" class="preview1" />
+                    <img id="ImgPreview" src="" class="preview1 ImgPreview" />
                     <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
                   </div>
-                </form>
               </div>
-            </div>
-          `;
+            </div>`;
                 $('.add-chapter-btn').before(chapterHtml);
                 $('.remove-chapter').click(function() {
                     $(this).closest('.added-chapter').remove();
