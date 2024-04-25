@@ -845,7 +845,8 @@ class StudentController extends Controller
                 $topics = [];
                 $category = [];
                 $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
-                    ->select('do_business_with.id', 'do_business_with.name', 'video_categories.id as vid', 'video_categories.name as vname')
+                    ->select('do_business_with.id', 'do_business_with.name',
+                     'video_categories.id as vid', 'video_categories.name as vname')
                     ->whereIn('do_business_with.id', function ($query) {
                         $query->select('topic.video_category_id')
                             ->from('topic')
@@ -867,6 +868,7 @@ class StudentController extends Controller
                         ];
                     }
                 }
+                $topicqry=[];
                 foreach ($catgry as $catvd) {
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
@@ -876,7 +878,7 @@ class StudentController extends Controller
                             return $query->where('topic.chapter_id', $chapter_id);
                         })
                         ->where('topic.institute_id', $institute_id)
-                        ->where('topic.video_category_id', $catvd->id)
+                        ->where('topic.video_category_id', $catvd->vid)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
                         ->get();
