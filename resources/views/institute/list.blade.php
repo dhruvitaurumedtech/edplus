@@ -173,9 +173,9 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var user_id = this.getAttribute('data-user-id');
-        var baseUrl = '{{ url(' / ') }}';
-        alert(baseUrl);
-        axios.post(baseUrl + '/admin/edit', {
+        var baseUrl = '{{ url('
+        ') }}';
+        axios.post(baseUrl + 'admin/edit', {
             user_id: user_id
           })
           .then(response => {
