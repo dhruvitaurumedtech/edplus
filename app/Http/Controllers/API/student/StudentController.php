@@ -878,15 +878,11 @@ class StudentController extends Controller
                         ->where('topic.institute_id', $institute_id)
                         ->where('topic.video_category_id', $catvd->id)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
-                        ->orderByDesc('topic.created_at');
-                        //->get();
-                        $sql = $topicqry->toSql();
-
-// Get the bound values
-$bindings = $topicqry->getBindings();
+                        ->orderByDesc('topic.created_at')
+                        ->get();
                     // echo "<pre>";
-                    print_r($bindings);
-                    exit;
+                    // print_r($topicqry);
+                    // exit;
                     $response = [];
                     foreach ($topicqry as $topval) {
                         if ($existingUser->role_type == 6) {
