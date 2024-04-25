@@ -923,7 +923,8 @@ class StudentController extends Controller
                                 "chapter_name" => $topval->chname,
                                 "status" => false,
                             );
-                            $category[$catvd->name] = array('id' => $catvd->id,
+                            //$category[$catvd->name] = array('id' => $catvd->id,
+                            $category = array('id' => $catvd->id,
                              'category_name' => $catvd->name,
                               'parent_category_id' => $catvd->vid, 
                               'parent_category_name' => $catvd->vname,
