@@ -213,7 +213,6 @@
           button.addEventListener('click', function() {
             var banner_id = this.getAttribute('data-user-id');
             var baseUrl = $('meta[name="base-url"]').attr('content');
-            alert(baseUrl);
 
 
             axios.post('/banner/edit', {
