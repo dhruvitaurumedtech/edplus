@@ -49,7 +49,7 @@ class ExamController extends Controller
                     'board_id' => 'required',
                     'medium_id' => 'required',
                     //'class_id' => 'required',
-                    'batch_id'=>'required',
+                    'batch_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
@@ -146,6 +146,7 @@ class ExamController extends Controller
                     'stream.name as stream_name',
                     'subject.name as subject_name',
                     'batches.batch_name',
+                    'batches.id as batch_id',
                     'exam.*'
                 )
                 ->where('exam.institute_id', $request->institute_id)
@@ -174,7 +175,8 @@ class ExamController extends Controller
                         'medium' => $value->medium_name,
                         //'class' => $value->class_name,
                         'standard' => $value->standard_name,
-                        'batch_name'=>$value->batch_name,
+                        'batch_id' => $value->batch_id,
+                        'batch_name' => $value->batch_name,
                         'stream' => $value->stream_name . '',
                         'subject' => $value->subject_name,
                     ];
@@ -233,24 +235,24 @@ class ExamController extends Controller
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
-        
+
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
         if ($existingUser) {
-            
+
             $exam_id = $request->input('exam_id');
             $examlist = DB::table('exam')
                 ->where('exam.id', $exam_id)
                 ->wherenull('exam.deleted_at')
                 ->get()->toarray();
-                
+
             if (!$examlist) {
                 return response()->json([
                     'status' => 400,
                     'message' => 'Exam Not Found.',
                 ], 400);
             } else {
-                
+
                 $validatedData = \Validator::make($request->all(), [
                     'user_id' => 'required',
                     'institute_id' => 'required',
@@ -263,12 +265,12 @@ class ExamController extends Controller
                     //'institute_for_id' => 'required',
                     'board_id' => 'required',
                     'medium_id' => 'required',
-                    'batch_id'=>'required',
+                    'batch_id' => 'required',
                     //'class_id' => 'required',
                     'standard_id' => 'required',
                     'subject_id' => 'required',
                 ]);
-                
+
                 if ($validatedData->fails()) {
                     $errorMessages = array_values($validatedData->errors()->all());
                     return response()->json([
@@ -289,7 +291,7 @@ class ExamController extends Controller
 
 
                 if (empty($exam_data)) {
-                    
+
                     $exam = Exam_Model::find($exam_id);
                     $exam->user_id = $request->user_id;
                     $exam->institute_id = $request->institute_id;
@@ -312,7 +314,7 @@ class ExamController extends Controller
                         return response()->json([
                             'status' => 200,
                             'message' => 'Successfully Create Exam.',
-                            'data'=>$exam
+                            'data' => $exam
                         ], 200, [], JSON_NUMERIC_CHECK);
                     } else {
                         return response()->json([
@@ -326,7 +328,6 @@ class ExamController extends Controller
                         'message' => 'Already Created This standard Exam!.',
                     ]);
                 }
-            
             }
         } else {
             return response()->json([
@@ -367,7 +368,7 @@ class ExamController extends Controller
                     $exam_update->update([
                         'user_id' => $request->user_id,
                         'institute_id' => $request->institute_id,
-                        'batch_id'=>$request->batch_id,
+                        'batch_id' => $request->batch_id,
                         'exam_title' => $request->exam_title,
                         'total_mark' => $request->total_mark,
                         'exam_type' => $request->exam_type,
@@ -395,7 +396,7 @@ class ExamController extends Controller
                         Exam_Model::create([
                             'user_id' => $request->user_id,
                             'institute_id' => $request->institute_id,
-                            'batch_id'=>$request->batch_id,
+                            'batch_id' => $request->batch_id,
                             'exam_title' => $request->exam_title,
                             'total_mark' => $request->total_mark,
                             'exam_type' => $request->exam_type,
