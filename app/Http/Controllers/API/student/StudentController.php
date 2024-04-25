@@ -948,11 +948,10 @@ class StudentController extends Controller
                 if (!empty($chapter_id) && !empty($batch_response)) {
                     $batch_response = [
                         'batch_list' => $batch_response,
-                        'category' => $category,
                     ];
-                //     $response = array_merge($batch_response, $category);
-                // } else {
-                     // Assign $category directly to $response
+                    $response = array_merge($batch_response, $category);
+                } else {
+                    $response = $category; // Assign $category directly to $response
                 }
                 
                 return response()->json([
