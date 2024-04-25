@@ -855,19 +855,19 @@ class StudentController extends Controller
                     ->get();
                 $batch_response = [];
 
-                if ($existingUser->role_type != 6) {
-                    $batch_list = Batches_model::where('institute_id', $institute_id)
-                        ->where('user_id', $user_id)
-                        ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                        ->select('*')
-                        ->get();
-                    foreach ($batch_list as $value) {
-                        $batch_response[] = [
-                            'batch_id' => $value->id,
-                            'batch_name' => $value->batch_name,
-                        ];
-                    }
-                }
+                // if ($existingUser->role_type != 6) {
+                //     $batch_list = Batches_model::where('institute_id', $institute_id)
+                //         ->where('user_id', $user_id)
+                //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                //         ->select('*')
+                //         ->get();
+                //     foreach ($batch_list as $value) {
+                //         $batch_response[] = [
+                //             'batch_id' => $value->id,
+                //             'batch_name' => $value->batch_name,
+                //         ];
+                //     }
+                // }
                 $topicqry=[];
                 foreach ($catgry as $catvd) {
                     $topics = []; 
@@ -919,6 +919,19 @@ class StudentController extends Controller
                                 //  'topics' => $topics);
                             }
                         } else {
+                            
+                            $batch_list = Batches_model::where('institute_id', $institute_id)
+                            ->where('user_id', $user_id)
+                            ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                            ->select('*')
+                            ->get();
+                            foreach ($batch_list as $value) {
+                                $batch_response[] = [
+                                    'batch_id' => $value->id,
+                                    'batch_name' => $value->batch_name,
+                                ];
+                            }
+
                             $topics[] = array(
                                 "id" => $topval->id,
                                 "topic_no" => $topval->topic_no,
@@ -928,6 +941,7 @@ class StudentController extends Controller
                                 "subject_name" => $topval->sname,
                                 "chapter_id" => $topval->chapter_id,
                                 "chapter_name" => $topval->chname,
+                                "batch_list"=>$batch_response,
                                 "status" => false,
                             );
                             //$category[$catvd->name] = array('id' => $catvd->id,
@@ -944,23 +958,13 @@ class StudentController extends Controller
                               'parent_category_name' => $catvd->vname,
                                'topics' => $topics);
                 }
-                //  $catdata = array('response'=>$category);
-                if (!empty($chapter_id) && !empty($batch_response)) {
-                    // $batch_response = [
-                    //     'batch_list' => $batch_response,
-                    // ];
-                    //$response = array_merge($category,$batch_response);
-                    $response = $category;
-                    
-                } else {
-                    $response = $category; // Assign $category directly to $response
-                }
                 
+                //$response = $category;
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
-                    'data' => $response,
-                    'batch_list'=>$batch_response
+                    'data' => $category,
+                    
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
