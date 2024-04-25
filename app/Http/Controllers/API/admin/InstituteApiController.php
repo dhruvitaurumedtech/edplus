@@ -133,7 +133,7 @@ class InstituteApiController extends Controller
                             $standardids .= 0;
                             $standardids = $standardidget->pluck('standard')->toArray();
                             $standard_array = Standard_model::whereIN('id', $standardids)
-                                ->get();
+                            ->get();
 
 
                             $standard = [];
