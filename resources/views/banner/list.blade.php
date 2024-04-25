@@ -87,7 +87,7 @@
             </div>
             <div class="col-lg-6">
               <div class="">
-                <div class="card institute-form">
+                <div class="institute-form">
 
                   <!-- /.card-header -->
                   <table class="table table-js table-bordered">
