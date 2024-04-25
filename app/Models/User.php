@@ -69,4 +69,15 @@ class User extends Authenticatable implements JWTSubject
 
         return $existingPermission && $existingPermission->$permission == 1;
     }
+
+
+    // get User Profile image
+    public function getImageAttribute($value)
+    {
+        if (!empty($value)) {
+            return asset($value);
+        } else {
+            return asset('profile/image.jpg');
+        }
+    }
 }
