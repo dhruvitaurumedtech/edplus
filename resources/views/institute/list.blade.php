@@ -61,7 +61,6 @@
                     <th style="width: 400px">lastname</th>
                     <th style="width: 400px">Email</th>
                     <th style="width: 400px">Mobile</th>
-                    <th style="width: 400px">Status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -74,7 +73,6 @@
                     <td>{{$value->lastname}}</td>
                     <td>{{$value->email}}</td>
                     <td>{{$value->mobile}}</td>
-                    <td>{{$value->status}}</td>
                     <td>
                       <div class="d-flex">
                         <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;

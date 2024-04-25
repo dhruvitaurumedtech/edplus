@@ -276,8 +276,8 @@
 
                                     </div>
                                 </div>
-                                <div class="col-md-12 submit-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                <div class="d-flex justify-content-end">
+                                    <button type="submit" class="btn btn-primary">Update</button>
                                 </div>
                             </form>
                         </div>

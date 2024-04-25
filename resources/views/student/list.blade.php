@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -296,6 +297,8 @@
       button.addEventListener('click', function() {
         var student_id = this.getAttribute('data-student-id');
         var institute_id = $('#institute_id').val();
+        var baseUrl = $('meta[name="base-url"]').attr('content');
+
         axios.post('/student/edit', {
             student_id: student_id,
             institute_id: institute_id
@@ -306,7 +309,9 @@
             var reponse_studentdetail = response.data.studentsdetailsDT;
 
             if (reponse_student !== null) {
-              var imgsrc = 'http://127.0.0.1:8000/' + reponse_student.image;
+              // var imgsrc = 'http://127.0.0.1:8000/' + reponse_student.image;
+              var imgsrc = baseUrl + '/' + reponse_student.image;
+
 
               $('#student_id').val(reponse_student.id);
               $('#firstname').val(reponse_student.firstname);

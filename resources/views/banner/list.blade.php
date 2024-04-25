@@ -87,7 +87,7 @@
             </div>
             <div class="col-lg-6">
               <div class="">
-                <div class="card institute-form">
+                <div class="institute-form">
 
                   <!-- /.card-header -->
                   <table class="table table-js table-bordered">
@@ -173,13 +173,14 @@
                             <label for="exampleInputEmail1">Banner Image : </label>
                             <input type="hidden" name="old_banner_image" id="old_banner_image">
                             <input type="file" onchange="previewFile()" name="banner_image" class="form-control">
-                            @error('icon')
+                            @error('banner_image')
                             <div class="text-danger">{{ $message }}</div>
                             @enderror
                           </div>
                           <div class="col-md-3">
-                            <img src="" id="banner_image" alt="banner" class="img-resize mt-3">
+                            <img src="" id="banner_image_preview" alt="banner" class="img-resize mt-3">
                           </div>
+
                           <div class="col-md-12">
                             <label for="exampleInputEmail1">status : </label>
                             <select class="form-control" name="status" id="status">
@@ -222,11 +223,11 @@
 
                 var reponse_data = response.data.banner_list;
                 var iconSrc = baseUrl + '/' + reponse_data.banner_image;
-
+                alert(iconSrc);
                 // var iconSrc = '{{ asset('
                 // ') }}' + reponse_data.banner_image;
                 $('#banner_id').val(reponse_data.id);
-                $('#banner_image').attr('src', iconSrc);
+                $('#banner_image_preview').attr('src', iconSrc);
                 $('#old_banner_image').val(reponse_data.banner_image);
                 $('#status').val(reponse_data.status);
                 $('#usereditModal').modal('show');
@@ -268,8 +269,8 @@
         });
 
         function previewFile() {
-          const preview = document.getElementById("banner_image");
-          const fileInput = document.querySelector("input[type=file]");
+          const preview = document.getElementById("banner_image_preview");
+          const fileInput = document.querySelector("input[name=banner_image]");
           const file = fileInput.files[0];
           const reader = new FileReader();
 
@@ -286,4 +287,5 @@
     </div>
   </div>
 </body>
+
 </html>
