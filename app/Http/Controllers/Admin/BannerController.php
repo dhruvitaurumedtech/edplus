@@ -79,16 +79,14 @@ class BannerController extends Controller
     }
     function edit_banner(Request $request)
     {
-        $id = $request->input('banner_id');
-        $banner_list = Banner_model::find($id);
+        $banner_list = Banner_model::find($request->banner_id);
 
         return response()->json(['banner_list' => $banner_list]);
     }
     function update_banner(Request $request)
     {
         // dd($request->all());exit;
-        $id = $request->input('banner_id');
-        $role = Banner_model::find($id);
+        $role = Banner_model::find($request->banner_id);
         $request->validate([
             'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
             'status' => 'required',
@@ -109,8 +107,7 @@ class BannerController extends Controller
     }
     function banner_delete(Request $request)
     {
-        $banner_id = $request->input('banner_id');
-        $banner_list = Banner_model::find($banner_id);
+        $banner_list = Banner_model::find($request->banner_id);
 
         if (!$banner_list) {
             return redirect()->route('banner.list')->with('error', 'banner not found');
