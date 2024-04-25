@@ -941,8 +941,8 @@ class StudentController extends Controller
                                 "subject_name" => $topval->sname,
                                 "chapter_id" => $topval->chapter_id,
                                 "chapter_name" => $topval->chname,
-                                "batch_list"=>$batch_response,
                                 "status" => false,
+                                "batch_list"=>$batch_response,
                             );
                             //$category[$catvd->name] = array('id' => $catvd->id,
                             // $category[] = array('id' => $catvd->id,
