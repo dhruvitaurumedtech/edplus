@@ -937,6 +937,7 @@ class StudentController extends Controller
                         } else {
                             $response = array($category); // Assign $category directly to $response
                         }
+                        
                     }
                 }
 
