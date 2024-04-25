@@ -220,21 +220,19 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var medium_id = this.getAttribute('data-user-id');
-          var csrfToken = '{{ csrf_token() }}';
-          var baseUrl = '{{ url(' / ') }}'; // Correct the URL generation if necessary
+          // var csrfToken = '{{ csrf_token() }}';
+          var baseUrl = '{{ url(' / ') }}';
 
           axios.post('/medium/edit', {
               medium_id: medium_id,
             }, {
-              headers: {
-                'X-CSRF-TOKEN': csrfToken
-              }
+              // headers: {
+              //   'X-CSRF-TOKEN': csrfToken
+              // }
             })
             .then(response => {
               var response_data = response.data.medium_list;
-              console.log(response_data);
               var iconSrc = baseUrl + '/' + response_data.icon;
-
               $('#medium_id').val(response_data.id);
               $('#name').val(response_data.name);
               $('#old_icon').val(response_data.icon);
@@ -242,9 +240,7 @@
               $('#status').val(response_data.status);
               $('#usereditModal').modal('show');
             })
-            .catch(error => {
-              // console.error(error);
-            });
+            .catch(error => {});
         });
       });
 

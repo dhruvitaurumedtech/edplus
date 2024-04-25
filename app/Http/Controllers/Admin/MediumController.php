@@ -38,8 +38,8 @@ class MediumController extends Controller
     }
     function medium_list_edit(Request $request)
     {
-        $id = $request->input('medium_id');
-        $medium_list = Medium_model::find($id);
+        // $id = $request->input('medium_id');
+        $medium_list = Medium_model::find($request->medium_id);
         return response()->json(['medium_list' => $medium_list]);
     }
     function medium_update(Request $request)

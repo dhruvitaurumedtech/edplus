@@ -133,7 +133,7 @@ class InstituteApiController extends Controller
                             $standardids .= 0;
                             $standardids = $standardidget->pluck('standard')->toArray();
                             $standard_array = Standard_model::whereIN('id', $standardids)
-                            ->get();
+                                ->get();
 
 
                             $standard = [];
@@ -1757,7 +1757,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'exam_id' => 'required',
-            'batch_id'=> 'required',
+            'batch_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -1782,7 +1782,7 @@ class InstituteApiController extends Controller
             $exam_id = $request->exam_id;
             $batch_id = $request->batch_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-            
+
             if (!empty($examdt)) {
 
                 $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
@@ -1800,16 +1800,16 @@ class InstituteApiController extends Controller
                     })
                     ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                     ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
-                    
-                    $studentsDET = [];
+
+                $studentsDET = [];
                 foreach ($studentDT as $stddt) {
                     $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
                     $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
                     $studentsDET[] = array(
                         'student_id' => $stddt->student_id,
                         'exam_id' => $request->exam_id,
-                        'batch_id'=>$request->batch_id,
-                        'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : '',
+                        'batch_id' => $request->batch_id,
+                        'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : 0,
                         'firstname' => $stddt->firstname,
                         'lastname' => $stddt->lastname,
                         'total_mark' => $examdt->total_mark,
