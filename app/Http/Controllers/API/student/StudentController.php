@@ -935,23 +935,22 @@ class StudentController extends Controller
                             //    'topics' => $topics);
                         }
                     }
-                            $category = array('id' => $catvd->id,
+                            $category[] = array('id' => $catvd->id,
                              'category_name' => $catvd->name,
                               'parent_category_id' => $catvd->vid, 
                               'parent_category_name' => $catvd->vname,
                                'topics' => $topics);
-                        if (!empty($chapter_id) && !empty($batch_response)) {
-                            $batch_response = [
-                                'batch_list' => $batch_response,
-                            ];
-                            $response = array_merge($batch_response, $category);
-                        } else {
-                            $response = $category; // Assign $category directly to $response
-                        }
-                        
-                    
                 }
 
+                if (!empty($chapter_id) && !empty($batch_response)) {
+                    $batch_response = [
+                        'batch_list' => $batch_response,
+                    ];
+                    $response = array_merge($batch_response, $category);
+                } else {
+                    $response = $category; // Assign $category directly to $response
+                }
+                
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
