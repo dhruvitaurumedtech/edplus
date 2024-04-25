@@ -879,8 +879,7 @@ class StudentController extends Controller
                         ->where('topic.video_category_id', $catvd->vid)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
-                        ->toSql();
-                        print_r($topicqry);exit;
+                        ->get();
                     // echo "<pre>";
                     // print_r($topicqry);
                     // exit;
