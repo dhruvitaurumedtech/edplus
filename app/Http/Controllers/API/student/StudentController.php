@@ -870,7 +870,7 @@ class StudentController extends Controller
                 // }
                 $topicqry=[];
                 foreach ($catgry as $catvd) {
-                    $batch_response = [];
+                    
                     $topics = []; 
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
@@ -926,6 +926,7 @@ class StudentController extends Controller
                             ->whereRaw("FIND_IN_SET($subject_id,subjects)")
                             ->select('*')
                             ->get();
+                            $batch_response = [];
                             foreach ($batch_list as $value) {
                                 $batch_response[] = [
                                     'batch_id' => $value->id,
