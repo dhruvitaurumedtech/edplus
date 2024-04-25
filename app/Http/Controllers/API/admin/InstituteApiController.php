@@ -1336,7 +1336,9 @@ class InstituteApiController extends Controller
                 $subjcts = Subject_model::whereIN('id', $subjids)->get();
                 $subjectslist = [];
                 foreach ($subjcts as $subDT) {
-                    $subjectslist[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => $subDT->image);
+                    $subjectslist[] = array('id' => $subDT->id,
+                     'name' => $subDT->name,
+                     'image' => asset($subDT->image));
                 }
 
                 $response_data = [
@@ -2371,7 +2373,7 @@ class InstituteApiController extends Controller
                     $stulist[] = array(
                         'id' => $stdDT->student_id,
                         'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
-                        'image' => $stdDT->image,
+                        'image' => asset($stdDT->image),
                         'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,
