@@ -2970,13 +2970,14 @@ class InstituteApiController extends Controller
                 $subjctslist = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
                     ->where('base_table.board', $request->board_id)
                     ->where('base_table.medium', $request->medium_id)
-                    ->where('base_table.standard', $request->standard_id)->get()->toarray();
+                    ->where('base_table.standard', $request->standard_id)
+                    ->select('subject')->get();
                 $allsub_response = [];
                 foreach ($subjctslist as $svalue) {
                     $allsub_response[] = [
-                        'id' => $svalue['id'],
-                        'name' => $svalue['name'],
-                        'image'=> asset($svalue['image']),
+                        'id' => $svalue->id,
+                        'name' => $svalue->name,
+                        'image'=> asset($svalue->image),
                     ];
                 }
                 return response()->json([
