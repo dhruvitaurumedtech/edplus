@@ -2976,7 +2976,7 @@ class InstituteApiController extends Controller
                     $allsub_response[] = [
                         'id' => $svalue['id'],
                         'name' => $svalue['name'],
-                        'image'=> $svalue['image'],
+                        'image'=> asset($svalue['image']),
                     ];
                 }
                 return response()->json([
