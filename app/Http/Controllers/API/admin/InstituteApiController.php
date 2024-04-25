@@ -1622,7 +1622,7 @@ class InstituteApiController extends Controller
                     ->where('board_sub.user_id', $user_id)
                     ->where('board_sub.institute_for_id', $inst_forsd->id)
                     ->select('board.*')
-                    ->distinct()->get();
+                    ->groupBy('board.id')->get();
                 $boards = [];
                 foreach ($board as $boardsdt) {
                     $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
