@@ -53,7 +53,8 @@ class InstituteApiController extends Controller
         $existingUser = User::where('token', $token)->first();
         if ($existingUser) {
 
-            $basinstitute = Base_table::where('status', 'active')->select('institute_for')->groupby('institute_for')->get();
+            $basinstitute = Base_table::where('status', 'active')
+            ->select('institute_for')->groupby('institute_for')->get();
             $institute_for_id = '';
             foreach ($basinstitute as $insvalue) {
                 $institute_for_id .= $insvalue->institute_for;

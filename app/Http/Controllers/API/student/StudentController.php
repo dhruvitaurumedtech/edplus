@@ -949,7 +949,8 @@ class StudentController extends Controller
                     $batch_response = [
                         'batch_list' => $batch_response,
                     ];
-                    $response = array_merge($batch_response, $category);
+                    //$response = array_merge($batch_response, $category);
+                    $response = array($batch_response, $category);
                 } else {
                     $response = $category; // Assign $category directly to $response
                 }
