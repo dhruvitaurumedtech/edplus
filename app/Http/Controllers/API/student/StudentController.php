@@ -876,7 +876,7 @@ class StudentController extends Controller
                             return $query->where('topic.chapter_id', $chapter_id);
                         })
                         ->where('topic.institute_id', $institute_id)
-                        ->where('topic.video_category_id', $catvd->vid)
+                        ->where('topic.video_category_id', $catvd->id)
                         ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                         ->orderByDesc('topic.created_at')
                         ->get();
