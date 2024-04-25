@@ -11,7 +11,6 @@
   <link rel="stylesheet" href="{{asset('front_asset/css/style.css')}}" />
   <link rel="stylesheet" href="{{asset('front_asset/css/responsive.css')}}" />
 </head>
-hihgi
 
 <body class="bg-gray">
   <div class="page-wrapper ">
