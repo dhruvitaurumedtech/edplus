@@ -870,6 +870,7 @@ class StudentController extends Controller
                 }
                 $topicqry=[];
                 foreach ($catgry as $catvd) {
+                    $topics = []; 
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
                         ->where('topic.subject_id', $subject_id)
@@ -937,14 +938,13 @@ class StudentController extends Controller
                             //    'topics' => $topics);
                         }
                     }
-                          
+                            $category[] = array('id' => $catvd->id,
+                             'category_name' => $catvd->name,
+                              'parent_category_id' => $catvd->vid, 
+                              'parent_category_name' => $catvd->vname,
+                               'topics' => $topics);
                 }
-                $category[] = array('id' => $catvd->id,
-                'category_name' => $catvd->name,
-                 'parent_category_id' => $catvd->vid, 
-                 'parent_category_name' => $catvd->vname,
-                  'topics' => $topics);
-
+                //  $catdata = array('response'=>$category);
                 if (!empty($chapter_id) && !empty($batch_response)) {
                     $batch_response = [
                         'batch_list' => $batch_response,
