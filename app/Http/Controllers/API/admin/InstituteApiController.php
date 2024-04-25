@@ -741,13 +741,15 @@ class InstituteApiController extends Controller
                 try {
                     $suadeed = Subject_sub::where('institute_id',$lastInsertedId)
                     ->where('subject_id',$value)->get();
-
-                    Subject_sub::create([
-                        'user_id' => $request->input('user_id'),
-                        'institute_id' => $lastInsertedId,
-                        'subject_id' => $value,
-                    ]);
+                    if(empty($suadeed)){
+                        Subject_sub::create([
+                            'user_id' => $request->input('user_id'),
+                            'institute_id' => $lastInsertedId,
+                            'subject_id' => $value,
+                        ]);
+                    }
                     
+
                 } catch (\Exception $e) {
 
                     Subject_sub::where('institute_id', $lastInsertedId)
