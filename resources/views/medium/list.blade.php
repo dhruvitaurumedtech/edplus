@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -220,9 +221,8 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var medium_id = this.getAttribute('data-user-id');
-          // var csrfToken = '{{ csrf_token() }}';
-          var baseUrl = '{{ url('
-          ') }}';
+          var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
           axios.post('/medium/edit', {
               medium_id: medium_id,
@@ -234,7 +234,6 @@
             .then(response => {
               var response_data = response.data.medium_list;
               var iconSrc = baseUrl + '/' + response_data.icon;
-              alert(iconSrc);
               $('#medium_id').val(response_data.id);
               $('#name').val(response_data.name);
               $('#old_icon').val(response_data.icon);
