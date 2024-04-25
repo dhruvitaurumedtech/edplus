@@ -909,7 +909,11 @@ class StudentController extends Controller
                                     "status" => True
                                 );
                                 //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
-                                $category[] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+                                // $category[] = array('id' => $catvd->id, 
+                                // 'category_name' => $catvd->name, 
+                                // 'parent_category_id' => $catvd->vid,
+                                //  'parent_category_name' => $catvd->vname,
+                                //  'topics' => $topics);
                             }
                         } else {
                             $topics[] = array(
@@ -924,13 +928,18 @@ class StudentController extends Controller
                                 "status" => false,
                             );
                             //$category[$catvd->name] = array('id' => $catvd->id,
-                            $category[] = array('id' => $catvd->id,
+                            // $category[] = array('id' => $catvd->id,
+                            //  'category_name' => $catvd->name,
+                            //   'parent_category_id' => $catvd->vid, 
+                            //   'parent_category_name' => $catvd->vname,
+                            //    'topics' => $topics);
+                        }
+                    }
+                            $category = array('id' => $catvd->id,
                              'category_name' => $catvd->name,
                               'parent_category_id' => $catvd->vid, 
                               'parent_category_name' => $catvd->vname,
                                'topics' => $topics);
-                        }
-
                         if (!empty($chapter_id) && !empty($batch_response)) {
                             $batch_response = [
                                 'batch_list' => $batch_response,
@@ -940,7 +949,7 @@ class StudentController extends Controller
                             $response = $category; // Assign $category directly to $response
                         }
                         
-                    }
+                    
                 }
 
                 return response()->json([
