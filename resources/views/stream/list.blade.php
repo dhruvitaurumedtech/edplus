@@ -205,7 +205,7 @@
           var stream_id = this.getAttribute('data-user-id');
           var baseUrl = '{{ url('') }}';
 
-          axios.post(baseUrl + 'stream-edit', {
+          axios.post(baseUrl + '/stream-edit', {
               stream_id: stream_id
             })
             .then(response => {
