@@ -1617,12 +1617,16 @@ class InstituteApiController extends Controller
                 ->distinct()->get();
             $institute_fors = [];
             foreach ($institute_for as $inst_forsd) {
-                $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
-                    ->where('board_sub.institute_id', $institute_id)
-                    ->where('board_sub.user_id', $user_id)
-                    ->where('board_sub.institute_for_id', $inst_forsd->id)
-                    ->select('board.*')
-                    ->groupBy('board.id')->get();
+                $board = Board::join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
+                    $join->on('board.id', '=', 'board_sub.board_id')
+                         ->where('board_sub.institute_id', $institute_id)
+                         ->where('board_sub.user_id', $user_id)
+                         ->where('board_sub.institute_for_id', $inst_forsd->id);
+                })
+                ->whereNull('board.deleted_at')
+                ->select('board.*')
+                ->get();
+
                 $boards = [];
                 foreach ($board as $boardsdt) {
                     $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
