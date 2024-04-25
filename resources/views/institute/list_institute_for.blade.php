@@ -231,7 +231,7 @@
         var institute_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
 
-        axios.post('/institute-for/edit', {
+        axios.post(baseUrl + '/institute-for/edit', {
             institute_id: institute_id
           })
           .then(response => {
