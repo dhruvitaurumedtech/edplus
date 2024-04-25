@@ -71,9 +71,11 @@
                     </select>
                   </div>
                   <br>
-                  <a class="btn btn-success" id="addmore">
-                    <i class="fa fa-plus"></i>plus
-                  </a>
+                  <div class="d-flex justify-content-end mt-1">
+                    <a class="btn btn-primary addmore text-white">
+                      <i class="fa fa-plus"></i> plus
+                    </a>
+                  </div>
                   <br>
                   <div id="container">
                     <div class="col-md-12">
@@ -99,7 +101,9 @@
                       @enderror
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
+                  <div class="d-flex justify-content-end mt-3">
+                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                  </div>
               </form>
               <br>
               <br>
@@ -163,154 +167,157 @@
     </div>
     @include('layouts/footer_new')
   </div>
-      <!-- view chapters -->
-      <div class="modal fade" id="chaptersModal" tabindex="-1" aria-labelledby="chaptersModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="chaptersModalLabel">Chapters</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
-            </div>
-            <div class="modal-body">
-              <table class="table table-js table-bordered table-responsive">
-                <thead>
-                  <tr>
-                    <th>Chapter No.</th>
-                    <th>Chapter Name</th>
-                    <th>Chapter Image</th>
-                  </tr>
-                </thead>
-                <tbody id="chapterdata">
-
-                </tbody>
-              </table>
-            </div>
-
-          </div>
+  <!-- view chapters -->
+  <div class="modal fade" id="chaptersModal" tabindex="-1" aria-labelledby="chaptersModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="chaptersModalLabel">Chapters</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
         </div>
+        <div class="modal-body">
+          <table class="table table-js table-bordered table-responsive">
+            <thead>
+              <tr>
+                <th>Chapter No.</th>
+                <th>Chapter Name</th>
+                <th>Chapter Image</th>
+              </tr>
+            </thead>
+            <tbody id="chapterdata">
+
+            </tbody>
+          </table>
+        </div>
+
       </div>
-      <!-- end chapter view -->
-      <script>
-        //view chapter
-        document.querySelectorAll('.viewButton').forEach(function(button) {
-          button.addEventListener('click', function() {
-            var subject_id = this.getAttribute('data-subject-id');
-            var base_id = this.getAttribute('data-base-id');
+    </div>
+  </div>
+  <!-- end chapter view -->
+  <script>
+    //view chapter
+    document.querySelectorAll('.viewButton').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var subject_id = this.getAttribute('data-subject-id');
+        var base_id = this.getAttribute('data-base-id');
 
-            axios.post('chapter-list', {
-                subject_id: subject_id,
-                base_id: base_id
-              })
-              .then(response => {
-                var chapterdata = document.getElementById('chapterdata');
-                chapterdata.innerHTML = ''; // Clear existing 
+        axios.post('chapter-list', {
+            subject_id: subject_id,
+            base_id: base_id
+          })
+          .then(response => {
+            var chapterdata = document.getElementById('chapterdata');
+            chapterdata.innerHTML = ''; // Clear existing 
 
-                response.data.chapters.forEach(function(chapter) {
-                  var tr = document.createElement('tr');
+            response.data.chapters.forEach(function(chapter) {
+              var tr = document.createElement('tr');
 
-                  // Create a new table data (<td>) for chapter number
-                  var tdChapterNo = document.createElement('td');
-                  tdChapterNo.textContent = chapter.chapter_no;
-                  tr.appendChild(tdChapterNo);
-                  var tdChapterName = document.createElement('td');
-                  tdChapterName.textContent = chapter.chapter_name;
-                  tr.appendChild(tdChapterName);
-                  var tdChapterImage = document.createElement('td');
-                  var img = document.createElement('img');
-                  img.src = '{{ asset('
-                  ') }}' + chapter.chapter_image;
-                  img.alt = chapter.chapter_name;
-                  img.style.width = '70px'; // Example width
-                  img.style.height = '70px'; // Example height
-                  tdChapterImage.appendChild(img);
-                  tr.appendChild(tdChapterImage);
-                  chapterdata.appendChild(tr);
-                });
-                $('#chaptersModal').modal('show');
+              // Create a new table data (<td>) for chapter number
+              var tdChapterNo = document.createElement('td');
+              tdChapterNo.textContent = chapter.chapter_no;
+              tr.appendChild(tdChapterNo);
+              var tdChapterName = document.createElement('td');
+              tdChapterName.textContent = chapter.chapter_name;
+              tr.appendChild(tdChapterName);
+              var tdChapterImage = document.createElement('td');
+              var img = document.createElement('img');
+              img.src = '{{ asset('
+              ') }}' + chapter.chapter_image;
+              img.alt = chapter.chapter_name;
+              img.style.width = '70px'; // Example width
+              img.style.height = '70px'; // Example height
+              tdChapterImage.appendChild(img);
+              tr.appendChild(tdChapterImage);
+              chapterdata.appendChild(tr);
+            });
+            $('#chaptersModal').modal('show');
 
-              })
-              .catch(error => {
-                console.error(error);
-              });
+          })
+          .catch(error => {
+            console.error(error);
           });
-        });
-      </script>
-      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+      });
+    });
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
 
-      <script>
-        $(document).ready(function() {
+  <script>
+    $(document).ready(function() {
 
-          $('#standard_id').on('change', function() {
-            var standard_id = $(this).val();
-            axios.post('chapter/get-subject', {
-                standard_id: standard_id,
-              })
-              .then(function(response) {
+      $('#standard_id').on('change', function() {
+        var standard_id = $(this).val();
+        axios.post('chapter/get-subject', {
+            standard_id: standard_id,
+          })
+          .then(function(response) {
 
-                var secondDropdown = document.getElementById('subject');
-                secondDropdown.innerHTML = ''; // Clear existing options
+            var secondDropdown = document.getElementById('subject');
+            secondDropdown.innerHTML = ''; // Clear existing options
 
-                secondDropdown.appendChild(new Option('Select Subject', ''));
+            secondDropdown.appendChild(new Option('Select Subject', ''));
 
-                response.data.subject.forEach(function(subjects) {
-                  var option = new Option(subjects.name, subjects.id);
-                  secondDropdown.appendChild(option);
-                });
-              })
-              .catch(function(error) {
-                console.error(error);
-              });
+            response.data.subject.forEach(function(subjects) {
+              var option = new Option(subjects.name, subjects.id);
+              secondDropdown.appendChild(option);
+            });
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        });
+      });
+    });
 
-        //add more
+    //add more
 
-        $(document).ready(function() {
-          var maxFields = 10; // Maximum number of input fields
-          var addButton = $('#addmore'); // Add button selector
-          var container = $('#container'); // Container selector
+    $(document).ready(function() {
+      var maxFields = 10; // Maximum number of input fields
+      var addButton = $('.addmore'); // Add button selector
+      var container = $('#container'); // Container selector
 
-          var x = 1; // Initial input field counter
+      var x = 1; // Initial input field counter
+      $(container).on('click', '#delete', function() {
+        $(this).parent().remove(); // Remove the parent element containing the input fields
+        x--; // Decrement the field counter
+      });
+      // Triggered on click of add button
+      $(addButton).click(function() {
+        // Check maximum number of input fields
+        if (x < maxFields) {
+          x++; // Increment field counter
+          // Add input field
+          $(container).append(
+            '<div class="col-md-12">' +
+            '<label for="chapter_no">Chapter Number : </label>' +
+            '<input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">' +
+            '@error('
+            chapter_no + x ')' +
+            '<div class="text-danger">{{ $message }}</div>' +
+            '@enderror' +
+            '</div>' +
+            '<div class="col-md-12">' +
+            '<label for="chapter_name">Chapter Name : </label>' +
+            '<input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">' +
+            '@error('
+            chapter_name + x ')' +
+            '<div class="text-danger">{{ $message }}</div>' +
+            '@enderror' +
+            '</div>' +
 
-          // Triggered on click of add button
-          $(addButton).click(function() {
-            // Check maximum number of input fields
-            if (x < maxFields) {
-              x++; // Increment field counter
-              // Add input field
-              $(container).append(
-                '<div class="col-md-12">' +
-                '<label for="chapter_no">Chapter Number : </label>' +
-                '<input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">' +
-                '@error('
-                chapter_no + x ')' +
-                '<div class="text-danger">{{ $message }}</div>' +
-                '@enderror' +
-                '</div>' +
-                '<div class="col-md-12">' +
-                '<label for="chapter_name">Chapter Name : </label>' +
-                '<input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">' +
-                '@error('
-                chapter_name + x ')' +
-                '<div class="text-danger">{{ $message }}</div>' +
-                '@enderror' +
-                '</div>' +
-
-                '<div class="col-md-12">' +
-                '<label for="chapter_image">Chapter Image : </label>' +
-                '<input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">' +
-                '@error('
-                chapter_image + x ')' +
-                '<div class="text-danger">{{ $message }}</div>' +
-                '@enderror' +
-                '</div><br><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>'
-              );
-            } else {
-              alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
-            }
-          });
-        });
-      </script>
+            '<div class="col-md-12">' +
+            '<label for="chapter_image">Chapter Image : </label>' +
+            '<input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">' +
+            '@error('
+            chapter_image + x ')' +
+            '<div class="text-danger">{{ $message }}</div>' +
+            '@enderror' +
+            '</div><br><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>'
+          );
+        } else {
+          alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+        }
+      });
+    });
+  </script>
 </body>
