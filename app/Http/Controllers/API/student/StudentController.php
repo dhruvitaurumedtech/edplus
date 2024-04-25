@@ -949,7 +949,8 @@ class StudentController extends Controller
                     // $batch_response = [
                     //     'batch_list' => $batch_response,
                     // ];
-                    $response = array('batch_list'=>$batch_response,$category);
+                    $response = array_merge($category,$batch_response);
+                    
                     
                 } else {
                     $response = $category; // Assign $category directly to $response
@@ -959,6 +960,7 @@ class StudentController extends Controller
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
                     'data' => $response,
+
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
