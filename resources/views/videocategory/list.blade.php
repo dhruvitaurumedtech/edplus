@@ -199,7 +199,7 @@
               var video_category_id = this.getAttribute('data-user-id');
               var baseUrl = '{{ url('') }}';
 
-              axios.post(baseUrl + 'video-category-edit', {
+              axios.post(baseUrl + '/video-category-edit', {
                   video_category_id: video_category_id
                 })
                 .then(response => {
