@@ -291,8 +291,9 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var anouncement_id = this.getAttribute('data-user-id');
+                        var baseUrl = '{{ url('') }}';
 
-                        axios.post('/announcement/edit', {
+                        axios.post(baseUrl + '/announcement/edit', {
                                 anouncement_id: anouncement_id
                             })
                             .then(response => {

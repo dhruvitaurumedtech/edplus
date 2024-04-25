@@ -198,8 +198,9 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var standard_id = this.getAttribute('data-user-id');
+          var baseUrl = '{{ url('') }}';
 
-          axios.post('/standard-list/edit', {
+          axios.post(baseUrl +'/standard-list/edit', {
               standard_id: standard_id
             })
             .then(response => {

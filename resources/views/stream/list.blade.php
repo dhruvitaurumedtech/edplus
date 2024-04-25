@@ -203,8 +203,9 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var stream_id = this.getAttribute('data-user-id');
+          var baseUrl = '{{ url('') }}';
 
-          axios.post('stream-edit', {
+          axios.post(baseUrl + '/stream-edit', {
               stream_id: stream_id
             })
             .then(response => {

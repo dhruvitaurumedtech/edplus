@@ -218,7 +218,7 @@
           button.addEventListener('click', function() {
             var banner_id = this.getAttribute('data-user-id');
             var baseUrl = $('meta[name="base-url"]').attr('content');
-            axios.post('/banner/edit', {
+            axios.post(baseUrl + '/banner/edit', {
                 banner_id: banner_id
               })
               .then(response => {

@@ -227,9 +227,9 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var board_id = this.getAttribute('data-user-id');
-        var baseUrl = $('meta[name="base-url"]').attr('content');
+        var baseUrl = '{{ url('') }}';
 
-        axios.post(baseUrl + 'board-edit', {
+        axios.post(baseUrl + '/board-edit', {
             board_id: board_id
           })
           .then(response => {
