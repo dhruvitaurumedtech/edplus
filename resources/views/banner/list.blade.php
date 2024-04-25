@@ -223,11 +223,11 @@
 
                 var reponse_data = response.data.banner_list;
                 var iconSrc = baseUrl + '/' + reponse_data.banner_image;
-
+                alert(iconSrc);
                 // var iconSrc = '{{ asset('
                 // ') }}' + reponse_data.banner_image;
                 $('#banner_id').val(reponse_data.id);
-                $('#banner_image').attr('src', iconSrc);
+                $('#banner_image_preview').attr('src', iconSrc);
                 $('#old_banner_image').val(reponse_data.banner_image);
                 $('#status').val(reponse_data.status);
                 $('#usereditModal').modal('show');
