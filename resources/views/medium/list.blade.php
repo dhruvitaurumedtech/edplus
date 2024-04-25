@@ -205,7 +205,7 @@
 
                     </div>
                   </div>
-                  <div class="card-footer">
+                  <div class="d-flex justify-content-end">
                     <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
                   </div>
               </div>
@@ -224,7 +224,7 @@
           var baseUrl = $('meta[name="base-url"]').attr('content');
 
 
-          axios.post('/medium/edit', {
+          axios.post(baseUrl + '/medium/edit', {
               medium_id: medium_id,
             }, {
               // headers: {

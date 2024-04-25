@@ -206,7 +206,7 @@
 
                   </div>
                 </div>
-                <div class="card-footer">
+                <div class="d-flex justify-content-end">
                   <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
                 </div>
               </form>
@@ -223,7 +223,7 @@
             var class_id = this.getAttribute('data-user-id');
             var baseUrl = $('meta[name="base-url"]').attr('content');
 
-            axios.post('/class-list/edit', {
+            axios.post(baseUrl + '/class-list/edit', {
                 class_id: class_id
               })
               .then(response => {

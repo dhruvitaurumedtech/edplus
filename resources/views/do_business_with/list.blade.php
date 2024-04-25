@@ -231,8 +231,9 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var id = this.getAttribute('data-user-id');
+        var baseUrl = '{{ url('') }}';
 
-        axios.post('/do-business-with/edit', {
+        axios.post(baseUrl +'/do-business-with/edit', {
             id: id
           })
           .then(response => {

@@ -279,7 +279,8 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var id = this.getAttribute('data-user-id');
-                        axios.post('video-timelimit-edit', {
+                        var baseUrl = '{{ url('') }}';
+                        axios.post(baseUrl + 'video-timelimit-edit', {
                                 id: id
                             })
                             .then(response => {

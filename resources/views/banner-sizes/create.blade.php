@@ -122,8 +122,9 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var bannerId = this.getAttribute('data-banner-id');
+                        var baseUrl = '{{ url('') }}';
 
-                        axios.post('/banner-sizes/edit', {
+                        axios.post(baseUrl +'/banner-sizes/edit', {
                                 banner_id: bannerId
                             })
                             .then(response => {
