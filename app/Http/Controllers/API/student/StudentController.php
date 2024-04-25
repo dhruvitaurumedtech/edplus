@@ -853,7 +853,7 @@ class StudentController extends Controller
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-                $batch_response = [];
+                
 
                 // if ($existingUser->role_type != 6) {
                 //     $batch_list = Batches_model::where('institute_id', $institute_id)
@@ -870,6 +870,7 @@ class StudentController extends Controller
                 // }
                 $topicqry=[];
                 foreach ($catgry as $catvd) {
+                    $batch_response = [];
                     $topics = []; 
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
