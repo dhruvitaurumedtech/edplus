@@ -1336,7 +1336,9 @@ class InstituteApiController extends Controller
                 $subjcts = Subject_model::whereIN('id', $subjids)->get();
                 $subjectslist = [];
                 foreach ($subjcts as $subDT) {
-                    $subjectslist[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => $subDT->image);
+                    $subjectslist[] = array('id' => $subDT->id,
+                     'name' => $subDT->name,
+                     'image' => asset($subDT->image));
                 }
 
                 $response_data = [
@@ -1611,14 +1613,20 @@ class InstituteApiController extends Controller
             $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
                 ->where('institute_for_sub.institute_id', $institute_id)
                 ->where('institute_for_sub.user_id', $user_id)
-                ->select('institute_for.*')->get();
+                ->select('institute_for.*')
+                ->distinct()->get();
             $institute_fors = [];
             foreach ($institute_for as $inst_forsd) {
-                $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
-                    ->where('board_sub.institute_id', $institute_id)
-                    ->where('board_sub.user_id', $user_id)
-                    ->where('board_sub.institute_for_id', $inst_forsd->id)
-                    ->select('board.*')->get();
+                $board = Board::join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
+                    $join->on('board.id', '=', 'board_sub.board_id')
+                         ->where('board_sub.institute_id', $institute_id)
+                         ->where('board_sub.user_id', $user_id)
+                         ->where('board_sub.institute_for_id', $inst_forsd->id);
+                })
+                ->whereNull('board.deleted_at')
+                ->select('board.*')
+                ->get();
+
                 $boards = [];
                 foreach ($board as $boardsdt) {
                     $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
@@ -1626,7 +1634,8 @@ class InstituteApiController extends Controller
                         ->where('medium_sub.user_id', $user_id)
                         ->where('medium_sub.institute_for_id', $inst_forsd->id)
                         ->where('medium_sub.board_id', $boardsdt->id)
-                        ->select('medium.*')->get();
+                        ->select('medium.*')
+                        ->distinct()->get();
                     $mediums = [];
                     foreach ($medium as $mediumdt) {
                         $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
@@ -1635,7 +1644,8 @@ class InstituteApiController extends Controller
                             ->where('class_sub.institute_for_id', $inst_forsd->id)
                             ->where('class_sub.board_id', $boardsdt->id)
                             ->where('class_sub.medium_id', $mediumdt->id)
-                            ->select('class.*')->get();
+                            ->select('class.*')
+                            ->distinct()->get();
                         $classs = [];
                         foreach ($class as $classdt) {
 
@@ -1646,7 +1656,8 @@ class InstituteApiController extends Controller
                                 ->where('standard_sub.board_id', $boardsdt->id)
                                 ->where('standard_sub.medium_id', $mediumdt->id)
                                 ->where('standard_sub.class_id', $classdt->id)
-                                ->select('standard.*')->get();
+                                ->select('standard.*')
+                                ->distinct()->get();
 
                             $standards = [];
                             foreach ($standard as $standarddt) {
@@ -1658,7 +1669,8 @@ class InstituteApiController extends Controller
                                     ->where('stream_sub.board_id', $boardsdt->id)
                                     ->where('stream_sub.medium_id', $mediumdt->id)
                                     ->where('stream_sub.class_id', $classdt->id)
-                                    ->select('stream.*')->get();
+                                    ->select('stream.*')
+                                    ->distinct()->get();
                                 $streams = [];
                                 foreach ($stream as $streamdt) {
                                     $streams[] = array(
@@ -1679,7 +1691,8 @@ class InstituteApiController extends Controller
                                     ->where('subject_sub.institute_id', $institute_id)
                                     ->where('subject_sub.user_id', $user_id)
                                     ->whereIN('subject.base_table_id', $batableids)
-                                    ->select('subject.*')->get();
+                                    ->select('subject.*')
+                                    ->distinct()->get();
                                 $subjects = [];
                                 foreach ($subject as $subjectdt) {
 
@@ -1729,12 +1742,12 @@ class InstituteApiController extends Controller
 
             $alldata = array(
                 'institute_fors' => $institute_fors,
-                'boards' => $boards,
-                'mediums' => $mediums,
-                'classs' => $classs,
-                'streams' => $streams,
-                'subjects' => $subjects,
-                'standards' => $standards
+                // 'boards' => $boards,
+                // 'mediums' => $mediums,
+                // 'classs' => $classs,
+                // 'streams' => $streams,
+                // 'subjects' => $subjects,
+                // 'standards' => $standards
             );
 
             return response()->json([
@@ -2371,7 +2384,7 @@ class InstituteApiController extends Controller
                     $stulist[] = array(
                         'id' => $stdDT->student_id,
                         'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
-                        'image' => $stdDT->image,
+                        'image' => asset($stdDT->image),
                         'board_id' => $stdDT->board_id,
                         'board' => $stdDT->board . '(' . $stdDT->medium . ')',
                         'standard_id' => $stdDT->standard_id,
@@ -2924,6 +2937,64 @@ class InstituteApiController extends Controller
                     'status' => '200',
                     'message' => 'Data Fetch Successfully',
                     'data' => $batch_response
+                ]);
+            } catch (\Exception $e) {
+                return response()->json([
+                    'success' => 500,
+                    'message' => 'Server Error',
+                    'error' => $e->getMessage(),
+                ], 500);
+            }
+        } else {
+            return response()->json([
+                'status' => 400,
+                'message' => 'Invalid token.',
+            ]);
+        }
+    }
+
+    public function allsubjectList(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required',
+            //'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            $errorMessages = array_values($validator->errors()->all());
+            return response()->json([
+                'success' => 400,
+                'message' => 'Validation error',
+                'errors' => $errorMessages,
+            ], 400);
+        }
+        $token = $request->header('Authorization');
+        if (strpos($token, 'Bearer ') === 0) {
+            $token = substr($token, 7);
+        }
+        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+        if ($existingUser) {
+            try {
+                $subjctslist = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                    ->where('base_table.board', $request->board_id)
+                    ->where('base_table.medium', $request->medium_id)
+                    ->where('base_table.standard', $request->standard_id)
+                    ->select('subject.*')->get();
+                $allsub_response = [];
+                foreach ($subjctslist as $svalue) {
+                    $allsub_response[] = [
+                        'id' => $svalue->id,
+                        'name' => $svalue->name,
+                        'image'=> asset($svalue->image),
+                    ];
+                }
+                return response()->json([
+                    'status' => '200',
+                    'message' => 'Data Fetch Successfully',
+                    'data' => $allsub_response
                 ]);
             } catch (\Exception $e) {
                 return response()->json([
