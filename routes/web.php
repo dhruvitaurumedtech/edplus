@@ -153,7 +153,9 @@ Route::middleware('auth')->group(function () {
     Route::post('subject/update', [SubjectController::class, 'subject_update'])->name('subject.update');
 
     //chapter
-    Route::get('add-lists', [ChapterController::class, 'add_lists'])->name('chapter.list');
+    Route::get('add-lists', [ChapterController::class, 'add_lists'])->name('chapter.create');
+    Route::get('chapter-list', [ChapterController::class, 'chapter_list'])->name('chapter.list');
+
     Route::post('chapter/get-subject', [ChapterController::class, 'get_subjects']);
     Route::post('chapter-save', [ChapterController::class, 'chapter_save'])->name('chapter.save');
     Route::post('chapter-list', [ChapterController::class, 'chapter_lists']);

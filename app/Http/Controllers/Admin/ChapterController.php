@@ -44,7 +44,24 @@ class ChapterController extends Controller
 
         return view('chapter.create', compact('Standard'));
     }
+    public function chapter_list(Request $request)
+    {
+        $Standards = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id'
+            )
+            ->where('standard.status', 'active')->paginate(10);
 
+        $subjects = Subject_model::get();
+        return view('chapter.list', compact('Standards', 'subjects'));
+    }
     //strandard wise data
     public function get_subjects(Request $request)
     {
@@ -56,12 +73,15 @@ class ChapterController extends Controller
     //chapter_save
     public function chapter_save(Request $request)
     {
+        echo "<pre>";
+        print_r($request->all());
+        exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
-            'chapter_no.*' => 'required',
-            'chapter_name.*' => 'required',
-            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
+            'chapter_no' => 'required',
+            'chapter_name' => 'required',
+            'chapter_image' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
         ]);
 
         foreach ($request->chapter_name as $i => $chapterName) {
