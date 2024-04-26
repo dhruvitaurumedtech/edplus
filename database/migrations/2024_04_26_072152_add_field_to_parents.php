@@ -11,10 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('attendance', function (Blueprint $table) {
-
-            $table->unsignedBigInteger('subject_id')->after('student_id');
-            $table->unsignedBigInteger('batch_id')->after('student_id');
+        Schema::table('parents', function (Blueprint $table) {
+            $table->string('institute_id')->after('parent_id');
         });
     }
 
@@ -23,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('attendance', function (Blueprint $table) {
-            //
+        Schema::table('parents', function (Blueprint $table) {
+            $table->dropColumn('institute_id');
         });
     }
 };

@@ -40,6 +40,8 @@ use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
 
 class InstituteApiController extends Controller
 {
@@ -1739,6 +1741,8 @@ class InstituteApiController extends Controller
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
+
+                        Mail::to($request->email_id)->send(new WelcomeMail($data));
 
                         return response()->json([
                             'status' => 200,
