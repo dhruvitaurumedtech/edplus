@@ -1774,7 +1774,7 @@ class InstituteApiController extends Controller
                         $data = $reject_list->update(['status' => '1']);
 
                         $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
-                            ->where('student_id', $student_id)
+                            ->where('parents.student_id', $student_id)
                             ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
                             ->get();
                         foreach ($prnts as $prdetail) {
