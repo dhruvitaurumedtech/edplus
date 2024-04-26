@@ -57,7 +57,7 @@
                 <div class="card-body">
                   <div class="col-md-12">
                     <label for="standard_id">Standard : </label>
-                    <select class="form-control" name="standard_id" id="standard_id" onchange="getsubject()">
+                    <select class="form-control" name="standard_id" id="standard_id">
                       <option value=" ">Select Option</option>
                       @foreach($Standard as $stdval)
                       <option value="{{$stdval->base_id}}">{{$stdval->name .'('.$stdval->board.','.$stdval->medium.','.$stdval->stream.')'}}</option>

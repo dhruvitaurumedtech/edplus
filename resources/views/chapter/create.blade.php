@@ -47,26 +47,26 @@
 
                         <h3>Select Standard</h3>
                         <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect1">
-                                <option>Nursery</option>
-                                <option>KG</option>
-                                <option>LKG</option>
-                                <option>UKG</option>
+                            <select class="form-control" id="exampleFormControlSelect1" name="standard_id">
+                                <option value=" ">Select Option</option>
+                                @foreach($Standard as $stdval)
+                                <option value="{{$stdval->base_id}}">{{$stdval->name .'('.$stdval->board.','.$stdval->medium.','.$stdval->stream.')'}}</option>
+                                @endforeach
                             </select>
                         </div>
                         <h3>Subject</h3>
                         <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect2" placeholder="Subject Name">
+                            <select class="form-control" id="exampleFormControlSelect2" name="subject" placeholder="Subject Name">
                                 <option>Mathematics </option>
                             </select>
                         </div>
                         <h3>Chapter Number</h3>
                         <div class="search-box-2 form-group">
-                            <input type="search" name="search" placeholder="Chapter Number" class="form-control">
+                            <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
                         </div>
                         <h3>Chapter Name</h3>
                         <div class="search-box-2 form-group">
-                            <input type="search" name="search" placeholder="Chapter Name" class="form-control">
+                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
                         </div>
                         <h3>Chapter Image</h3>
                         <!-- <div class="input-group">
@@ -136,7 +136,7 @@
                   </div>
                   <h3>Chapter Image</h3>
                   <div class="file">
-                    <div class="input-group search-box-2">
+                    <div class="input-group search-bo   x-2">
                       <input type="text" class="form-control" placeholder="Chapter Image">
                       <div class="input-group-append">
                         <span class="btn_upload">
