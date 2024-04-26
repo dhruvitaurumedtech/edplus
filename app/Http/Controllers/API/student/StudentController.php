@@ -369,7 +369,7 @@ class StudentController extends Controller
                             'id' => $parnsad->id
                         ];
 
-                        Mail::to($tomail)->send(new WelcomeMail($data));
+                        //Mail::to($tomail)->send(new WelcomeMail($data));
                     }
                 }
 
