@@ -1163,123 +1163,210 @@ class InstituteApiController extends Controller
             ], 500);
         }
     }
-    function get_homescreen_first(Request $request)
+    // function get_homescreen_first(Request $request)
+    // {
+
+    //     $institute_id = $request->input('institute_id');
+    //     $user_id = $request->input('user_id');
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $perPage = $request->input('per_page', 10);
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->input('user_id'))->first();
+
+    //     if ($existingUser) {
+    //         if (empty($institute_id)) {
+    //             $institute_id = Institute_detail::where('user_id', $user_id)->select('id')->first();
+    //         }
+    //         // Institute_detail::where();
+    //         $boarids = Institute_board_sub::where('user_id', $user_id)
+    //             ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+    //         $uniqueBoardIds = array_unique($boarids);
+
+    //         $board_list = DB::table('board')
+    //             ->whereIN('id', $uniqueBoardIds)
+    //             ->get();
+
+    //         $board_array = [];
+    //         foreach ($board_list as $board_value) {
+
+    //             $medium_sublist = DB::table('medium_sub')
+    //                 ->where('user_id', $user_id)
+    //                 ->where('board_id', $board_value->id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->pluck('medium_id')->toArray();
+    //             $uniquemediumds = array_unique($medium_sublist);
+
+    //             $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+    //             $medium_array = [];
+    //             foreach ($medium_list as $medium_value) {
+    //                 $medium_array[] = [
+    //                     'id' => $medium_value->id,
+    //                     'medium_name' => $medium_value->name,
+    //                     'medium_icon' => asset($medium_value->icon)
+    //                 ];
+    //             }
+    //             $board_array[] = [
+    //                 'id' => $board_value->id,
+    //                 'board_name' => $board_value->name,
+    //                 'board_icon' => asset($board_value->icon),
+    //                 'medium' => $medium_array,
+
+    //                 // Include banner_array inside board_array
+    //             ];
+    //         }
+    //         $banner_list = Banner_model::where('user_id', $user_id)
+    //             ->where('institute_id', $institute_id)
+    //             ->get();
+    //         if ($banner_list->isEmpty()) {
+    //             $banner_list = Banner_model::where('status', 'active')
+    //                 ->where('user_id', '1')
+    //                 ->get();
+    //         }
+    //         $banner_array = [];
+
+    //         foreach ($banner_list as $value) {
+    //             $banner_array[] = [
+    //                 'id' => $value->id,
+    //                 'banner_image' => asset($value->banner_image),
+    //                 'url' => $value->url . '',
+    //             ];
+    //         }
+
+    //         //announcement
+    //         $announcement = [];
+    //         $fifteenDaysAgo = Carbon::now()->subDays(15);
+
+    //         // $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
+    //         // foreach ($announcement_list as $value) {
+    //         //     $announcement = [
+    //         //         'title' => $value['title'],
+    //         //         'message' => $value['detail']
+    //         //     ];
+    //         // }
+
+    //         $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
+    //             ->where('created_at', '>=', $fifteenDaysAgo)
+    //             ->orderBy('created_at', 'desc')->paginate($perPage);
+    //         foreach ($announcement_list as $value) {
+    //             $announcement[] = array(
+    //                 'title' => $value['title'],
+    //                 'announcement' => $value['announcement'],
+    //                 'created_at' => $value['created_at']
+    //             );
+    //         }
+
+    //         $response = [
+    //             'banner' => $banner_array,
+    //             'board' => $board_array,
+    //             'announcement' => $announcement
+    //         ];
+    //         return response()->json([
+    //             'success' => 200,
+    //             'message' => 'Fetch Board successfully',
+    //             // 'banner' => $banner_array,
+    //             'data' => $response,
+    //         ], 200);
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
+    public function get_homescreen_first(Request $request)
     {
-
-        $institute_id = $request->input('institute_id');
-        $user_id = $request->input('user_id');
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
+        try {
+            $user_id = Auth::id();
+            $perPage = $request->input('per_page', 10);
+            // Fetch institute_id if empty
+            $institute_id = $request->institute_id ?: Institute_detail::where('user_id', $user_id)->value('id');
 
-        $perPage = $request->input('per_page', 10);
+            // Fetch unique board ids
+            $uniqueBoardIds = Institute_board_sub::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->distinct()
+                ->pluck('board_id')
+                ->toArray();
 
-        $existingUser = User::where('token', $token)->where('id', $request->input('user_id'))->first();
-
-        if ($existingUser) {
-            if (empty($institute_id)) {
-                $institute_id = Institute_detail::where('user_id', $user_id)->select('id')->first();
-            }
-            // Institute_detail::where();
-            $boarids = Institute_board_sub::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
-            $uniqueBoardIds = array_unique($boarids);
-
-            $board_list = DB::table('board')
-                ->whereIN('id', $uniqueBoardIds)
-                ->get();
+            // Fetch board details
+            $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name', 'icon']);
 
             $board_array = [];
-            foreach ($board_list as $board_value) {
+            foreach ($board_list as $board) {
+                $medium_list = Medium_model::whereIn('id', function ($query) use ($user_id, $institute_id, $board) {
+                    $query->select('medium_id')
+                        ->from('medium_sub')
+                        ->where('user_id', $user_id)
+                        ->where('board_id', $board->id)
+                        ->where('institute_id', $institute_id);
+                })->get(['id', 'name', 'icon']);
 
-                $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $user_id)
-                    ->where('board_id', $board_value->id)
-                    ->where('institute_id', $institute_id)
-                    ->pluck('medium_id')->toArray();
-                $uniquemediumds = array_unique($medium_sublist);
-
-                $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-
-                $medium_array = [];
-                foreach ($medium_list as $medium_value) {
-                    $medium_array[] = [
-                        'id' => $medium_value->id,
-                        'medium_name' => $medium_value->name,
-                        'medium_icon' => asset($medium_value->icon)
+                $medium_array = $medium_list->map(function ($medium) {
+                    return [
+                        'id' => $medium->id,
+                        'medium_name' => $medium->name,
+                        'medium_icon' => asset($medium->icon)
                     ];
-                }
-                $board_array[] = [
-                    'id' => $board_value->id,
-                    'board_name' => $board_value->name,
-                    'board_icon' => asset($board_value->icon),
-                    'medium' => $medium_array,
+                })->toArray();
 
+                $board_array[] = [
+                    'id' => $board->id,
+                    'board_name' => $board->name,
+                    'board_icon' => asset($board->icon),
+                    'medium' => $medium_array,
                     // Include banner_array inside board_array
                 ];
             }
-            $banner_list = Banner_model::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
-                ->get();
-            if ($banner_list->isEmpty()) {
-                $banner_list = Banner_model::where('status', 'active')
-                    ->where('user_id', '1')
-                    ->get();
-            }
-            $banner_array = [];
 
-            foreach ($banner_list as $value) {
-                $banner_array[] = [
-                    'id' => $value->id,
-                    'banner_image' => asset($value->banner_image),
-                    'url' => $value->url . '',
+            // Fetch banners
+            $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
+                $query->where('user_id', $user_id)
+                    ->where('institute_id', $institute_id);
+            })
+                ->orWhere('status', 'active')
+                ->where('user_id', 1)
+                ->get(['id', 'banner_image', 'url']);
+
+            $banner_array = $banner_list->map(function ($banner) {
+                return [
+                    'id' => $banner->id,
+                    'banner_image' => asset($banner->banner_image),
+                    'url' => $banner->url ?? ''
                 ];
-            }
+            })->toArray();
 
-            //announcement
-            $announcement = [];
-            $fifteenDaysAgo = Carbon::now()->subDays(15);
-
-            // $announcement_list = announcements_model::where('institute_id', $institute_id)->where('created_at', '>=', $fifteenDaysAgo)->orderBy('created_at', 'desc')->get()->toarray();
-            // foreach ($announcement_list as $value) {
-            //     $announcement = [
-            //         'title' => $value['title'],
-            //         'message' => $value['detail']
-            //     ];
-            // }
-
+            // Fetch announcements
             $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
-                ->where('created_at', '>=', $fifteenDaysAgo)
-                ->orderBy('created_at', 'desc')->paginate($perPage);
-            foreach ($announcement_list as $value) {
-                $announcement[] = array(
-                    'title' => $value['title'],
-                    'announcement' => $value['announcement'],
-                    'created_at' => $value['created_at']
-                );
-            }
+                ->where('created_at', '>=', now()->subDays(15))
+                ->orderBy('created_at', 'desc')
+                ->paginate($perPage, ['title', 'announcement', 'created_at']);
 
+            $announcement = $announcement_list->toArray()['data'];
             $response = [
                 'banner' => $banner_array,
                 'board' => $board_array,
-                'announcement' => $announcement
+                'announcement' => $announcement,
             ];
-            return response()->json([
-                'success' => 200,
-                'message' => 'Fetch Board successfully',
-                // 'banner' => $banner_array,
-                'data' => $response,
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+            return $this->response($response, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
 
     public function get_homescreen_second(Request $request)
     {
@@ -1665,8 +1752,8 @@ class InstituteApiController extends Controller
                 $batch_id = $request->batch_id;
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
-                
-                
+
+
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -1742,19 +1829,20 @@ class InstituteApiController extends Controller
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
+                        
 
-                        $prnts = Parents::join('users','users.id','parents.parent_id')
-                        ->where('student_id',$student_id)
-                        ->select('users.firstname','users.lastname','users.email','parents.id')
-                        ->get();
-                        foreach($prnts as $prdetail){
-                            $parDT = ['name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
-                            'email' => $prdetail,
-                            'id' => $prdetail->id];
-                            Mail::to($request->email_id)->send(new WelcomeMail($parDT));
+                        $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
+                            ->where('parents.student_id', $student_id)
+                            ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
+                            ->get();
+                        foreach ($prnts as $prdetail) {
+                            $parDT = [
+                                'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+                                'email' => $prdetail,
+                                'id' => $prdetail->id
+                            ];
+                            Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
-                        
-                        
 
                         return response()->json([
                             'status' => 200,
@@ -2979,65 +3067,82 @@ class InstituteApiController extends Controller
             ]);
         }
     }
-    //category list for add do business with 
+    // category list for add do business with 
+    // public function category_list(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+
+    //             $vcategory = VideoCategory::where('status', 'active')->get();
+
+    //             $cat_array = [];
+    //             foreach ($vcategory as $cat_value) {
+    //                 $cat_array[] = array(
+    //                     'id' => $cat_value->id,
+    //                     'name' => $cat_value->name
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Data Fetch Successfully',
+    //                 'data' => $cat_array
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     public function category_list(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
-        }
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-
-                $vcategory = VideoCategory::where('status', 'active')->get();
-
-                $cat_array = [];
-                foreach ($vcategory as $cat_value) {
-                    $cat_array[] = array(
-                        'id' => $cat_value->id,
-                        'name' => $cat_value->name
-                    );
-                }
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $cat_array
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+        try {
+            $user = Auth::user();
+            $vcategory = VideoCategory::where('status', 'active')->get();
+            $cat_array = [];
+            foreach ($vcategory as $cat_value) {
+                $cat_array[] = array(
+                    'id' => $cat_value->id,
+                    'name' => $cat_value->name
+                );
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($cat_array, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
     //create batch
     public function create_batch(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',

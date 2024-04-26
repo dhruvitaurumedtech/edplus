@@ -161,53 +161,85 @@ class AuthController extends Controller
     //     return response()->json($responseData);
     // }
 
+    // public function verify_otp12(Request $request)
+    // {
+    //     $phone = $request->input('mobile');
+    //     $otp_num = $request->input('otp_num');
+
+    //     $user = DB::table('users')->where('mobile', $phone)->get();
+
+    //     if ($user->count() > 0) {
+
+    //         $otp_check = DB::table('users')->where('otp_num', $otp_num)->get();
+
+    //         if ($otp_check->isNotEmpty()) {
+    //             if (!empty($user->photo)) {
+    //                 $photo = asset('profile/' . $user->image);
+    //             } else {
+    //                 $photo = asset('profile/image.jpg');
+    //             }
+    //             foreach ($user as $value) {
+    //                 $data = array(
+    //                     'user_id' => $value->id,
+    //                     'user_name' => $value->firstname . ' ' . $value->lastname,
+    //                     'mobile_no' => $value->mobile,
+    //                     'user_email' => $value->email,
+    //                     'user_image' => $photo,
+    //                     'role_type' => $value->role_type,
+    //                     'token' => $value->token
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Registered successfully',
+    //                 'data' => $data
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid OTP.',
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'This mobile_no does not already exists.',
+
+    //         ]);
+    //     }
+    // }
+
     public function verify_otp(Request $request)
     {
-        $phone = $request->input('mobile');
-        $otp_num = $request->input('otp_num');
+        try {
+            $user = User::where('mobile', $request->mobile)
+                ->where('otp_num', $request->otp_num)
+                ->first();
 
-        $user = DB::table('users')->where('mobile', $phone)->get();
-
-        if ($user->count() > 0) {
-
-            $otp_check = DB::table('users')->where('otp_num', $otp_num)->get();
-
-            if ($otp_check->isNotEmpty()) {
-                if (!empty($user->photo)) {
-                    $photo = asset('profile/' . $user->image);
+            if ($user) {
+                $data = [
+                    'user_id' => $user->id,
+                    'user_name' => $user->firstname . ' ' . $user->lastname,
+                    'mobile_no' => $user->mobile,
+                    'user_email' => $user->email,
+                    'user_image' => $user->image,
+                    'role_type' => (int)$user->role_type,
+                    'token' => $user->token
+                ];
+                if ($user->mobile == $request->mobile && $user->otp_num == $request->otp_num) {
+                    return $this->response($data, "OTP verification successful");
                 } else {
-                    $photo = asset('profile/image.jpg');
+                    return $this->response([], "Mobile number and OTP do not match", false, 400);
                 }
-                foreach ($user as $value) {
-                    $data = array(
-                        'user_id' => $value->id,
-                        'user_name' => $value->firstname . ' ' . $value->lastname,
-                        'mobile_no' => $value->mobile,
-                        'user_email' => $value->email,
-                        'user_image' => $photo,
-                        'role_type' => (int)$value->role_type,
-                        'token' => $value->token
-                    );
-                }
-                return response()->json([
-                    'status' => true,
-                    'message' => 'Registered successfully',
-                    'data' => $data
-                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid OTP.',
-                ]);
+                return $this->response([], "User not found or OTP incorrect", false, 400);
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'This mobile_no does not already exists.',
-
-            ]);
+        } catch (Exception $e) {
+            return $this->response([], "Something went wrong!", false, 400);
         }
     }
+
+
     protected function createNewToken($token)
     {
         return response()->json([
