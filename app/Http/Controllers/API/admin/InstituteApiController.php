@@ -1663,7 +1663,7 @@ class InstituteApiController extends Controller
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
                 
-
+                
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
