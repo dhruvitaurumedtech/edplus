@@ -1,21 +1,13 @@
 <link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
 </head>
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">Chapter List</h1>
         <ul>
@@ -26,7 +18,6 @@
           <li><a href="{{url('class-list')}}" class="active-link-dir">Chapter List</a></li>
         </ul>
       </div>
-
       <script>
         window.setTimeout(function() {
           $(".alert-success").slideUp(500, function() {
@@ -43,128 +34,70 @@
           @endif
         </div>
       </div>
-
       <div class="dashboard-content side-content">
 
         <div class="row">
-          <div class="col-lg-12">
-            <div class="institute-form">
-              <h3 class="card-title">Chapter</h3>
-
-              <form method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">
-                @csrf
-                <!-- /.card-header -->
-                <div class="card-body">
-                  <div class="col-md-12">
-                    <label for="standard_id">Standard : </label>
-                    <select class="form-control" name="standard_id" id="standard_id">
-                      <option value=" ">Select Option</option>
-                      @foreach($Standard as $stdval)
-                      <option value="{{$stdval->base_id}}">{{$stdval->name .'('.$stdval->board.','.$stdval->medium.','.$stdval->stream.')'}}</option>
-                      @endforeach
-                    </select>
-                  </div>
-                  <div class="col-md-12">
-                    <label for="subject">Subject : </label>
-                    <select class="form-control" name="subject" id="subject" on>
-                      <option value=" ">Select Option</option>
-                    </select>
-                  </div>
-                  <br>
-                  <div class="d-flex justify-content-end mt-1">
-                    <a class="btn btn-primary addmore text-white">
-                      <i class="fa fa-plus"></i> plus
-                    </a>
-                  </div>
-                  <br>
-                  <div id="container">
-                    <div class="col-md-12">
-                      <label for="chapter_no">Chapter Number : </label>
-                      <input type="text" name="chapter_no[]" id="chapter_no" class="form-control" placeholder="Enter Chapter Number">
-                      @error('chapter_no')
-                      <div class="text-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-                    <div class="col-md-12">
-                      <label for="chapter_name">Chapter Name : </label>
-                      <input type="text" name="chapter_name[]" id="chapter_name" class="form-control" placeholder="Enter Chapter Name">
-                      @error('chapter_name')
-                      <div class="text-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-
-                    <div class="col-md-12">
-                      <label for="chapter_image">Chapter Image : </label>
-                      <input type="file" name="chapter_image[]" id="chapter_image" class="form-control" placeholder="Select Chapter Image">
-                      @error('chapter_image')
-                      <div class="text-danger">{{ $message }}</div>
-                      @enderror
-                    </div>
-                  </div>
-                  <div class="d-flex justify-content-end mt-3">
-                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
-                  </div>
-              </form>
-              <br>
-              <br>
+          <!-- table -->
+          <div class="col-lg-12 mt-5">
+            <div class="create-title-btn">
+              <h4 class="mb-0">Chapter List</h4>
+              <a href="{{url('add-lists')}}" class="btn text-white btn-rmv2">Create Chapter</a>
             </div>
-          </div>
-          <div class="row">
-            <div class="col-lg-12">
-              <div class="institute-form">
-                <h3 class="card-title">Chapter</h3>
+            <table class="table table-responsive-sm table-bordered institute-table mt-4">
+              <thead>
+                <tr>
+                  <th scope="col">No</th>
+                  <th scope="col">Standard</th>
+                  <th scope="col">Subjects</th>
+                  <th scope="col">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                @php $i=1 @endphp
+                @foreach($Standards as $value)
+                <tr>
+                  <td>{{$i}}</td>
+                  <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
+                  <td>
+                    @foreach($subjects as $sbvalue)
+                    @if($sbvalue->base_table_id == $value->base_id)
+                    <div class="d-flex align-items-center">
+                      {{$sbvalue->name}}
 
-                <table class="table table-js table-bordered table-responsive">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">No</th>
-                      <th style="width: 250px">Standard</th>
-                      <th>Subject</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @php $i=1 @endphp
-                    @foreach($Standards as $value)
-                    <tr>
-                      <td>{{$i}}</td>
-                      <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
-                      <td>
-                        @foreach($subjects as $sbvalue)
-                        @if($sbvalue->base_table_id == $value->base_id)
-                        <div class="d-flex align-items-center">
-                          {{$sbvalue->name}}
-                          @canButton('edit', 'Subject')
-                          <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
-                          @endCanButton
-                          @canButton('view', 'Subject')
-                          <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View">&nbsp;&nbsp;
-                          @endCanButton
-                          @canButton('delete', 'Subject')
-                          <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete">
-                          @endCanButton
-                        </div>
-                        <br>
-                        @endif
-                        @endforeach
-                      </td>
-                    </tr>
-                    @php $i++ @endphp
+                    </div>
+                    @endif
                     @endforeach
-                  </tbody>
-                </table>
+                  </td>
+                  <td>
+                    @foreach($subjects as $sbvalue)
+                    @if($sbvalue->base_table_id == $value->base_id)
+                    <div class="d-flex align-items-center">
+                      <a class="editButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-pen"></i></a>
 
-                <div class="d-flex justify-content-end">
-                  {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
+                      <!-- <input type="submit" class="editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp; -->
+                      <a class="viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-eye"></i></a>
+                      <!-- <input type="submit" class="viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View">&nbsp;&nbsp; -->
+                      <a class="deletebutton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-trash-alt"></i></a>
 
-                </div>
-              </div>
-            </div>
-            <!--  -->
+                      <!-- <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete"> -->
+                    </div>
+                    <br>
+                    @endif
+                    @endforeach
+                  </td>
+                </tr>
+                @php $i++ @endphp
+                @endforeach
+              </tbody>
+            </table>
           </div>
-        </div>
 
+        </div>
       </div>
+
+
     </div>
+
     @include('layouts/footer_new')
   </div>
   <!-- view chapters -->

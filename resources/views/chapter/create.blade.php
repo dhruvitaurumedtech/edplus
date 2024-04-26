@@ -40,8 +40,10 @@
             </div>
 
             <div class="dashboard-content side-content">
+                <a href="{{url('chapter-list')}}" class="btn text-white btn-rmv2"> Chapter List</a>
 
-                <form class="s-chapter-form" action="#">
+                <form class="s-chapter-form" method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">
+                    @csrf
 
                     <div class="institute-list">
 
@@ -54,12 +56,18 @@
                                 @endforeach
                             </select>
                         </div>
+                        @error('standard_id')
+                        <div class="text-danger">{{ $message }}</div>
+                        @enderror
                         <h3>Subject</h3>
                         <div class="form-group">
                             <select class="form-control" id="exampleFormControlSelect2" name="subject" placeholder="Subject Name">
                                 <option>Mathematics </option>
                             </select>
                         </div>
+                        @error('subject')
+                        <div class="text-danger">{{ $message }}</div>
+                        @enderror
                         <h3>Chapter Number</h3>
                         <div class="search-box-2 form-group">
                             <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
@@ -83,7 +91,7 @@
                                 <input type="text" class="form-control" placeholder="Chapter Image">
                                 <div class="input-group-append">
                                     <span class="btn_upload">
-                                        <input type="file" id="imag" title="" class="input-img  file__input--label" for="customFile" data-text-btn="Upload" />
+                                        <input type="file" id="imag" name="chapter_image[]" title="" class="input-img  file__input--label" for="customFile" data-text-btn="Upload" />
                                         Choose Image
                                     </span>
                                 </div>
@@ -105,13 +113,10 @@
                     </div>
 
                 </form>
-            </div><!-- Sub Main Col END -->
-        </div><!-- MAIN row END -->
+            </div>
+        </div>
         @include('layouts/footer_new')
-
     </div>
-
-    <!-- js -->
     <script src="../js/jquery-3.7.1.min.js"></script>
     <script src="../js/bootstrap.bundle.min.js"></script>
     <script src="../js/main.js"></script>
@@ -128,11 +133,11 @@
                <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
                   <h3>Chapter Number</h3>
                   <div class="search-box-2 form-group">
-                    <input type="search" name="search" placeholder="Chapter Number" class="form-control">
+                    <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
                   </div>
                   <h3>Chapter Name</h3>
                   <div class="search-box-2 form-group">
-                    <input type="search" name="search" placeholder="Chapter Name" class="form-control">
+                    <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
                   </div>
                   <h3>Chapter Image</h3>
                   <div class="file">
@@ -140,7 +145,7 @@
                       <input type="text" class="form-control" placeholder="Chapter Image">
                       <div class="input-group-append">
                         <span class="btn_upload">
-                          <input type="file" id="imag" title="" class="input-img  file__input--label" for="customFile"
+                          <input type="file" id="imag" name="chapter_image[]"  title="" class="input-img  file__input--label" for="customFile"
                             data-text-btn="Upload" />
                           Choose Image
                         </span>

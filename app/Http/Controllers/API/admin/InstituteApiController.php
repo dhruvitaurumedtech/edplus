@@ -1281,6 +1281,36 @@ class InstituteApiController extends Controller
         }
     }
 
+    // public function get_homescreen_first(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_id' => 'required|exists:institute_detail,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+    //     try {
+    //         if (empty($institute_id)) {
+    //             $institute_id = Institute_detail::where('user_id', Auth::id())->select('id')->first();
+    //         }
+    //         $uniqueBoardIds = Institute_board_sub::where('user_id', Auth::id())
+    //             ->where('institute_id', $institute_id)
+    //             ->distinct('board_id')
+    //             ->pluck('board_id')
+    //             ->toArray();
+
+    //         $board_list = DB::table('board')
+    //             ->whereIN('id', $uniqueBoardIds)
+    //             ->get();
+    //         return $this->response($cat_array, "Data Fetch Successfully");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
+
+
+
     public function get_homescreen_second(Request $request)
     {
         $institute_id = $request->input('institute_id');
@@ -1665,8 +1695,8 @@ class InstituteApiController extends Controller
                 $batch_id = $request->batch_id;
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
-                
-                
+
+
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -1743,14 +1773,16 @@ class InstituteApiController extends Controller
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
 
-                        $prnts = Parents::join('users','users.id','parents.parent_id')
-                        ->where('student_id',$student_id)
-                        ->select('users.firstname','users.lastname','users.email','parents.id')
-                        ->get();
-                        foreach($prnts as $prdetail){
-                            $parDT = ['name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
-                            'email' => $prdetail,
-                            'id' => $prdetail->id];
+                        $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
+                            ->where('student_id', $student_id)
+                            ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
+                            ->get();
+                        foreach ($prnts as $prdetail) {
+                            $parDT = [
+                                'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+                                'email' => $prdetail,
+                                'id' => $prdetail->id
+                            ];
                             Mail::to($request->email_id)->send(new WelcomeMail($parDT));
                         }
                         
@@ -2977,65 +3009,82 @@ class InstituteApiController extends Controller
             ]);
         }
     }
-    //category list for add do business with 
+    // category list for add do business with 
+    // public function category_list(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+
+    //             $vcategory = VideoCategory::where('status', 'active')->get();
+
+    //             $cat_array = [];
+    //             foreach ($vcategory as $cat_value) {
+    //                 $cat_array[] = array(
+    //                     'id' => $cat_value->id,
+    //                     'name' => $cat_value->name
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Data Fetch Successfully',
+    //                 'data' => $cat_array
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     public function category_list(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
-        }
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-
-                $vcategory = VideoCategory::where('status', 'active')->get();
-
-                $cat_array = [];
-                foreach ($vcategory as $cat_value) {
-                    $cat_array[] = array(
-                        'id' => $cat_value->id,
-                        'name' => $cat_value->name
-                    );
-                }
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $cat_array
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+        try {
+            $user = Auth::user();
+            $vcategory = VideoCategory::where('status', 'active')->get();
+            $cat_array = [];
+            foreach ($vcategory as $cat_value) {
+                $cat_array[] = array(
+                    'id' => $cat_value->id,
+                    'name' => $cat_value->name
+                );
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($cat_array, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
     //create batch
     public function create_batch(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
