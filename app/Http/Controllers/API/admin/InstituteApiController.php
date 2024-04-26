@@ -42,6 +42,7 @@ use App\Traits\ApiTrait;
 use Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use App\Models\Parents;
 
 class InstituteApiController extends Controller
 {
@@ -1742,7 +1743,18 @@ class InstituteApiController extends Controller
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
 
-                        Mail::to($request->email_id)->send(new WelcomeMail($data));
+                        $prnts = Parents::join('users','users.id','parents.parent_id')
+                        ->where('student_id',$student_id)
+                        ->select('users.firstname','users.lastname','users.email','parents.id')
+                        ->get();
+                        foreach($prnts as $prdetail){
+                            $parDT = ['name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+                            'email' => $prdetail,
+                            'id' => $prdetail->id];
+                            Mail::to($request->email_id)->send(new WelcomeMail($parDT));
+                        }
+                        
+                        
 
                         return response()->json([
                             'status' => 200,
