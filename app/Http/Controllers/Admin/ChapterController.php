@@ -73,19 +73,20 @@ class ChapterController extends Controller
     //chapter_save
     public function chapter_save(Request $request)
     {
-        echo "<pre>";
-        print_r($request->all());
-        exit;
+
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
             'chapter_no' => 'required',
             'chapter_name' => 'required',
             'chapter_image' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
+        ], [
+            'chapter_no.*' => 'required',
+            'chapter_name.*' => 'required',
+            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
         ]);
 
         foreach ($request->chapter_name as $i => $chapterName) {
-
             $chapter_imageFile = $request->file('chapter_image')[$i];
             $imagePath = $chapter_imageFile->store('chapter', 'public');
 
