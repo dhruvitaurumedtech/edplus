@@ -1754,8 +1754,6 @@ class InstituteApiController extends Controller
                             Mail::to($request->email_id)->send(new WelcomeMail($parDT));
                         }
                         
-                        
-
                         return response()->json([
                             'status' => 200,
                             'message' => 'Successfully Update Student.',
