@@ -37,9 +37,17 @@ use Carbon\Carbon;
 use PDO;
 use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiTrait;
+use Auth;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
+use App\Models\Parents;
 
 class InstituteApiController extends Controller
 {
+
+    use ApiTrait;
 
     // function get_institute_reponse(Request $request)
     // {
@@ -281,187 +289,177 @@ class InstituteApiController extends Controller
     //     }
     // }
 
-    function get_institute_reponse(Request $request)
+    public function get_institute_reponse(Request $request)
     {
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-        $existingUser = User::where('token', $token)->first();
-        if ($existingUser) {
-
-            $basinstitute = Base_table::where('status', 'active')->select('institute_for')->groupby('institute_for')->pluck('institute_for')->toArray();
-
-            $institute_for_array = DB::table('institute_for')
-                ->whereIN('id', $basinstitute)->get();
-            $institute_for = [];
-            foreach ($institute_for_array as $institute_for_array_value) {
-                $onlyboardfrombase = base_table::where('institute_for', $institute_for_array_value->id)
-                    ->select('board')
-                    ->groupby('board')
-                    ->pluck('board')->toArray();
-                $board_array = board::whereIN('id', $onlyboardfrombase)
-                    ->get();
-                $board = [];
-                foreach ($board_array as $board_array_value) {
-                    $mediumsidget = base_table::where('board', $board_array_value->id)
-                        ->where('institute_for', $institute_for_array_value->id)
-                        ->select('medium')
-                        ->groupby('medium')
-                        ->pluck('medium')->toArray();
-                    $medium_array = Medium_model::whereIN('id', $mediumsidget)->get();
-                    $medium = [];
-                    foreach ($medium_array as $medium_array_value) {
-
-                        $classesidget = base_table::where('medium', $medium_array_value->id)
-                            ->where('board', $board_array_value->id)
+        try {
+            $user = Auth::user();
+            if ($user) {
+                $basinstitute = Base_table::where('status', 'active')->select('institute_for')->groupby('institute_for')->pluck('institute_for')->toArray();
+                $institute_for_array = DB::table('institute_for')
+                    ->whereIN('id', $basinstitute)->get();
+                $institute_for = [];
+                foreach ($institute_for_array as $institute_for_array_value) {
+                    $onlyboardfrombase = base_table::where('institute_for', $institute_for_array_value->id)
+                        ->select('board')
+                        ->groupby('board')
+                        ->pluck('board')->toArray();
+                    $board_array = board::whereIN('id', $onlyboardfrombase)
+                        ->get();
+                    $board = [];
+                    foreach ($board_array as $board_array_value) {
+                        $mediumsidget = base_table::where('board', $board_array_value->id)
                             ->where('institute_for', $institute_for_array_value->id)
-                            ->select('institute_for_class')
-                            ->groupby('institute_for_class')
-                            ->pluck('institute_for_class')->toArray();
-                        $class_array = Class_model::whereIN('id', $classesidget)
-                            ->get();
+                            ->select('medium')
+                            ->groupby('medium')
+                            ->pluck('medium')->toArray();
+                        $medium_array = Medium_model::whereIN('id', $mediumsidget)->get();
+                        $medium = [];
+                        foreach ($medium_array as $medium_array_value) {
 
-                        $class = [];
-                        foreach ($class_array as $class_array_value) {
-
-                            $standardidget = base_table::where('institute_for_class', $class_array_value->id)
-                                ->where('medium', $medium_array_value->id)
+                            $classesidget = base_table::where('medium', $medium_array_value->id)
                                 ->where('board', $board_array_value->id)
                                 ->where('institute_for', $institute_for_array_value->id)
-                                ->select('standard', 'id')
-                                ->pluck('standard')->toArray();
-                            $standard_array = Standard_model::whereIN('id', $standardidget)
+                                ->select('institute_for_class')
+                                ->groupby('institute_for_class')
+                                ->pluck('institute_for_class')->toArray();
+                            $class_array = Class_model::whereIN('id', $classesidget)
                                 ->get();
 
+                            $class = [];
+                            foreach ($class_array as $class_array_value) {
 
-                            $standard = [];
-                            foreach ($standard_array as $standard_array_value) {
-                                $stream_array = DB::table('base_table')
-                                    ->leftJoin('stream', 'stream.id', '=', 'base_table.stream')
-                                    ->select('stream.name as stream_name', 'base_table.id', 'stream.id as stream_id')
-                                    ->whereNull('base_table.deleted_at')
-                                    ->where('base_table.standard', $standard_array_value->id)
+                                $standardidget = base_table::where('institute_for_class', $class_array_value->id)
+                                    ->where('medium', $medium_array_value->id)
+                                    ->where('board', $board_array_value->id)
+                                    ->where('institute_for', $institute_for_array_value->id)
+                                    ->select('standard', 'id')
+                                    ->pluck('standard')->toArray();
+                                $standard_array = Standard_model::whereIN('id', $standardidget)
                                     ->get();
-                                $stream = [];
 
-                                foreach ($stream_array as $stream_array_value) {
 
-                                    $forsubdidget = base_table::where('institute_for_class', $class_array_value->id)
-                                        ->where('institute_for', $institute_for_array_value->id)
-                                        ->where('standard', $standard_array_value->id)
-                                        ->where('board', $board_array_value->id)
-                                        ->where('medium', $medium_array_value->id)
-                                        ->orwhere('stream', $stream_array_value->id)
-                                        ->select('standard', 'id')
+                                $standard = [];
+                                foreach ($standard_array as $standard_array_value) {
+                                    $stream_array = DB::table('base_table')
+                                        ->leftJoin('stream', 'stream.id', '=', 'base_table.stream')
+                                        ->select('stream.name as stream_name', 'base_table.id', 'stream.id as stream_id')
+                                        ->whereNull('base_table.deleted_at')
+                                        ->where('base_table.standard', $standard_array_value->id)
                                         ->get();
-                                    $baseidsfosubj = $forsubdidget->pluck('id')->toArray();
+                                    $stream = [];
 
-                                    // $subject_array = Subject_model::whereIN('base_table_id', $baseidsfosubj)
-                                    //     ->get();
+                                    foreach ($stream_array as $stream_array_value) {
 
-                                    if (!empty($stream_array_value->stream_id)) {
-                                        $stream[] = [
-                                            'stream_id' => $stream_array_value->stream_id . '',
-                                            'stream' => $stream_array_value->stream_name . '',
-                                            // 'subject' => $subject_array
+                                        $forsubdidget = base_table::where('institute_for_class', $class_array_value->id)
+                                            ->where('institute_for', $institute_for_array_value->id)
+                                            ->where('standard', $standard_array_value->id)
+                                            ->where('board', $board_array_value->id)
+                                            ->where('medium', $medium_array_value->id)
+                                            ->orwhere('stream', $stream_array_value->id)
+                                            ->select('standard', 'id')
+                                            ->get();
+                                        $baseidsfosubj = $forsubdidget->pluck('id')->toArray();
+
+                                        // $subject_array = Subject_model::whereIN('base_table_id', $baseidsfosubj)
+                                        //     ->get();
+
+                                        if (!empty($stream_array_value->stream_id)) {
+                                            $stream[] = [
+                                                'stream_id' => $stream_array_value->stream_id . '',
+                                                'stream' => $stream_array_value->stream_name . '',
+                                                // 'subject' => $subject_array
+                                            ];
+                                        }
+                                    }
+
+                                    $subject_array = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                                        ->whereIN('subject.base_table_id', $baseidsfosubj)
+                                        ->select('subject.*', 'base_table.stream')
+                                        ->get();
+
+                                    $subject = [];
+                                    foreach ($subject_array as $value) {
+                                        if ($value->stream != null) {
+                                            $sstream = $value->stream;
+                                        } else {
+                                            $sstream = 0;
+                                        }
+                                        $subject[] = [
+                                            'subject_id' => $value->id,
+                                            'subject' => $value->name,
+                                            'stream_id' => $sstream
                                         ];
                                     }
-                                }
-
-                                $subject_array = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
-                                    ->whereIN('subject.base_table_id', $baseidsfosubj)
-                                    ->select('subject.*', 'base_table.stream')
-                                    ->get();
-
-                                $subject = [];
-                                foreach ($subject_array as $value) {
-                                    if ($value->stream != null) {
-                                        $sstream = $value->stream;
-                                    } else {
-                                        $sstream = 0;
-                                    }
-                                    $subject[] = [
-                                        'subject_id' => $value->id,
-                                        'subject' => $value->name,
-                                        'stream_id' => $sstream
+                                    $standard[] = [
+                                        'standard_id' => $standard_array_value->id,
+                                        'standard' => $standard_array_value->name,
+                                        'stream' => $stream,
+                                        'subject' => $subject
                                     ];
                                 }
-                                $standard[] = [
-                                    'standard_id' => $standard_array_value->id,
-                                    'standard' => $standard_array_value->name,
-                                    'stream' => $stream,
-                                    'subject' => $subject
+
+                                $class[] = [
+                                    'class_id' => $class_array_value->id,
+                                    'class_icon' => asset($class_array_value->icon),
+                                    'class' => $class_array_value->name,
+                                    'standard' => $standard,
                                 ];
                             }
 
-                            $class[] = [
-                                'class_id' => $class_array_value->id,
-                                'class_icon' => asset($class_array_value->icon),
-                                'class' => $class_array_value->name,
-                                'standard' => $standard,
+                            $medium[] = [
+                                'medium_id' => $medium_array_value->id,
+                                'medium_icon' => asset($medium_array_value->icon),
+                                'medium' => $medium_array_value->name,
+                                'class' => $class,
                             ];
                         }
 
-                        $medium[] = [
-                            'medium_id' => $medium_array_value->id,
-                            'medium_icon' => asset($medium_array_value->icon),
-                            'medium' => $medium_array_value->name,
-                            'class' => $class,
+                        $board[] = [
+                            'board_id' => $board_array_value->id,
+                            'board_icon' => asset($board_array_value->icon),
+                            'board' => $board_array_value->name,
+                            'medium' => $medium,
                         ];
                     }
+                    $institute_for_name = $institute_for_array_value->name;
 
-                    $board[] = [
-                        'board_id' => $board_array_value->id,
-                        'board_icon' => asset($board_array_value->icon),
-                        'board' => $board_array_value->name,
-                        'medium' => $medium,
-                    ];
+                    if (!isset($institute_for[$institute_for_name])) {
+                        $institute_for[] = [
+                            'institute_id' => $institute_for_array_value->id,
+                            'institute_icon' => asset($institute_for_array_value->icon),
+                            'institute_for' => $institute_for_name,
+                            'board_details' => $board,
+                        ];
+                    } else {
+                        $institute_for['board_details'][] = $board;
+                    }
+                    $institute_for = array_values($institute_for);
                 }
-                $institute_for_name = $institute_for_array_value->name;
-
-                if (!isset($institute_for[$institute_for_name])) {
-                    $institute_for[] = [
-                        'institute_id' => $institute_for_array_value->id,
-                        'institute_icon' => asset($institute_for_array_value->icon),
-                        'institute_for' => $institute_for_name,
-                        'board_details' => $board,
-                    ];
-                } else {
-                    $institute_for['board_details'][] = $board;
+                $dobusiness_with = Dobusinesswith_Model::where('status', 'active')
+                    ->where(function ($query) {
+                        $query->whereNull('created_by')
+                            ->orWhere('created_by', 1);
+                    })->get();
+                $do_business_with = [];
+                foreach ($dobusiness_with as $dobusinesswith_val) {
+                    $do_business_with[] = array(
+                        'id' => $dobusinesswith_val->id,
+                        'name' => $dobusinesswith_val->name
+                    );
                 }
-                $institute_for = array_values($institute_for);
-            }
-            $dobusiness_with = Dobusinesswith_Model::where('status', 'active')
-                ->where(function ($query) {
-                    $query->whereNull('created_by')
-                        ->orWhere('created_by', 1);
-                })->get();
-            $do_business_with = [];
-            foreach ($dobusiness_with as $dobusinesswith_val) {
-                $do_business_with[] = array(
-                    'id' => $dobusinesswith_val->id,
-                    'name' => $dobusinesswith_val->name
+                $data = array(
+                    'do_business_with' => $do_business_with,
+                    'institute_details' => $institute_for
                 );
+                return $this->response($data, "Fetch Data Successfully");
             }
-            $data = array(
-                'do_business_with' => $do_business_with,
-                'institute_details' => $institute_for
-            );
-
-            return response()->json([
-                'success' => true,
-                'message' => 'Fetch Data Successfully',
-                'data' => $data,
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+            return $this->response([], "Something want Wrong!!", false, 400);
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
+
+
 
 
     public function register_institute(Request $request)
@@ -1646,6 +1644,7 @@ class InstituteApiController extends Controller
         if (strpos($token, 'Bearer ') === 0) {
             $token = substr($token, 7);
         }
+
         $institute_id = $request->institute_id;
         $user_id = $request->user_id;
         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
@@ -1662,11 +1661,12 @@ class InstituteApiController extends Controller
                     $institute_id = $request->institute_id;
                     $user_id = $request->user_id;
                 }
+
                 $batch_id = $request->batch_id;
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
-
-
+                
+                
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -1742,6 +1742,19 @@ class InstituteApiController extends Controller
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
+
+                        $prnts = Parents::join('users','users.id','parents.parent_id')
+                        ->where('student_id',$student_id)
+                        ->select('users.firstname','users.lastname','users.email','parents.id')
+                        ->get();
+                        foreach($prnts as $prdetail){
+                            $parDT = ['name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+                            'email' => $prdetail,
+                            'id' => $prdetail->id];
+                            Mail::to($request->email_id)->send(new WelcomeMail($parDT));
+                        }
+                        
+                        
 
                         return response()->json([
                             'status' => 200,

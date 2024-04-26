@@ -343,6 +343,7 @@ class StudentController extends Controller
                             $parnsad = Parents::create([
                                 'student_id' => $student_id,
                                 'parent_id' => $userId,
+                                'institute_id'=>$request->input('institute_id'),
                                 'relation' => $parentData['relation'],
                                 'verify' => '0',
                             ]);
@@ -369,7 +370,7 @@ class StudentController extends Controller
                             'id' => $parnsad->id
                         ];
 
-                        Mail::to($tomail)->send(new WelcomeMail($data));
+                        //Mail::to($tomail)->send(new WelcomeMail($data));
                     }
                 }
 
