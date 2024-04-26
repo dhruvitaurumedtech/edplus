@@ -185,12 +185,12 @@ class AuthController extends Controller
                         'mobile_no' => $value->mobile,
                         'user_email' => $value->email,
                         'user_image' => $photo,
-                        'role_type' => $value->role_type,
+                        'role_type' => (int)$value->role_type,
                         'token' => $value->token
                     );
                 }
                 return response()->json([
-                    'status' => 200,
+                    'status' => true,
                     'message' => 'Registered successfully',
                     'data' => $data
                 ], 200, [], JSON_NUMERIC_CHECK);

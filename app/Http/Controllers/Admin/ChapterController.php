@@ -46,6 +46,7 @@ class ChapterController extends Controller
     }
     public function chapter_list(Request $request)
     {
+
         $Standards = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
             ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
@@ -58,6 +59,9 @@ class ChapterController extends Controller
                 'base_table.id as base_id'
             )
             ->where('standard.status', 'active')->paginate(10);
+        // echo "<pre>";
+        // print_r($Standards);
+        // exit;
 
         $subjects = Subject_model::get();
         return view('chapter.list', compact('Standards', 'subjects'));
@@ -77,14 +81,20 @@ class ChapterController extends Controller
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
-            'chapter_no' => 'required',
-            'chapter_name' => 'required',
-            'chapter_image' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
+            'chapter_no' => 'required|array', // Ensuring chapter_no is an array
+            'chapter_no.*' => 'required', // Validating each chapter_no element
+            'chapter_name' => 'required|array', // Ensuring chapter_name is an array
+            'chapter_name.*' => 'required', // Validating each chapter_name element
+            'chapter_image' => 'required|array', // Ensuring chapter_image is an array
+            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048', // Validating each chapter_image element
         ], [
-            'chapter_no.*' => 'required',
-            'chapter_name.*' => 'required',
-            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
+            'chapter_no.*.required' => 'Chapter number is required.',
+            'chapter_name.*.required' => 'Chapter name is required.',
+            'chapter_image.*.required' => 'Chapter image is required.',
+            'chapter_image.*.mimes' => 'Chapter image must be a valid SVG, JPEG, PNG, or PDF file.',
+            'chapter_image.*.max' => 'Chapter image may not be greater than 2048 kilobytes in size.',
         ]);
+
 
         foreach ($request->chapter_name as $i => $chapterName) {
             $chapter_imageFile = $request->file('chapter_image')[$i];
