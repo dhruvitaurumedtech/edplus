@@ -1783,7 +1783,7 @@ class InstituteApiController extends Controller
                                 'email' => $prdetail,
                                 'id' => $prdetail->id
                             ];
-                            Mail::to($request->email_id)->send(new WelcomeMail($parDT));
+                            Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
                         
                         return response()->json([
