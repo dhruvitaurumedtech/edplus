@@ -171,51 +171,150 @@ class VideoController extends Controller
     // }
 
     //if need video category type
+    // public function video_category(Request $request)
+    // {
+    //     $user_id = $request->user_id;
+    //     $instituteid = $request->institute_id;
+    //     $categories = Dobusinesswith_sub::join('do_business_with', 'do_business_with.id', '=', 'do_business_with_sub.do_business_with_id')
+    //         ->join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+    //         ->where('do_business_with_sub.user_id', $user_id)
+    //         ->where('do_business_with_sub.institute_id', $instituteid)
+    //         ->where('do_business_with.status', 'active')
+    //         ->whereNull('do_business_with.deleted_at')
+    //         ->select('do_business_with.name', 'do_business_with.id as did', 'do_business_with.status', 'video_categories.name as cname', 'video_categories.id as cid')
+    //         ->get();
+
+    //     $videocat = [];
+    //     foreach ($categories as $catvalu) {
+    //         $videocat[] = array(
+    //             'id' => $catvalu->did,
+    //             'name' => $catvalu->name,
+    //             'parent_category_id' => $catvalu->cid,
+    //             'parent_category_name' => $catvalu->cname,
+    //             'status' => $catvalu->status
+    //         );
+    //     }
+    //     return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
+    // }
+
     public function video_category(Request $request)
     {
-        $user_id = $request->user_id;
-        $instituteid = $request->institute_id;
-        $categories = Dobusinesswith_sub::join('do_business_with', 'do_business_with.id', '=', 'do_business_with_sub.do_business_with_id')
-            ->join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
-            ->where('do_business_with_sub.user_id', $user_id)
-            ->where('do_business_with_sub.institute_id', $instituteid)
-            ->where('do_business_with.status', 'active')
-            ->whereNull('do_business_with.deleted_at')
-            ->select('do_business_with.name', 'do_business_with.id as did', 'do_business_with.status', 'video_categories.name as cname', 'video_categories.id as cid')
-            ->get();
-
-        $videocat = [];
-        foreach ($categories as $catvalu) {
-            $videocat[] = array(
-                'id' => $catvalu->did,
-                'name' => $catvalu->name,
-                'parent_category_id' => $catvalu->cid,
-                'parent_category_name' => $catvalu->cname,
-                'status' => $catvalu->status
-            );
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $categories = Dobusinesswith_sub::where('user_id', Auth::id())
+                ->where('institute_id', $request->institute_id)
+                ->whereHas('business', function ($query) {
+                    $query->where('status', 'active');
+                })
+                ->with(['business', 'business.category'])
+                ->get();
+            $video_categories = $categories->map(function ($category) {
+                return [
+                    'id' => $category->business->id,
+                    'name' => $category->business->name,
+                    'parent_category_id' => $category->business->category->id,
+                    'parent_category_name' => $category->business->category->name,
+                    'status' => $category->business->status
+                ];
+            });
+            return $this->response($video_categories, "Video Category List");
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
         }
-        return response()->json(['success' => 200, 'message' => 'Video Category List', 'Category' => $videocat]);
     }
 
-    // public function videoassign(Request $request)
+    public function videoassign(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'batch_id' => 'required|exists:batches,id',
+            'standard_id' => 'required',
+            'chapter_id' => 'required',
+            'subject_id' => 'required',
+            'user_id'  => 'required',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $batch_ids = explode(",", $request->batch_id);
+            foreach ($batch_ids as $batch_id_value) {
+                $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
+                    ->where('subject_id', $request->subject_id)
+                    ->where('video_id', $request->video_id)
+                    ->count();
+                if ($record == 1) {
+                    return $this->response([], 'Already Assign Video This Batch!', false, 400);
+                }
+                $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
+                    ->where('subject_id', $request->subject_id)
+                    ->count();
+                if ($existingRecordsCount >= 4) {
+                    return $this->response([], 'Four records with the same Batch and Subject already exist', false, 400);
+                }
+            }
+            foreach ($batch_ids as $value) {
+                $VideoAssignToBatch = VideoAssignToBatch::create([
+                    'video_id' => $request->video_id,
+                    'batch_id' => $value,
+                    'standard_id' => $request->standard_id,
+                    'chapter_id' => $request->chapter_id,
+                    'subject_id' => $request->subject_id
+                ]);
+            }
+            return $this->response([], "Video Assign Batch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
+
+
+    // public function videoassign1(Request $request)
     // {
-    //     $validator = Validator::make($request->all(), [
-    //         'batch_id' => 'required|exists:batches,id',
-    //         'standard_id' => 'required',
-    //         'chapter_id' => 'required',
-    //         'subject_id' => 'required',
-    //         'user_id'  => 'required',
-    //     ]);
-    //     if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-    //     try {
-    //         $batch_ids = explode(",", $request->batch_id);
+    //     $batch_id = $request->batch_id;
+    //     $video_id = $request->video_id;
+    //     $user_id = $request->user_id;
+    //     $standard_id = $request->standard_id;
+    //     $chapter_id = $request->chapter_id;
+    //     $subject_id = $request->subject_id;
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         $validator = \Validator::make($request->all(), [
+    //             'batch_id' => 'required|exists:batches,id',
+    //             'standard_id' => 'required',
+    //             'chapter_id' => 'required',
+    //             'subject_id' => 'required',
+    //             'user_id'  => 'required',
+    //         ]);
+
+    //         // Check if validation fails
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'success' => 400,
+    //                 'message' => 'Validation failed',
+    //                 'errors' => $validator->errors(),
+    //             ], 400);
+    //         }
+    //         $batch_ids = explode(",", $batch_id);
     //         foreach ($batch_ids as $batch_id_value) {
     //             $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
-    //                 ->where('subject_id', $request->subject_id)
-    //                 ->where('video_id', $request->video_id)
+    //                 ->where('subject_id', $subject_id)
+    //                 ->where('video_id', $video_id)
     //                 ->count();
     //             if ($record == 1) {
-    //                 return $this->response([], 'Already Assign Video This Batch!', false, 400);
+    //                 return response()->json([
+    //                     'success' => 400,
+    //                     'message' => 'Already Assign Video This Batch!',
+    //                     'data' => []
+    //                 ], 400);
     //             }
     //             $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
     //                 ->where('subject_id', $subject_id)
@@ -228,100 +327,35 @@ class VideoController extends Controller
     //                 ], 400);
     //             }
     //         }
-    //         return $this->response($user->otp_num, "OTP Sent Successfully !");
-    //     } catch (Exception $e) {
-    //         return $this->response($e, "Something want Wrong!!", false, 400);
+    //         // video_assignbatch::whereIn('b')
+    //         foreach ($batch_ids as $value) {
+    //             $VideoAssignToBatch = VideoAssignToBatch::create([
+    //                 'video_id' => $video_id,
+    //                 'batch_id' => $value,
+    //                 'standard_id' => $standard_id,
+    //                 'chapter_id' => $chapter_id,
+    //                 'subject_id' => $subject_id
+    //             ]);
+    //         }
+    //         // foreach ($batch_ids as $value) {
+    //         //     $assign_video_sub = VideoAssignToBatch_Sub::create([
+    //         //         'video_assign_id' => $VideoAssignToBatch->id,
+    //         //         'batch_id' => $value,
+    //         //         'subject_id' => $subject_id,
+    //         //     ]);
+    //         // }
+
+    //         return response()->json([
+    //             'success' => 200,
+    //             'message' => 'Video Assign Batch Successfully',
+    //             'data' => []
+    //         ], 200);
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //             'data' => []
+    //         ]);
     //     }
     // }
-
-
-
-    public function videoassign(Request $request)
-    {
-        $batch_id = $request->batch_id;
-        $video_id = $request->video_id;
-        $user_id = $request->user_id;
-        $standard_id = $request->standard_id;
-        $chapter_id = $request->chapter_id;
-        $subject_id = $request->subject_id;
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
-            $validator = \Validator::make($request->all(), [
-                'batch_id' => 'required|exists:batches,id',
-                'standard_id' => 'required',
-                'chapter_id' => 'required',
-                'subject_id' => 'required',
-                'user_id'  => 'required',
-            ]);
-
-            // Check if validation fails
-            if ($validator->fails()) {
-                return response()->json([
-                    'success' => 400,
-                    'message' => 'Validation failed',
-                    'errors' => $validator->errors(),
-                ], 400);
-            }
-            $batch_ids = explode(",", $batch_id);
-            foreach ($batch_ids as $batch_id_value) {
-                $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
-                    ->where('subject_id', $subject_id)
-                    ->where('video_id', $video_id)
-                    ->count();
-                if ($record == 1) {
-                    return response()->json([
-                        'success' => 400,
-                        'message' => 'Already Assign Video This Batch!',
-                        'data' => []
-                    ], 400);
-                }
-                $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
-                    ->where('subject_id', $subject_id)
-                    ->count();
-                if ($existingRecordsCount >= 4) {
-                    return response()->json([
-                        'success' => 400,
-                        'message' => 'Four records with the same Batch and Subject already exist',
-                        'data' => []
-                    ], 400);
-                }
-            }
-            // video_assignbatch::whereIn('b')
-            foreach ($batch_ids as $value) {
-                $VideoAssignToBatch = VideoAssignToBatch::create([
-                    'video_id' => $video_id,
-                    'batch_id' => $value,
-                    'standard_id' => $standard_id,
-                    'chapter_id' => $chapter_id,
-                    'subject_id' => $subject_id
-                ]);
-            }
-            // foreach ($batch_ids as $value) {
-            //     $assign_video_sub = VideoAssignToBatch_Sub::create([
-            //         'video_assign_id' => $VideoAssignToBatch->id,
-            //         'batch_id' => $value,
-            //         'subject_id' => $subject_id,
-            //     ]);
-            // }
-
-            return response()->json([
-                'success' => 200,
-                'message' => 'Video Assign Batch Successfully',
-                'data' => []
-            ], 200);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-                'data' => []
-            ]);
-        }
-    }
 }
