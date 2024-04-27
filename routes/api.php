@@ -44,8 +44,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/category-list', [VideoController::class, 'video_category']);
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
     Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
-
-    
+    Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
 });
 
 
@@ -75,7 +74,6 @@ Route::post('/institute/get-board', [InstituteApiController::class, 'get_board']
 Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
 // Route::post('/institute/get-subject-or-stream', [InstituteApiController::class, 'get_subject_stream'])->name('get_subject_stream.get');
 
-Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
 Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
 Route::post('/institute/get-reject-request-list', [InstituteApiController::class, 'get_reject_request_list'])->name('reject.request_list.get');
 

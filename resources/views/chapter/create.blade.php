@@ -49,7 +49,7 @@
 
                         <h3>Select Standard</h3>
                         <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect1" name="standard_id">
+                            <select class="form-control" id="standard_id" name="standard_id">
                                 <option value=" ">Select Option</option>
                                 @foreach($Standard as $stdval)
                                 <option value="{{$stdval->base_id}}">{{$stdval->name .'('.$stdval->board.','.$stdval->medium.','.$stdval->stream.')'}}</option>
@@ -61,8 +61,8 @@
                         @enderror
                         <h3>Subject</h3>
                         <div class="form-group">
-                            <select class="form-control" id="exampleFormControlSelect2" name="subject" placeholder="Subject Name">
-                                <option>Mathematics </option>
+                            <select class="form-control" id="subject" name="subject" placeholder="Subject Name">
+                                <option value=" ">Select Option</option>
                             </select>
                         </div>
                         @error('subject')
@@ -125,6 +125,31 @@
             $('#addmore').click(function() {
                 addChapter();
             });
+            $(document).ready(function() {
+
+                $('#standard_id').on('change', function() {
+                    var standard_id = $(this).val();
+                    axios.post('chapter/get-subject', {
+                            standard_id: standard_id,
+                        })
+                        .then(function(response) {
+
+                            var secondDropdown = document.getElementById('subject');
+                            secondDropdown.innerHTML = ''; // Clear existing options
+
+                            secondDropdown.appendChild(new Option('Select Subject', ''));
+
+                            response.data.subject.forEach(function(subjects) {
+                                var option = new Option(subjects.name, subjects.id);
+                                secondDropdown.appendChild(option);
+                            });
+                        })
+                        .catch(function(error) {
+                            console.error(error);
+                        });
+                });
+            });
+
 
             function addChapter() {
                 var chapterHtml = `

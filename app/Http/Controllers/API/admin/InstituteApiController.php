@@ -1368,23 +1368,126 @@ class InstituteApiController extends Controller
     }
 
 
+    // public function get_homescreen_second(Request $request)
+    // {
+    //     $institute_id = $request->input('institute_id');
+    //     $user_id = $request->input('user_id');
+    //     $board_id = $request->input('board_id');
+    //     $medium_id = $request->input('medium_id');
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->input('user_id'))->first();
+    //     // echo "<pre>";print_r($existingUser);exit;
+    //     if ($existingUser) {
+    //         if (empty($institute_id)) {
+    //             $institute_id = Institute_detail::where('user_id', $user_id)->first();
+    //         }
+    //         // Institute_detail::where();
+    //         $standard_list = DB::table('standard_sub')
+    //             ->join('standard', 'standard_sub.standard_id', '=', 'standard.id')
+    //             ->select('standard.*')
+    //             ->where('standard_sub.user_id', $user_id)
+    //             ->where('standard_sub.institute_id', $institute_id)
+    //             ->where('standard_sub.board_id', $board_id)
+    //             ->where('standard_sub.medium_id', $medium_id)
+    //             ->get();
+    //         // print_r($standard_list);exit;
+
+    //         $standard_array = [];
+    //         foreach ($standard_list as $standard_value) {
+
+    //             $getbsiqy = Base_table::where('board', $board_id)
+    //                 ->where('medium', $medium_id)
+    //                 ->where('standard', $standard_value->id)
+    //                 ->pluck('id')
+    //                 ->toArray();
+
+    //             $subject_list = DB::table('subject_sub')
+    //                 ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
+    //                 ->select('subject.*')
+    //                 ->where('subject_sub.user_id', $user_id)
+    //                 ->where('subject_sub.institute_id', $institute_id)
+    //                 ->whereIN('subject.base_table_id', $getbsiqy)
+    //                 ->get();
+
+    //             $subject_array = [];
+    //             foreach ($subject_list as $subject_value) {
+    //                 $subject_array[] = [
+    //                     'id' => $subject_value->id,
+    //                     'subject_value' => $subject_value->name,
+    //                     'image' => asset($subject_value->image),
+    //                 ];
+    //             }
+
+    //             //batch list
+    //             $batchqY = Batches_model::join('board', 'board.id', '=', 'batches.board_id')
+    //                 ->join('medium', 'medium.id', '=', 'batches.medium_id')
+    //                 ->leftjoin('stream', 'stream.id', '=', 'batches.stream_id')
+    //                 ->where('batches.institute_id', $institute_id)
+    //                 ->where('batches.standard_id', $standard_value->id)
+    //                 ->where('batches.user_id', $user_id)
+    //                 ->select('batches.*', 'board.name as board', 'medium.name as medium', 'stream.name as stream')->get();
+    //             $batchesDT = [];
+    //             foreach ($batchqY as $batDT) {
+    //                 $subids = explode(",", $batDT->subjects);
+    //                 $batSubQY = Subject_model::whereIN('id', $subids)->get();
+    //                 $subects = [];
+    //                 foreach ($batSubQY as $batDt) {
+    //                     $subects[] = array('id' => $batDt->id, 'subject_name' => $batDt->name);
+    //                 }
+
+    //                 $batchesDT[] = array(
+    //                     'id' => $batDT->id,
+    //                     'batch_name' => $batDT->batch_name,
+    //                     'board' => $batDT->board,
+    //                     'medium' => $batDT->medium,
+    //                     'stream' => $batDT->stream,
+    //                     'subjects' => $subects
+    //                 );
+    //             }
+
+    //             $standard_array[] = [
+    //                 'id' => $standard_value->id,
+    //                 'standard_name' => $standard_value->name,
+    //                 'subject' => $subject_array,
+    //                 'batches' => $batchesDT
+    //                 // Include banner_array inside board_array
+    //             ];
+    //         }
+    //         return response()->json([
+    //             'success' => 200,
+    //             'message' => 'Fetch Standard successfully',
+    //             'data' => $standard_array,
+    //         ], 200);
+    //     } else {
+
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
+
     public function get_homescreen_second(Request $request)
     {
-        $institute_id = $request->input('institute_id');
-        $user_id = $request->input('user_id');
-        $board_id = $request->input('board_id');
-        $medium_id = $request->input('medium_id');
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'board_id' => 'required|exists:board,id',
+            'medium_id' => 'required|exists:medium,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
-
-        $existingUser = User::where('token', $token)->where('id', $request->input('user_id'))->first();
-        // echo "<pre>";print_r($existingUser);exit;
-        if ($existingUser) {
+        try {
+            $institute_id = $request->institute_id;
+            $user_id = Auth::id();
             if (empty($institute_id)) {
                 $institute_id = Institute_detail::where('user_id', $user_id)->first();
             }
@@ -1394,20 +1497,17 @@ class InstituteApiController extends Controller
                 ->select('standard.*')
                 ->where('standard_sub.user_id', $user_id)
                 ->where('standard_sub.institute_id', $institute_id)
-                ->where('standard_sub.board_id', $board_id)
-                ->where('standard_sub.medium_id', $medium_id)
+                ->where('standard_sub.board_id',  $request->board_id)
+                ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
-            // print_r($standard_list);exit;
-
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
 
-                $getbsiqy = Base_table::where('board', $board_id)
-                    ->where('medium', $medium_id)
+                $getbsiqy = Base_table::where('board',  $request->board_id)
+                    ->where('medium', $request->medium_id)
                     ->where('standard', $standard_value->id)
                     ->pluck('id')
                     ->toArray();
-
                 $subject_list = DB::table('subject_sub')
                     ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
                     ->select('subject.*')
@@ -1457,20 +1557,11 @@ class InstituteApiController extends Controller
                     'standard_name' => $standard_value->name,
                     'subject' => $subject_array,
                     'batches' => $batchesDT
-                    // Include banner_array inside board_array
                 ];
             }
-            return response()->json([
-                'success' => 200,
-                'message' => 'Fetch Standard successfully',
-                'data' => $standard_array,
-            ], 200);
-        } else {
-
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+            return $this->response($standard_array, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
     public function get_request_list(Request $request)
@@ -1829,7 +1920,7 @@ class InstituteApiController extends Controller
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
-                        
+
 
                         $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
                             ->where('parents.student_id', $student_id)

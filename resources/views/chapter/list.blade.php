@@ -90,6 +90,10 @@
                 @endforeach
               </tbody>
             </table>
+            <div class="d-flex justify-content-end">
+              {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
+
+            </div>
           </div>
 
         </div>

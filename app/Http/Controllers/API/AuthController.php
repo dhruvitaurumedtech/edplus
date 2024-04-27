@@ -223,7 +223,7 @@ class AuthController extends Controller
                     'mobile_no' => $user->mobile,
                     'user_email' => $user->email,
                     'user_image' => $user->image,
-                    'role_type' => $user->role_type,
+                    'role_type' => (int)$user->role_type,
                     'token' => $user->token
                 ];
                 if ($user->mobile == $request->mobile && $user->otp_num == $request->otp_num) {
