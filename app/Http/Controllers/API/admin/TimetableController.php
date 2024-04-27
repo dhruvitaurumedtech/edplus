@@ -34,10 +34,11 @@ class TimetableController extends Controller
             $timetable->subject_id = $request->subject_id;
             $timetable->batch_id = $request->batch_id;
             $timetable->teacher_id = $request->teacher_id;
+            $timetable->lecture_type = $request->lecture_type;
             $timetable->day = $request->day;
             $timetable->start_time = $request->start_time;
             $timetable->end_time = $request->end_time;
-            $timetable->end_time = save();
+            $timetable->save();
             return $this->response($timetable,'data save');
         }catch(Exeption $e){
             return $this->response($e,"Something want Wrong!!", false, 400);
