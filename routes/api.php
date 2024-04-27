@@ -17,6 +17,7 @@ use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\ParentsController;
+use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\student\StudentAttendance;
 use App\Http\Controllers\PdfController;
@@ -43,12 +44,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/category-list', [VideoController::class, 'video_category']);
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
     Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
+
+    
 });
 
 
 
 
-
+Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
 Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
 Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request'])->name('student_add_institute_request.get');
@@ -92,7 +95,7 @@ Route::post('/institute/student-list-with-marks', [InstituteApiController::class
 Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
 Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
 Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
-Route::post('/institute/add-timetable', [InstituteApiController::class, 'add_time_table'])->name('add_time_table');
+
 Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
 Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
 Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
