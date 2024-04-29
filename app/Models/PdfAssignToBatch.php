@@ -11,6 +11,6 @@ class PdfAssignToBatch extends Model
     use HasFactory, SoftDeletes;
     protected $table =  'pdf_assign_batch';
     protected $fillable = [
-        'pdf_id', 'batch_id', 'standard_id', 'chapter_id', 'subject_id'
+        'pdf_id', 'batch_id', 'standard_id', 'chapter_id', 'subject_id', 'assign_status'
     ];
 }
