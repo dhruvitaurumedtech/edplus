@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\admin;
 use App\Http\Controllers\Controller;
 use App\Models\board;
 use App\Models\Institute_for_model;
+use App\Models\Medium_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,12 +38,7 @@ class BasetableControllerAPI extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
@@ -63,6 +59,36 @@ class BasetableControllerAPI extends Controller
         }
     }
 
-    
+    public function medium(Request $request){
+
+        $validator = \Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+                $institute_for_ids = explode(',', $request->institute_for_id);
+                $board_ids = explode(',', $request->board_id);
+                $base_medium = Medium_model::join('base_table', 'base_table.medium', '=', 'medium.id')
+                    ->whereIN('base_table.board',$institute_for_ids)
+                    ->whereIN('base_table.medium',$board_ids)
+                    ->select('medium.id', 'medium.name', 'medium.icon')
+                    ->distinct()
+                    ->get();
+                $data = [];
+                foreach ($base_medium as $basemedium) {
+                    $data[] = array('id' => $basemedium->id, 'name' => $basemedium->name,
+                     'icon' => url($basemedium->icon));
+                }
+                
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
 
 }
