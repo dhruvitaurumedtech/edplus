@@ -17,7 +17,7 @@ class BasetableControllerAPI extends Controller
 
             if (Auth::user()) {
                 $base_institutfor = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
-                    ->select('institute_for.id', 'institute_for.name')
+                    ->select('institute_for.id', 'institute_for.name', 'institute_for.icon')
                     ->distinct()
                     ->get();
                 $data = [];
