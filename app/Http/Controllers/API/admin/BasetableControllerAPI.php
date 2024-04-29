@@ -7,6 +7,7 @@ use App\Models\board;
 use App\Models\Class_model;
 use App\Models\Institute_for_model;
 use App\Models\Medium_model;
+use App\Models\Standard_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -129,4 +130,41 @@ class BasetableControllerAPI extends Controller
         }
     }
 
+    public function standard(Request $request){
+
+        $validator = \Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'class_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+                $institute_for_ids = explode(',', $request->institute_for_id);
+                $board_ids = explode(',', $request->board_id);
+                $medium_ids = explode(',', $request->medium_id);
+                $class_ids = explode(',', $request->class_id);
+
+                $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                    ->whereIN('base_table.institute_for',$institute_for_ids)
+                    ->whereIN('base_table.board',$board_ids)
+                    ->whereIN('base_table.medium',$medium_ids)
+                    ->whereIN('base_table.institute_for_class',$class_ids)
+                    ->select('standard.id', 'standard.name')
+                    ->distinct()
+                    ->get();
+                $data = [];
+                foreach ($base_standard as $basestandard) {
+                    $data[] = array('id' => $basestandard->id, 'name' => $basestandard->name);
+                }
+                
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
 }
