@@ -239,7 +239,9 @@ class BasetableControllerAPI extends Controller
                     ->whereIN('base_table.medium',$medium_ids)
                     ->whereIN('base_table.institute_for_class',$class_ids)
                     ->whereIN('base_table.standard',$standard_ids)
-                    
+                    ->when($stream_ids, function ($query, $stream_ids) {
+                        return $query->whereIN('base_table.stream',$stream_ids);
+                    })
                     ->select('subject.id', 'subject.name','subject.image')
                     ->distinct()
                     ->get();
