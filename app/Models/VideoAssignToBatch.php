@@ -11,6 +11,6 @@ class VideoAssignToBatch extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'video_assignbatch';
     protected $fillable = [
-        'batch_id', 'video_id', 'standard_id', 'chapter_id', 'subject_id',
+        'batch_id', 'video_id', 'standard_id', 'chapter_id', 'subject_id', 'assign_status'
     ];
 }
