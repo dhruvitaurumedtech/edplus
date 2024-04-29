@@ -240,7 +240,7 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $class_ids = explode(',', $request->class_id);
             $standard_ids = explode(',', $request->standard_id);
-            $stream_ids = explode(',', $request->stream);
+            $stream_ids = explode(',', trim($request->stream));
 
             $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
                 ->whereIn('base_table.institute_for', $institute_for_ids)
@@ -248,10 +248,6 @@ class BasetableControllerAPI extends Controller
                 ->whereIn('base_table.medium', $medium_ids)
                 ->whereIn('base_table.institute_for_class', $class_ids)
                 ->whereIn('base_table.standard', $standard_ids);
-
-            if (!empty($stream_ids)) {
-                $base_subject_query->whereIn('base_table.stream', $stream_ids);
-            }
 
             if (!empty($stream_ids) && array_filter($stream_ids)) {
                 $base_subject_query->whereIn('base_table.stream', $stream_ids);
@@ -265,8 +261,6 @@ class BasetableControllerAPI extends Controller
             foreach ($base_subject as $basesubject) {
                 $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name, 'image' => $basesubject->image);
             }
-
-
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
