@@ -46,13 +46,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
     Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
     Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
-    Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
     Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request');
 
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);
     Route::post('/institute/base-board', [BasetableControllerAPI::class, 'board']);
 });
+Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get');
+
 
 
 

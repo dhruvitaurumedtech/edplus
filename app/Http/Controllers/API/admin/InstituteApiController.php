@@ -1576,19 +1576,23 @@ class InstituteApiController extends Controller
             $user = Auth::user();
             $request_list = Student_detail::where('institute_id', $request->institute_id)
                 ->where('status', '0')
-                ->get();
-
-            $response = $request_list->filter(function ($value) {
-                return $user_data = User::find($value->student_id);
-            })->map(function ($value) {
-                $user_data = User::find($value->student_id);
-                return [
-                    'student_id' => $user_data->id,
-                    'name' => $user_data->firstname . ' ' . $user_data->lastname,
-                    'photo' => $user_data->image,
-                ];
-            })->toArray();
-            return $this->response($response, "Fetch student request list.");
+                ->get()
+                ->toArray();
+            if (!empty($request_list)) {
+                $response = $request_list->filter(function ($value) {
+                    return $user_data = User::find($value->student_id);
+                })->map(function ($value) {
+                    $user_data = User::find($value->student_id);
+                    return [
+                        'student_id' => $user_data->id,
+                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
+                        'photo' => $user_data->image,
+                    ];
+                })->toArray();
+                return $this->response($response, "Fetch student request list.");
+            } else {
+                return $this->response([], "student not found.", false, 400);
+            }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }

@@ -42,7 +42,28 @@
         </div>
 
         <div class="row">
-          <div class="col-lg-12 mt-3 institute-form">
+          <div class="col-lg-6 mt-3 institute-form">
+            <form class="s-chapter-form institute-form" action="{{ url('roles/save') }}" method="post">
+              @csrf
+              <h4 class="mb-3">Create Admin</h4>
+
+              <div class="create-admin mt-4">
+                <div class="form-group row">
+                  <div class="col-md-3">
+                    <label>Enter Role</label>
+                  </div>
+                  <div class="col-md-9">
+                    <input type="text" name="role_name" class="form-control" placeholder="Enter Role">
+                  </div>
+                </div>
+              </div>
+
+              <div class="submit-btn">
+                <input type="submit" value="Submit" class="btn bg-primary-btn text-white">
+              </div>
+            </form>
+          </div>
+          <div class="col-lg-5 offset-md-1 mt-3 institute-form">
             <div class="create-title-btn">
               <h4 class="mb-0">List of Role</h4>
               <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
@@ -103,7 +124,7 @@
       </div><!-- Sub Main Col END -->
     </div><!-- MAIN row END -->
     @include('layouts/footer_new')
-    
+
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
