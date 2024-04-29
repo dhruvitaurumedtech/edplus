@@ -8,6 +8,8 @@ use App\Models\Class_model;
 use App\Models\Institute_for_model;
 use App\Models\Medium_model;
 use App\Models\Standard_model;
+use App\Models\Stream_model;
+use App\Models\Subject_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -160,6 +162,92 @@ class BasetableControllerAPI extends Controller
                 $data = [];
                 foreach ($base_standard as $basestandard) {
                     $data[] = array('id' => $basestandard->id, 'name' => $basestandard->name);
+                }
+                
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+
+    public function stream(Request $request){
+
+        $validator = \Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'class_id' => 'required',
+            'standard_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+                $institute_for_ids = explode(',', $request->institute_for_id);
+                $board_ids = explode(',', $request->board_id);
+                $medium_ids = explode(',', $request->medium_id);
+                $class_ids = explode(',', $request->class_id);
+                $standard_ids = explode(',', $request->standard_id);
+
+                $base_stream = Stream_model::join('base_table', 'base_table.stream', '=', 'stream.id')
+                    ->whereIN('base_table.institute_for',$institute_for_ids)
+                    ->whereIN('base_table.board',$board_ids)
+                    ->whereIN('base_table.medium',$medium_ids)
+                    ->whereIN('base_table.institute_for_class',$class_ids)
+                    ->whereIN('base_table.standard',$standard_ids)
+                    ->select('stream.id', 'stream.name')
+                    ->distinct()
+                    ->get();
+                $data = [];
+                foreach ($base_stream as $basestream) {
+                    $data[] = array('id' => $basestream->id, 'name' => $basestream->name);
+                }
+                
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+
+    public function subject(Request $request){
+
+        $validator = \Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'class_id' => 'required',
+            'standard_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+                $institute_for_ids = explode(',', $request->institute_for_id);
+                $board_ids = explode(',', $request->board_id);
+                $medium_ids = explode(',', $request->medium_id);
+                $class_ids = explode(',', $request->class_id);
+                $standard_ids = explode(',', $request->standard_id);
+                $stream_ids = explode(',', $request->stream_id);
+
+                $base_subject = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                    ->whereIN('base_table.institute_for',$institute_for_ids)
+                    ->whereIN('base_table.board',$board_ids)
+                    ->whereIN('base_table.medium',$medium_ids)
+                    ->whereIN('base_table.institute_for_class',$class_ids)
+                    ->whereIN('base_table.standard',$standard_ids)
+                    ->when($stream_ids, function ($query, $stream_ids) {
+                        return $query->whereIN('base_table.stream',$stream_ids);
+                    })
+                    ->select('subject.id', 'subject.name','subject.image')
+                    ->distinct()
+                    ->get();
+                $data = [];
+                foreach ($base_subject as $basesubject) {
+                    $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name,'image'=>$basesubject->image);
                 }
                 
             return $this->response($data, "Fetch Data Successfully");

@@ -56,6 +56,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/base-medium', [BasetableControllerAPI::class, 'medium']);
     Route::post('/institute/base-class', [BasetableControllerAPI::class, 'class']);
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
+    Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
+    Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
 });
 
 
