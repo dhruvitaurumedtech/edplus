@@ -1777,42 +1777,24 @@ class InstituteApiController extends Controller
     //     }
     // }
 
+
     public function fetch_student_detail(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
             'student_id' => 'required|integer',
             'institute_id' => 'required|integer',
         ]);
 
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
-        }
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-        $institute_id = $request->institute_id;
-        $user_id = $request->user_id;
-        $student_id = $request->student_id;
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
             $user_list = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('board', 'board.id', '=', 'students_details.board_id')
                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                ->where('students_details.student_id', $student_id)
-                ->where('students_details.user_id', $user_id)
-                ->where('students_details.institute_id', $institute_id)
+                ->where('students_details.student_id', $request->student_id)
+                ->where('students_details.user_id', Auth::id())
+                ->where('students_details.institute_id', $request->institute_id)
                 ->select(
                     'students_details.*',
                     'users.firstname',
@@ -1838,7 +1820,6 @@ class InstituteApiController extends Controller
                         'image' => asset($subDT->image)
                     );
                 }
-
                 $response_data = [
                     'student_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
@@ -1859,26 +1840,122 @@ class InstituteApiController extends Controller
                     'stream' => $user_list->stream,
                     'stream_id' => $user_list->stream_id,
                     'subject_list' => $subjectslist,
-
                 ];
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully Fetch data.',
-                    'data' => $response_data
-                ], 200, [], JSON_NUMERIC_CHECK);
+                return $this->response($response_data, "Successfully Reject Request.");
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'No Data Found.',
-                ]);
+                return $this->response([], "Successfully Reject Request.");
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    // public function fetch_student_detail(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required|integer',
+    //         'student_id' => 'required|integer',
+    //         'institute_id' => 'required|integer',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+    //     $institute_id = $request->institute_id;
+    //     $user_id = $request->user_id;
+    //     $student_id = $request->student_id;
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         $user_list = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+    //             ->join('board', 'board.id', '=', 'students_details.board_id')
+    //             ->join('medium', 'medium.id', '=', 'students_details.medium_id')
+    //             ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+    //             ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+    //             ->where('students_details.student_id', $student_id)
+    //             ->where('students_details.user_id', $user_id)
+    //             ->where('students_details.institute_id', $institute_id)
+    //             ->select(
+    //                 'students_details.*',
+    //                 'users.firstname',
+    //                 'users.lastname',
+    //                 'users.dob',
+    //                 'users.address',
+    //                 'users.email',
+    //                 'users.mobile',
+    //                 'board.name as board',
+    //                 'medium.name as medium',
+    //                 'standard.name as standard',
+    //                 'stream.name as stream'
+    //             )
+    //             ->first();
+    //         if ($user_list) {
+    //             $subjids = explode(',', $user_list->subject_id);
+    //             $subjcts = Subject_model::whereIN('id', $subjids)->get();
+    //             $subjectslist = [];
+    //             foreach ($subjcts as $subDT) {
+    //                 $subjectslist[] = array(
+    //                     'id' => $subDT->id,
+    //                     'name' => $subDT->name,
+    //                     'image' => asset($subDT->image)
+    //                 );
+    //             }
+
+    //             $response_data = [
+    //                 'student_id' => $user_list->student_id,
+    //                 'institute_id' => $user_list->institute_id,
+    //                 'first_name' => $user_list->firstname,
+    //                 'last_name' => $user_list->lastname,
+    //                 'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
+    //                 'address' => $user_list->address,
+    //                 'email' => $user_list->email,
+    //                 'mobile_no' => $user_list->mobile,
+    //                 //'institute_for' => $institute_for_list,
+    //                 'board' => $user_list->board,
+    //                 'board_id' => $user_list->board_id,
+    //                 'medium' => $user_list->medium,
+    //                 'medium_id' => $user_list->medium_id,
+    //                 //'class_list' => $class_list,
+    //                 'standard' => $user_list->standard,
+    //                 'standard_id' => $user_list->standard_id,
+    //                 'stream' => $user_list->stream,
+    //                 'stream_id' => $user_list->stream_id,
+    //                 'subject_list' => $subjectslist,
+
+    //             ];
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully Fetch data.',
+    //                 'data' => $response_data
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'No Data Found.',
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
+
+
     public function add_student(Request $request)
     {
         $validator = \Validator::make($request->all(), [
