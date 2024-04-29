@@ -49,6 +49,7 @@ class SubjectController extends Controller
     }
     function subject_list_save(Request $request)
     {
+
         $request->validate([
             'institute_for' => 'required',
             'board' => 'required',
@@ -60,44 +61,65 @@ class SubjectController extends Controller
             'status' => 'required',
         ]);
 
-        $base_table = Base_table::create([
-            'institute_for' => $request->input('institute_for'),
-            'board' => $request->input('board'),
-            'medium' => $request->input('medium'),
-            'institute_for_class' => $request->input('institute_for_class'),
-            'standard' => $request->input('standard'),
-            'stream' => $request->input('stream'),
-            'subject' => $request->input('subject'),
-            'status' => $request->input('status'),
-            'created_by' => Auth::id(),
-        ]);
+        $query = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
+            ->where('base_table.institute_for', $request->input('institute_for'))
+            ->where('base_table.board', $request->input('board'))
+            ->where('base_table.medium', $request->input('medium'))
+            ->where('base_table.institute_for_class', $request->input('institute_for_class'))
+            ->where('base_table.standard', $request->input('standard'))
+            ->where('base_table.stream', $request->input('stream'))
+            ->where('subject.name', $request->input('subject'));
 
-        $base_table_id = $base_table->id;
+        // Print the last executed SQL query
+        $lastQuery = $query->toSql();
+        echo $lastQuery;
 
-        $subjects = $request->input('subject');
-        $subject_images = $request->file('subject_image');
-        // print_r($subject_images = $request->file('subject_image'));exit;
-        if ($subjects && $subject_images) {
-            foreach ($subjects as $i => $subject) {
-                if (isset($subject_images[$i])) {
-                    $subject_image = $subject_images[$i];
-                    $name = $subject_image->getClientOriginalName();
-                    $subject_image->move(public_path() . '/subject/', $name);
-                    Subject_model::create([
-                        'base_table_id' => $base_table_id,
-                        'name' => $subject,
-                        'image' => '/subject/' . $name,
-                        'status' => 'active',
-                        'created_by' => Auth::id(),
-                    ]);
-                } else {
+
+        // exit;
+        if ($count > 0) {
+
+
+            $base_table = Base_table::create([
+                'institute_for' => $request->input('institute_for'),
+                'board' => $request->input('board'),
+                'medium' => $request->input('medium'),
+                'institute_for_class' => $request->input('institute_for_class'),
+                'standard' => $request->input('standard'),
+                'stream' => $request->input('stream'),
+                'subject' => $request->input('subject'),
+                'status' => $request->input('status'),
+                'created_by' => Auth::id(),
+            ]);
+
+            $base_table_id = $base_table->id;
+
+            $subjects = $request->input('subject');
+            $subject_images = $request->file('subject_image');
+            // print_r($subject_images = $request->file('subject_image'));exit;
+            if ($subjects && $subject_images) {
+                foreach ($subjects as $i => $subject) {
+                    if (isset($subject_images[$i])) {
+                        $subject_image = $subject_images[$i];
+                        $name = $subject_image->getClientOriginalName();
+                        $subject_image->move(public_path() . '/subject/', $name);
+                        Subject_model::create([
+                            'base_table_id' => $base_table_id,
+                            'name' => $subject,
+                            'image' => '/subject/' . $name,
+                            'status' => 'active',
+                            'created_by' => Auth::id(),
+                        ]);
+                    } else {
+                    }
                 }
+            } else {
             }
+
+
+            return redirect()->route('subject.list')->with('success', 'Subject Created Successfully');
         } else {
+            return redirect()->route('subject.list')->with('success', 'Already Exist Record!');
         }
-
-
-        return redirect()->route('subject.list')->with('success', 'Subject Created Successfully');
     }
 
     function create_subject()
