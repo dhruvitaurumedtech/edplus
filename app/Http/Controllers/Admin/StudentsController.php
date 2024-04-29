@@ -25,10 +25,10 @@ use Illuminate\Validation\Rule;
 
 class StudentsController extends Controller
 {
-    public function list_student(Request $request): View
+    public function list_student(Request $request, $id): View
     {
         $id = Auth::id();
-        $institute_id = $request->institute_id;
+        $institute_id =  $id;
 
         $student = User::leftjoin('students_details', 'users.id', '=', 'students_details.student_id')
             ->where('users.role_type', [6])
@@ -45,10 +45,10 @@ class StudentsController extends Controller
         return view('student.list', compact('institute_id', 'student', 'institute_for', 'board', 'medium', 'class', 'stream', 'subject', 'standard'));
     }
 
-    public function create_student(Request $request)
+    public function create_student(Request $request, $institute_id)
     {
         $id = Auth::id();
-        $institute_id = $request->institute_id;
+        $institute_id = $institute_id;
 
         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id', $institute_id)->select('institute_for.*')->get();
         $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id', $institute_id)->select('board.*')->get();
@@ -79,18 +79,20 @@ class StudentsController extends Controller
 
     public function save_student(Request $request)
     {
-
         $validator = $request->validate([
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|max:16|min:8',
             'mobile' => 'required',
+            'image' => 'required',
         ]);
         if ($request->hasFile('image')) {
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('public/profile'), $imageName);
+        } else {
+            $imageName = "";
         }
 
         $student = User::create([
@@ -108,6 +110,11 @@ class StudentsController extends Controller
 
         $student_id = $student->id;
         $id = Auth::id();
+        if (is_array($request->subject_id)) {
+            $subjectIds = implode(",", $request->subject_id);
+        } else {
+            $subjectIds = $request->subject_id;
+        }
         $studentdetail = Student_detail::create([
             'user_id' => $id,
             'institute_id' => $request->institute_id,
@@ -118,10 +125,14 @@ class StudentsController extends Controller
             'class_id' => $request->class_id,
             'standard_id' => $request->standard_id,
             'stream_id' => $request->stream_id,
-            'subject_id' => implode(",", $request->subject_id),
+            'subject_id' => $subjectIds,
             'status' => $request->status,
         ]);
-        return Redirect::route('student.create')->with('success', 'profile-created');
+        if ($studentdetail) {
+            return Redirect::route('student.create')->with('success', 'profile-created');
+        } else {
+            return Redirect::route('student.create')->with('success', 'fail!');
+        }
     }
 
     public function edit_student(Request $request)

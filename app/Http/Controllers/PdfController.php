@@ -19,6 +19,7 @@ class PdfController extends Controller
         $standard_id = $request->standard_id;
         $chapter_id = $request->chapter_id;
         $subject_id = $request->subject_id;
+        $assign_status = $request->assign_status;
 
         $token = $request->header('Authorization');
 
@@ -35,6 +36,7 @@ class PdfController extends Controller
                 'subject_id' => 'required',
                 'user_id'  => 'required',
                 'pdf_id' => 'required',
+                'assign_status' => 'required',
             ]);
 
             // Check if validation fails
@@ -74,7 +76,8 @@ class PdfController extends Controller
                     'batch_id' => $value,
                     'standard_id' => $standard_id,
                     'chapter_id' => $chapter_id,
-                    'subject_id' => $subject_id
+                    'subject_id' => $subject_id,
+                    'assign_status' => $assign_status,
                 ]);
             }
 

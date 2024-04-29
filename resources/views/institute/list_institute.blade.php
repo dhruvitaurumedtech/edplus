@@ -80,11 +80,12 @@
                       &nbsp;&nbsp;
                       <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
-                      <form method="post" action="{{url('/student/list')}}">
+                      <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning">Student List</a>
+                      <!-- <form method="post" action="{{url('/student/list')}}">
                         @csrf
-                        <input type="hidden" name="institute_id" value="{{ $value['id'] }}">
+                        <input type="hidden" name="institute_id" value="">
                         <input type="submit" class="btn btn-warning" value="Student List">
-                      </form>
+                      </form> -->
                     </div>
                 </tr>
                 @php $i++ @endphp
@@ -173,8 +174,9 @@
   document.querySelectorAll('.editButton').forEach(function(button) {
     button.addEventListener('click', function() {
       var user_id = this.getAttribute('data-user-id');
-      var baseUrl = '{{ url('') }}';
-      axios.post(baseUrl +'/admin/edit', {
+      var baseUrl = '{{ url('
+      ') }}';
+      axios.post(baseUrl + '/admin/edit', {
           user_id: user_id
         })
         .then(response => {

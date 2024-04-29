@@ -42,78 +42,82 @@
         </div>
 
         <div class="row">
-          <div class="col-lg-6 mt-3 institute-form">
-            <form class="s-chapter-form institute-form" action="{{ url('roles/save') }}" method="post">
-              @csrf
-              <h4 class="mb-3">Create Admin</h4>
+          <div class="col-lg-6 mt-3">
+            <div class="institute-form">
+              <form class="s-chapter-form " action="{{ url('roles/save') }}" method="post">
+                @csrf
+                <h4 class="mb-3">Create Admin</h4>
 
-              <div class="create-admin mt-4">
-                <div class="form-group row">
-                  <div class="col-md-3">
-                    <label>Enter Role</label>
-                  </div>
-                  <div class="col-md-9">
-                    <input type="text" name="role_name" class="form-control" placeholder="Enter Role">
+                <div class="create-admin mt-4">
+                  <div class="form-group row">
+                    <div class="col-md-3">
+                      <label>Enter Role</label>
+                    </div>
+                    <div class="col-md-9">
+                      <input type="text" name="role_name" class="form-control" placeholder="Enter Role" value="{{old('role_name')}}">
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              <div class="submit-btn">
-                <input type="submit" value="Submit" class="btn bg-primary-btn text-white">
-              </div>
-            </form>
-          </div>
-          <div class="col-lg-5 offset-md-1 mt-3 institute-form">
-            <div class="create-title-btn">
-              <h4 class="mb-0">List of Role</h4>
-              <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
-              <div class="inner-list-search">
-                <input type="search" class="form-control myInput" name="search" placeholder="Search">
-                @canButton('add', 'Role')
-                <a href="{{ url('create/role') }}" class="btn text-white btn-rmv2">Create role</a>
-                @endCanButton
-
-              </div>
-
+                <div class="submit-btn">
+                  <input type="submit" value="Submit" class="btn bg-primary-btn text-white">
+                </div>
+              </form>
             </div>
-            <table class="table table-bordered institute-table mt-4 table-responsive-sm">
-              <thead>
-                <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Role Name</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody class="myTable">
-                @php $i=1 @endphp
-                @foreach($roles as $value)
-                <tr>
-                  <td>{{$i}}</td>
-                  <td>{{$value->role_name}}</td>
-                  <td>
-                    <div class="d-flex">
-                      @canButton('edit', 'Role')
-                      <input type="submit" class="btn btn-primary editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                      @endCanButton
-                      <form method="get" action="{{url('permission')}}">
-                        @csrf
-                        <input type="hidden" value="{{ $value->id }}" name="id">
-                        <input type="submit" class="btn btn-success" value="Permission">
+          </div>
+          <div class="col-lg-6  mt-3">
+            <div class="institute-form">
+              <div class="create-title-btn ">
+                <h4 class="mb-0">List of Role</h4>
+                <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
+                <div class="inner-list-search">
+                  <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                  @canButton('add', 'Role')
+                  <a href="{{ url('create/role') }}" class="btn text-white btn-rmv2">Create role</a>
+                  @endCanButton
 
-                      </form>
-                      &nbsp;&nbsp;
-                      @canButton('delete', 'Role')
+                </div>
 
-                      @if($value->id !='1')
-                      <input type="submit" class="btn btn-danger deletebutton" data-role-id="{{ $value->id }}" value="Delete">
-                      @endif
-                      @endCanButton
-                    </div>
-                </tr>
-                @php $i++ @endphp
-                @endforeach
-              </tbody>
-            </table>
+              </div>
+              <table class="table table-bordered institute-table mt-4 table-responsive-sm">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Role Name</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody class="myTable">
+                  @php $i=1 @endphp
+                  @foreach($roles as $value)
+                  <tr>
+                    <td>{{$i}}</td>
+                    <td>{{$value->role_name}}</td>
+                    <td>
+                      <div class="d-flex">
+                        @canButton('edit', 'Role')
+                        <input type="submit" class="btn btn-primary editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        @endCanButton
+                        <form method="get" action="{{url('permission')}}">
+                          @csrf
+                          <input type="hidden" value="{{ $value->id }}" name="id">
+                          <input type="submit" class="btn btn-success" value="Permission">
+
+                        </form>
+                        &nbsp;&nbsp;
+                        @canButton('delete', 'Role')
+
+                        @if($value->id !='1')
+                        <input type="submit" class="btn btn-danger deletebutton" data-role-id="{{ $value->id }}" value="Delete">
+                        @endif
+                        @endCanButton
+                      </div>
+                  </tr>
+                  @php $i++ @endphp
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
           </div>
           <div class="d-flex justify-content-end">
             {!! $roles->withQueryString()->links('pagination::bootstrap-5') !!}

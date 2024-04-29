@@ -57,8 +57,8 @@
               <div class="col-sm-10">
                 <select class="form-control" name="role_type" id="role_type">
                   <option value="">Select Role</option>
-                  <option value="2">Admin</option>
-                  <option value="3">Institute</option>
+                  <option value="2" {{ old('role_type') == '2' ? 'selected' : '' }}>Admin</option>
+                  <option value="3" {{ old('role_type') == '3' ? 'selected' : '' }}>Institute</option>
                 </select>
                 @error('role_type')
                 <div class="text-danger">{{ $message }}</div>
@@ -68,7 +68,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
               <div class="col-sm-10">
-                <input type="text" id="firstname" name="firstname" class="form-control" placeholder="first name">
+                <input type="text" id="firstname" name="firstname" class="form-control" placeholder="first name" value="{{old('firstname')}}">
                 @error('firstname')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -77,7 +77,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">lastname</label>
               <div class="col-sm-10">
-                <input type="text" id="lastname" name="lastname" class="form-control" placeholder="last name">
+                <input type="text" id="lastname" name="lastname" class="form-control" placeholder="last name" value="{{old('lastname')}}">
                 @error('lastname')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -86,7 +86,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
               <div class="col-sm-10">
-                <input type="email" class="form-control" id="email" name="email" placeholder="Email">
+                <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{old('email')}}">
                 @error('email')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -95,7 +95,7 @@
             <div class="form-group row">
               <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
               <div class="col-sm-10">
-                <input type="password" id="password" name="password" class="form-control" placeholder="Password">
+                <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="{{old('password')}}">
                 @error('password')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -104,7 +104,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Phone </label>
               <div class="col-sm-10">
-                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('password')}}">
               </div>
             </div>
           </div>

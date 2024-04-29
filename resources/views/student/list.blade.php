@@ -44,12 +44,14 @@
             @endif
           </div>
         </div>
+        <a href="{{url('student/create/'.$institute_id)}}" class="btn btn-success" style="float: right;">Create Student</a>
 
-        <form method="post" action="{{url('student/create')}}">
+        <!-- <form method="post" action="{{url('student/create')}}">
           @csrf
           <input type="submit" value="Create Student" class="btn btn-success" style="float: right;">
-          <input type="hidden" name="institute_id" id="institute_id" value="{{ $institute_id }}">
-        </form>
+        </form> -->
+        <!-- <input type="text" name="institute_id" id="institute_id" value="{{ $institute_id }}"> -->
+
         <div class="card-body">
           <table class="table table-js table-bordered table-responsive">
             <thead>

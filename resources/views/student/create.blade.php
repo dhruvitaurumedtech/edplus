@@ -1,3 +1,7 @@
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/css/bootstrap-datepicker.css" rel="stylesheet">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.5.0/js/bootstrap-datepicker.js"></script>
+
 </head>
 
 <body>
@@ -52,7 +56,7 @@
                                 <div class="row">
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">First Name : </label>
-                                        <input type="text" name="firstname" class="form-control" placeholder="Enter First Name">
+                                        <input type="text" name="firstname" class="form-control" placeholder="Enter First Name" value="{{old('firstname')}}">
                                         @error('firstname')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -60,7 +64,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">Last Name : </label>
-                                        <input type="text" name="lastname" class="form-control" placeholder="Enter Last Name">
+                                        <input type="text" name="lastname" class="form-control" placeholder="Enter Last Name" value="{{old('lastname')}}">
                                         @error('lastname')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -68,7 +72,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">Mobile : </label>
-                                        <input type="tel" name="mobile" class="form-control" placeholder="Enter Mobile No.">
+                                        <input type="tel" name="mobile" class="form-control" placeholder="Enter Mobile No." value="{{old('mobile')}}">
                                         @error('mobile')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -76,7 +80,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">EmailID : </label>
-                                        <input type="email" name="email" class="form-control" placeholder="Enter Email ID">
+                                        <input type="email" name="email" class="form-control" placeholder="Enter Email ID" value="{{old('email')}}">
                                         @error('email')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -84,7 +88,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputpassword">Password : </label>
-                                        <input type="password" name="password" class="form-control" placeholder="Enter Password">
+                                        <input type="password" name="password" class="form-control" placeholder="Enter Password" value="{{old('password')}}">
                                         @error('password')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -92,7 +96,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">Address : </label>
-                                        <textarea name="address" class="form-control" placeholder="Address"></textarea>
+                                        <textarea name="address" class="form-control" placeholder="Address">{{old('address')}}</textarea>
                                         @error('address')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -100,7 +104,7 @@
 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">DOB : </label>
-                                        <input type="date" name="dob" class="form-control" placeholder="Date Of Birth">
+                                        <input type="date" name="dob" class="form-control" placeholder="Date Of Birth" value="{{old('dob')}}">
                                         @error('dob')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
@@ -120,7 +124,7 @@
                                         <select name="institute_for_id" id="institute_for_id" class="form-control" onchange="boardlist()">
                                             <option value="">Select Institute For</option>
                                             @foreach($institute_for as $stage)
-                                            <option value="{{ $stage->id }}">{{ $stage->name }}</option>
+                                            <option value="{{ $stage->id }}" {{ old('institute_for_id') == $stage->id ? 'selected' : '' }}>{{ $stage->name }}</option>
                                             @endforeach
                                         </select>
                                         @error('institute_for_id')
@@ -132,9 +136,11 @@
                                         <label for="exampleInputEmail1">Board : </label>
                                         <select name="board_id" id="board_id" class="form-control">
                                             <option value="">Select Board</option>
+                                            @if(!empty($board))
                                             @foreach($board as $instituteboard)
-                                            <option value="{{ $instituteboard->id }}">{{ $instituteboard->name }}</option>
+                                            <option value="{{ $instituteboard->id }}" {{ old('board_id') == $instituteboard->id ? 'selected' : '' }}>{{ $instituteboard->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('board_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -145,9 +151,11 @@
                                         <label for="exampleInputEmail1">Medium : </label>
                                         <select name="medium_id" class="form-control">
                                             <option value="">Select Medium</option>
+                                            @if(!empty($medium))
                                             @foreach($medium as $institutemedium)
-                                            <option value="{{ $institutemedium->id }}">{{ $institutemedium->name }}</option>
+                                            <option value="{{ $institutemedium->id }}" {{ old('medium_id') == $institutemedium->id ? 'selected' : '' }}>{{ $institutemedium->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('medium_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -158,9 +166,11 @@
                                         <label for="exampleInputEmail1">Student Class : </label>
                                         <select name="class_id" class="form-control">
                                             <option value="">Select Class</option>
+                                            @if(!empty($class))
                                             @foreach($class as $instituteclass)
-                                            <option value="{{ $instituteclass->id }}">{{ $instituteclass->name }}</option>
+                                            <option value="{{ $instituteclass->id }}" {{ old('class_id') == $instituteclass->id ? 'selected' : '' }}>{{ $instituteclass->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('class_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -170,9 +180,11 @@
                                         <label for="exampleInputEmail1">Standard : </label>
                                         <select name="standard_id" class="form-control">
                                             <option value="">Select Standard</option>
+                                            @if(!empty($standard))
                                             @foreach($standard as $institutestandard)
-                                            <option value="{{ $institutestandard->id }}">{{ $institutestandard->name }}</option>
+                                            <option value="{{ $institutestandard->id }}" {{ old('standard_id') == $institutestandard->id ? 'selected' : '' }}>{{ $institutestandard->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('standard_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -182,9 +194,11 @@
                                         <label for="exampleInputEmail1">Stream : </label>
                                         <select name="stream_id" class="form-control">
                                             <option value="">Select Stream</option>
+                                            @if(!empty($stream))
                                             @foreach($stream as $institutestream)
-                                            <option value="{{ $institutestream->id }}">{{ $institutestream->name }}</option>
+                                            <option value="{{ $institutestream->id }}" {{ old('stream_id') == $institutestream->id ? 'selected' : '' }}>{{ $institutestream->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('stream_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -195,9 +209,11 @@
                                         <label for="exampleInputEmail1">Subject : </label>
                                         <select name="subject_id" class="form-control">
                                             <option value="">Select Subject</option>
+                                            @if(!empty($subject))
                                             @foreach($subject as $institutesubject)
-                                            <option value="{{ $institutesubject->id }}">{{ $institutesubject->name }}</option>
+                                            <option value="{{ $institutesubject->id }}" {{ old('subject_id') == $institutesubject->id ? 'selected' : '' }}>{{ $institutesubject->name }}</option>
                                             @endforeach
+                                            @endif
                                         </select>
                                         @error('subject_id')
                                         <div class="text-danger">{{ $message }}</div>
@@ -208,9 +224,9 @@
                                         <label for="exampleInputEmail1">status : </label>
                                         <select class="form-control" name="status">
                                             <option value="">Select option</option>
-                                            <option value="0">Pending</option>
-                                            <option value="1">Approved</option>
-                                            <option value="2">Denied</option>
+                                            <option value="0" {{ old('0') == 0 ? 'selected' : '' }}>Pending</option>
+                                            <option value="1" {{ old('1') == 1 ? 'selected' : '' }}>Approved</option>
+                                            <option value="2" {{ old('2') == 2 ? 'selected' : '' }}>Denied</option>
                                         </select>
                                         @error('status')
                                         <div class="text-danger">{{ $message }}</div>
@@ -224,15 +240,17 @@
                         <div class="submit-btn">
                             <input type="submit" value="Submit" class="btn bg-primary-btn text-white mt-4">
                         </div>
+                    </form>
                 </div>
             </div>
 
 
-            </form>
+
 
         </div>
 
         @include('layouts/footer_new')
+
         <script>
             function previewFile() {
                 $("#image").show();

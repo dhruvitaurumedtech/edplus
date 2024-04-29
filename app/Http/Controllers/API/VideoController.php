@@ -234,6 +234,7 @@ class VideoController extends Controller
             'chapter_id' => 'required',
             'subject_id' => 'required',
             'user_id'  => 'required',
+            'assign_status' => 'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
@@ -259,7 +260,8 @@ class VideoController extends Controller
                     'batch_id' => $value,
                     'standard_id' => $request->standard_id,
                     'chapter_id' => $request->chapter_id,
-                    'subject_id' => $request->subject_id
+                    'subject_id' => $request->subject_id,
+                    'assign_status' => $request->assign_status,
                 ]);
             }
             return $this->response([], "Video Assign Batch Successfully");
