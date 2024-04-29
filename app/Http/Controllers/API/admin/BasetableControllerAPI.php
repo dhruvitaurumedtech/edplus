@@ -211,7 +211,9 @@ class BasetableControllerAPI extends Controller
         }
     }
 
-    public function subject(Request $request){
+   
+    public function subject(Request $request)
+    {
 
         $validator = \Validator::make($request->all(), [
             'institute_for_id' => 'required',
@@ -226,31 +228,32 @@ class BasetableControllerAPI extends Controller
         }
 
         try {
-                $institute_for_ids = explode(',', $request->institute_for_id);
-                $board_ids = explode(',', $request->board_id);
-                $medium_ids = explode(',', $request->medium_id);
-                $class_ids = explode(',', $request->class_id);
-                $standard_ids = explode(',', $request->standard_id);
-                $stream_ids = explode(',', $request->stream_id);
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $board_ids = explode(',', $request->board_id);
+            $medium_ids = explode(',', $request->medium_id);
+            $class_ids = explode(',', $request->class_id);
+            $standard_ids = explode(',', $request->standard_id);
+            $stream_ids = explode(',', trim($request->stream));
 
-                $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
-                ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->whereIN('base_table.board', $board_ids)
-                ->whereIN('base_table.medium', $medium_ids)
-                ->whereIN('base_table.institute_for_class', $class_ids)
-                ->whereIN('base_table.standard', $standard_ids);
+            $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->whereIn('base_table.institute_for', $institute_for_ids)
+                ->whereIn('base_table.board', $board_ids)
+                ->whereIn('base_table.medium', $medium_ids)
+                ->whereIn('base_table.institute_for_class', $class_ids)
+                ->whereIn('base_table.standard', $standard_ids);
 
-            
-
+            if (!empty($stream_ids) && array_filter($stream_ids)) {
+                $base_subject_query->whereIn('base_table.stream', $stream_ids);
+            }
             $base_subject = $base_subject_query
                 ->select('subject.id', 'subject.name', 'subject.image')
                 ->distinct()
                 ->get();
-                $data = [];
-                foreach ($base_subject as $basesubject) {
-                    $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name,'image'=>$basesubject->image);
-                }
-                
+
+            $data = [];
+            foreach ($base_subject as $basesubject) {
+                $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name, 'image' => $basesubject->image);
+            }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
