@@ -38,6 +38,13 @@
           </div>
           @endif
         </div>
+        <div class="col-md-10 offset-md-1">
+          @if (session('error'))
+          <div class="alert alert-success">
+            {{ session('error') }}
+          </div>
+          @endif
+        </div>
       </div>
 
       <div class="dashboard-content side-content">
@@ -224,117 +231,117 @@
       @include('layouts/footer_new')
     </div>
   </div>
-      <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-      <script>
-        document.querySelectorAll('.editButton').forEach(function(button) {
-          button.addEventListener('click', function() {
-            var subject_id = this.getAttribute('data-user-id');
-            axios.post('/subject/edit', {
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script>
+    document.querySelectorAll('.editButton').forEach(function(button) {
+      button.addEventListener('click', function() {
+        var subject_id = this.getAttribute('data-user-id');
+        axios.post('/subject/edit', {
+            subject_id: subject_id
+          })
+          .then(response => {
+            var reponse_data = response.data.subjectlist;
+            $('#subject_id').val(reponse_data.id);
+            $('#standard_id').val(reponse_data.standard_id);
+            $('#name').val(reponse_data.name);
+            $('#status').val(reponse_data.status);
+            $('#usereditModal').modal('show');
+          })
+          .catch(error => {
+            console.error(error);
+          });
+      });
+    });
+
+    document.querySelectorAll('.deletebutton').forEach(function(button) {
+      button.addEventListener('click', function(event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var subject_id = this.getAttribute('data-user-id');
+
+        // Show SweetAlert confirmation
+        Swal.fire({
+          title: 'Are you sure want to delete?',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            axios.post('/subject/delete', {
                 subject_id: subject_id
               })
               .then(response => {
-                var reponse_data = response.data.subjectlist;
-                $('#subject_id').val(reponse_data.id);
-                $('#standard_id').val(reponse_data.standard_id);
-                $('#name').val(reponse_data.name);
-                $('#status').val(reponse_data.status);
-                $('#usereditModal').modal('show');
+                location.reload(true);
+
               })
               .catch(error => {
                 console.error(error);
               });
-          });
+          }
         });
+      });
+    });
+  </script>
 
-        document.querySelectorAll('.deletebutton').forEach(function(button) {
-          button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default form submission
+  <script>
+    $(document).ready(function() {
 
-            var subject_id = this.getAttribute('data-user-id');
+      $('#standard_id').on('change', function() {
+        var standard_id = $(this).val();
+        axios.post('/get/standard_wise_stream', {
+            standard_id: standard_id,
+          })
+          .then(function(response) {
+            console.log(response.data.streamlist);
+            if (response.data.streamlist && Object.keys(response.data.streamlist).length > 0) {
+              $('#secondDropdown2').show();
+              $('#streamlabel').show();
 
-            // Show SweetAlert confirmation
-            Swal.fire({
-              title: 'Are you sure want to delete?',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#3085d6',
-              confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                axios.post('/subject/delete', {
-                    subject_id: subject_id
-                  })
-                  .then(response => {
-                    location.reload(true);
+              var secondDropdown = document.getElementById('secondDropdown2');
+              secondDropdown.innerHTML = ''; // Clear existing options
 
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
-            });
-          });
-        });
-      </script>
+              secondDropdown.appendChild(new Option('Select stream', ''));
 
-      <script>
-        $(document).ready(function() {
-
-          $('#standard_id').on('change', function() {
-            var standard_id = $(this).val();
-            axios.post('/get/standard_wise_stream', {
-                standard_id: standard_id,
-              })
-              .then(function(response) {
-                console.log(response.data.streamlist);
-                if (response.data.streamlist && Object.keys(response.data.streamlist).length > 0) {
-                  $('#secondDropdown2').show();
-                  $('#streamlabel').show();
-
-                  var secondDropdown = document.getElementById('secondDropdown2');
-                  secondDropdown.innerHTML = ''; // Clear existing options
-
-                  secondDropdown.appendChild(new Option('Select stream', ''));
-
-                  response.data.streamlist.forEach(function(stream) {
-                    var option = new Option(stream.name, stream.id);
-                    secondDropdown.appendChild(option);
-                  });
-                } else {
-                  $('#secondDropdown2').hide();
-                  $('#streamlabel').hide();
-                }
-
-              })
-              .catch(function(error) {
-                console.error(error);
+              response.data.streamlist.forEach(function(stream) {
+                var option = new Option(stream.name, stream.id);
+                secondDropdown.appendChild(option);
               });
-
-
-          });
-        });
-
-        //add more
-
-        $(document).ready(function() {
-          var maxFields = 10; // Maximum number of input fields
-          var addButton = $('#addmore'); // Add button selector
-          var container = $('#container'); // Container selector
-
-          var x = 1; // Initial input field counter
-
-          // Triggered on click of add button
-          $(addButton).click(function() {
-            // Check maximum number of input fields
-            if (x < script maxFields) {
-              x++; // Increment field counter
-              // Add input field
-              $(container).append('<input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>');
             } else {
-              alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+              $('#secondDropdown2').hide();
+              $('#streamlabel').hide();
             }
+
+          })
+          .catch(function(error) {
+            console.error(error);
           });
-        });
-      </script>
+
+
+      });
+    });
+
+    //add more
+
+    $(document).ready(function() {
+      var maxFields = 10; // Maximum number of input fields
+      var addButton = $('#addmore'); // Add button selector
+      var container = $('#container'); // Container selector
+
+      var x = 1; // Initial input field counter
+
+      // Triggered on click of add button
+      $(addButton).click(function() {
+        // Check maximum number of input fields
+        if (x < script maxFields) {
+          x++; // Increment field counter
+          // Add input field
+          $(container).append('<input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>');
+        } else {
+          alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+        }
+      });
+    });
+  </script>
 </body>

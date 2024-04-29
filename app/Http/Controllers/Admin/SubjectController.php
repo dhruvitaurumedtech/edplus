@@ -61,22 +61,30 @@ class SubjectController extends Controller
             'status' => 'required',
         ]);
 
-        $query = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
-            ->where('base_table.institute_for', $request->input('institute_for'))
-            ->where('base_table.board', $request->input('board'))
-            ->where('base_table.medium', $request->input('medium'))
-            ->where('base_table.institute_for_class', $request->input('institute_for_class'))
-            ->where('base_table.standard', $request->input('standard'))
-            ->where('base_table.stream', $request->input('stream'))
-            ->where('subject.name', $request->input('subject'));
+        // Build the query
 
-        // Print the last executed SQL query
-        $lastQuery = $query->toSql();
-        echo $lastQuery;
+        // Subquery to check for existence of a record in the subject table
+        $subquery = DB::table('subject')
+            ->select(DB::raw(1))
+            ->whereColumn('subject.base_table_id', 'base_table.id')
+            ->where('subject.name', request('subject'));
 
+        // Build the main query
+        $query = DB::table('base_table')
+            ->where('institute_for', request('institute_for'))
+            ->where('board', request('board'))
+            ->where('medium', request('medium'))
+            ->where('institute_for_class', request('institute_for_class'))
+            ->where('standard', request('standard'))
+            ->where('stream', request('stream'))
+            ->where('status', request('status'))
+            ->whereExists($subquery);
 
-        // exit;
-        if ($count > 0) {
+        // Print the generated SQL query
+
+        // Execute the query and check if any results are returned
+        $exists = $query->count();
+        if ($exists <= 0) {
 
 
             $base_table = Base_table::create([
@@ -86,7 +94,7 @@ class SubjectController extends Controller
                 'institute_for_class' => $request->input('institute_for_class'),
                 'standard' => $request->input('standard'),
                 'stream' => $request->input('stream'),
-                'subject' => $request->input('subject'),
+                // 'subject' => $request->input('subject'),
                 'status' => $request->input('status'),
                 'created_by' => Auth::id(),
             ]);
@@ -112,13 +120,12 @@ class SubjectController extends Controller
                     } else {
                     }
                 }
-            } else {
             }
 
 
             return redirect()->route('subject.list')->with('success', 'Subject Created Successfully');
         } else {
-            return redirect()->route('subject.list')->with('success', 'Already Exist Record!');
+            return redirect()->route('subject.list')->with('error', 'Already Exist Record!');
         }
     }
 
