@@ -1,4 +1,5 @@
 </head>
+<meta name="base-url" content="{{ url('/') }}">
 
 <body>
   <div class="dashboard">
@@ -41,7 +42,7 @@
       <div class="dashboard-content side-content">
 
 
-        <div class="col-lg-12 mt-3 institute-form">
+        <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
             <h4 class="mb-0">List of Role</h4>
             <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
@@ -76,11 +77,11 @@
                   <td>{{$value['status']}}</td>
                   <td>
                     <div class="d-flex">
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
+                      <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
                       &nbsp;&nbsp;
                       <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
-                      <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning">Student List</a>
+                      <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning" style="text-wrap: nowrap;">Student List</a>
                       <!-- <form method="post" action="{{url('/student/list')}}">
                         @csrf
                         <input type="hidden" name="institute_id" value="">
@@ -174,8 +175,7 @@
   document.querySelectorAll('.editButton').forEach(function(button) {
     button.addEventListener('click', function() {
       var user_id = this.getAttribute('data-user-id');
-      var baseUrl = '{{ url('
-      ') }}';
+      var baseUrl = $('meta[name="base-url"]').attr('content');
       axios.post(baseUrl + '/admin/edit', {
           user_id: user_id
         })

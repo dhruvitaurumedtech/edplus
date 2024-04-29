@@ -23,7 +23,7 @@
                     <li><a href="javascript:void(0)">/</a></li>
                     <li><a href="javascript:void(0)">Institute</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)">List Institute</a></li>
+                    <li><a href="javascript:void(0)">Subject</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
 
                     <li><a href="javascript:void(0)" class="active-link-dir">Student </a></li>

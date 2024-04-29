@@ -109,7 +109,7 @@
             </div>
           </div>
           <div class="d-flex">
-            <button type="submit" class="btn btn-info" style="margin-left: auto;">Submit</button>
+            <button type="submit" class="btn text-white btn-rmv2" style="margin-left: auto;">Submit</button>
           </div>
 
         </form>

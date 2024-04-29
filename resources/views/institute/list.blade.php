@@ -75,7 +75,7 @@
                     <td>{{$value->mobile}}</td>
                     <td>
                       <div class="d-flex">
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         &nbsp;&nbsp;
                         <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                       </div>
@@ -173,7 +173,8 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var user_id = this.getAttribute('data-user-id');
-        var baseUrl = '{{ url('') }}';
+        var baseUrl = '{{ url('
+        ') }}';
         axios.post(baseUrl + '/admin/edit', {
             user_id: user_id
           })

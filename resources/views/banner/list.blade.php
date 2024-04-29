@@ -22,7 +22,7 @@
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Banner</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}">Create Banner</a></li>
+          <li><a href="{{url('institute-list')}}" class="active-link-dir">Create Banner</a></li>
         </ul>
       </div>
 
@@ -53,20 +53,22 @@
                   <select name="institute_id" class="form-control">
                     <option value="">Select option</option>
                     @foreach($institute_list as $value)
-                    <option value="{{$value->id}}">{{$value->institute_name}}</option>
+                    <option value="{{ $value->id }}" {{ $value->id == old('institute_id') ? 'selected' : '' }}>
+                      {{ $value->institute_name }}
+                    </option>
                     @endforeach
                   </select>
                   @error('banner_image')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   <label for="exampleInputEmail1">Url : </label>
-                  <input type="text" name="url" class="form-control" placeholder="Enter url">
+                  <input type="text" name="url" class="form-control" placeholder="Enter url" value="{{url('url')}}">
                   @error('url')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   @endif
                   <label for="exampleInputEmail1">Banner_image : </label>
-                  <input type="file" name="banner_image[]" class="form-control" multiple>
+                  <input type="file" name="banner_image[]" class="form-control" multiple name="{{url('banner_image')}}">
                   @error('banner_image')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
@@ -82,7 +84,7 @@
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                    <button type="submit" class="btn text-white blue-button" style="float: right;">Submit</button>
                   </div>
                 </form>
               </div>
@@ -132,7 +134,7 @@
                         <td>
                           <div class="d-flex">
                             @canButton('edit', 'Banner')
-                            <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                            <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                             @endCanButton
                             &nbsp;&nbsp;
                             @canButton('delete', 'Banner')
@@ -200,7 +202,7 @@
                       </div>
                     </div>
                     <div class="d-flex justify-content-end">
-                      <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                      <button type="submit" class="btn text-white blue-button" style="float: right;">Update</button>
                     </div>
                 </div>
               </div>

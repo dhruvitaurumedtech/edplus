@@ -682,6 +682,15 @@ form.institute {
     cursor: pointer;
 }
 
+.blue-button {
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 6px 10px;
+    text-wrap: nowrap;
+    cursor: pointer;
+}
+
 .inner-list-search {
     display: flex;
     gap: 10px;
@@ -1421,4 +1430,29 @@ h1,
 
 .img-resize {
     height: 50px;
+}
+
+.border-line-subject {
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    padding: 0px 42px 42px 42px;
+}
+
+.f-icons {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 50px;
+    margin-top: 25px;
+    width: 100px;
+    margin-left: auto;
+}
+
+.delete_buttton_subject {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 50px;
+    margin-top: 54px;
+    width: 100px;
+    margin-left: auto;
 }

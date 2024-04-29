@@ -122,7 +122,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn text-white blue-button">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -171,7 +171,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
                                                 &nbsp;&nbsp;
                                                 <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
                                             </div>
@@ -277,7 +277,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary">Update</button>
+                                    <button type="submit" class="btn text-white blue-button">Update</button>
                                 </div>
                             </form>
                         </div>
@@ -291,7 +291,8 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var anouncement_id = this.getAttribute('data-user-id');
-                        var baseUrl = '{{ url('') }}';
+                        var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
                         axios.post(baseUrl + '/announcement/edit', {
                                 anouncement_id: anouncement_id

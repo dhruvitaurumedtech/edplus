@@ -1,5 +1,4 @@
 </head>
-<meta name="base-url" content="{{ url('/') }}">
 
 <body>
 
@@ -51,7 +50,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">Name : </label>
-                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Name">
+                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -84,9 +83,10 @@
                     <label for="exampleInputEmail1">status : </label>
                     <select class="form-control search-box" name="status">
                       <option value=" ">Select Option</option>
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
+                      <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                      <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
+
                     @error('status')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -141,7 +141,7 @@
                       <div class="d-flex">
 
                         @canButton('edit', 'Institute_for')
-                        <input type="button" class="btn btn-primary institute_for_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="button" class="btn text-white btn-rmv2 institute_for_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Institute_for')

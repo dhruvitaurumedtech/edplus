@@ -84,7 +84,7 @@
                 <td>{{$value->mobile}}</td>
                 <td>
                   <div class="d-flex">
-                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                    <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                     &nbsp;&nbsp;
                     <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                   </div>
@@ -169,7 +169,7 @@
 
             <hr>
             <div class="">
-              <button type="submit" class="btn btn-info" style="float:right">Update</button>
+              <button type="submit" class="btn text-white btn-rmv2" style="float:right">Update</button>
             </div>
         </form>
       </div>

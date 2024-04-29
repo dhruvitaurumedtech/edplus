@@ -77,7 +77,7 @@
                   </div>
                 </div>
                 <div class="d-flex">
-                  <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
+                  <button type="submit" class="btn text-white blue-button" style="float: right;">Submit</button>
                 </div>
               </form>
             </div>
@@ -121,7 +121,7 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Board')
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Board')
@@ -183,7 +183,7 @@
                         </div>
                       </div>
                       <div class="d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                        <button type="submit" class="btn text-white blue-button" style="float: right;">Update</button>
                       </div>
                   </div>
                 </div>
@@ -197,7 +197,7 @@
           document.querySelectorAll('.editButton').forEach(function(button) {
             button.addEventListener('click', function() {
               var video_category_id = this.getAttribute('data-user-id');
-              var baseUrl = '{{ url('') }}';
+              var baseUrl = $('meta[name="base-url"]').attr('content');
 
               axios.post(baseUrl + '/video-category-edit', {
                   video_category_id: video_category_id

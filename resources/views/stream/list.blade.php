@@ -53,7 +53,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">Stream Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Stream Name">
+                        <input type="text" name="name" class="form-control" placeholder="Enter Stream Name" value="{{old('name')}}">
                         @error('name')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -63,8 +63,8 @@
                         <label for="exampleInputEmail1">status : </label>
                         <select class="form-control" name="status">
                           <option value=" ">Select Option</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
+                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         @error('status')
                         <div class="text-danger">{{ $message }}</div>
@@ -76,7 +76,7 @@
                   </div>
                 </div>
                 <div class="col-md-12 submit-btn">
-                  <button type="submit" class="btn btn-primary">Submit</button>
+                  <button type="submit" class="btn text-white btn-rmv2">Submit</button>
                 </div>
               </form>
             </div>
@@ -125,7 +125,7 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Stream')
-                        <input type="submit" class="btn btn-success editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Stream')
@@ -189,7 +189,7 @@
                     </div>
                   </div>
                   <div>
-                    <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                    <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Update</button>
                   </div>
               </div>
             </div>
@@ -203,7 +203,7 @@
       document.querySelectorAll('.editButton').forEach(function(button) {
         button.addEventListener('click', function() {
           var stream_id = this.getAttribute('data-user-id');
-          var baseUrl = '{{ url('') }}';
+          var baseUrl = $('meta[name="base-url"]').attr('content');
 
           axios.post(baseUrl + '/stream-edit', {
               stream_id: stream_id

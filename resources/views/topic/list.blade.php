@@ -88,7 +88,7 @@
                     </select>
                   </div>
                   <br>
-                  <a class="btn btn-success" id="addmore">
+                  <a class="btn text-white btn-rmv2" id="addmore">
                     <i class="fas fa-plus"></i>
                   </a>
                   <br>
@@ -128,7 +128,7 @@
                       @enderror
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-success mt-3" style="float: right;">Submit</button>
+                  <button type="submit" class="btn text-white btn-rmv2 mt-3" style="float: right;">Submit</button>
               </form>
               <br>
               <br>
@@ -169,7 +169,7 @@
                   </td>
                   <td>
                     @canButton('edit', 'Topic')
-                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
+                    <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
                     @endCanButton
                     @canButton('view', 'Topic')
                     <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $value->subject_id }}" data-base-id="{{ $value->base_id }}" data-chapter-id="{{$value->chapter_id}}" value="View">&nbsp;&nbsp;
@@ -371,7 +371,7 @@
           video + x ')' +
           '<div class="text-danger">{{ $message }}</div>' +
           '@enderror' +
-          '</div><br><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>'
+          '</div><br><a class="btn text-white btn-rmv2" id="delete"><i class="fas fa-trash"></i></a>'
         );
       } else {
         alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached

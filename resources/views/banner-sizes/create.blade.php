@@ -66,13 +66,13 @@
                                     <input type="number" class="form-control" name="height" required>
                                 </div>
                                 <div class="flex mb-5">
-                                    <button type="submit" class="btn btn-primary" style="float: right;">Create</button>
+                                    <button type="submit" class="btn text-white blue-button" style="float: right;">Create</button>
                                 </div>
                             </form>
 
                         </div>
                     </div>
-                    <div class="col-lg-7 mt-4">
+                    <div class="col-lg-7">
                         <div class="institute-form">
                             <h3>BannerSize List</h3>
                             <div class="card-body">
@@ -96,7 +96,7 @@
                                             <td>
 
                                                 <div class="d-flex">
-                                                    <button class="btn btn-primary editButton" data-banner-id="{{ $bannerSize->id }}">Edit</button>
+                                                    <button class="btn text-white blue-button editButton" data-banner-id="{{ $bannerSize->id }}">Edit</button>
                                                     &nbsp;&nbsp;
                                                     <button class="btn btn-danger deleteButton" data-banner-id="{{ $bannerSize->id }}">Delete</button>
                                                 </div>
@@ -122,9 +122,9 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var bannerId = this.getAttribute('data-banner-id');
-                        var baseUrl = '{{ url('') }}';
+                        var baseUrl = $('meta[name="base-url"]').attr('content');
 
-                        axios.post(baseUrl +'/banner-sizes/edit', {
+                        axios.post(baseUrl + '/banner-sizes/edit', {
                                 banner_id: bannerId
                             })
                             .then(response => {
@@ -196,7 +196,7 @@
                                 <label for="height">Height</label>
                                 <input type="number" class="form-control" id="height" name="height" required>
                             </div>
-                            <button type="submit" class="btn btn-primary">Update</button>
+                            <button type="submit" class="btn text-white blue-button">Update</button>
                         </form>
                     </div>
                 </div>

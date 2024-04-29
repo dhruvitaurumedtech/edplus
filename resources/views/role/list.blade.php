@@ -96,7 +96,7 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Role')
-                        <input type="submit" class="btn btn-primary editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         <form method="get" action="{{url('permission')}}">
                           @csrf

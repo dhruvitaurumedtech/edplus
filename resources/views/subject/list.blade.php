@@ -46,191 +46,68 @@
           @endif
         </div>
       </div>
+      <div class="dashboard-content side-content ">
+        <div class="col-lg-12 institute-form">
+          <div class="create-title-btn">
+            <h4 class="mb-0">List of Institute</h4>
+            <div class="inner-list-search">
+              <input type="search" class="form-control myInput" name="search" placeholder="Search">
+              <a href="{{url('create/subject')}}" class="btn text-white btn-rmv2">Create Subject</a>
 
-      <div class="dashboard-content side-content">
-
-        <!-- /.card-header -->
-        <!-- form start -->
-        <div class="row">
-          <div class="col-md-12">
-            <div class="institute-form">
-              <form method="post" action="{{ url('subject-save') }}" enctype="multipart/form-data">
-                @csrf
-                <div class="card-body">
-                  <div class="form-group">
-                    <div class="row">
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Institute For : </label>
-                        <br>
-                        @foreach($institute_for as $insval)
-                        <input type="radio" name="institute_for" value="{{$insval->id}}">{{$insval->name}} &nbsp;
-                        @endforeach
-                        @error('institute_id')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Board : </label>
-                        <br>
-                        @foreach($board as $insval)
-                        <input type="radio" name="board" value="{{$insval->id}}">{{$insval->name}} &nbsp;
-                        @endforeach
-                        @error('board')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Medium : </label>
-                        <br>
-                        @foreach($medium as $insval)
-                        <input type="radio" name="medium" value="{{$insval->id}}">{{$insval->name}} &nbsp;
-                        @endforeach
-                        @error('medium')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Institute For Class : </label>
-                        <br>
-                        @foreach($class as $insval)
-                        <input type="radio" name="institute_for_class" value="{{$insval->id}}">{{$insval->name}} &nbsp;
-                        @endforeach
-                        @error('institute_for_class')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Select Standard : </label>
-                        <select class="form-control" name="standard">
-                          <option value=" ">Select Option</option>
-                          @foreach($standard as $insval)
-                          <option value="{{$insval->id}}">{{$insval->name}}</option>
-                          @endforeach
-                        </select>
-                        @error('standard')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Stream (optional) : </label>
-                        <select class="form-control" name="stream">
-                          <option value=" ">Select Option</option>
-                          @foreach($stream as $insval)
-                          <option value="{{$insval->id}}">{{$insval->name}}</option>
-                          @endforeach
-                        </select>
-                        @error('stream')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-                      <br>
-                      <div class="col-md-12">
-                        <div class="col-md-3" id="container">
-                          <label for="exampleInputEmail1">Subject Name :
-                            <a class="btn btn-success" id="addmore">
-                              <i class="fas fa-plus"></i>
-                            </a>
-                          </label>
-
-                          <input type="text" name="subject[]" id="subject" class="form-control" placeholder="Enter Subject Name">
-                          <input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image">
-
-                          <a class="btn btn-success" id="delete">
-                            <i class="fas fa-trash"></i>
-                          </a>
-                          @error('subject')
-                          <div class="text-danger">{{ $message }}</div>
-                          @enderror
-                        </div>
-
-                      </div>
-
-                      <div class="col-md-6">
-                        <label for="exampleInputEmail1">status : </label>
-                        <select class="form-control" name="status">
-                          <option value=" ">Select Option</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
-                        </select>
-                        @error('status')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                    </div>
-
-                  </div>
-                </div>
-                <div class="card-footer">
-                  <button type="submit" class="btn btn-success" style="float: right;">Submit</button>
-                </div>
             </div>
           </div>
 
-          <div class="col-md-12">
-            <div class="card">
-              <div class="card-header">
-                <h3 class="card-title">Subject List</h3>
-              </div>
-              <div class="card-body">
-                <table class="table table-js table-bordered table-responsive">
-                  <thead>
-                    <tr>
-                      <th style="width: 10px">
-                        <Sr class="No">No</Sr>
-                      </th>
-                      <th style="width: 200px">Standard</th>
-                      <th style="width: 200px">Board/Medium</th>
-                      <th style="width: 200px">Stream</th>
-                      <th style="width: 200px">Subjects</th>
-                      <th style="width: 500px">Status</th>
-                      <th>Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    @php $i=1 @endphp
-                    @foreach($addsubstandard as $value)
+          <table class="table table-js table-responsive-sm table-responsive table-bordered institute-table mt-4">
+            <thead>
+              <tr>
+                <th style="width: 10px">
+                  <Sr class="No">No</Sr>
+                </th>
+                <th style="width: 200px">Standard</th>
+                <th style="width: 200px">Board/Medium</th>
+                <th style="width: 200px">Stream</th>
+                <th style="width: 200px">Subjects</th>
+                <th style="width: 500px">Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody class="myTable">
+              @php $i=1 @endphp
+              @foreach($addsubstandard as $value)
 
 
-                    <tr>
-                      <td>{{$i}}</td>
-                      <td>{{$value->name}}</td>
-                      <td>{{ $value->board.'-'.$value->medium}}</td>
-                      <td>{{$value->sname}}</td>
-                      <td>
-                        @foreach($subject_list as $subvalue)
-                        @if($value->base_id == $subvalue->baset_id)
-                        {{$subvalue->name}}<br>
-                        @endif
+              <tr>
+                <td>{{$i}}</td>
+                <td>{{$value->name}}</td>
+                <td>{{$value->board.'-'.$value->medium}}</td>
+                <td>{{$value->sname}}</td>
+                <td>
+                  @foreach($subject_list as $subvalue)
+                  @if($value->base_id == $subvalue->baset_id)
+                  {{$subvalue->name}}<br>
+                  @endif
 
-                        @endforeach
-                      </td>
+                  @endforeach
+                </td>
 
-                      <td>{{$value->status}}</td>
-                    </tr>
+                <td>{{$value->status}}</td>
+              </tr>
 
-                    @php $i++ @endphp
+              @php $i++ @endphp
 
-                    @endforeach
-                  </tbody>
-                </table>
-              </div>
-              <div class="d-flex justify-content-end">
-                {!! $addsubstandard->withQueryString()->links('pagination::bootstrap-5') !!}
-              </div>
-            </div>
+              @endforeach
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-end">
+            {!! $addsubstandard->withQueryString()->links('pagination::bootstrap-5') !!}
           </div>
         </div>
-        </section>
       </div>
-
-      @include('layouts/footer_new')
     </div>
   </div>
+  @include('layouts/footer_new')
+
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
     document.querySelectorAll('.editButton').forEach(function(button) {
@@ -284,65 +161,3 @@
       });
     });
   </script>
-
-  <script>
-    $(document).ready(function() {
-
-      $('#standard_id').on('change', function() {
-        var standard_id = $(this).val();
-        axios.post('/get/standard_wise_stream', {
-            standard_id: standard_id,
-          })
-          .then(function(response) {
-            console.log(response.data.streamlist);
-            if (response.data.streamlist && Object.keys(response.data.streamlist).length > 0) {
-              $('#secondDropdown2').show();
-              $('#streamlabel').show();
-
-              var secondDropdown = document.getElementById('secondDropdown2');
-              secondDropdown.innerHTML = ''; // Clear existing options
-
-              secondDropdown.appendChild(new Option('Select stream', ''));
-
-              response.data.streamlist.forEach(function(stream) {
-                var option = new Option(stream.name, stream.id);
-                secondDropdown.appendChild(option);
-              });
-            } else {
-              $('#secondDropdown2').hide();
-              $('#streamlabel').hide();
-            }
-
-          })
-          .catch(function(error) {
-            console.error(error);
-          });
-
-
-      });
-    });
-
-    //add more
-
-    $(document).ready(function() {
-      var maxFields = 10; // Maximum number of input fields
-      var container = $('#container'); // Container selector
-
-      // Triggered on click of add button
-      $('#addmore').click(function() {
-        // Check maximum number of input fields
-        if (container.children().length / 3 < maxFields) {
-          // Add input fields
-          container.append('<div><input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success delete" id="delete"><i class="fas fa-trash"></i></a></div>');
-        } else {
-          alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
-        }
-      });
-
-      // Triggered on click of delete button
-      container.on('click', '.delete', function() {
-        $(this).parent().remove(); // Remove the parent element (input fields and delete button)
-      });
-    });
-  </script>
-</body>
