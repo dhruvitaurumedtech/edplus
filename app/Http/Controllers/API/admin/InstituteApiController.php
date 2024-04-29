@@ -1580,6 +1580,10 @@ class InstituteApiController extends Controller
                 ->where('status', '0')
                 ->get()
                 ->toArray();
+            if (!empty($request_list)) {
+            } else {
+                return $this->response("", "student not found.", false, 400);
+            }
 
             $response = []; // Initialize the response array outside the loop
             foreach ($request_list as $value) {
@@ -2653,7 +2657,7 @@ class InstituteApiController extends Controller
         }
     }
 
-    
+
     public function delete_account(Request $request)
     {
 
