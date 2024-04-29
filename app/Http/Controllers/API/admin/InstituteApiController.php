@@ -1564,144 +1564,220 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
     public function get_request_list(Request $request)
     {
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-
-        if ($existingUser) {
-            $institute_id = $request->institute_id;
-            $request_list = Student_detail::where('institute_id', $institute_id)
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $user = Auth::user();
+            $request_list = Student_detail::where('institute_id', $request->institute_id)
                 ->where('status', '0')
                 ->get()
                 ->toArray();
             if (!empty($request_list)) {
+                $response = $request_list->filter(function ($value) {
+                    return $user_data = User::find($value->student_id);
+                })->map(function ($value) {
+                    $user_data = User::find($value->student_id);
+                    return [
+                        'student_id' => $user_data->id,
+                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
+                        'photo' => $user_data->image,
+                    ];
+                })->toArray();
+                return $this->response($response, "Fetch student request list.");
             } else {
                 return $this->response("", "student not found.", false, 400);
             }
-
-            $response = []; // Initialize the response array outside the loop
-            foreach ($request_list as $value) {
-                $user_data = User::where('id', $value['student_id'])->first();
-                if ($user_data) {
-                    if (!empty($user_data->image)) {
-                        $image = asset($user_data->image);
-                    } else {
-                        $image = asset('default.jpg');
-                    }
-                    $response[] = [
-                        'student_id' => $user_data->id,
-                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
-                        'photo' => $image,
-                    ];
-                }
-            }
-
-            if (!empty($response)) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Fetch student request list.',
-                    'data' => $response,
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'No data found.',
-                ]);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    // public function get_request_list(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+
+    //     if ($existingUser) {
+    //         $institute_id = $request->institute_id;
+    //         $request_list = Student_detail::where('institute_id', $institute_id)
+    //             ->where('status', '0')
+    //             ->get()
+    //             ->toArray();
+    //         $response = []; // Initialize the response array outside the loop
+    //         foreach ($request_list as $value) {
+    //             $user_data = User::where('id', $value['student_id'])->first();
+    //             if ($user_data) {
+    //                 if (!empty($user_data->image)) {
+    //                     $image = asset($user_data->image);
+    //                 } else {
+    //                     $image = asset('default.jpg');
+    //                 }
+    //                 $response[] = [
+    //                     'student_id' => $user_data->id,
+    //                     'name' => $user_data->firstname . ' ' . $user_data->lastname,
+    //                     'photo' => $image,
+    //                 ];
+    //             }
+    //         }
+
+    //         if (!empty($response)) {
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Fetch student request list.',
+    //                 'data' => $response,
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'No data found.',
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     public function get_reject_request_list(Request $request)
     {
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        // echo "<pre>";print_r($existingUser);exit;
-        if ($existingUser) {
-
-            $institute_id = $request->institute_id;
-            $student_id = Student_detail::where('institute_id', $institute_id)
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $student_id = Student_detail::where('institute_id', $request->institute_id)
                 ->where('status', '2')
                 ->where('created_at', '>=', Carbon::now()->subDays(15))
                 ->pluck('student_id');
-
             if (!empty($student_id)) {
-
-                $user_data = User::whereIN('id', $student_id)->get();
-
-                $response = [];
-                foreach ($user_data as $value2) {
-                    if (!empty($value2['image'])) {
-                        $image = asset($value2['image']);
-                    } else {
-                        $image = asset('default.jpg');
-                    }
-                    $response[] = [
-                        'student_id' => $value2['id'],
-                        'name' => $value2['firstname'] . ' ' . $value2['lastname'],
-                        'photo' => $image,
-                    ];
-                }
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Fetch student Reject list.',
-                    'data' => $response,
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'No data Found.',
-                ]);
+                $response = User::whereIn('id', $student_id)
+                    ->get(['id', 'firstname', 'lastname', 'image'])
+                    ->map(function ($user) {
+                        return [
+                            'student_id' => $user->id,
+                            'name' => $user->firstname . ' ' . $user->lastname,
+                            'photo' => $user->image,
+                        ];
+                    })->toArray();
+                return $this->response($response, "Fetch student Reject list.");
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    // public function get_reject_request_list(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     // echo "<pre>";print_r($existingUser);exit;
+    //     if ($existingUser) {
+
+    //         $institute_id = $request->institute_id;
+    //         $student_id = Student_detail::where('institute_id', $institute_id)
+    //             ->where('status', '2')
+    //             ->where('created_at', '>=', Carbon::now()->subDays(15))
+    //             ->pluck('student_id');
+
+    //         if (!empty($student_id)) {
+
+    //             $user_data = User::whereIN('id', $student_id)->get();
+
+    //             $response = [];
+    //             foreach ($user_data as $value2) {
+    //                 if (!empty($value2['image'])) {
+    //                     $image = asset($value2['image']);
+    //                 } else {
+    //                     $image = asset('default.jpg');
+    //                 }
+    //                 $response[] = [
+    //                     'student_id' => $value2['id'],
+    //                     'name' => $value2['firstname'] . ' ' . $value2['lastname'],
+    //                     'photo' => $image,
+    //                 ];
+    //             }
+
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Fetch student Reject list.',
+    //                 'data' => $response,
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'No data Found.',
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
 
     public function get_reject_request(Request $request)
     {
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->first();
-            $reject_list = Student_detail::find($response->id);
-            $data = $reject_list->update(['status' => '2']);
-            if (!empty($data)) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully Reject Request.',
-                ], 200, [], JSON_NUMERIC_CHECK);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'student_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '2']);
+            return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    // public function get_reject_request(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->first();
+    //         $reject_list = Student_detail::find($response->id);
+    //         $data = $reject_list->update(['status' => '2']);
+    //         if (!empty($data)) {
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully Reject Request.',
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     public function fetch_student_detail(Request $request)
     {
         $validator = \Validator::make($request->all(), [
