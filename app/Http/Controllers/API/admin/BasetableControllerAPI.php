@@ -233,18 +233,19 @@ class BasetableControllerAPI extends Controller
                 $standard_ids = explode(',', $request->standard_id);
                 $stream_ids = explode(',', $request->stream_id);
 
-                $base_subject = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
-                    ->whereIN('base_table.institute_for',$institute_for_ids)
-                    ->whereIN('base_table.board',$board_ids)
-                    ->whereIN('base_table.medium',$medium_ids)
-                    ->whereIN('base_table.institute_for_class',$class_ids)
-                    ->whereIN('base_table.standard',$standard_ids)
-                    ->when(!empty($stream_ids), function ($query) use ($stream_ids) {
-                        return $query->whereIn('base_table.stream', $stream_ids);
-                    })
-                    ->select('subject.id', 'subject.name','subject.image')
-                    ->distinct()
-                    ->get();
+                $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->whereIN('base_table.institute_for', $institute_for_ids)
+                ->whereIN('base_table.board', $board_ids)
+                ->whereIN('base_table.medium', $medium_ids)
+                ->whereIN('base_table.institute_for_class', $class_ids)
+                ->whereIN('base_table.standard', $standard_ids);
+
+            
+
+            $base_subject = $base_subject_query
+                ->select('subject.id', 'subject.name', 'subject.image')
+                ->distinct()
+                ->get();
                 $data = [];
                 foreach ($base_subject as $basesubject) {
                     $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name,'image'=>$basesubject->image);
