@@ -20,6 +20,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use function PHPSTORM_META\map;
+use Illuminate\Support\Facades\Auth;
 
 class ExamController extends Controller
 {
@@ -162,7 +163,6 @@ class ExamController extends Controller
             $exam->fill($request->all());
             $exam->exam_date = Carbon::createFromFormat('d-m-Y', $request->exam_date);
             $exam->save();
-
             if (!empty($exam->id)) {
                 return $this->response([], "Successfully created Exam.");
             } else {
@@ -174,117 +174,188 @@ class ExamController extends Controller
     }
 
 
-
-
     public function get_exam(Request $request)
     {
-        $token = $request->header('Authorization');
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $user_id = $request->user_id;
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
-            $exam_list = DB::table('exam')
-                //->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
+
+        try {
+            $exam_list = Exam_Model::select(
+                'exam.id as exam_id',
+                'exam.exam_title',
+                'exam.exam_type',
+                'exam.exam_date',
+                'exam.total_mark',
+                DB::raw("TIME_FORMAT(exam.start_time, '%h:%i %p') as start_time"),
+                DB::raw("TIME_FORMAT(exam.end_time, '%h:%i %p') as end_time"),
+                'board.name as board',
+                'medium.name as medium',
+                'standard.name as standard',
+                'stream.name as stream',
+                'subject.name as subject',
+                'batches.id as batch_id',
+                'batches.batch_name'
+            )
                 ->leftJoin('board', 'board.id', '=', 'exam.board_id')
                 ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
-                //->leftJoin('class', 'class.id', '=', 'exam.class_id')
                 ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
                 ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
                 ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
                 ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
-                ->select(
-                    'board.name as board_name',
-                    'medium.name as medium_name',
-                    'standard.name as standard_name',
-                    'stream.name as stream_name',
-                    'subject.name as subject_name',
-                    'batches.batch_name',
-                    'batches.id as batch_id',
-                    'exam.*'
-                )
                 ->where('exam.institute_id', $request->institute_id)
-                ->where('exam.user_id', $request->user_id)
-                ->wherenull('exam.deleted_at')
+                ->where('exam.user_id', Auth::id())
+                ->whereNull('exam.deleted_at')
                 ->orderByDesc('exam.created_at')
-                ->get()->toarray();
-            if (!empty($exam_list)) {
-                $exam_list_array = [];
-                foreach ($exam_list as $key => $value) {
-                    $start_time_convert = Carbon::createFromFormat('H:i:s', $value->start_time);
-                    $start_time = $start_time_convert->format('h:i A');
-                    $end_time_convert = Carbon::createFromFormat('H:i:s', $value->end_time);
-                    $end_time = $end_time_convert->format('h:i A');
+                ->get()->toArray();
 
-                    $exam_list_array[] = [
-                        'exam_id' => $value->id,
-                        'exam_title' => $value->exam_title,
-                        'exam_type' => $value->exam_type,
-                        'exam_date' => $value->exam_date,
-                        'total_mark' => $value->total_mark,
-                        'start_time' => $start_time,
-                        'end_time' => $end_time,
-                        //'institute_for' => $value->institute_for_name,
-                        'board' => $value->board_name,
-                        'medium' => $value->medium_name,
-                        //'class' => $value->class_name,
-                        'standard' => $value->standard_name,
-                        'batch_id' => $value->batch_id,
-                        'batch_name' => $value->batch_name,
-                        'stream' => $value->stream_name . '',
-                        'subject' => $value->subject_name,
-                    ];
-                }
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Successfully Fetch Exam List',
-                    'data' => $exam_list_array
-                ], 200);
+            if (!empty($exam_list)) {
+                return $this->response($exam_list, "Successfully Fetch Exam List");
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'No Data Found.',
-                ], 400);
+                return $this->response([], "No Data Found.", false, 400);
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
+    // public function get_exam(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+    //     $user_id = $request->user_id;
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         $exam_list = DB::table('exam')
+    //             //->leftJoin('institute_for', 'institute_for.id', '=', 'exam.institute_for_id')
+    //             ->leftJoin('board', 'board.id', '=', 'exam.board_id')
+    //             ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
+    //             //->leftJoin('class', 'class.id', '=', 'exam.class_id')
+    //             ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
+    //             ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
+    //             ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+    //             ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
+    //             ->select(
+    //                 'board.name as board_name',
+    //                 'medium.name as medium_name',
+    //                 'standard.name as standard_name',
+    //                 'stream.name as stream_name',
+    //                 'subject.name as subject_name',
+    //                 'batches.batch_name',
+    //                 'batches.id as batch_id',
+    //                 'exam.*'
+    //             )
+    //             ->where('exam.institute_id', $request->institute_id)
+    //             ->where('exam.user_id', $request->user_id)
+    //             ->wherenull('exam.deleted_at')
+    //             ->orderByDesc('exam.created_at')
+    //             ->get()->toarray();
+    //         if (!empty($exam_list)) {
+    //             $exam_list_array = [];
+    //             foreach ($exam_list as $key => $value) {
+    //                 $start_time_convert = Carbon::createFromFormat('H:i:s', $value->start_time);
+    //                 $start_time = $start_time_convert->format('h:i A');
+    //                 $end_time_convert = Carbon::createFromFormat('H:i:s', $value->end_time);
+    //                 $end_time = $end_time_convert->format('h:i A');
+
+    //                 $exam_list_array[] = [
+    //                     'exam_id' => $value->id,
+    //                     'exam_title' => $value->exam_title,
+    //                     'exam_type' => $value->exam_type,
+    //                     'exam_date' => $value->exam_date,
+    //                     'total_mark' => $value->total_mark,
+    //                     'start_time' => $start_time,
+    //                     'end_time' => $end_time,
+    //                     //'institute_for' => $value->institute_for_name,
+    //                     'board' => $value->board_name,
+    //                     'medium' => $value->medium_name,
+    //                     //'class' => $value->class_name,
+    //                     'standard' => $value->standard_name,
+    //                     'batch_id' => $value->batch_id,
+    //                     'batch_name' => $value->batch_name,
+    //                     'stream' => $value->stream_name . '',
+    //                     'subject' => $value->subject_name,
+    //                 ];
+    //             }
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Successfully Fetch Exam List',
+    //                 'data' => $exam_list_array
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'No Data Found.',
+    //             ], 400);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
+
+
+
+    // public function delete_exam(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+    //     $user_id = $request->user_id;
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         $exam_id = $request->input('exam_id');
+    //         $exam_list = Exam_Model::find($exam_id);
+    //         if (!$exam_list) {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Exam Not Found.',
+    //             ], 400);
+    //         } else {
+    //             $exam_list->delete();
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully Exam Delete.',
+    //             ], 200);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
     public function delete_exam(Request $request)
     {
-        $token = $request->header('Authorization');
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        $validator = Validator::make($request->all(), [
+            'exam_id' => 'required|exists:exam,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $user_id = $request->user_id;
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
-            $exam_id = $request->input('exam_id');
-            $exam_list = Exam_Model::find($exam_id);
-            if (!$exam_list) {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Exam Not Found.',
-                ], 400);
-            } else {
-                $exam_list->delete();
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully Exam Delete.',
-                ], 200);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+        try {
+            $exam  = Exam_Model::where('id', $request->exam_id)->delete();
+            return $this->response([], "Successfully Deleted Exam.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
     public function edit_exam(Request $request)
     {
         $token = $request->header('Authorization');
