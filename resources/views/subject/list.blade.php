@@ -40,7 +40,7 @@
         </div>
         <div class="col-md-10 offset-md-1">
           @if (session('error'))
-          <div class="alert alert-success">
+          <div class="alert alert-danger">
             {{ session('error') }}
           </div>
           @endif
@@ -326,21 +326,22 @@
 
     $(document).ready(function() {
       var maxFields = 10; // Maximum number of input fields
-      var addButton = $('#addmore'); // Add button selector
       var container = $('#container'); // Container selector
 
-      var x = 1; // Initial input field counter
-
       // Triggered on click of add button
-      $(addButton).click(function() {
+      $('#addmore').click(function() {
         // Check maximum number of input fields
-        if (x < script maxFields) {
-          x++; // Increment field counter
-          // Add input field
-          $(container).append('<input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>');
+        if (container.children().length / 3 < maxFields) {
+          // Add input fields
+          container.append('<div><input type="text" name="subject[]" class="form-control" placeholder="Enter Subject Name"/><input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image"><a class="btn btn-success delete" id="delete"><i class="fas fa-trash"></i></a></div>');
         } else {
           alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
         }
+      });
+
+      // Triggered on click of delete button
+      container.on('click', '.delete', function() {
+        $(this).parent().remove(); // Remove the parent element (input fields and delete button)
       });
     });
   </script>

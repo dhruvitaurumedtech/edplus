@@ -59,6 +59,8 @@ class SubjectController extends Controller
             //'stream' => 'required',
             //'subject' => 'required',
             'status' => 'required',
+
+
         ]);
 
         // Build the query
