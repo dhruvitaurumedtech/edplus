@@ -1576,8 +1576,7 @@ class InstituteApiController extends Controller
             $user = Auth::user();
             $request_list = Student_detail::where('institute_id', $request->institute_id)
                 ->where('status', '0')
-                ->get()
-                ->toArray();
+                ->get();
             if (!empty($request_list)) {
                 $response = $request_list->filter(function ($value) {
                     return $user_data = User::find($value->student_id);
