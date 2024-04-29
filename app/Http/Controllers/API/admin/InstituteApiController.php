@@ -1591,7 +1591,7 @@ class InstituteApiController extends Controller
                 })->toArray();
                 return $this->response($response, "Fetch student request list.");
             } else {
-                return $this->response("", "student not found.", false, 400);
+                return $this->response([], "student not found.", false, 400);
             }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
