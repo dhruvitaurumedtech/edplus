@@ -39,10 +39,10 @@ use PHPUnit\Framework\Attributes\Medium;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
-use Auth;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\Parents;
+use Illuminate\Support\Facades\Auth;
 
 class InstituteApiController extends Controller
 {
@@ -2442,39 +2442,91 @@ class InstituteApiController extends Controller
             ]);
         }
     }
-    //student list with marks
+    // student list with marks
+    // public function student_list_with_marks(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'exam_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         //$student_id = $request->student_id;
+    //         $user_id = $request->user_id;
+    //         $examid = $request->exam_id;
+    //         $examdtr = Exam_Model::where('id', $examid)->first();
+
+    //         if (!empty($examdtr)) {
+    //             $marksdt = Marks_model::join('users', 'users.id', '=', 'marks.student_id')
+    //                 ->where('marks.exam_id', $examid)
+    //                 ->select('marks.*', 'users.firstname', 'users.lastname')->get();
+    //             $studentsDET = [];
+    //             foreach ($marksdt as $markses) {
+    //                 $subjectq = Subject_model::where('id', $examdtr->subject_id)->first();
+    //                 $standardtq = Standard_model::where('id', $examdtr->standard_id)->first();
+    //                 $studentsDET[] = array(
+    //                     'student_id' => $markses->student_id,
+    //                     'exam_id' => $request->exam_id,
+    //                     'firstname' => $markses->firstname,
+    //                     'lastname' => $markses->lastname,
+    //                     'total_mark' => $examdtr->total_mark,
+    //                     'mark' => $markses->mark,
+    //                     'standard' => $standardtq->name,
+    //                     'subject' => $subjectq->name
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch Data.',
+    //                 'data' => $studentsDET
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Exam not found.',
+    //                 'data' => []
+    //             ], 400, [], JSON_NUMERIC_CHECK);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
     public function student_list_with_marks(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
+        $validator = Validator::make($request->all(), [
             'exam_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            //$student_id = $request->student_id;
-            $user_id = $request->user_id;
-            $examid = $request->exam_id;
-            $examdtr = Exam_Model::where('id', $examid)->first();
-
+        try {
+            $examdtr = Exam_Model::where('id', $request->exam_id)->first();
             if (!empty($examdtr)) {
                 $marksdt = Marks_model::join('users', 'users.id', '=', 'marks.student_id')
-                    ->where('marks.exam_id', $examid)
+                    ->where('marks.exam_id', $request->exam_id)
                     ->select('marks.*', 'users.firstname', 'users.lastname')->get();
                 $studentsDET = [];
                 foreach ($marksdt as $markses) {
@@ -2491,29 +2543,18 @@ class InstituteApiController extends Controller
                         'subject' => $subjectq->name
                     );
                 }
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch Data.',
-                    'data' => $studentsDET
-                ], 200, [], JSON_NUMERIC_CHECK);
+                return $this->response($studentsDET, "Successfully fetch Data.");
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Exam not found.',
-                    'data' => []
-                ], 400, [], JSON_NUMERIC_CHECK);
+                return $this->response([], "Exam not found.", false, 400);
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
-    //add exam marks
+
     public function add_marks(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'user_id' => 'required',
             'student_id' => 'required',
@@ -2522,79 +2563,110 @@ class InstituteApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            $institute_id = $request->institute_id;
-            $user_id = $request->user_id;
-            $student_id = $request->student_id;
-            $exam_id = $request->exam_id;
-            $mark = $request->mark;
-
-            $addesmarks = Marks_model::where('student_id', $student_id)->where('exam_id', $exam_id)->first();
+        try {
+            $addesmarks = Marks_model::where('student_id', $request->student_id)->where('exam_id', $request->exam_id)->first();
             if ($addesmarks) {
                 $admarks = Marks_model::where('id', $addesmarks->id)->update([
-                    'student_id' => $student_id,
-                    'exam_id' => $exam_id,
-                    'mark' => $mark,
+                    'student_id' => $request->student_id,
+                    'exam_id' => $request->exam_id,
+                    'mark' => $request->mark,
                 ]);
             } else {
                 $admarks = Marks_model::create([
-                    'student_id' => $student_id,
-                    'exam_id' => $exam_id,
-                    'mark' => $mark,
+                    'student_id' => $request->student_id,
+                    'exam_id' => $request->exam_id,
+                    'mark' => $request->mark,
                 ]);
             }
-
-
-            if ($admarks) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Added.',
-                    'data' => []
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Data not added.',
-                    'data' => []
-                ]);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-                'data' => []
-            ]);
+            return $this->response([], "Mark Added!!");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
 
-    //add announcements
+    //add exam marks
+    // public function add_marks(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'institute_id' => 'required|integer',
+    //         'user_id' => 'required',
+    //         'student_id' => 'required',
+    //         'exam_id' => 'required',
+    //         'mark' => 'required'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         $institute_id = $request->institute_id;
+    //         $user_id = $request->user_id;
+    //         $student_id = $request->student_id;
+    //         $exam_id = $request->exam_id;
+    //         $mark = $request->mark;
+
+    //         $addesmarks = Marks_model::where('student_id', $student_id)->where('exam_id', $exam_id)->first();
+    //         if ($addesmarks) {
+    //             $admarks = Marks_model::where('id', $addesmarks->id)->update([
+    //                 'student_id' => $student_id,
+    //                 'exam_id' => $exam_id,
+    //                 'mark' => $mark,
+    //             ]);
+    //         } else {
+    //             $admarks = Marks_model::create([
+    //                 'student_id' => $student_id,
+    //                 'exam_id' => $exam_id,
+    //                 'mark' => $mark,
+    //             ]);
+    //         }
+
+
+    //         if ($admarks) {
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Added.',
+    //                 'data' => []
+    //             ]);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Data not added.',
+    //                 'data' => []
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //             'data' => []
+    //         ]);
+    //     }
+    // }
+
     public function add_announcements(Request $request)
     {
-        // echo "<pre>";print_r($request->all());exit;
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
             'batch_id' => 'required',
-            //'institute_for_id' => 'required',
-            //'class_id' => 'required',
-            //'stream_id' => 'required',
             'subject_id' => 'required',
             'role_type' => 'required',
             'title' => 'required',
@@ -2603,209 +2675,336 @@ class InstituteApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-
-        if ($existingUser) {
-            $user_id = $request->user_id;
-            $institute_id = $request->institute_id;
-            $board_id = $request->board_id;
-            $medium_id = $request->medium_id;
-            // $institute_for_id = $request->institute_for_id;
-            //$class_id = $request->class_id;
-            $stream_id = $request->stream_id;
-            $subject_id = $request->subject_id;
-            $role_type = $request->role_type;
-            $title = $request->title;
-            $detail = $request->detail;
-            $standard_id = $request->standard_id;
-            $batch_id = $request->batch_id;
-
-            if ($stream_id == 'null') {
+        try {
+            $announcement = new announcements_model();
+            $announcement->user_id = $request->user_id;
+            $announcement->institute_id = $request->institute_id;
+            $announcement->board_id = $request->board_id;
+            $announcement->medium_id = $request->medium_id;
+            if ($request->stream_id == 'null') {
                 $stream_idd = null;
             } else {
                 $stream_idd = $request->stream_id;
             }
-
-            $addannounc = announcements_model::create([
-                'user_id' => $user_id,
-                'institute_id' => $institute_id,
-                'batch_id' => $batch_id,
-                'board_id' => $board_id,
-                'medium_id' => $medium_id,
-                //'institute_for_id' => $institute_for_id,
-                //'class_id' => $class_id,
-                'stream_id' => $stream_idd,
-                'subject_id' => $subject_id,
-                'role_type' => $role_type,
-                'title' => $title,
-                'detail' => $detail,
-                'standard_id' => $standard_id
-            ]);
-
-            if ($addannounc) {
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Announcement added successfully.',
-                    'data' => []
-                ]);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Data not added.',
-                ]);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            $announcement->stream_id = $stream_idd;
+            $announcement->subject_id = $request->subject_id;
+            $announcement->role_type = $request->role_type;
+            $announcement->title = $request->title;
+            $announcement->detail = $request->detail;
+            $announcement->standard_id = $request->standard_id;
+            $announcement->batch_id = $request->batch_id;
+            $announcement->save();
+            return $this->response([], "Announcement added successfully.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
 
+    //add announcements
+    // public function add_announcements(Request $request)
+    // {
+    //     // echo "<pre>";print_r($request->all());exit;
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //         'board_id' => 'required',
+    //         'medium_id' => 'required',
+    //         'batch_id' => 'required',
+    //         //'institute_for_id' => 'required',
+    //         //'class_id' => 'required',
+    //         //'stream_id' => 'required',
+    //         'subject_id' => 'required',
+    //         'role_type' => 'required',
+    //         'title' => 'required',
+    //         'detail' => 'required',
+    //         'standard_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+
+    //     if ($existingUser) {
+    //         $user_id = $request->user_id;
+    //         $institute_id = $request->institute_id;
+    //         $board_id = $request->board_id;
+    //         $medium_id = $request->medium_id;
+    //         // $institute_for_id = $request->institute_for_id;
+    //         //$class_id = $request->class_id;
+    //         $stream_id = $request->stream_id;
+    //         $subject_id = $request->subject_id;
+    //         $role_type = $request->role_type;
+    //         $title = $request->title;
+    //         $detail = $request->detail;
+    //         $standard_id = $request->standard_id;
+    //         $batch_id = $request->batch_id;
+
+    //         if ($stream_id == 'null') {
+    //             $stream_idd = null;
+    //         } else {
+    //             $stream_idd = $request->stream_id;
+    //         }
+
+    //         $addannounc = announcements_model::create([
+    //             'user_id' => $user_id,
+    //             'institute_id' => $institute_id,
+    //             'batch_id' => $batch_id,
+    //             'board_id' => $board_id,
+    //             'medium_id' => $medium_id,
+    //             //'institute_for_id' => $institute_for_id,
+    //             //'class_id' => $class_id,
+    //             'stream_id' => $stream_idd,
+    //             'subject_id' => $subject_id,
+    //             'role_type' => $role_type,
+    //             'title' => $title,
+    //             'detail' => $detail,
+    //             'standard_id' => $standard_id
+    //         ]);
+
+    //         if ($addannounc) {
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Announcement added successfully.',
+    //                 'data' => []
+    //             ]);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Data not added.',
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     //announcement list
+    // public function announcements_list(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             //$student_id = $request->student_id;
+    //             $user_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+    //             $board_id = $request->board_id;
+    //             $standard_id = $request->standard_id;
+    //             $searchData = $request->searchData;
+
+    //             $anoouncmntdt = announcements_model::where('user_id', $user_id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->when($searchData, function ($query, $searchData) {
+    //                     return $query->where(function ($query) use ($searchData) {
+    //                         $query->where('title', 'like', '%' . $searchData . '%')
+    //                             ->orWhere('detail', 'like', '%' . $searchData . '%');
+    //                     });
+    //                 })
+    //                 ->when($board_id, function ($query, $board_id) {
+    //                     return $query->where(function ($query) use ($board_id) {
+    //                         $query->where('board_id', $board_id);
+    //                     });
+    //                 })
+    //                 ->when($standard_id, function ($query, $standard_id) {
+    //                     return $query->where(function ($query) use ($standard_id) {
+    //                         $query->where('standard_id', $standard_id);
+    //                     });
+    //                 })
+    //                 ->orderByDesc('created_at')
+    //                 ->get();
+
+    //             if (!empty($anoouncmntdt)) {
+
+    //                 $announcementDT = [];
+    //                 foreach ($anoouncmntdt as $anoouncmnt) {
+
+    //                     $subary = explode(",", $anoouncmnt->subject_id);
+    //                     $batinsd = explode(",", $anoouncmnt->batch_id);
+    //                     $subjectq = Subject_model::whereIN('id', $subary)->get();
+    //                     $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
+    //                     $boarddt = board::where('id', $anoouncmnt->board_id)->first();
+    //                     $batchnm = Batches_model::whereIN('id', $batinsd)->get();
+
+    //                     $subjctslist = [];
+    //                     foreach ($subjectq as $subnms) {
+    //                         $subjctslist[] = array('id' => $subnms->id, 'name' => $subnms->name);
+    //                     }
+
+    //                     $batchslist = [];
+    //                     foreach ($batchnm as $btcnmms) {
+    //                         $batchslist[] = array('id' => $btcnmms->id, 'name' => $btcnmms->batch_name);
+    //                     }
+
+    //                     $roles = [];
+    //                     $roledsid = explode(",", $anoouncmnt->role_type);
+    //                     $roqy = Role::whereIN('id', $roledsid)->get();
+    //                     foreach ($roqy as $rolDT) {
+    //                         $roles[] = array(
+    //                             'id' => $rolDT->id,
+    //                             'name' => $rolDT->role_name
+    //                         );
+    //                     }
+
+    //                     $announcementDT[] = array(
+    //                         'id' => $anoouncmnt->id,
+    //                         'date' => $anoouncmnt->created_at,
+    //                         'title' => $anoouncmnt->title,
+    //                         'detail' => $anoouncmnt->detail,
+    //                         //'subject_id' => $subjectq->id,
+
+    //                         //'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
+    //                         //'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
+
+    //                         'standard_id' => $standardtq->id,
+    //                         'standard' => $standardtq->name,
+    //                         'board_id' => $boarddt->id,
+    //                         'board' => $boarddt->name,
+    //                         'role' => $roles,
+    //                         'batches' => $batchslist,
+    //                         'subject' => $subjctslist,
+
+    //                     );
+    //                 }
+    //                 return response()->json([
+    //                     'status' => 200,
+    //                     'message' => 'Successfully fetch Data.',
+    //                     'data' => $announcementDT
+    //                 ], 200, [], JSON_NUMERIC_CHECK);
+    //             } else {
+    //                 return response()->json([
+    //                     'status' => 400,
+    //                     'message' => 'Data not found.',
+    //                 ], 400, [], JSON_NUMERIC_CHECK);
+    //             }
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
     public function announcements_list(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required',
             'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
+        try {
+            $user_id = $request->user_id;
+            $institute_id = $request->institute_id;
+            $board_id = $request->board_id;
+            $standard_id = $request->standard_id;
+            $searchData = $request->searchData;
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
+            $announcements = announcements_model::where('user_id', $user_id)
+                ->where('institute_id', $institute_id)
+                ->when($searchData, function ($query, $searchData) {
+                    $query->where(function ($query) use ($searchData) {
+                        $query->where('title', 'like', '%' . $searchData . '%')
+                            ->orWhere('detail', 'like', '%' . $searchData . '%');
+                    });
+                })
+                ->when($board_id, function ($query, $board_id) {
+                    $query->where('board_id', $board_id);
+                })
+                ->when($standard_id, function ($query, $standard_id) {
+                    $query->where('standard_id', $standard_id);
+                })
+                ->orderByDesc('created_at')
+                ->get();
 
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-                //$student_id = $request->student_id;
-                $user_id = $request->user_id;
-                $institute_id = $request->institute_id;
-                $board_id = $request->board_id;
-                $standard_id = $request->standard_id;
-                $searchData = $request->searchData;
-
-                $anoouncmntdt = announcements_model::where('user_id', $user_id)
-                    ->where('institute_id', $institute_id)
-                    ->when($searchData, function ($query, $searchData) {
-                        return $query->where(function ($query) use ($searchData) {
-                            $query->where('title', 'like', '%' . $searchData . '%')
-                                ->orWhere('detail', 'like', '%' . $searchData . '%');
-                        });
-                    })
-                    ->when($board_id, function ($query, $board_id) {
-                        return $query->where(function ($query) use ($board_id) {
-                            $query->where('board_id', $board_id);
-                        });
-                    })
-                    ->when($standard_id, function ($query, $standard_id) {
-                        return $query->where(function ($query) use ($standard_id) {
-                            $query->where('standard_id', $standard_id);
-                        });
-                    })
-                    ->orderByDesc('created_at')
-                    ->get();
-
-                if (!empty($anoouncmntdt)) {
-
-                    $announcementDT = [];
-                    foreach ($anoouncmntdt as $anoouncmnt) {
-
-                        $subary = explode(",", $anoouncmnt->subject_id);
-                        $batinsd = explode(",", $anoouncmnt->batch_id);
-                        $subjectq = Subject_model::whereIN('id', $subary)->get();
-                        $standardtq = Standard_model::where('id', $anoouncmnt->standard_id)->first();
-                        $boarddt = board::where('id', $anoouncmnt->board_id)->first();
-                        $batchnm = Batches_model::whereIN('id', $batinsd)->get();
-
-                        $subjctslist = [];
-                        foreach ($subjectq as $subnms) {
-                            $subjctslist[] = array('id' => $subnms->id, 'name' => $subnms->name);
-                        }
-
-                        $batchslist = [];
-                        foreach ($batchnm as $btcnmms) {
-                            $batchslist[] = array('id' => $btcnmms->id, 'name' => $btcnmms->batch_name);
-                        }
-
-                        $roles = [];
-                        $roledsid = explode(",", $anoouncmnt->role_type);
-                        $roqy = Role::whereIN('id', $roledsid)->get();
-                        foreach ($roqy as $rolDT) {
-                            $roles[] = array(
-                                'id' => $rolDT->id,
-                                'name' => $rolDT->role_name
-                            );
-                        }
-
-                        $announcementDT[] = array(
-                            'id' => $anoouncmnt->id,
-                            'date' => $anoouncmnt->created_at,
-                            'title' => $anoouncmnt->title,
-                            'detail' => $anoouncmnt->detail,
-                            //'subject_id' => $subjectq->id,
-
-                            //'batch_id' => !empty($batchnm->id) ? $batchnm->id : 0,
-                            //'batch_name' => !empty($batchnm->batch_name) ? $batchnm->batch_name : '',
-
-                            'standard_id' => $standardtq->id,
-                            'standard' => $standardtq->name,
-                            'board_id' => $boarddt->id,
-                            'board' => $boarddt->name,
-                            'role' => $roles,
-                            'batches' => $batchslist,
-                            'subject' => $subjctslist,
-
-                        );
-                    }
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Successfully fetch Data.',
-                        'data' => $announcementDT
-                    ], 200, [], JSON_NUMERIC_CHECK);
-                } else {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'Data not found.',
-                    ], 400, [], JSON_NUMERIC_CHECK);
-                }
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+            if ($announcements->isEmpty()) {
+                return $this->response([], "Data not found.", false, 400);
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+
+            $announcementDT = $announcements->map(function ($announcement) {
+                $subjectIds = explode(",", $announcement->subject_id);
+                $batchIds = explode(",", $announcement->batch_id);
+
+                $subjects = Subject_model::whereIn('id', $subjectIds)->get()->map(function ($subject) {
+                    return ['id' => $subject->id, 'name' => $subject->name];
+                });
+
+                $batches = Batches_model::whereIn('id', $batchIds)->get()->map(function ($batch) {
+                    return ['id' => $batch->id, 'name' => $batch->batch_name];
+                });
+
+                $roles = Role::whereIn('id', explode(",", $announcement->role_type))->get()->map(function ($role) {
+                    return ['id' => $role->id, 'name' => $role->role_name];
+                });
+
+                $standard = Standard_model::find($announcement->standard_id);
+                $board = board::find($announcement->board_id);
+
+                return [
+                    'id' => $announcement->id,
+                    'date' => $announcement->created_at,
+                    'title' => $announcement->title,
+                    'detail' => $announcement->detail,
+                    'standard_id' => optional($standard)->id,
+                    'standard' => optional($standard)->name,
+                    'board_id' => optional($board)->id,
+                    'board' => optional($board)->name,
+                    'role' => $roles,
+                    'batches' => $batches,
+                    'subject' => $subjects,
+                ];
+            });
+            return $this->response($announcementDT, "Successfully fetch Data.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
 
@@ -2836,283 +3035,434 @@ class InstituteApiController extends Controller
         }
     }
 
-    //roles list
-    public function roles(Request $request)
+
+    public function  roles(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
-
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
-        }
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-
-        if ($existingUser) {
-            try {
-                $rolesDT = [];
-                $suad = [1, 2, 3];
-                $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
-                foreach ($roleqry as $roldel) {
-                    $rolesDT[] = array(
-                        'id' => $roldel->id,
-                        'role_name' => $roldel->role_name
-                    );
-                }
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $rolesDT
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Something went wrong',
-                    'data' => []
-                ]);
+        try {
+            $rolesDT = [];
+            $suad = [1, 2, 3];
+            $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
+            foreach ($roleqry as $roldel) {
+                $rolesDT[] = array(
+                    'id' => $roldel->id,
+                    'role_name' => $roldel->role_name
+                );
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+            return $this->response($rolesDT, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
-    //student list all and filter wise
+    //roles list
+    // public function roles(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+
+    //     if ($existingUser) {
+    //         try {
+    //             $rolesDT = [];
+    //             $suad = [1, 2, 3];
+    //             $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
+    //             foreach ($roleqry as $roldel) {
+    //                 $rolesDT[] = array(
+    //                     'id' => $roldel->id,
+    //                     'role_name' => $roldel->role_name
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Data Fetch Successfully',
+    //                 'data' => $rolesDT
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Something went wrong',
+    //                 'data' => []
+    //             ]);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
+
     public function institute_students(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'institute_id' => 'required',
-
-        ]);
+        $validator = Validator::make($request->all(), ['institute_id' => 'required']);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
+        try {
+            $user_id = Auth::id();
+            $query = Student_detail::join('users', 'users.id', 'students_details.student_id')
+                ->join('board', 'board.id', 'students_details.board_id')
+                ->join('medium', 'medium.id', 'students_details.medium_id')
+                ->join('standard', 'standard.id', 'students_details.standard_id')
+                ->leftjoin('batches', 'batches.id', 'students_details.batch_id')
+                ->where('students_details.user_id', $user_id)
+                ->where('students_details.institute_id', $request->institute_id)
+                ->when($request->board_id, fn ($q, $board) => $q->where('students_details.board_id', $board))
+                ->when($request->medium_id, fn ($q, $medium) => $q->where('students_details.medium_id', $medium))
+                ->when($request->standard_id, fn ($q, $standard) => $q->where('students_details.standard_id', $standard))
+                ->when($request->batch_id, fn ($q, $batch_id) => $q->where('students_details.batch_id', $batch_id))
+                ->when($request->searchkeyword, function ($q, $searchkeyword) {
+                    $q->where(function ($q) use ($searchkeyword) {
+                        $q->where('users.firstname', 'like', '%' . $searchkeyword . '%')
+                            ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
+                            ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
+                    });
+                });
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
+            $perPage = $request->input('per_page', 10);
+            $students = $query->select(
+                'students_details.*',
+                'batches.batch_name',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'board.name as board',
+                'medium.name as medium',
+                'standard.name as standard'
+            )->orderByDesc('students_details.created_at')->paginate($perPage);
 
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-                $user_id = $request->user_id;
-                $institute_id = $request->institute_id;
-
-                //filter fields
-                $board = $request->board_id;
-                $medium = $request->medium_id;
-                $standard = $request->standard_id;
-                $batch_id = $request->batch_id;
-                $searchkeyword = $request->searchkeyword;
-                $perPage = $request->input('per_page', 10);
-
-                $students = Student_detail::join('users', 'users.id', 'students_details.student_id')
-                    ->join('board', 'board.id', 'students_details.board_id')
-                    ->join('medium', 'medium.id', 'students_details.medium_id')
-                    ->join('standard', 'standard.id', 'students_details.standard_id')
-                    ->leftjoin('batches', 'batches.id', 'students_details.batch_id')
-                    ->where('students_details.user_id', $user_id)
-                    ->where('students_details.institute_id', $institute_id)
-                    ->when($board, function ($query, $board) {
-                        return $query->where('students_details.board_id', $board);
-                    })
-                    ->when($medium, function ($query, $medium) {
-                        return $query->where('students_details.medium_id', $medium);
-                    })
-                    ->when($standard, function ($query, $standard) {
-                        return $query->where('students_details.standard_id', $standard);
-                    })
-                    ->when($batch_id, function ($query, $batch_id) {
-                        return $query->where('students_details.batch_id', $batch_id);
-                    })
-                    ->when($searchkeyword, function ($query, $searchkeyword) {
-                        return $query->where(function ($query) use ($searchkeyword) {
-                            $query->where('users.firstname', 'like', '%' . $searchkeyword . '%')
-                                ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
-                                ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
-                        });
-                    })
-                    ->select(
-                        'students_details.*',
-                        'batches.batch_name',
-                        'users.firstname',
-                        'users.lastname',
-                        'users.image',
-                        'board.name as board',
-                        'medium.name as medium',
-                        'standard.name as standard'
-                    )
-                    ->orderByDesc('students_details.created_at')
-                    ->paginate($perPage);
-
-                $stulist = [];
-                foreach ($students as $stdDT) {
-                    $stulist[] = array(
-                        'id' => $stdDT->student_id,
-                        'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
-                        'image' => asset($stdDT->image),
-                        'board_id' => $stdDT->board_id,
-                        'board' => $stdDT->board . '(' . $stdDT->medium . ')',
-                        'standard_id' => $stdDT->standard_id,
-                        'standard' => $stdDT->standard,
-                        'batch_id' => $stdDT->batch_id,
-                        'batch_name' => $stdDT->batch_name,
-                    );
-                }
-
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $stulist
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($students->map(fn ($stdDT) => [
+                'id' => $stdDT->student_id,
+                'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
+                'image' => asset($stdDT->image),
+                'board_id' => $stdDT->board_id,
+                'board' => $stdDT->board . '(' . $stdDT->medium . ')',
+                'standard_id' => $stdDT->standard_id,
+                'standard' => $stdDT->standard,
+                'batch_id' => $stdDT->batch_id,
+                'batch_name' => $stdDT->batch_name,
+            ]), "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
-    public function filters_data(Request $request)
+
+    //student list all and filter wise
+    // public function institute_students(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             $user_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+
+    //             //filter fields
+    //             $board = $request->board_id;
+    //             $medium = $request->medium_id;
+    //             $standard = $request->standard_id;
+    //             $batch_id = $request->batch_id;
+    //             $searchkeyword = $request->searchkeyword;
+    //             $perPage = $request->input('per_page', 10);
+
+    //             $students = Student_detail::join('users', 'users.id', 'students_details.student_id')
+    //                 ->join('board', 'board.id', 'students_details.board_id')
+    //                 ->join('medium', 'medium.id', 'students_details.medium_id')
+    //                 ->join('standard', 'standard.id', 'students_details.standard_id')
+    //                 ->leftjoin('batches', 'batches.id', 'students_details.batch_id')
+    //                 ->where('students_details.user_id', $user_id)
+    //                 ->where('students_details.institute_id', $institute_id)
+    //                 ->when($board, function ($query, $board) {
+    //                     return $query->where('students_details.board_id', $board);
+    //                 })
+    //                 ->when($medium, function ($query, $medium) {
+    //                     return $query->where('students_details.medium_id', $medium);
+    //                 })
+    //                 ->when($standard, function ($query, $standard) {
+    //                     return $query->where('students_details.standard_id', $standard);
+    //                 })
+    //                 ->when($batch_id, function ($query, $batch_id) {
+    //                     return $query->where('students_details.batch_id', $batch_id);
+    //                 })
+    //                 ->when($searchkeyword, function ($query, $searchkeyword) {
+    //                     return $query->where(function ($query) use ($searchkeyword) {
+    //                         $query->where('users.firstname', 'like', '%' . $searchkeyword . '%')
+    //                             ->orWhere('users.lastname', 'like', '%' . $searchkeyword . '%')
+    //                             ->orWhere('users.unique_id', 'like', '%' . $searchkeyword . '%');
+    //                     });
+    //                 })
+    //                 ->select(
+    //                     'students_details.*',
+    //                     'batches.batch_name',
+    //                     'users.firstname',
+    //                     'users.lastname',
+    //                     'users.image',
+    //                     'board.name as board',
+    //                     'medium.name as medium',
+    //                     'standard.name as standard'
+    //                 )
+    //                 ->orderByDesc('students_details.created_at')
+    //                 ->paginate($perPage);
+
+    //             $stulist = [];
+    //             foreach ($students as $stdDT) {
+    //                 $stulist[] = array(
+    //                     'id' => $stdDT->student_id,
+    //                     'name' => $stdDT->firstname . ' ' . $stdDT->lastname,
+    //                     'image' => asset($stdDT->image),
+    //                     'board_id' => $stdDT->board_id,
+    //                     'board' => $stdDT->board . '(' . $stdDT->medium . ')',
+    //                     'standard_id' => $stdDT->standard_id,
+    //                     'standard' => $stdDT->standard,
+    //                     'batch_id' => $stdDT->batch_id,
+    //                     'batch_name' => $stdDT->batch_name,
+    //                 );
+    //             }
+
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Data Fetch Successfully',
+    //                 'data' => $stulist
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
+    public function  filters_data(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $boarids = Institute_board_sub::where('user_id', $request->user_id)
+                ->where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
+            $uniqueBoardIds = array_unique($boarids);
 
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
-        }
+            $board_list = DB::table('board')
+                ->whereIN('id', $uniqueBoardIds)
+                ->get();
 
-        $token = $request->header('Authorization');
+            $board_array = [];
+            foreach ($board_list as $board_value) {
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
+                $medium_sublist = DB::table('medium_sub')
+                    ->where('user_id', $request->user_id)
+                    ->where('board_id', $board_value->id)
+                    ->where('institute_id', $request->institute_id)
+                    ->pluck('medium_id')->toArray();
+                $uniquemediumds = array_unique($medium_sublist);
 
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
+                $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
 
-                $user_id = $request->user_id;
-                $institute_id = $request->institute_id;
+                $medium_array = [];
+                foreach ($medium_list as $medium_value) {
 
+                    $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
+                        ->where('standard_sub.user_id', $request->user_id)
+                        ->where('standard_sub.institute_id', $request->institute_id)
+                        ->where('standard_sub.board_id', $board_value->id)
+                        ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id', 'standard.name as std_name')->get();
+                    $stddata = [];
+                    foreach ($stndQY as $stndDT) {
+                        $forcounstd = Student_detail::whereNull('deleted_at')
+                            ->where('user_id', $request->user_id)
+                            ->where('institute_id', $request->institute_id)
+                            ->where('board_id', $board_value->id)
+                            ->where('medium_id', $medium_value->id)
+                            ->get();
+                        $stdCount = $forcounstd->count();
 
-                $boarids = Institute_board_sub::where('user_id', $user_id)
-                    ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
-                $uniqueBoardIds = array_unique($boarids);
-
-                $board_list = DB::table('board')
-                    ->whereIN('id', $uniqueBoardIds)
-                    ->get();
-
-                $board_array = [];
-                foreach ($board_list as $board_value) {
-
-                    $medium_sublist = DB::table('medium_sub')
-                        ->where('user_id', $user_id)
-                        ->where('board_id', $board_value->id)
-                        ->where('institute_id', $institute_id)
-                        ->pluck('medium_id')->toArray();
-                    $uniquemediumds = array_unique($medium_sublist);
-
-                    $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-
-                    $medium_array = [];
-                    foreach ($medium_list as $medium_value) {
-
-                        $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
-                            ->where('standard_sub.user_id', $user_id)
-                            ->where('standard_sub.institute_id', $institute_id)
-                            ->where('standard_sub.board_id', $board_value->id)
-                            ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id', 'standard.name as std_name')->get();
-                        $stddata = [];
-                        foreach ($stndQY as $stndDT) {
-                            $forcounstd = Student_detail::whereNull('deleted_at')
-                                ->where('user_id', $user_id)
-                                ->where('institute_id', $institute_id)
-                                ->where('board_id', $board_value->id)
-                                ->where('medium_id', $medium_value->id)
-                                ->get();
-                            $stdCount = $forcounstd->count();
-
-                            $stddata[] = array(
-                                'id' => $stndDT->std_id,
-                                'name' => $stndDT->std_name,
-                                'no_of_std' => $stdCount
-                            );
-                        }
-
-                        $medium_array[] = [
-                            'id' => $medium_value->id,
-                            'medium_name' => $medium_value->name,
-                            'standard' => $stddata
-                        ];
+                        $stddata[] = array(
+                            'id' => $stndDT->std_id,
+                            'name' => $stndDT->std_name,
+                            'no_of_std' => $stdCount
+                        );
                     }
 
-                    $board_array[] = [
-                        'id' => $board_value->id,
-                        'board_name' => $board_value->name,
-                        'medium' => $medium_array,
-
-                        // Include banner_array inside board_array
+                    $medium_array[] = [
+                        'id' => $medium_value->id,
+                        'medium_name' => $medium_value->name,
+                        'standard' => $stddata
                     ];
                 }
 
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Data Fetch Successfully',
-                    'data' => $board_array
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+                $board_array[] = [
+                    'id' => $board_value->id,
+                    'board_name' => $board_value->name,
+                    'medium' => $medium_array,
+                ];
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($board_array, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+    // public function filters_data(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+
+    //             $user_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+
+
+    //             $boarids = Institute_board_sub::where('user_id', $user_id)
+    //                 ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+    //             $uniqueBoardIds = array_unique($boarids);
+
+    //             $board_list = DB::table('board')
+    //                 ->whereIN('id', $uniqueBoardIds)
+    //                 ->get();
+
+    //             $board_array = [];
+    //             foreach ($board_list as $board_value) {
+
+    //                 $medium_sublist = DB::table('medium_sub')
+    //                     ->where('user_id', $user_id)
+    //                     ->where('board_id', $board_value->id)
+    //                     ->where('institute_id', $institute_id)
+    //                     ->pluck('medium_id')->toArray();
+    //                 $uniquemediumds = array_unique($medium_sublist);
+
+    //                 $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+    //                 $medium_array = [];
+    //                 foreach ($medium_list as $medium_value) {
+
+    //                     $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
+    //                         ->where('standard_sub.user_id', $user_id)
+    //                         ->where('standard_sub.institute_id', $institute_id)
+    //                         ->where('standard_sub.board_id', $board_value->id)
+    //                         ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id', 'standard.name as std_name')->get();
+    //                     $stddata = [];
+    //                     foreach ($stndQY as $stndDT) {
+    //                         $forcounstd = Student_detail::whereNull('deleted_at')
+    //                             ->where('user_id', $user_id)
+    //                             ->where('institute_id', $institute_id)
+    //                             ->where('board_id', $board_value->id)
+    //                             ->where('medium_id', $medium_value->id)
+    //                             ->get();
+    //                         $stdCount = $forcounstd->count();
+
+    //                         $stddata[] = array(
+    //                             'id' => $stndDT->std_id,
+    //                             'name' => $stndDT->std_name,
+    //                             'no_of_std' => $stdCount
+    //                         );
+    //                     }
+
+    //                     $medium_array[] = [
+    //                         'id' => $medium_value->id,
+    //                         'medium_name' => $medium_value->name,
+    //                         'standard' => $stddata
+    //                     ];
+    //                 }
+
+    //                 $board_array[] = [
+    //                     'id' => $board_value->id,
+    //                     'board_name' => $board_value->name,
+    //                     'medium' => $medium_array,
+
+    //                     // Include banner_array inside board_array
+    //                 ];
+    //             }
+
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Data Fetch Successfully',
+    //                 'data' => $board_array
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
     public function institute_profile(Request $request)
     {
         $institute_id = $request->institute_id;
@@ -3383,11 +3733,10 @@ class InstituteApiController extends Controller
         }
     }
 
-    //create batch
+
     public function create_batch(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -3398,108 +3747,173 @@ class InstituteApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-
-                $addbatch = Batches_model::create([
-                    'user_id' => $request->user_id,
-                    'institute_id' => $request->institute_id,
-                    'board_id' => $request->board_id,
-                    'medium_id' => $request->medium_id,
-                    'stream_id' => $request->stream_id, //nullable
-                    'standard_id' => $request->standard_id,
-                    'batch_name' => $request->batch_name,
-                    'subjects' => $request->subjects,
-                    'student_capacity' => $request->student_capacity
-                ]);
-
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Batch Added Successfully',
-                    'data' => []
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        try {
+            $batch = new Batches_model();
+            $batch->user_id  = Auth::id();
+            $batch->institute_id  = $request->institute_id;
+            $batch->board_id  = $request->board_id;
+            $batch->medium_id  = $request->medium_id;
+            $batch->stream_id  = $request->stream_id;
+            $batch->standard_id  = $request->standard_id;
+            $batch->batch_name  = $request->batch_name;
+            $batch->subjects  = $request->subjects;
+            $batch->student_capacity  = $request->student_capacity;
+            $batch->save();
+            return $this->response([], "Batch Added Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+    //create batch
+    // public function create_batch(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //         'board_id' => 'required',
+    //         'medium_id' => 'required',
+    //         'standard_id' => 'required',
+    //         'batch_name' => 'required',
+    //         'subjects' => 'required',
+    //         'student_capacity' => 'required'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+
+    //             $addbatch = Batches_model::create([
+    //                 'user_id' => $request->user_id,
+    //                 'institute_id' => $request->institute_id,
+    //                 'board_id' => $request->board_id,
+    //                 'medium_id' => $request->medium_id,
+    //                 'stream_id' => $request->stream_id, //nullable
+    //                 'standard_id' => $request->standard_id,
+    //                 'batch_name' => $request->batch_name,
+    //                 'subjects' => $request->subjects,
+    //                 'student_capacity' => $request->student_capacity
+    //             ]);
+
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Batch Added Successfully',
+    //                 'data' => []
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
     public function batch_list(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'board_id' => 'required',
             'standard_id' => 'required',
         ]);
+
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $token = $request->header('Authorization');
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-                $batchlist = Batches_model::where('user_id', $request->user_id)
-                    ->where('institute_id', $request->institute_id)
-                    ->where('board_id', $request->board_id)
-                    ->where('standard_id', $request->standard_id)->get()->toarray();
-                $batch_response = [];
-                foreach ($batchlist as $value) {
-                    $batch_response[] = [
-                        'id' => $value['id'],
-                        'batch_name' => $value['batch_name']
-                    ];
-                }
-                return response()->json([
-                    'status' => '200',
-                    'message' => 'Batch Fetch Successfully',
-                    'data' => $batch_response
-                ]);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+
+        try {
+            $batchlist = Batches_model::where([
+                ['user_id', Auth::id()],
+                ['institute_id', $request->institute_id],
+                ['board_id', $request->board_id],
+                ['standard_id', $request->standard_id]
+            ])->get(['id', 'batch_name'])->toArray();
+            return $this->response($batchlist, "Batch Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
+    // public function batch_list(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //         'board_id' => 'required',
+    //         'standard_id' => 'required',
+    //     ]);
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+    //     $token = $request->header('Authorization');
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             $batchlist = Batches_model::where('user_id', $request->user_id)
+    //                 ->where('institute_id', $request->institute_id)
+    //                 ->where('board_id', $request->board_id)
+    //                 ->where('standard_id', $request->standard_id)->get()->toarray();
+    //             $batch_response = [];
+    //             foreach ($batchlist as $value) {
+    //                 $batch_response[] = [
+    //                     'id' => $value['id'],
+    //                     'batch_name' => $value['batch_name']
+    //                 ];
+    //             }
+    //             return response()->json([
+    //                 'status' => '200',
+    //                 'message' => 'Batch Fetch Successfully',
+    //                 'data' => $batch_response
+    //             ]);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
 
     public function subjectList(Request $request)
     {
