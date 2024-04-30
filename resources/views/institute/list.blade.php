@@ -21,29 +21,12 @@
         </ul>
       </div>
 
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
         <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
-          </div>
-        </div>
-        <div class="row">
-          <!-- table -->
           <div class="col-lg-12 mt-3 institute-form">
             <div class="create-title-btn">
               <h4 class="mb-0">List of Role</h4>
-              <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
               <div class="inner-list-search">
                 <input type="search" class="form-control myInput" name="search" placeholder="Search">
                 @canButton('add', 'Role')
@@ -75,9 +58,9 @@
                     <td>{{$value->mobile}}</td>
                     <td>
                       <div class="d-flex">
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 institute_admin_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         &nbsp;&nbsp;
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger institute_admin_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                       </div>
                   </tr>
                   @php $i++ @endphp
@@ -102,7 +85,7 @@
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="usereditModalLabel">Role </h5>
+          <h5 class="modal-title" id="usereditModalLabel">Institute Admin </h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
@@ -161,7 +144,7 @@
 
               <hr>
               <div class="">
-                <button type="submit" class="btn btn-info" style="float:right">Update</button>
+                <button type="submit" class="btn text-white btn-rmv2" style="float:right">Update</button>
               </div>
           </form>
         </div>
@@ -169,59 +152,4 @@
       </div>
     </div>
   </div>
-  <script>
-    document.querySelectorAll('.editButton').forEach(function(button) {
-      button.addEventListener('click', function() {
-        var user_id = this.getAttribute('data-user-id');
-        var baseUrl = '{{ url('') }}';
-        axios.post(baseUrl + '/admin/edit', {
-            user_id: user_id
-          })
-          .then(response => {
-            var reponse_data = response.data.userDT;
-
-            $('#user_id').val(reponse_data.id);
-            $('#role_type').val(reponse_data.role_type);
-            $('#firstname').val(reponse_data.firstname);
-            $('#lastname').val(reponse_data.lastname);
-            $('#email').val(reponse_data.email);
-            $('#mobile').val(reponse_data.mobile);
-            $('#usereditModal').modal('show');
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      });
-    });
-    document.querySelectorAll('.deletebutton').forEach(function(button) {
-      button.addEventListener('click', function(event) {
-        event.preventDefault(); // Prevent the default form submission
-
-        var user_id = this.getAttribute('data-user-id');
-
-        // Show SweetAlert confirmation
-        Swal.fire({
-          title: 'Are you sure?',
-          text: 'You won\'t be able to revert this!',
-          icon: 'warning',
-          showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#3085d6',
-          confirmButtonText: 'Yes, delete it!'
-        }).then((result) => {
-          if (result.isConfirmed) {
-            axios.post('/admin/delete', {
-                user_id: user_id
-              })
-              .then(response => {
-                location.reload(true);
-
-              })
-              .catch(error => {
-                console.error(error);
-              });
-          }
-        });
-      });
-    });
-  </script>
+  <script src="{{asset('mayal_assets/js/file.js')}}"></script>

@@ -88,7 +88,7 @@
                     </select>
                   </div>
                   <br>
-                  <a class="btn btn-success" id="addmore">
+                  <a class="btn text-white btn-rmv2" id="addmore">
                     <i class="fas fa-plus"></i>
                   </a>
                   <br>
@@ -128,7 +128,7 @@
                       @enderror
                     </div>
                   </div>
-                  <button type="submit" class="btn btn-success mt-3" style="float: right;">Submit</button>
+                  <button type="submit" class="btn text-white btn-rmv2 mt-3" style="float: right;">Submit</button>
               </form>
               <br>
               <br>
@@ -169,7 +169,7 @@
                   </td>
                   <td>
                     @canButton('edit', 'Topic')
-                    <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
+                    <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
                     @endCanButton
                     @canButton('view', 'Topic')
                     <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $value->subject_id }}" data-base-id="{{ $value->base_id }}" data-chapter-id="{{$value->chapter_id}}" value="View">&nbsp;&nbsp;
@@ -319,7 +319,6 @@
   });
 
   //add more
-
   $(document).ready(function() {
     var maxFields = 10; // Maximum number of input fields
     var addButton = $('#addmore'); // Add button selector
@@ -329,53 +328,46 @@
 
     // Triggered on click of add button
     $(addButton).click(function() {
-      // Check maximum number of input fields
-      if (x < maxFields) {
-        x++; // Increment field counter
-        // Add input field
-        $(container).append(
-          '<div class="col-md-12">' +
-          '<label for="chapter_no">Topic No : </label>' +
-          '<input type="text" name="topic_no[]" id="topic_no" class="form-control" placeholder="Enter Topic No">' +
-          '@error('
-          topic_no + x ')' +
-          '<div class="text-danger">{{ $message }}</div>' +
-          '@enderror' +
-          '</div>' +
-          '<div class="col-md-12">' +
-          '<label for="chapter_name">Topic Name : </label>' +
-          '<input type="text" name="topic_name[]" id="topic_name" class="form-control" placeholder="Enter Topic Name">' +
-          '@error('
-          topic_name + x ')' +
-          '<div class="text-danger">{{ $message }}</div>' +
-          '@enderror' +
-          '</div>' +
-          '<div class="col-md-12">' +
-          '<label for="chapter_name">Video Category : </label>' +
-          '<select class="form-control" name="video_category[]' + x + '">' +
-          '<option>Select Option</option>' +
-          '<?php foreach ($videolist as $value) : ?>' +
-          '<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>' +
-          '<?php endforeach; ?>' +
-          '</select>' +
-          '@error('
-          video_category_id + x ')' +
-          '<div class="text-danger">{{ $message }}</div>' +
-          '@enderror' +
-          '</div>' +
-
-          '<div class="col-md-12">' +
-          '<label for="chapter_image">Video Upload : </label>' +
-          '<input type="file" name="topic_video[]" id="topic_video" class="form-control" placeholder="Select Video Upload" multiple>' +
-          '@error('
-          video + x ')' +
-          '<div class="text-danger">{{ $message }}</div>' +
-          '@enderror' +
-          '</div><br><a class="btn btn-success" id="delete"><i class="fas fa-trash"></i></a>'
-        );
-      } else {
-        alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
-      }
+        // Check maximum number of input fields
+        if (x < maxFields) {
+            x++; // Increment field counter
+            // Add input field
+            $(container).append(
+                '<div class="row">' +
+                '<div class="col-md-12 mt-5">' +
+                '<a class="btn text-white btn-rmv2 mb-2 delete"><i class="fas fa-trash"></i></a>' +
+                '<label for="chapter_no">Topic No : </label>' +
+                '<input type="text" name="topic_no[]" class="form-control" placeholder="Enter Topic No">' +
+                '</div>' +
+                '<div class="col-md-12">' +
+                '<label for="chapter_name">Topic Name : </label>' +
+                '<input type="text" name="topic_name[]" class="form-control" placeholder="Enter Topic Name">' +
+                '</div>' +
+                '<div class="col-md-12">' +
+                '<label for="chapter_name">Video Category : </label>' +
+                '<select class="form-control" name="video_category[]">' +
+                '<option>Select Option</option>' +
+                '<?php foreach ($videolist as $value) : ?>' +
+                '<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>' +
+                '<?php endforeach; ?>' +
+                '</select>' +
+                '</div>' +
+                '<div class="col-md-12">' +
+                '<label for="chapter_image">Video Upload : </label>' +
+                '<input type="file" name="topic_video[]" class="form-control" placeholder="Select Video Upload" multiple>' +
+                '</div>' +
+                '</div>'
+            );
+        } else {
+            alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+        }
     });
-  });
+
+    // Triggered on click of delete button
+    $(document).on('click', '.delete', function() {
+        $(this).closest('.row').remove(); // Remove the closest row
+        x--; // Decrement field counter
+    });
+});
+
 </script>

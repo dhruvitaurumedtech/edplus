@@ -1,19 +1,8 @@
-</head>
-
 <body>
   <div class="dashboard">
     @include('layouts/header-sidebar')
-    <!-- MAIN -->
     <div class="dashboard-app">
       @include('layouts/header-topbar')
-      <!-- /.content-header -->
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
       <div class="link-dir">
         <h1 class="display-4">Institute List</h1>
         <ul>
@@ -24,33 +13,18 @@
           <li><a href="{{url('institute-list')}}">Institute List</a></li>
         </ul>
       </div>
-
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-      </div>
-
-      <!-- /.card-header -->
-      <!-- form start -->
-
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
 
 
-        <div class="col-lg-12 mt-3 institute-form">
+        <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
-            <h4 class="mb-0">List of Role</h4>
-            <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
+            <h4 class="mb-0">Institute List</h4>
             <div class="inner-list-search">
               <input type="search" class="form-control myInput" name="search" placeholder="Search">
-              @canButton('add', 'Role')
+              @canButton('add', 'List institute')
               <a href="{{url('/create/institute')}}" class="btn text-white btn-rmv2" style="float: right;">Create Institute</a>
               @endCanButton
-
             </div>
             <table class="table table-js table-bordered institute-table mt-4">
               <thead>
@@ -76,11 +50,11 @@
                   <td>{{$value['status']}}</td>
                   <td>
                     <div class="d-flex">
-                      <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
+                      <input type="submit" class="btn text-white btn-rmv2 institute_list_editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
                       &nbsp;&nbsp;
-                      <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
+                      <input type="submit" class="btn btn-danger institute_list_deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
-                      <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning">Student List</a>
+                      <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning" style="text-wrap: nowrap;">Student List</a>
                       <!-- <form method="post" action="{{url('/student/list')}}">
                         @csrf
                         <input type="hidden" name="institute_id" value="">
@@ -111,7 +85,8 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="usereditModalLabel">Role </h5>
+        <h5 class="modal-title" id="usereditModalLabel">Institute List
+        </h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -161,7 +136,7 @@
 
             <hr>
             <div class="">
-              <button type="submit" class="btn btn-info" style="float:right">Update</button>
+              <button type="submit" class="btn text-white btn-rmv2" style="float:right">Update</button>
             </div>
         </form>
       </div>
@@ -169,60 +144,4 @@
     </div>
   </div>
 </div>
-
-<script>
-  document.querySelectorAll('.editButton').forEach(function(button) {
-    button.addEventListener('click', function() {
-      var user_id = this.getAttribute('data-user-id');
-      var baseUrl = '{{ url('
-      ') }}';
-      axios.post(baseUrl + '/admin/edit', {
-          user_id: user_id
-        })
-        .then(response => {
-          var reponse_data = response.data.userDT;
-          console.log(reponse_data);
-          $('#user_id').val(reponse_data.id);
-          $('#role_type').val(reponse_data.role_type);
-          $('#name').val(reponse_data.firstname);
-          $('#email').val(reponse_data.email);
-          $('#mobile').val(reponse_data.mobile);
-          $('#usereditModal').modal('show');
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    });
-  });
-  document.querySelectorAll('.deletebutton').forEach(function(button) {
-    button.addEventListener('click', function(event) {
-      event.preventDefault(); // Prevent the default form submission
-
-      var user_id = this.getAttribute('data-user-id');
-
-      // Show SweetAlert confirmation
-      Swal.fire({
-        title: 'Are you sure?',
-        text: 'You won\'t be able to revert this!',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Yes, delete it!'
-      }).then((result) => {
-        if (result.isConfirmed) {
-          axios.post('/admin/delete', {
-              user_id: user_id
-            })
-            .then(response => {
-              location.reload(true);
-
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        }
-      });
-    });
-  });
-</script>
+<script src="{{asset('mayal_assets/js/file.js')}}"></script>

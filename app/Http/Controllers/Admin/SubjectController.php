@@ -31,7 +31,7 @@ class SubjectController extends Controller
                 'board.name as board',
                 'base_table.id as base_id'
             )
-            ->where('standard.status', 'active')->paginate(10);
+            ->where('standard.status', 'active')->orderBy('base_table.id', 'desc')->paginate(10);
 
         $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
             ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
@@ -39,13 +39,8 @@ class SubjectController extends Controller
 
 
 
-        $institute_for = Institute_for_model::where('status', 'active')->get();
-        $board = board::where('status', 'active')->get();
-        $medium = Medium_model::where('status', 'active')->get();
-        $class = Class_model::where('status', 'active')->get();
-        $standard = Standard_model::where('status', 'active')->get();
-        $stream = Stream_model::where('status', 'active')->get();
-        return view('subject.list', compact('institute_for', 'board', 'medium', 'class', 'standard', 'stream', 'subject_list', 'addsubstandard'));
+
+        return view('subject.list', compact('subject_list', 'addsubstandard'));
     }
     function subject_list_save(Request $request)
     {
@@ -133,9 +128,29 @@ class SubjectController extends Controller
 
     function create_subject()
     {
-        $standardlist = Standard_model::get()->toArray();
-        $streamlist = Stream_model::get()->toArray();
-        return view('subject.create', compact('streamlist', 'standardlist'));
+        $institute_for = Institute_for_model::where('status', 'active')->get();
+        $board = board::where('status', 'active')->get();
+        $medium = Medium_model::where('status', 'active')->get();
+        $class = Class_model::where('status', 'active')->get();
+        $standard = Standard_model::where('status', 'active')->get();
+        $stream = Stream_model::where('status', 'active')->get();
+        $addsubstandard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id'
+            )
+            ->where('standard.status', 'active')->paginate(10);
+
+        $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
+            ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
+            ->where('base_table.status', 'active')->get();
+        return view('subject.create', compact('addsubstandard', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
     }
     function standard_wise_stream(Request $request)
     {

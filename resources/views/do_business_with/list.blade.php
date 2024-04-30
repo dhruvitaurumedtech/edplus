@@ -55,7 +55,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Name">
+                        <input type="text" name="name" class="form-control" placeholder="Enter Name" value="{{old('name')}}">
                         @error('name')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -66,7 +66,7 @@
                         <select class="form-control" name="category" id="category">
                           <option value=" ">Select Option</option>
                           @foreach($categories as $catval)
-                          <option value="{{$catval->id}}">{{$catval->name}}</option>
+                          <option value="{{$catval->id}}" {{ old('category') == $catval->id ? 'selected' : '' }}>{{$catval->name}}</option>
                           @endforeach
 
                         </select>
@@ -78,8 +78,8 @@
                         <label for="exampleInputEmail1">status : </label>
                         <select class="form-control" name="status">
                           <option value=" ">Select Option</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
+                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         @error('status')
                         <div class="text-danger">{{ $message }}</div>
@@ -91,7 +91,7 @@
                   </div>
                 </div>
                 <div class="d-flex">
-                  <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                  <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Submit</button>
                 </div>
 
 
@@ -140,7 +140,7 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Do_business_with')
-                        <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Do_business_with')
@@ -217,7 +217,7 @@
                   </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                  <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Update</button>
                 </div>
             </div>
           </div>
@@ -231,9 +231,10 @@
     document.querySelectorAll('.editButton').forEach(function(button) {
       button.addEventListener('click', function() {
         var id = this.getAttribute('data-user-id');
-        var baseUrl = '{{ url('') }}';
+        var baseUrl = $('meta[name="base-url"]').attr('content');
 
-        axios.post(baseUrl +'/do-business-with/edit', {
+
+        axios.post(baseUrl + '/do-business-with/edit', {
             id: id
           })
           .then(response => {

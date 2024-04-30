@@ -619,7 +619,7 @@ form.institute {
 }
 
 #addmore {
-    padding: 5px !important;
+    /* padding: 9px !important; */
 }
 
 .add-chapter-btn label {
@@ -679,6 +679,15 @@ form.institute {
     padding: 6px 10px;
     text-wrap: nowrap;
     float: right;
+    cursor: pointer;
+}
+
+.blue-button {
+    font-size: 16px;
+    background-color: var(--primary-color);
+    color: var(--white-color);
+    padding: 6px 10px;
+    text-wrap: nowrap;
     cursor: pointer;
 }
 
@@ -1421,4 +1430,46 @@ h1,
 
 .img-resize {
     height: 50px;
+}
+
+.border-line-subject {
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    padding: 0px 42px 35px 42px;
+}
+
+.f-icons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    margin-top: 35px;
+    /* width: 100px; */
+    /* margin-left: auto; */
+}
+
+.delete_buttton_subject {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 50px;
+    margin-top: 54px;
+    width: 100px;
+    margin-left: auto;
+}
+
+#imagePreviewContainer img {
+    max-width: 200px;
+    /* Set maximum width for the image preview */
+    max-height: 200px;
+    /* Set maximum height for the image preview */
+    margin-right: 10px;
+    /* Add some space between images */
+    margin-bottom: 10px;
+    margin-top: 10px;
+}
+
+.institute-form label {
+    margin-top: 10px;
+    font-weight: 600;
 }

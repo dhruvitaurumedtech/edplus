@@ -65,7 +65,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -89,7 +89,7 @@
                                                         </a>
                                                         @foreach($teachers as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('teacher_id', [])) ? 'checked' : '' }} />
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
@@ -103,14 +103,14 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputtitle">Title : </label>
-                                                <input type="text" class="form-control" name="title">
+                                                <input type="text" class="form-control" name="title" value="{{old('title')}}">
                                                 @error('title')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Announcement : </label>
-                                                <textarea class="form-control" name="announcement"></textarea>
+                                                <textarea class="form-control" name="announcement">{{old('announcement')}}</textarea>
                                                 @error('announcement')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -122,7 +122,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn text-white blue-button">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -147,7 +147,7 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="myTable">
 
                                     @foreach($response as $values)
                                     <tr>
@@ -171,7 +171,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
                                                 &nbsp;&nbsp;
                                                 <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
                                             </div>
@@ -277,7 +277,7 @@
                                     </div>
                                 </div>
                                 <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn btn-primary">Update</button>
+                                    <button type="submit" class="btn text-white blue-button">Update</button>
                                 </div>
                             </form>
                         </div>
@@ -291,7 +291,8 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var anouncement_id = this.getAttribute('data-user-id');
-                        var baseUrl = '{{ url('') }}';
+                        var baseUrl = $('meta[name="base-url"]').attr('content');
+
 
                         axios.post(baseUrl + '/announcement/edit', {
                                 anouncement_id: anouncement_id

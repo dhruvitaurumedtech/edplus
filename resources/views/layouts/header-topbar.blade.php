@@ -1,3 +1,5 @@
+<meta name="base-url" content="{{ url('/') }}">
+
 <header class='dashboard-toolbar'>
     <a href="index.php"><img src="{{asset('mayal_assets/images/logo.svg')}}" alt="e School logo" class="img-fluid eschool-logo-img"></a>
 

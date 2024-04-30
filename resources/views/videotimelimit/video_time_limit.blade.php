@@ -68,7 +68,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -92,7 +92,7 @@
                                                         </a>
                                                         @foreach($teachers as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('teacher_id', [])) ? 'checked' : '' }} />
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
@@ -106,7 +106,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Time Limit (Hour) : </label>
-                                                <input type="text" name="time" class="form-control">
+                                                <input type="text" name="time" class="form-control" value="{{old('time')}}">
                                                 @error('time')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -118,7 +118,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn text-white blue-button">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -165,7 +165,7 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
                                                 &nbsp;&nbsp;
                                                 <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
                                             </div>
@@ -265,7 +265,7 @@
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
-                                    <button type="submit" class="btn btn-primary">Submit</button>
+                                    <button type="submit" class="btn text-white blue-button">Submit</button>
                                 </div>
                             </form>
                         </div>
@@ -279,7 +279,8 @@
                 document.querySelectorAll('.editButton').forEach(function(button) {
                     button.addEventListener('click', function() {
                         var id = this.getAttribute('data-user-id');
-                        var baseUrl = '{{ url('') }}';
+                        var baseUrl = $('meta[name="base-url"]').attr('content');
+
                         axios.post(baseUrl + '/video-timelimit-edit', {
                                 id: id
                             })

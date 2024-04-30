@@ -22,7 +22,7 @@
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Banner</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}">Create Banner</a></li>
+          <li><a href="{{url('institute-list')}}" class="active-link-dir">Create Banner</a></li>
         </ul>
       </div>
 
@@ -53,36 +53,49 @@
                   <select name="institute_id" class="form-control">
                     <option value="">Select option</option>
                     @foreach($institute_list as $value)
-                    <option value="{{$value->id}}">{{$value->institute_name}}</option>
+                    <option value="{{ $value->id }}" {{ $value->id == old('institute_id') ? 'selected' : '' }}>
+                      {{ $value->institute_name }}
+                    </option>
                     @endforeach
                   </select>
                   @error('banner_image')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   <label for="exampleInputEmail1">Url : </label>
-                  <input type="text" name="url" class="form-control" placeholder="Enter url">
+                  <input type="text" name="url" class="form-control" placeholder="Enter url" value="{{url('url')}}">
                   @error('url')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   @endif
-                  <label for="exampleInputEmail1">Banner_image : </label>
-                  <input type="file" name="banner_image[]" class="form-control" multiple>
-                  @error('banner_image')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
+                  <div class="row">
+                    <div class="col-md-8">
+                      <label for="banner_image">Banner Image:</label>
+                      <input type="file" id="banner_image" name="banner_image[]" class="form-control" multiple>
+
+                      @error('banner_image')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+
+                    </div>
+                    <div class="col-md-4">
+                      <div id="imagePreviewContainer"></div>
+                    </div>
+                  </div>
+
 
 
                   <label for="exampleInputEmail1">status : </label>
                   <select class="form-control" name="status">
                     <option value=" ">Select Option</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
                   </select>
                   @error('status')
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   <div class="d-flex justify-content-end mt-4">
-                    <button type="submit" class="btn btn-primary" style="float: right;">Submit</button>
+                    <button type="submit" class="btn text-white blue-button" style="float: right;">Submit</button>
                   </div>
                 </form>
               </div>
@@ -111,7 +124,7 @@
                         <th>Action</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="myTable">
                       @php $i=1 @endphp
                       @foreach($banner_list as $value)
                       <tr>
@@ -132,7 +145,7 @@
                         <td>
                           <div class="d-flex">
                             @canButton('edit', 'Banner')
-                            <input type="submit" class="btn btn-primary editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                            <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                             @endCanButton
                             &nbsp;&nbsp;
                             @canButton('delete', 'Banner')
@@ -200,7 +213,7 @@
                       </div>
                     </div>
                     <div class="d-flex justify-content-end">
-                      <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                      <button type="submit" class="btn text-white blue-button" style="float: right;">Update</button>
                     </div>
                 </div>
               </div>
@@ -289,3 +302,28 @@
 </body>
 
 </html>
+<script>
+  $(document).ready(function() {
+    // Function to handle image preview
+    function readURL(input, container) {
+      if (input.files && input.files.length > 0) {
+        for (var i = 0; i < input.files.length; i++) {
+          var reader = new FileReader();
+
+          reader.onload = function(e) {
+            var img = $('<img>').attr('src', e.target.result);
+            $(container).append(img);
+          }
+
+          reader.readAsDataURL(input.files[i]); // Read the selected file as a URL
+        }
+      }
+    }
+
+    // Attach change event listener to the file input element
+    $('#banner_image').change(function() {
+      $('#imagePreviewContainer').empty(); // Clear previous previews
+      readURL(this, '#imagePreviewContainer'); // Call readURL function when file input changes
+    });
+  });
+</script>

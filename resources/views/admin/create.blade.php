@@ -1,33 +1,10 @@
 </head>
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- /.content-header -->
-
-      <div class="col-md-10 offset-md-1">
-        @if (session('success'))
-        <div class="alert alert-success">
-          {{ session('success') }}
-        </div>
-        @endif
-      </div>
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
-      <!-- Main content -->
       <div class="link-dir">
         <h1 class="display-4">Admin</h1>
         <ul>
@@ -40,12 +17,12 @@
           <li><a href="javascript:void(0)" class="active-link-dir">Create Admin</a></li>
         </ul>
       </div>
-
       <script>
         function clearFormData() {
           document.getElementById("myForm").reset();
         }
       </script>
+      @include('layouts/alert')
       <!-- Main content -->
       <div class="dashboard-content side-content">
         <form class="s-chapter-form institute-form" method="post" id="myForm" action="{{ url('store/admin') }}">
@@ -53,7 +30,7 @@
           <h4 class="mb-3">Create Admin</h4>
           <div class="card-body">
             <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
+              <label for="inputPassword3" class="col-sm-2 col-form-label mt-0">Select Role :</label>
               <div class="col-sm-10">
                 <select class="form-control" name="role_type" id="role_type">
                   <option value="">Select Role</option>
@@ -66,7 +43,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">firstname :</label>
               <div class="col-sm-10">
                 <input type="text" id="firstname" name="firstname" class="form-control" placeholder="first name" value="{{old('firstname')}}">
                 @error('firstname')
@@ -75,7 +52,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">lastname</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">lastname :</label>
               <div class="col-sm-10">
                 <input type="text" id="lastname" name="lastname" class="form-control" placeholder="last name" value="{{old('lastname')}}">
                 @error('lastname')
@@ -84,7 +61,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">Email :</label>
               <div class="col-sm-10">
                 <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{old('email')}}">
                 @error('email')
@@ -93,7 +70,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+              <label for="inputPassword3" class="col-sm-2 col-form-label mt-0">Password :</label>
               <div class="col-sm-10">
                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="{{old('password')}}">
                 @error('password')
@@ -102,14 +79,14 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Phone </label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">Phone :</label>
               <div class="col-sm-10">
-                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('password')}}">
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('mobile')}}">
               </div>
             </div>
           </div>
           <div class="d-flex">
-            <button type="submit" class="btn btn-info" style="margin-left: auto;">Submit</button>
+            <button type="submit" class="btn text-white btn-rmv2" style="margin-left: auto;">Submit</button>
           </div>
 
         </form>
