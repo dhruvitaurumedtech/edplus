@@ -188,8 +188,8 @@ class BasetableControllerAPI extends Controller
                 ->get();
             $base_standard = [];
             foreach ($base_standard as $basestandard) {
-                $base_class = Standard_model::join('base_table', 'base_table.institute_for_class', '=', 'standard.id')
-                    ->whereIN('id.base_table', $basestandard->id)
+                $base_class = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                    ->whereIN('base_table.id', $basestandard->id)
                     ->select('standard.id', 'standard.name')
                     ->distinct()
                     ->get();
