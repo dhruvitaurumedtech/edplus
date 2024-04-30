@@ -17,7 +17,7 @@
       <div class="dashboard-content side-content ">
         <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
-            <h4 class="mb-0">Subject List dhruvit</h4>
+            <h4 class="mb-0">Subject List</h4>
             <div class="inner-list-search">
               <input type="search" class="form-control myInput" name="search" placeholder="Search">
               <a href="{{url('create/subject')}}" class="btn text-white btn-rmv2">Create Subject</a>
