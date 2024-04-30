@@ -3463,28 +3463,27 @@ class InstituteApiController extends Controller
     //         ]);
     //     }
     // }
+
+
     public function institute_profile(Request $request)
     {
-        $institute_id = $request->institute_id;
-        $user_id = $request->user_id;
-        $token = $request->header('Authorization');
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
+        try {
+            $institute_id = $request->institute_id;
             $institute_detail = Institute_detail::where('institute_detail.id', $institute_id)
                 ->select('institute_detail.*')
                 ->get()->toarray();
-
-
             if (empty($institute_id)) {
-                $institute_id = Institute_detail::where('user_id', $user_id)->select('id')->first();
+                $institute_id = Institute_detail::where('user_id', Auth::id())->select('id')->first();
             }
-            // Institute_detail::where();
-            $boarids = Institute_board_sub::where('user_id', $user_id)
+            $boarids = Institute_board_sub::where('user_id', Auth::id())
                 ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
             $uniqueBoardIds = array_unique($boarids);
 
@@ -3496,7 +3495,7 @@ class InstituteApiController extends Controller
             foreach ($board_list as $board_value) {
 
                 $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $user_id)
+                    ->where('user_id', Auth::id())
                     ->where('board_id', $board_value->id)
                     ->where('institute_id', $institute_id)
                     ->pluck('medium_id')->toArray();
@@ -3516,8 +3515,6 @@ class InstituteApiController extends Controller
                     'board_name' => $board_value->name,
                     'icon' => $board_value->icon,
                     'medium' => $medium_array,
-
-                    // Include banner_array inside board_array
                 ];
             }
             $institute_response = [];
@@ -3549,24 +3546,214 @@ class InstituteApiController extends Controller
 
                 ];
             }
-            return response()->json([
-                'status' => '200',
-                'message' => 'Institute Fetch Successfully',
-                'data' => $institute_response
-            ]);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($institute_response, "Institute Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+    // public function institute_profile(Request $request)
+    // {
+    //     $institute_id = $request->institute_id;
+    //     $user_id = $request->user_id;
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         $institute_detail = Institute_detail::where('institute_detail.id', $institute_id)
+    //             ->select('institute_detail.*')
+    //             ->get()->toarray();
+
+
+    //         if (empty($institute_id)) {
+    //             $institute_id = Institute_detail::where('user_id', $user_id)->select('id')->first();
+    //         }
+    //         // Institute_detail::where();
+    //         $boarids = Institute_board_sub::where('user_id', $user_id)
+    //             ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+    //         $uniqueBoardIds = array_unique($boarids);
+
+    //         $board_list = DB::table('board')
+    //             ->whereIN('id', $uniqueBoardIds)
+    //             ->get();
+
+    //         $board_array = [];
+    //         foreach ($board_list as $board_value) {
+
+    //             $medium_sublist = DB::table('medium_sub')
+    //                 ->where('user_id', $user_id)
+    //                 ->where('board_id', $board_value->id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->pluck('medium_id')->toArray();
+    //             $uniquemediumds = array_unique($medium_sublist);
+
+    //             $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+    //             $medium_array = [];
+    //             foreach ($medium_list as $medium_value) {
+    //                 $medium_array[] = [
+    //                     'id' => $medium_value->id,
+    //                     'medium_name' => $medium_value->name,
+    //                 ];
+    //             }
+    //             $board_array[] = [
+    //                 'id' => $board_value->id,
+    //                 'board_name' => $board_value->name,
+    //                 'icon' => $board_value->icon,
+    //                 'medium' => $medium_array,
+
+    //                 // Include banner_array inside board_array
+    //             ];
+    //         }
+    //         $institute_response = [];
+    //         foreach ($institute_detail as $value) {
+    //             $institute_response[] = [
+    //                 'institute_name' => $value['institute_name'],
+    //                 'address' => $value['address'] . '',
+    //                 'contact_no' => $value['contact_no'] . '',
+    //                 'email' => $value['email'] . '',
+    //                 'about_us' => $value['about_us'] . '',
+    //                 'board_name' => $board_array,
+    //                 'website_link' => $value['website_link'] . '',
+    //                 'instagram_link' => $value['instagram_link'] . '',
+    //                 'facebook_link' => $value['facebook_link'] . '',
+    //                 'whatsaap_link' => $value['whatsaap_link'] . '',
+    //                 'youtube_link' => $value['youtube_link'] . '',
+    //                 'logo' => url($value['logo']),
+    //                 'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_blank_image.png')),
+    //                 'country' => $value['country'] . '',
+    //                 'state' => $value['state'] . '',
+    //                 'city' => $value['city'] . '',
+    //                 'pincode' => $value['pincode'] . '',
+    //                 'open_time' => $value['open_time'] . '',
+    //                 'close_time' => $value['close_time'] . '',
+    //                 'gst_number' => $value['gst_number'] . '',
+    //                 'gst_slab' => $value['gst_slab'] . '',
+    //                 'start_academic_year' => $value['start_academic_year'] . '',
+    //                 'end_academic_year' => $value['end_academic_year'] . '',
+
+    //             ];
+    //         }
+    //         return response()->json([
+    //             'status' => '200',
+    //             'message' => 'Institute Fetch Successfully',
+    //             'data' => $institute_response
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
     //institute profile edit
+    // public function institute_profile_edit(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'institute_id' => 'required',
+    //         'institute_name' => 'required',
+    //         'email' => 'required',
+    //         'address' => 'required',
+    //         'contact_no' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             $user_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+    //             $institutedt = Institute_detail::find($institute_id);
+    //             if ($institutedt) {
+    //                 $institutedt->institute_name = $request->institute_name;
+    //                 $institutedt->address = $request->address;
+    //                 $institutedt->contact_no = $request->contact_no;
+    //                 $institutedt->email = $request->email;
+    //                 $institutedt->about_us = $request->about_us;
+    //                 //$institutedt->about_us = $request->country;
+    //                 //$institutedt->state = $request->state;
+    //                 //$institutedt->city = $request->city;
+    //                 //$institutedt->pincode = $request->pincode;                 
+    //                 $institutedt->open_time = $request->open_time;
+    //                 $institutedt->close_time = $request->close_time;
+    //                 $institutedt->gst_number = $request->gst_number;
+    //                 $institutedt->gst_slab = $request->gst_slab;
+    //                 $institutedt->website_link = $request->website_link;
+    //                 $institutedt->instagram_link = $request->instagram_link;
+    //                 $institutedt->facebook_link = $request->facebook_link;
+    //                 $institutedt->whatsaap_link = $request->whatsaap_link;
+    //                 $institutedt->youtube_link = $request->youtube_link;
+    //                 $institutedt->start_academic_year = $request->start_academic_year;
+    //                 $institutedt->end_academic_year = $request->end_academic_year;
+
+    //                 $imagePath = null;
+    //                 if ($request->hasFile('logo')) {
+    //                     $logo_image = $request->file('logo');
+    //                     $imagePath = $logo_image->store('logo', 'public');
+    //                 }
+    //                 if ($imagePath !== null) {
+    //                     $institutedt->logo = $imagePath;
+    //                 }
+    //                 $imagePath2 = null;
+    //                 if ($request->hasFile('cover_photo')) {
+    //                     $logo_image = $request->file('cover_photo');
+    //                     $imagePath2 = $logo_image->store('cover_photo', 'public');
+    //                 }
+    //                 if ($imagePath2 !== null) {
+    //                     $institutedt->cover_photo = $imagePath2;
+    //                 }
+    //                 $institutedt->save();
+
+    //                 return response()->json([
+    //                     'status' => 200,
+    //                     'message' => 'Record Update Successfully!.',
+    //                     'data' => []
+    //                 ]);
+    //             } else {
+    //                 return response()->json([
+    //                     'status' => 400,
+    //                     'message' => 'Record not found.',
+    //                     'data' => []
+    //                 ]);
+    //             }
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
     public function institute_profile_edit(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'institute_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
             'institute_name' => 'required',
             'email' => 'required',
             'address' => 'required',
@@ -3574,92 +3761,51 @@ class InstituteApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-                $user_id = $request->user_id;
-                $institute_id = $request->institute_id;
-                $institutedt = Institute_detail::find($institute_id);
-                if ($institutedt) {
-                    $institutedt->institute_name = $request->institute_name;
-                    $institutedt->address = $request->address;
-                    $institutedt->contact_no = $request->contact_no;
-                    $institutedt->email = $request->email;
-                    $institutedt->about_us = $request->about_us;
-                    //$institutedt->about_us = $request->country;
-                    //$institutedt->state = $request->state;
-                    //$institutedt->city = $request->city;
-                    //$institutedt->pincode = $request->pincode;                 
-                    $institutedt->open_time = $request->open_time;
-                    $institutedt->close_time = $request->close_time;
-                    $institutedt->gst_number = $request->gst_number;
-                    $institutedt->gst_slab = $request->gst_slab;
-                    $institutedt->website_link = $request->website_link;
-                    $institutedt->instagram_link = $request->instagram_link;
-                    $institutedt->facebook_link = $request->facebook_link;
-                    $institutedt->whatsaap_link = $request->whatsaap_link;
-                    $institutedt->youtube_link = $request->youtube_link;
-                    $institutedt->start_academic_year = $request->start_academic_year;
-                    $institutedt->end_academic_year = $request->end_academic_year;
-
-                    $imagePath = null;
-                    if ($request->hasFile('logo')) {
-                        $logo_image = $request->file('logo');
-                        $imagePath = $logo_image->store('logo', 'public');
-                    }
-                    if ($imagePath !== null) {
-                        $institutedt->logo = $imagePath;
-                    }
-                    $imagePath2 = null;
-                    if ($request->hasFile('cover_photo')) {
-                        $logo_image = $request->file('cover_photo');
-                        $imagePath2 = $logo_image->store('cover_photo', 'public');
-                    }
-                    if ($imagePath2 !== null) {
-                        $institutedt->cover_photo = $imagePath2;
-                    }
-                    $institutedt->save();
-
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Record Update Successfully!.',
-                        'data' => []
-                    ]);
-                } else {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'Record not found.',
-                        'data' => []
-                    ]);
-                }
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+        try {
+            $institutedt = Institute_detail::find($request->institute_id);
+            $institutedt->institute_name = $request->institute_name;
+            $institutedt->address = $request->address;
+            $institutedt->contact_no = $request->contact_no;
+            $institutedt->email = $request->email;
+            $institutedt->about_us = $request->about_us;
+            $institutedt->open_time = $request->open_time;
+            $institutedt->close_time = $request->close_time;
+            $institutedt->gst_number = $request->gst_number;
+            $institutedt->gst_slab = $request->gst_slab;
+            $institutedt->website_link = $request->website_link;
+            $institutedt->instagram_link = $request->instagram_link;
+            $institutedt->facebook_link = $request->facebook_link;
+            $institutedt->whatsaap_link = $request->whatsaap_link;
+            $institutedt->youtube_link = $request->youtube_link;
+            $institutedt->start_academic_year = $request->start_academic_year;
+            $institutedt->end_academic_year = $request->end_academic_year;
+            $imagePath = null;
+            if ($request->hasFile('logo')) {
+                $logo_image = $request->file('logo');
+                $imagePath = $logo_image->store('logo', 'public');
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            if ($imagePath !== null) {
+                $institutedt->logo = $imagePath;
+            }
+            $imagePath2 = null;
+            if ($request->hasFile('cover_photo')) {
+                $logo_image = $request->file('cover_photo');
+                $imagePath2 = $logo_image->store('cover_photo', 'public');
+            }
+            if ($imagePath2 !== null) {
+                $institutedt->cover_photo = $imagePath2;
+            }
+            $institutedt->save();
+            return $this->response([], "Institute Update Successfully!.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
     // category list for add do business with 
     // public function category_list(Request $request)
     // {

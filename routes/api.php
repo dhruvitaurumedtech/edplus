@@ -71,6 +71,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
     Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
     Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
+    Route::post('/institute/student_list', [StudentController::class, 'student_list']);
+    Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
+    Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
+    Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
 
 
     //new API
@@ -81,21 +85,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
-       
     Route::post('/institute/lecture-type', [TimetableController::class, 'lecture_type_list']);
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable']);
-    
 });
-
-
-
-
-
-
-Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
-
-
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
 Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
@@ -154,7 +147,7 @@ Route::post('/institute/Subject-edit', [InstituteApiController::class, 'edit_sub
 
 
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
+
 
 
 //parents API's
@@ -162,9 +155,8 @@ Route::post('/parents/child-list-parents', [ParentsController::class, 'child_lis
 
 
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-Route::post('/institute/student_list', [StudentController::class, 'student_list']);
-Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
-Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
+
+
 
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
 

@@ -80,4 +80,9 @@ class User extends Authenticatable implements JWTSubject
             return asset('profile/image.jpg');
         }
     }
+
+    public function studentsDetails()
+    {
+        return $this->hasMany(Student_detail::class, 'user_id');
+    }
 }
