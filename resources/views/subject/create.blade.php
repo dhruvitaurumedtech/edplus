@@ -220,7 +220,6 @@
                         console.error(error);
                     });
 
-
             });
         });
 

@@ -30,7 +30,7 @@
           <h4 class="mb-3">Create Admin</h4>
           <div class="card-body">
             <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
+              <label for="inputPassword3" class="col-sm-2 col-form-label mt-0">Select Role :</label>
               <div class="col-sm-10">
                 <select class="form-control" name="role_type" id="role_type">
                   <option value="">Select Role</option>
@@ -43,7 +43,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">firstname :</label>
               <div class="col-sm-10">
                 <input type="text" id="firstname" name="firstname" class="form-control" placeholder="first name" value="{{old('firstname')}}">
                 @error('firstname')
@@ -52,7 +52,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">lastname</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">lastname :</label>
               <div class="col-sm-10">
                 <input type="text" id="lastname" name="lastname" class="form-control" placeholder="last name" value="{{old('lastname')}}">
                 @error('lastname')
@@ -61,7 +61,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Email</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">Email :</label>
               <div class="col-sm-10">
                 <input type="email" class="form-control" id="email" name="email" placeholder="Email" value="{{old('email')}}">
                 @error('email')
@@ -70,7 +70,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Password</label>
+              <label for="inputPassword3" class="col-sm-2 col-form-label mt-0">Password :</label>
               <div class="col-sm-10">
                 <input type="password" id="password" name="password" class="form-control" placeholder="Password" value="{{old('password')}}">
                 @error('password')
@@ -79,7 +79,7 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Phone </label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label mt-0">Phone :</label>
               <div class="col-sm-10">
                 <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('mobile')}}">
               </div>

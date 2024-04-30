@@ -1468,3 +1468,8 @@ h1,
     margin-bottom: 10px;
     margin-top: 10px;
 }
+
+.institute-form label {
+    margin-top: 10px;
+    font-weight: 600;
+}
