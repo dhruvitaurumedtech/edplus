@@ -161,47 +161,22 @@ class BasetableControllerAPI extends Controller
             $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
-                ->whereIn('base_table.institute_for', $institute_for_ids)
-                ->whereIn('base_table.board', $board_ids)
-                ->whereIn('base_table.medium', $medium_ids)
-                ->whereIn('base_table.institute_for_class', $class_ids)
+                ->whereIN('base_table.institute_for', $institute_for_ids)
+                ->whereIN('base_table.board', $board_ids)
+                ->whereIN('base_table.medium', $medium_ids)
+                ->whereIN('base_table.institute_for_class', $class_ids)
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name')
                 ->distinct()
                 ->get();
-
             $data = [];
-
             foreach ($base_standard as $basestandard) {
-                $data[] = [
+                $data[] = array(
                     'id' => $basestandard->id,
                     'standard_name' => $basestandard->name,
-                ];
+                    'class_name' => $basestandard->class_name,
+                    'medium_name' => $basestandard->medium_name
+                );
             }
-
-            // Grouping data by class_name and medium_name
-            $groupedData = [];
-            foreach ($base_standard as $basestandard) {
-                $groupKey = $basestandard->class_name . '_' . $basestandard->medium_name;
-                if (!isset($groupedData[$groupKey])) {
-                    $groupedData[$groupKey] = [
-                        'class_name' => $basestandard->class_name,
-                        'medium_name' => $basestandard->medium_name,
-                        'std_data' => [],
-                    ];
-                }
-                $groupedData[$groupKey]['std_data'][] = [
-                    'id' => $basestandard->id,
-                    'standard_name' => $basestandard->name,
-                ];
-            }
-
-            $responseData = [
-                'data' => array_values($groupedData),
-                'message' => 'Fetch Data Successfully',
-                'success' => true,
-            ];
-
-            return response()->json($responseData);
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
