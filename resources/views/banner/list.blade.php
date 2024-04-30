@@ -67,18 +67,29 @@
                   <div class="text-danger">{{ $message }}</div>
                   @enderror
                   @endif
-                  <label for="exampleInputEmail1">Banner_image : </label>
-                  <input type="file" name="banner_image[]" class="form-control" multiple name="{{url('banner_image')}}">
-                  @error('banner_image')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
+                  <div class="row">
+                    <div class="col-md-8">
+                      <label for="banner_image">Banner Image:</label>
+                      <input type="file" id="banner_image" name="banner_image[]" class="form-control" multiple>
+
+                      @error('banner_image')
+                      <div class="text-danger">{{ $message }}</div>
+                      @enderror
+
+                    </div>
+                    <div class="col-md-4">
+                      <div id="imagePreviewContainer"></div>
+                    </div>
+                  </div>
+
 
 
                   <label for="exampleInputEmail1">status : </label>
                   <select class="form-control" name="status">
                     <option value=" ">Select Option</option>
-                    <option value="active">Active</option>
-                    <option value="inactive">Inactive</option>
+                    <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                    <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
                   </select>
                   @error('status')
                   <div class="text-danger">{{ $message }}</div>
@@ -113,7 +124,7 @@
                         <th>Action</th>
                       </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="myTable">
                       @php $i=1 @endphp
                       @foreach($banner_list as $value)
                       <tr>
@@ -291,3 +302,28 @@
 </body>
 
 </html>
+<script>
+  $(document).ready(function() {
+    // Function to handle image preview
+    function readURL(input, container) {
+      if (input.files && input.files.length > 0) {
+        for (var i = 0; i < input.files.length; i++) {
+          var reader = new FileReader();
+
+          reader.onload = function(e) {
+            var img = $('<img>').attr('src', e.target.result);
+            $(container).append(img);
+          }
+
+          reader.readAsDataURL(input.files[i]); // Read the selected file as a URL
+        }
+      }
+    }
+
+    // Attach change event listener to the file input element
+    $('#banner_image').change(function() {
+      $('#imagePreviewContainer').empty(); // Clear previous previews
+      readURL(this, '#imagePreviewContainer'); // Call readURL function when file input changes
+    });
+  });
+</script>

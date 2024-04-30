@@ -49,6 +49,7 @@ $(document).ready(function () {
         $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
       });
       var trSel = $(".myTable tr:not('.no-records'):visible")
+      alert(trsel);
       // Check for number of rows & append no records found row
       if (trSel.length == 0) {
         $(".myTable").html('<tr class="no-records"><td colspan="3">No record found.</td></tr>')
@@ -244,3 +245,5 @@ updateResponsiveClasses();
 
 // Update on window resize
 window.addEventListener("resize", updateResponsiveClasses);
+
+

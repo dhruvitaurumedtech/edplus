@@ -68,7 +68,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -92,7 +92,7 @@
                                                         </a>
                                                         @foreach($teachers as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('teacher_id', [])) ? 'checked' : '' }} />
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
@@ -106,7 +106,7 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Time Limit (Hour) : </label>
-                                                <input type="text" name="time" class="form-control">
+                                                <input type="text" name="time" class="form-control" value="{{old('time')}}">
                                                 @error('time')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror

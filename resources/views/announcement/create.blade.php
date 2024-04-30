@@ -65,7 +65,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -89,7 +89,7 @@
                                                         </a>
                                                         @foreach($teachers as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" />
+                                                            <input type="checkbox" name="teacher_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('teacher_id', [])) ? 'checked' : '' }} />
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
@@ -103,14 +103,14 @@
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputtitle">Title : </label>
-                                                <input type="text" class="form-control" name="title">
+                                                <input type="text" class="form-control" name="title" value="{{old('title')}}">
                                                 @error('title')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
                                             <div class="col-md-12">
                                                 <label for="exampleInputEmail1">Announcement : </label>
-                                                <textarea class="form-control" name="announcement"></textarea>
+                                                <textarea class="form-control" name="announcement">{{old('announcement')}}</textarea>
                                                 @error('announcement')
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
@@ -147,7 +147,7 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody class="myTable">
 
                                     @foreach($response as $values)
                                     <tr>

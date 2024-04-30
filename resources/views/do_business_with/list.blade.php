@@ -55,7 +55,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Name">
+                        <input type="text" name="name" class="form-control" placeholder="Enter Name" value="{{old('name')}}">
                         @error('name')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -66,7 +66,7 @@
                         <select class="form-control" name="category" id="category">
                           <option value=" ">Select Option</option>
                           @foreach($categories as $catval)
-                          <option value="{{$catval->id}}">{{$catval->name}}</option>
+                          <option value="{{$catval->id}}" {{ old('category') == $catval->id ? 'selected' : '' }}>{{$catval->name}}</option>
                           @endforeach
 
                         </select>
@@ -78,8 +78,8 @@
                         <label for="exampleInputEmail1">status : </label>
                         <select class="form-control" name="status">
                           <option value=" ">Select Option</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
+                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
                         </select>
                         @error('status')
                         <div class="text-danger">{{ $message }}</div>

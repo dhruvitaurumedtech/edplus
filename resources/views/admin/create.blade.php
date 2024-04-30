@@ -1,33 +1,10 @@
 </head>
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- /.content-header -->
-
-      <div class="col-md-10 offset-md-1">
-        @if (session('success'))
-        <div class="alert alert-success">
-          {{ session('success') }}
-        </div>
-        @endif
-      </div>
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
-      <!-- Main content -->
       <div class="link-dir">
         <h1 class="display-4">Admin</h1>
         <ul>
@@ -40,12 +17,12 @@
           <li><a href="javascript:void(0)" class="active-link-dir">Create Admin</a></li>
         </ul>
       </div>
-
       <script>
         function clearFormData() {
           document.getElementById("myForm").reset();
         }
       </script>
+      @include('layouts/alert')
       <!-- Main content -->
       <div class="dashboard-content side-content">
         <form class="s-chapter-form institute-form" method="post" id="myForm" action="{{ url('store/admin') }}">
@@ -104,7 +81,7 @@
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Phone </label>
               <div class="col-sm-10">
-                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('password')}}">
+                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number" value="{{old('mobile')}}">
               </div>
             </div>
           </div>

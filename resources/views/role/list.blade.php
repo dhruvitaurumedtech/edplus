@@ -1,17 +1,8 @@
-</head>
-
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">Role</h1>
         <ul>
@@ -22,29 +13,13 @@
           <li><a href="javascript:void(0)" class="active-link-dir">Role</a></li>
         </ul>
       </div>
-
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-        <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
-          </div>
-        </div>
 
         <div class="row">
           <div class="col-lg-6 mt-3">
             <div class="institute-form">
-              <form class="s-chapter-form " action="{{ url('roles/save') }}" method="post">
+              <form class="s-chapter-form" action="{{ url('roles/save') }}" method="post">
                 @csrf
                 <h4 class="mb-3">Create Admin</h4>
 
@@ -58,7 +33,6 @@
                     </div>
                   </div>
                 </div>
-
                 <div class="submit-btn">
                   <input type="submit" value="Submit" class="btn bg-primary-btn text-white">
                 </div>
@@ -69,15 +43,10 @@
             <div class="institute-form">
               <div class="create-title-btn ">
                 <h4 class="mb-0">List of Role</h4>
-                <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
                 <div class="inner-list-search">
                   <input type="search" class="form-control myInput" name="search" placeholder="Search">
-                  @canButton('add', 'Role')
-                  <a href="{{ url('create/role') }}" class="btn text-white btn-rmv2">Create role</a>
-                  @endCanButton
 
                 </div>
-
               </div>
               <table class="table table-bordered institute-table mt-4 table-responsive-sm">
                 <thead>
@@ -96,19 +65,17 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Role')
-                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 role_editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         <form method="get" action="{{url('permission')}}">
                           @csrf
                           <input type="hidden" value="{{ $value->id }}" name="id">
                           <input type="submit" class="btn btn-success" value="Permission">
-
                         </form>
                         &nbsp;&nbsp;
                         @canButton('delete', 'Role')
-
                         @if($value->id !='1')
-                        <input type="submit" class="btn btn-danger deletebutton" data-role-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger role_deletebutton" data-role-id="{{ $value->id }}" value="Delete">
                         @endif
                         @endCanButton
                       </div>
@@ -121,14 +88,11 @@
           </div>
           <div class="d-flex justify-content-end">
             {!! $roles->withQueryString()->links('pagination::bootstrap-5') !!}
-
           </div>
-
         </div>
-      </div><!-- Sub Main Col END -->
-    </div><!-- MAIN row END -->
+      </div>
+    </div>
     @include('layouts/footer_new')
-
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -150,7 +114,7 @@
               </div>
               <hr>
               <div class="">
-                <button type="submit" class="btn btn-primary" style="float:right">Update</button>
+                <button type="submit" class="btn bg-primary-btn text-white" style="float:right">Update</button>
               </div>
             </form>
           </div>
@@ -158,65 +122,11 @@
         </div>
       </div>
     </div>
-
-    <script>
-      document.querySelectorAll('.editButton').forEach(function(button) {
-        button.addEventListener('click', function() {
-          var roleId = this.getAttribute('data-role-id');
-
-          axios.post('/roles/edit', {
-              roleId: roleId
-            })
-            .then(response => {
-              var reponse_data = response.data.roles;
-              $('#role_id').val(reponse_data.id);
-              $('#role_name').val(reponse_data.role_name);
-              $('#exampleModal').modal('show');
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        });
-      });
-      document.querySelectorAll('.deletebutton').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the default form submission
-
-          var roleId = this.getAttribute('data-role-id');
-
-          // Show SweetAlert confirmation
-          Swal.fire({
-            title: 'Are you sure want to delete?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post('/roles/delete', {
-                  roleId: roleId
-                })
-                .then(response => {
-                  location.reload(true);
-
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            }
-          });
-        });
-      });
-    </script>
   </div>
-
-  <!-- js -->
   <script src="{{asset('mayal_assets/js/jquery-3.7.1.min.js')}}"></script>
   <script src="{{asset('mayal_assets/js/bootstrap.bundle.min.js')}}"></script>
   <script src="{{asset('mayal_assets/js/main.js')}}"></script>
-
+  <script src="{{asset('mayal_assets/js/file.js')}}"></script>
 </body>
-
 
 </html>

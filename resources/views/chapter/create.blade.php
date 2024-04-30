@@ -185,6 +185,9 @@
                 $('.remove-chapter').click(function() {
                     $(this).closest('.added-chapter').remove();
                 });
+                $('#imageInput').change(function() {
+                    readURL(this);
+                });
 
             }
         });

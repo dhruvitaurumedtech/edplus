@@ -54,7 +54,7 @@
                     <div class="row">
                       <div class="col-md-12">
                         <label for="exampleInputEmail1">Video Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Board Name">
+                        <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
                         @error('name')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -64,8 +64,9 @@
                         <label for="exampleInputEmail1">status : </label>
                         <select class="form-control" name="status">
                           <option value=" ">Select Option</option>
-                          <option value="active">Active</option>
-                          <option value="inactive">Inactive</option>
+                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
                         </select>
                         @error('status')
                         <div class="text-danger">{{ $message }}</div>
@@ -160,7 +161,7 @@
                             <div class="col-md-12">
                               <input type="hidden" id="video_category_id" name="video_category_id">
                               <label for="exampleInputEmail1">Name : </label>
-                              <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name">
+                              <input type="text" name="name" id="name" class="form-control" placeholder="Enter Name" value="{{old('name')}}">
                               @error('name')
                               <div class="text-danger">{{ $message }}</div>
                               @enderror
@@ -170,8 +171,9 @@
                               <label for="exampleInputEmail1">status : </label>
                               <select class="form-control" name="status" id="status">
                                 <option value=" ">Select Option</option>
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
+                                <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                                <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+
                               </select>
                               @error('status')
                               <div class="text-danger">{{ $message }}</div>
