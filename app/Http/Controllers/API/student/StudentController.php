@@ -33,12 +33,15 @@ use App\Models\Medium_model;
 use App\Models\Timetable;
 use App\Models\VideoAssignToBatch;
 use Illuminate\Auth\Events\Verified;
-
-
 use Illuminate\Broadcasting\Channel;
+use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiTrait;
+use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
 {
+
+    use ApiTrait;
     public function homescreen_student(Request $request)
     {
         $token = $request->header('Authorization');
@@ -344,7 +347,7 @@ class StudentController extends Controller
                             $parnsad = Parents::create([
                                 'student_id' => $student_id,
                                 'parent_id' => $userId,
-                                'institute_id'=>$request->input('institute_id'),
+                                'institute_id' => $request->input('institute_id'),
                                 'relation' => $parentData['relation'],
                                 'verify' => '0',
                             ]);
@@ -593,8 +596,8 @@ class StudentController extends Controller
                 $user_id = $request->user_id;
                 $institute_id = $request->institute_id;
 
-                $getstdntdata = Student_detail::where('student_id',$request->user_id)
-                ->where('institute_id',$request->institute_id)->first();
+                $getstdntdata = Student_detail::where('student_id', $request->user_id)
+                    ->where('institute_id', $request->institute_id)->first();
 
                 //banner
 
@@ -623,21 +626,23 @@ class StudentController extends Controller
 
                 $today = date('Y-m-d');
                 $todays_lecture = [];
-                $todayslect = Timetable::join('subject','subject.id','=','time_table.institute_id')
-                ->join('users','users.id','=','time_table.teacher_id')
-                ->join('lecture_type','lecture_type.id','=','time_table.lecture_type')
-                ->join('batches','batches.id','=','time_table.board_id')
-                ->join('standard','standard.id','=','batches.standard_id')
-                ->where('time_table.batch_id',$getstdntdata->batch_id)
-                ->where('time_table.day',$today)
-                ->select('subject.name as subject','users.firstname','users.lastname','lecture_type.name as lecture_type_name','batches.*','standard.name as standard')
-                ->paginate(2);
+                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.institute_id')
+                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'time_table.board_id')
+                    ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                    ->where('time_table.batch_id', $getstdntdata->batch_id)
+                    ->where('time_table.day', $today)
+                    ->select('subject.name as subject', 'users.firstname', 'users.lastname', 'lecture_type.name as lecture_type_name', 'batches.*', 'standard.name as standard')
+                    ->paginate(2);
 
-                foreach($todayslect as $todayslecDT){
-                    $todays_lecture[] = array('subject' => $todayslecDT->subject, 
-                    'teacher' => $todayslecDT->firstname .' '.$todayslecDT->lastname, 
-                    'start_time' => $todayslecDT->start_time,
-                    'end_time' => $todayslecDT->end_time,);
+                foreach ($todayslect as $todayslecDT) {
+                    $todays_lecture[] = array(
+                        'subject' => $todayslecDT->subject,
+                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'start_time' => $todayslecDT->start_time,
+                        'end_time' => $todayslecDT->end_time,
+                    );
                 }
 
                 $subjects = [];
@@ -646,7 +651,7 @@ class StudentController extends Controller
                 $examlist = [];
 
 
-                
+
                 $announcQY = announcements_model::where('institute_id', $institute_id)
                     ->where('batch_id', $existingUser->batch_id)
                     ->whereRaw("FIND_IN_SET('6', role_type)")
@@ -867,15 +872,19 @@ class StudentController extends Controller
                 $topics = [];
                 $category = [];
                 $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
-                    ->select('do_business_with.id', 'do_business_with.name',
-                     'video_categories.id as vid', 'video_categories.name as vname')
+                    ->select(
+                        'do_business_with.id',
+                        'do_business_with.name',
+                        'video_categories.id as vid',
+                        'video_categories.name as vname'
+                    )
                     ->whereIn('do_business_with.id', function ($query) {
                         $query->select('topic.video_category_id')
                             ->from('topic')
                             ->groupBy('topic.video_category_id');
                     })
                     ->get();
-                
+
 
                 // if ($existingUser->role_type != 6) {
                 //     $batch_list = Batches_model::where('institute_id', $institute_id)
@@ -890,10 +899,10 @@ class StudentController extends Controller
                 //         ];
                 //     }
                 // }
-                $topicqry=[];
+                $topicqry = [];
                 foreach ($catgry as $catvd) {
-                    
-                    $topics = []; 
+
+                    $topics = [];
                     $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
                         ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
                         ->where('topic.subject_id', $subject_id)
@@ -942,12 +951,12 @@ class StudentController extends Controller
                                 //  'topics' => $topics);
                             }
                         } else {
-                            
+
                             $batch_list = Batches_model::where('institute_id', $institute_id)
-                            ->where('user_id', $user_id)
-                            ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                            ->select('*')
-                            ->get();
+                                ->where('user_id', $user_id)
+                                ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                                ->select('*')
+                                ->get();
                             $batch_response = [];
                             foreach ($batch_list as $value) {
                                 $batch_response[] = [
@@ -966,7 +975,7 @@ class StudentController extends Controller
                                 "chapter_id" => $topval->chapter_id,
                                 "chapter_name" => $topval->chname,
                                 "status" => false,
-                                "batch_list"=>$batch_response,
+                                "batch_list" => $batch_response,
                             );
                             //$category[$catvd->name] = array('id' => $catvd->id,
                             // $category[] = array('id' => $catvd->id,
@@ -976,19 +985,21 @@ class StudentController extends Controller
                             //    'topics' => $topics);
                         }
                     }
-                            $category[] = array('id' => $catvd->id,
-                             'category_name' => $catvd->name,
-                              'parent_category_id' => $catvd->vid, 
-                              'parent_category_name' => $catvd->vname,
-                               'topics' => $topics);
+                    $category[] = array(
+                        'id' => $catvd->id,
+                        'category_name' => $catvd->name,
+                        'parent_category_id' => $catvd->vid,
+                        'parent_category_name' => $catvd->vname,
+                        'topics' => $topics
+                    );
                 }
-                
+
                 //$response = $category;
                 return response()->json([
                     'status' => 200,
                     'message' => 'Successfully fetch data.',
                     'data' => $category,
-                    
+
                 ], 200, [], JSON_NUMERIC_CHECK);
             } else {
                 return response()->json([
@@ -1440,101 +1451,219 @@ class StudentController extends Controller
             ], 500);
         }
     }
+    // public function student_list(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $user_id = $request->user_id;
+    //     $institute_id = $request->institute_id;
+    //     $batch_id = $request->batch_id;
+    //     $subject_ids = $request->subject_id;
+    //     $board_id = $request->board_id;
+    //     $medium_id = $request->medium_id;
+    //     $standard_id = $request->standard_id;
+    //     $keyword = $request->search;
+
+
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         $query = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
+    //             ->leftJoin('standard', 'students_details.standard_id', '=', 'standard.id')
+    //             ->leftJoin('board', 'students_details.board_id', '=', 'board.id')
+    //             ->leftJoin('medium', 'students_details.medium_id', '=', 'medium.id')
+    //             ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
+    //             //->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
+    //             ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
+    //             ->select(
+    //                 'users.*',
+    //                 'students_details.student_id',
+    //                 'standard.name as standard_name',
+    //                 'stream.name as stream_name',
+    //                 //'attendance.attendance',
+    //                 'students_details.standard_id',
+    //                 'students_details.stream_id',
+    //                 'students_details.batch_id',
+    //                 'board.name as board_name',
+    //                 'medium.name as medium_name'
+    //             )
+    //             // , 'students_details.subject_id'
+    //             ->where('students_details.user_id', $user_id)
+    //             // ->where('students_details.batch_id', $batch_id)
+    //             ->where('students_details.institute_id', $institute_id)
+    //             ->where('students_details.board_id', $board_id)
+    //             ->where('students_details.medium_id', $medium_id)
+    //             ->where('students_details.standard_id', $standard_id)
+    //             ->where('students_details.standard_id', $standard_id)
+    //             ->where('students_details.status', '1')
+    //             ->whereNull('students_details.deleted_at');
+    //         if (!empty($keyword)) {
+    //             $query->where(function ($query) use ($keyword) {
+    //                 $query->where('users.firstname', 'like', "%{$keyword}%")
+    //                     ->orWhere('users.lastname', 'like', "%{$keyword}%")
+    //                     ->orWhere('standard.name', 'like', "%{$keyword}%")
+    //                     ->orWhere('board.name', 'like', "%{$keyword}%")
+    //                     ->orWhere('medium.name', 'like', "%{$keyword}%");
+    //             });
+    //         }
+
+    //         if (!empty($subject_ids)) {
+    //             $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
+    //                 $query->select('id')
+    //                     ->from('subject')
+    //                     ->whereIn('id', explode(',', $subject_ids));
+    //             });
+    //         }
+    //         if (!empty($batch_id)) {
+    //             $query->where('students_details.batch_id', $batch_id);
+    //         }
+
+    //         $student_data = $query->get()->toArray();
+
+
+    //         if (!empty($student_data)) {
+    //             foreach ($student_data as $value) {
+    //                 if (!empty($request->date && !empty($request->batch_id) && !empty($request->subject_id))) {
+    //                     $attendance_records = Attendance_model::where('student_id', $value['id'])
+    //                         ->whereDate('date', date('Y-m-d', strtotime($request->date)))
+    //                         ->where('batch_id', $batch_id)
+    //                         ->where('subject_id', $subject_ids)
+    //                         ->get()
+    //                         ->toArray();
+    //                 } else {
+    //                     $attendance_records = Attendance_model::where('student_id', $value['id'])
+    //                         ->where('batch_id', $batch_id)
+    //                         ->where('subject_id', $subject_ids)
+    //                         ->get()
+    //                         ->toArray();
+    //                 }
+    //                 // echo "<pre>";
+    //                 // print_r($attendance_records);
+    //                 // exit;
+
+    //                 $attendances = [];
+    //                 foreach ($attendance_records as $attendance_record) {
+    //                     $attendances[] = ['date' => date('d-m-y', strtotime($attendance_record['date'])), 'attendance' => $attendance_record['attendance']];
+    //                 }
+
+    //                 $student_response[] = [
+    //                     'student_id' => $value['id'],
+    //                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+    //                     'attendance' => $attendances,
+    //                     'photo' => !empty($value['image']) ? url($value['image']) : url('no-image.png'),
+    //                     'board_name' => $value['board_name'] . '',
+    //                     'medium_name' => $value['medium_name'] . '',
+    //                 ];
+    //             }
+    //             $base = [
+    //                 'standard' => $student_data[0]['standard_name'],
+    //                 'stream' => $student_data[0]['stream_name'] . '',
+    //                 'data' => $student_response,
+    //             ];
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Student Fetch Successfully',
+    //                 'data' => $base
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'success' => 400,
+    //                 'message' => 'Data Not Found',
+    //             ], 400);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
     public function student_list(Request $request)
     {
-        $token = $request->header('Authorization');
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        $validator = Validator::make($request->all(), []);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
-        $user_id = $request->user_id;
-        $institute_id = $request->institute_id;
-        $batch_id = $request->batch_id;
-        $subject_ids = $request->subject_id;
-        $board_id = $request->board_id;
-        $medium_id = $request->medium_id;
-        $standard_id = $request->standard_id;
-        $keyword = $request->search;
-
-
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
+        try {
             $query = Student_detail::join('users', 'students_details.student_id', '=', 'users.id')
                 ->leftJoin('standard', 'students_details.standard_id', '=', 'standard.id')
                 ->leftJoin('board', 'students_details.board_id', '=', 'board.id')
                 ->leftJoin('medium', 'students_details.medium_id', '=', 'medium.id')
                 ->leftJoin('stream', 'students_details.stream_id', '=', 'stream.id')
-                //->leftJoin('attendance', 'students_details.student_id', '=', 'attendance.student_id')
                 ->leftJoin('batches', 'students_details.batch_id', '=', 'batches.id')
                 ->select(
                     'users.*',
                     'students_details.student_id',
                     'standard.name as standard_name',
                     'stream.name as stream_name',
-                    //'attendance.attendance',
                     'students_details.standard_id',
                     'students_details.stream_id',
                     'students_details.batch_id',
                     'board.name as board_name',
                     'medium.name as medium_name'
                 )
-                // , 'students_details.subject_id'
-                ->where('students_details.user_id', $user_id)
-                // ->where('students_details.batch_id', $batch_id)
-                ->where('students_details.institute_id', $institute_id)
-                ->where('students_details.board_id', $board_id)
-                ->where('students_details.medium_id', $medium_id)
-                ->where('students_details.standard_id', $standard_id)
-                ->where('students_details.standard_id', $standard_id)
+                ->where('students_details.user_id', Auth::id())
+                ->where('students_details.institute_id', $request->institute_id)
+                ->where('students_details.board_id', $request->board_id)
+                ->where('students_details.medium_id', $request->medium_id)
+                ->where('students_details.standard_id', $request->standard_id)
                 ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at');
-            if (!empty($keyword)) {
-                $query->where(function ($query) use ($keyword) {
-                    $query->where('users.firstname', 'like', "%{$keyword}%")
-                        ->orWhere('users.lastname', 'like', "%{$keyword}%")
-                        ->orWhere('standard.name', 'like', "%{$keyword}%")
-                        ->orWhere('board.name', 'like', "%{$keyword}%")
-                        ->orWhere('medium.name', 'like', "%{$keyword}%");
+
+            if (!empty($request->search)) {
+                $query->where(function ($query) use ($request) {
+                    $query->where('users.firstname', 'like', "%{$request->search}%")
+                        ->orWhere('users.lastname', 'like', "%{$request->search}%")
+                        ->orWhere('standard.name', 'like', "%{$request->search}%")
+                        ->orWhere('board.name', 'like', "%{$request->search}%")
+                        ->orWhere('medium.name', 'like', "%{$request->search}%");
                 });
             }
 
-            if (!empty($subject_ids)) {
-                $query->whereIn('students_details.subject_id', function ($query) use ($subject_ids) {
+            if (!empty($request->subject_id)) {
+                $query->whereIn('students_details.subject_id', function ($query) use ($request) {
                     $query->select('id')
                         ->from('subject')
-                        ->whereIn('id', explode(',', $subject_ids));
+                        ->whereIn('id', explode(',', $request->subject_id));
                 });
             }
-            if (!empty($batch_id)) {
-                $query->where('students_details.batch_id', $batch_id);
+
+            if (!empty($request->batch_id)) {
+                $query->where('students_details.batch_id', $request->batch_id);
             }
 
             $student_data = $query->get()->toArray();
 
-
             if (!empty($student_data)) {
+                $student_response = [];
+
                 foreach ($student_data as $value) {
                     if (!empty($request->date && !empty($request->batch_id) && !empty($request->subject_id))) {
                         $attendance_records = Attendance_model::where('student_id', $value['id'])
                             ->whereDate('date', date('Y-m-d', strtotime($request->date)))
-                            ->where('batch_id', $batch_id)
-                            ->where('subject_id', $subject_ids)
+                            ->where('batch_id', $request->batch_id)
+                            ->where('subject_id', $request->subject_id)
                             ->get()
                             ->toArray();
                     } else {
                         $attendance_records = Attendance_model::where('student_id', $value['id'])
-                            ->where('batch_id', $batch_id)
-                            ->where('subject_id', $subject_ids)
+                            ->where('batch_id', $request->batch_id)
+                            ->where('subject_id', $request->subject_id)
                             ->get()
                             ->toArray();
                     }
-                    // echo "<pre>";
-                    // print_r($attendance_records);
-                    // exit;
 
                     $attendances = [];
+
                     foreach ($attendance_records as $attendance_record) {
-                        $attendances[] = ['date' => date('d-m-y', strtotime($attendance_record['date'])), 'attendance' => $attendance_record['attendance']];
+                        $attendances[] = [
+                            'date' => date('d-m-y', strtotime($attendance_record['date'])),
+                            'attendance' => $attendance_record['attendance']
+                        ];
                     }
 
                     $student_response[] = [
@@ -1546,29 +1675,22 @@ class StudentController extends Controller
                         'medium_name' => $value['medium_name'] . '',
                     ];
                 }
+
                 $base = [
                     'standard' => $student_data[0]['standard_name'],
                     'stream' => $student_data[0]['stream_name'] . '',
                     'data' => $student_response,
                 ];
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Student Fetch Successfully',
-                    'data' => $base
-                ], 200);
+                return $this->response($base, "Student Fetch Successfully");
             } else {
-                return response()->json([
-                    'success' => 400,
-                    'message' => 'Data Not Found',
-                ], 400);
+                return $this->response([], "Data Not Found");
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
     // public function child_detail(Request $request)
     // {
     //     $parent_id = $request->parent_id;
