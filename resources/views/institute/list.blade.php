@@ -20,13 +20,13 @@
           <li><a href="javascript:void(0)" class="active-link-dir">Institute admin</a></li>
         </ul>
       </div>
-
       @include('layouts/alert')
       <div class="dashboard-content side-content">
         <div class="row">
           <div class="col-lg-12 mt-3 institute-form">
             <div class="create-title-btn">
-              <h4 class="mb-0">List of Role</h4>
+              <h4 class="mb-0">Institute admin
+              </h4>
               <div class="inner-list-search">
                 <input type="search" class="form-control myInput" name="search" placeholder="Search">
                 @canButton('add', 'Role')
@@ -152,4 +152,3 @@
       </div>
     </div>
   </div>
-  <script src="{{asset('mayal_assets/js/file.js')}}"></script>

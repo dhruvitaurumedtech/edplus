@@ -1,18 +1,10 @@
 </head>
-<meta name="base-url" content="{{ url('/') }}">
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">Medium List</h1>
         <ul>
@@ -23,67 +15,49 @@
           <li><a href="{{url('class-list')}}" class="active-link-dir">Medium</a></li>
         </ul>
       </div>
-
-
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-      </div>
-
-
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-
-        <!-- /.card-header -->
-        <!-- form start -->
         <div class="row">
           <div class="col-md-6">
             <div class="institute-form">
               <form method="post" action="{{ url('medium-list/save') }}" enctype="multipart/form-data">
                 @csrf
-                <div class="card-body">
-                  <div class="form-group">
-                    <div class="row">
+                <div class="row">
 
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Medium Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Medium Name" value="{{old('name')}}">
-                        @error('name')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Icon : </label>
-                        <input type="file" onchange="previewFile()" name="icon" id="nicon" class="form-control">
-                        @error('icon')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-                      <div class="col-md-12">
-                        <img src="" id="icon" alt="Icon" class="img-resize mt-3" style="display: none;">
-                      </div>
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">status : </label>
-                        <select class="form-control" name="status">
-                          <option value=" ">Select Option</option>
-                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @error('status')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                    </div>
-
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">Medium Name : </label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter Medium Name" value="{{old('name')}}">
+                    @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
                   </div>
+
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">Icon : </label>
+                    <input type="file" onchange="previewFile()" name="icon" id="nicon" class="form-control">
+                    @error('icon')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-md-12">
+                    <img src="" id="icon" alt="Icon" class="img-resize mt-3" style="display: none;">
+                  </div>
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">status : </label>
+                    <select class="form-control" name="status">
+                      <option value=" ">Select Option</option>
+                      <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                      <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                    @error('status')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+
                 </div>
-                <div class="col-md-12 submit-btn">
+
+
+                <div class="col-md-12 submit-btn mt-3">
                   <button type="submit" class="btn text-white btn-rmv2">Submit</button>
                 </div>
               </form>
@@ -93,10 +67,6 @@
           <div class="col-md-6">
             <div class="institute-form">
               <h3 class="card-title">Medium List</h3>
-              <!-- @canButton('add', 'Medium')
-              <a href="{{url('create/medium')}}" class="btn btn-success" style="float: right;">Create Medium</a>
-              @endCanButton -->
-              <!-- /.card-header -->
               <form action="#">
                 <div class="search-box">
                   <input type="search" class="form-control myInput" name="search" placeholder="Search">
@@ -132,10 +102,10 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Medium')
-                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 medium_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton&nbsp;&nbsp;
                         @canButton('delete', 'Medium')
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger medium_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>
                   </tr>
@@ -206,7 +176,7 @@
                     </div>
                   </div>
                   <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                    <button type="submit" class="btn btn-primary blue-button" style="float: right;">Update</button>
                   </div>
               </div>
             </div>
@@ -218,63 +188,7 @@
       @include('layouts/footer_new')
     </div>
     <script>
-      document.querySelectorAll('.editButton').forEach(function(button) {
-        button.addEventListener('click', function() {
-          var medium_id = this.getAttribute('data-user-id');
-          var baseUrl = $('meta[name="base-url"]').attr('content');
 
-
-          axios.post(baseUrl + '/medium/edit', {
-              medium_id: medium_id,
-            }, {
-              // headers: {
-              //   'X-CSRF-TOKEN': csrfToken
-              // }
-            })
-            .then(response => {
-              var response_data = response.data.medium_list;
-              var iconSrc = baseUrl + '/' + response_data.icon;
-              $('#medium_id').val(response_data.id);
-              $('#name').val(response_data.name);
-              $('#old_icon').val(response_data.icon);
-              $('#editicon').attr('src', iconSrc);
-              $('#status').val(response_data.status);
-              $('#usereditModal').modal('show');
-            })
-            .catch(error => {});
-        });
-      });
-
-      document.querySelectorAll('.deletebutton').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the default form submission
-
-          var medium_id = this.getAttribute('data-user-id');
-
-          // Show SweetAlert confirmation
-          Swal.fire({
-            title: 'Are you sure want to delete?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post('/medium/delete', {
-                  medium_id: medium_id
-                })
-                .then(response => {
-                  location.reload(true);
-
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            }
-          });
-        });
-      });
     </script>
 
     <script>

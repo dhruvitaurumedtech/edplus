@@ -26,40 +26,17 @@
           <li><a href="javascript:void(0)" class="active-link-dir">Student list</a></li>
         </ul>
       </div>
-
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-        <div class="row">
-          <div class="col-md-10 offset-md-1 ">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
-          </div>
-        </div>
         <div class="institute-form">
           <div class="create-title-btn">
-            <h4 class="mb-0">List of Role</h4>
-            <!-- <a href="role.php" class="btn text-white btn-rmv2">Create Role</a> -->
+            <h4 class="mb-0">List of Student</h4>
             <div class="inner-list-search">
               <input type="search" class="form-control myInput" name="search" placeholder="Search">
               <a href="{{url('student/create/'.$institute_id)}}" class="btn btn-success btn-rmv2" style="float: right;">Create Student</a>
 
 
             </div>
-
-            <!-- <form method="post" action="{{url('student/create')}}">
-          @csrf
-          <input type="submit" value="Create Student" class="btn btn-success" style="float: right;">
-        </form> -->
-            <!-- <input type="text" name="institute_id" id="institute_id" value="{{ $institute_id }}"> -->
 
             <table class="table table-js table-bordered institute-table mt-4">
               <thead>
@@ -85,11 +62,11 @@
                   <td>{{$value->status}}</td>
                   <td>
                     <div class="d-flex">
-                      <input type="submit" class="btn btn-info editButton" data-student-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                      <input type="submit" class="btn text-white btn-rmv2 student_editButton" data-student-id="{{ $value->id }}" data-institute-id="{{ $institute_id }}" value="Edit">&nbsp;&nbsp;
                       &nbsp;&nbsp;
                       <form method="post" action="{{url('/student/view')}}">
                         @csrf
-                        <input type="submit" class="btn btn-success viewButton" value="View">
+                        <input type="submit" class="btn btn-warning student_viewButton" value="View">
                         <input type="hidden" id="institute_id" name="institute_id" value="{{ $institute_id }}">
                         <input type="hidden" name="student_id" value="{{ $value->id }}">
                       </form>&nbsp;&nbsp;
@@ -114,8 +91,8 @@
       </section>
 
     </div>
-    <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+    <div class="modal fade bd-example-modal-lg" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="usereditModalLabel">Student </h5>
@@ -129,6 +106,8 @@
               <div class="card-body">
                 <div class="form-group">
                   <div class="row">
+
+                    <input type="hidden" name="institute_id" id="inst_id">
                     <input type="hidden" name="Student_detail_id" id="Student_detail_id">
                     <input type="hidden" name="student_id" id="student_id">
                     <div class="col-md-4">
@@ -187,7 +166,7 @@
                       @error('image')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
-                      <img src="" id="image" alt="image" class="mt-4" style="width:150px; height:150px">
+                      <img src="" id="image" alt="image" class="mt-4" style="width:150px; height:150px;display:none">
                     </div>
 
 
@@ -287,9 +266,11 @@
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
                     </div>
-                    <input type="text" name="note" id="note">
+                    <div class="col-md-4">
+                      <label for="exampleInputEmail1">Note : </label>
+                      <input type="text" name="note" id="note" class="form-control" placeholder="Please enter note">
+                    </div>
                   </div>
-
                 </div>
               </div>
               <hr>
@@ -303,90 +284,6 @@
       </div>
     </div>
     <script>
-      document.querySelectorAll('.editButton').forEach(function(button) {
-        button.addEventListener('click', function() {
-          var student_id = this.getAttribute('data-student-id');
-          var institute_id = $('#institute_id').val();
-          var baseUrl = $('meta[name="base-url"]').attr('content');
-
-          axios.post('/student/edit', {
-              student_id: student_id,
-              institute_id: institute_id
-            })
-            .then(response => {
-
-              var reponse_student = response.data.studentDT;
-              var reponse_studentdetail = response.data.studentsdetailsDT;
-
-              if (reponse_student !== null) {
-                // var imgsrc = 'http://127.0.0.1:8000/' + reponse_student.image;
-                var imgsrc = baseUrl + '/' + reponse_student.image;
-
-
-                $('#student_id').val(reponse_student.id);
-                $('#firstname').val(reponse_student.firstname);
-                $('#lastname').val(reponse_student.lastname);
-                $('#email').val(reponse_student.email);
-                $('#mobile').val(reponse_student.mobile);
-                $('#address').val(reponse_student.address);
-                $('#dob').val(reponse_student.dob);
-                $('#image').attr('src', imgsrc);
-                $('#uploded_image').val(reponse_student.image);
-              }
-              if (reponse_studentdetail !== null) {
-                $('#status').val(reponse_studentdetail.status);
-                $('#Student_detail_id').val(reponse_studentdetail.id);
-                $('#institute_for_id').val(reponse_studentdetail.institute_for_id);
-                $('#board_id').val(reponse_studentdetail.board_id);
-                $('#medium_id').val(reponse_studentdetail.medium_id);
-                $('#class_id').val(reponse_studentdetail.class_id);
-                $('#stream_id').val(reponse_studentdetail.stream_id);
-                if (reponse_studentdetail.subject_i != null) {
-                  var subjects = reponse_studentdetail.subject_id;
-                  var arr_subjects = subjects.split(",");
-                  $('#subject_id').val(arr_subjects);
-                }
-              }
-              $('#usereditModal').modal('show');
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        });
-      });
-
-      document.querySelectorAll('.deletebutton').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the default form submission
-
-          var student_id = this.getAttribute('data-student-id');
-
-          // Show SweetAlert confirmation
-          Swal.fire({
-            title: 'Are you sure?',
-            text: 'You won\'t be able to revert this!',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post('/student/delete', {
-                  student_id: student_id
-                })
-                .then(response => {
-                  location.reload(true);
-
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            }
-          });
-        });
-      });
-
       //image preview
       function previewFile() {
         $("#image").show();
@@ -405,4 +302,6 @@
         }
       }
     </script>
+    <script src="{{asset('mayal_assets/js/file.js')}}"></script>
+
     @include('layouts/footer_new')

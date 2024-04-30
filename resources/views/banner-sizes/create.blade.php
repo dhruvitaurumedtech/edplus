@@ -1,23 +1,8 @@
-<!-- resources/views/banner-sizes/create.blade.php -->
-
-<link rel="stylesheet" href="{{asset('mayal_assets/css/bootstrap.min.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
-<link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
-
-</head>
-
 <body>
-
     <div class="dashboard">
-
         @include('layouts/header-sidebar')
-
-        <!-- MAIN -->
         <div class="dashboard-app">
-
             @include('layouts/header-topbar')
-
-            <!-- Sub MAIN -->
             <div class="link-dir">
                 <h1 class="display-4">Banner Size</h1>
                 <ul>
@@ -28,23 +13,7 @@
                     <li><a href="{{url('class-list')}}" class="active-link-dir">Banner Size</a></li>
                 </ul>
             </div>
-
-            <script>
-                window.setTimeout(function() {
-                    $(".alert-success").slideUp(500, function() {
-                        $(this).remove();
-                    });
-                }, 3000);
-            </script>
-            <div class="row">
-                <div class="col-md-10 offset-md-1">
-                    @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-                </div>
-            </div>
+            @include('layouts/alert')
             <div class="dashboard-content side-content">
 
                 <div class="row">
@@ -96,9 +65,9 @@
                                             <td>
 
                                                 <div class="d-flex">
-                                                    <button class="btn text-white blue-button editButton" data-banner-id="{{ $bannerSize->id }}">Edit</button>
+                                                    <button class="btn text-white blue-button banner_size_editButton" data-banner-id="{{ $bannerSize->id }}">Edit</button>
                                                     &nbsp;&nbsp;
-                                                    <button class="btn btn-danger deleteButton" data-banner-id="{{ $bannerSize->id }}">Delete</button>
+                                                    <button class="btn btn-danger banner_size_deleteButton" data-banner-id="{{ $bannerSize->id }}">Delete</button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -117,59 +86,7 @@
         </div>
         @include('layouts/footer_new')
         <script type="text/javascript">
-            $(document).ready(function() {
 
-                document.querySelectorAll('.editButton').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        var bannerId = this.getAttribute('data-banner-id');
-                        var baseUrl = $('meta[name="base-url"]').attr('content');
-
-                        axios.post(baseUrl + '/banner-sizes/edit', {
-                                banner_id: bannerId
-                            })
-                            .then(response => {
-                                var response_data = response.data.bannerSize;
-                                console.log(response_data.size);
-                                $('#id').val(response_data.id);
-                                $('#size').val(response_data.size);
-                                $('#width').val(response_data.width);
-                                $('#height').val(response_data.height);
-                                $('#usereditModal').modal('show');
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    });
-                });
-            });
-            document.querySelectorAll('.deletebutton').forEach(function(button) {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    var bannerId = this.getAttribute('data-banner-id');
-
-                    Swal.fire({
-                        title: 'Are you sure want to delete?',
-                        icon: 'warning',
-                        showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#3085d6',
-                        confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-                        if (result.isConfirmed) {
-                            axios.post("{{ url('banner-sizes/destroy') }}", {
-                                    bannerId: bannerId
-                                })
-                                .then(response => {
-                                    location.reload(true);
-
-                                })
-                                .catch(error => {
-                                    console.error(error);
-                                });
-                        }
-                    });
-                });
-            });
         </script>
         <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
             <div class="modal-dialog">
@@ -196,7 +113,7 @@
                                 <label for="height">Height</label>
                                 <input type="number" class="form-control" id="height" name="height" required>
                             </div>
-                            <button type="submit" class="btn text-white blue-button">Update</button>
+                            <button type="submit" class="btn text-white blue-button" style="float: right;">Update</button>
                         </form>
                     </div>
                 </div>

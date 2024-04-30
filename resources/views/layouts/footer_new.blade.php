@@ -21,5 +21,6 @@ if ($currentMonth >= 9) { // If the current month is September or later
 <script src="{{asset('mayal_assets/js/jquery-3.7.1.min.js')}}"></script>
 <script src="{{asset('mayal_assets/js/bootstrap.bundle.min.js')}}"></script>
 <script src="{{asset('mayal_assets/js/main.js')}}"></script>
+<script src="{{asset('mayal_assets/js/file.js')}}"></script>
 
 <!-- <script src="{{asset('admin_assets/plugins/jquery/jquery.min.js')}}"></script> -->

@@ -33,7 +33,7 @@ class InstituteController extends Controller
     }
     public function list_institute()
     {
-        $institute_list = Institute_detail::paginate(10);
+        $institute_list = Institute_detail::orderBy('id', 'desc')->paginate(10);
         return view('institute/list_institute', compact('institute_list'));
     }
     public function create_institute()

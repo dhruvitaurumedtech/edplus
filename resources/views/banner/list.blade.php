@@ -1,20 +1,8 @@
-</head>
-<meta name="base-url" content="{{ url('/') }}">
-
 <body>
   <div class="dashboard">
     @include('layouts/header-sidebar')
-    <!-- MAIN -->
     <div class="dashboard-app">
       @include('layouts/header-topbar')
-      <!-- /.content-header -->
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
       <div class="link-dir">
         <h1 class="display-4">Banner List</h1>
         <ul>
@@ -25,29 +13,14 @@
           <li><a href="{{url('institute-list')}}" class="active-link-dir">Create Banner</a></li>
         </ul>
       </div>
-
-      <!-- /.card-header -->
-      <!-- form start -->
-
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-        <div class="row">
-          <div class="col-md-10 offset-md-1">
-            @if (session('success'))
-            <div class="alert alert-success">
-              {{ session('success') }}
-            </div>
-            @endif
-          </div>
-        </div>
-
         <div class="dashboard-content side-content">
-
           <div class="row">
             <div class="col-lg-6">
               <div class="institute-form">
                 <form method="post" action="{{ url('banner/save') }}" enctype="multipart/form-data">
                   @csrf
-
                   @if(auth::user()->role_type == '3')
                   <label for="exampleInputEmail1">Select Institute : </label>
                   <select name="institute_id" class="form-control">
@@ -71,25 +44,19 @@
                     <div class="col-md-8">
                       <label for="banner_image">Banner Image:</label>
                       <input type="file" id="banner_image" name="banner_image[]" class="form-control" multiple>
-
                       @error('banner_image')
                       <div class="text-danger">{{ $message }}</div>
                       @enderror
-
                     </div>
                     <div class="col-md-4">
                       <div id="imagePreviewContainer"></div>
                     </div>
                   </div>
-
-
-
                   <label for="exampleInputEmail1">status : </label>
                   <select class="form-control" name="status">
                     <option value=" ">Select Option</option>
                     <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
                     <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-
                   </select>
                   @error('status')
                   <div class="text-danger">{{ $message }}</div>
@@ -103,8 +70,6 @@
             <div class="col-lg-6">
               <div class="">
                 <div class="institute-form">
-
-                  <!-- /.card-header -->
                   <table class="table table-js table-bordered">
                     <thead>
                       <tr>
@@ -138,18 +103,16 @@
                           <input type="button" value="Active" class="btn btn-success">
                           @else
                           <input type="button" value="Inactive" class="btn btn-danger">
-
                           @endif
                         </td>
-
                         <td>
                           <div class="d-flex">
                             @canButton('edit', 'Banner')
-                            <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                            <input type="submit" class="btn text-white blue-button banner_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                             @endCanButton
                             &nbsp;&nbsp;
                             @canButton('delete', 'Banner')
-                            <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                            <input type="submit" class="btn btn-danger banner_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                             @endCanButton
                           </div>
                       </tr>
@@ -227,60 +190,6 @@
       </div>
       @include('layouts/footer_new')
       <script>
-        document.querySelectorAll('.editButton').forEach(function(button) {
-          button.addEventListener('click', function() {
-            var banner_id = this.getAttribute('data-user-id');
-            var baseUrl = $('meta[name="base-url"]').attr('content');
-            axios.post(baseUrl + '/banner/edit', {
-                banner_id: banner_id
-              })
-              .then(response => {
-
-                var reponse_data = response.data.banner_list;
-                var iconSrc = baseUrl + '/' + reponse_data.banner_image;
-
-                $('#banner_id').val(reponse_data.id);
-                $('#banner_image').attr('src', iconSrc);
-                $('#old_banner_image').val(reponse_data.banner_image);
-                $('#status').val(reponse_data.status);
-                $('#usereditModal').modal('show');
-              })
-              .catch(error => {
-                console.error(error);
-              });
-          });
-        });
-        document.querySelectorAll('.deletebutton').forEach(function(button) {
-          button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default form submission
-
-            var banner_id = this.getAttribute('data-user-id');
-
-            // Show SweetAlert confirmation
-            Swal.fire({
-              title: 'Are you sure want to delete?',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#3085d6',
-              confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                axios.post('/banner/delete', {
-                    banner_id: banner_id
-                  })
-                  .then(response => {
-                    location.reload(true);
-
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
-            });
-          });
-        });
-
         function previewFile() {
           const preview = document.getElementById("banner_image");
           const fileInput = document.querySelector("input[type=file]");

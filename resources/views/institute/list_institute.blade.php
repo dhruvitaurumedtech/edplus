@@ -10,7 +10,7 @@
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Institute</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}">Institute List</a></li>
+          <li><a href="{{url('institute-list')}}" class="active-link-dir">Institute List</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -55,11 +55,6 @@
                       <input type="submit" class="btn btn-danger institute_list_deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
                       <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning" style="text-wrap: nowrap;">Student List</a>
-                      <!-- <form method="post" action="{{url('/student/list')}}">
-                        @csrf
-                        <input type="hidden" name="institute_id" value="">
-                        <input type="submit" class="btn btn-warning" value="Student List">
-                      </form> -->
                     </div>
                 </tr>
                 @php $i++ @endphp

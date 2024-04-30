@@ -33,7 +33,7 @@ class StudentsController extends Controller
         $student = User::leftjoin('students_details', 'users.id', '=', 'students_details.student_id')
             ->where('users.role_type', [6])
             ->where('students_details.institute_id', $institute_id)
-            ->select('users.*', 'students_details.status')->paginate(10);
+            ->select('users.*', 'students_details.status')->orderBy('users.id', 'desc')->paginate(10);
 
         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id', $institute_id)->select('institute_for.*')->get();
         $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id', $institute_id)->select('board.*')->get();
@@ -129,7 +129,7 @@ class StudentsController extends Controller
             'status' => $request->status,
         ]);
         if ($studentdetail) {
-            return Redirect::route('student.create')->with('success', 'profile-created');
+            return redirect('student/list/' . $request->institute_id)->with('success', 'profile-created');
         } else {
             return Redirect::route('student.create')->with('success', 'fail!');
         }
@@ -140,12 +140,10 @@ class StudentsController extends Controller
         $student_id = $request->input('student_id');
         $institute_id = $request->input('institute_id');
         $studentDT = User::find($student_id);
+        if (!empty($student_id) && !empty($institute_id)) {
 
+            $studentdetailsDT = Student_detail::where('student_id', $student_id)->where('institute_id', $institute_id)->first();
 
-        if (!empty($studentDT)) {
-            $user_id = Auth::id();
-
-            $studentdetailsDT = Student_detail::where('student_id', $student_id)->where('institute_id', $institute_id)->where('user_id', $user_id)->first();
             return response()->json(['studentDT' => $studentDT, 'studentsdetailsDT' => $studentdetailsDT]);
         } else {
             return response()->json(['error' => 'Student not found'], 404);
@@ -154,6 +152,9 @@ class StudentsController extends Controller
 
     public function update_student(Request $request)
     {
+        // echo "<pre>";
+        // print_r($_POST);
+        // exit;
         $student_id = $request->student_id;
         $studentUP = User::find($student_id);
 
@@ -191,7 +192,13 @@ class StudentsController extends Controller
 
         $user_id = Auth::id();
         $Student_detail_id = $request->Student_detail_id;
+        if (is_array($request->subject_id)) {
+            $subject_id = implode(",", $request->subject_id);
+        } else {
+            $subject_id = $request->subject_id;
+        }
         $studentdetailsDT = Student_detail::where('id', $Student_detail_id)->first();
+
         $studentdetailsDT->update([
             'institute_for_id' => $request->institute_for_id,
             'board_id' =>  $request->board_id,
@@ -199,12 +206,13 @@ class StudentsController extends Controller
             'class_id' => $request->class_id,
             'standard_id' => $request->standard_id,
             'stream_id' => $request->stream_id,
-            'subject_id' => implode(",", $request->subject_id),
+            'subject_id' => $subject_id,
             'status' => $request->status,
+            'note' => ($request->note) ? $request->note : ''
 
         ]);
 
-        return Redirect::route('student.list')->with('success', 'profile-created');
+        return redirect('student/list/' . $request->institute_id)->with('success', 'profile-created');
     }
 
     public function view_student(Request $request)

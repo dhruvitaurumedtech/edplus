@@ -1,31 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Chapter List - e School</title>
-
-    <!-- css  -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.11.2/css/all.min.css" />
-    <link rel="stylesheet" href="../css/bootstrap.min.css" />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/responsive.css" />
-
-</head>
-
 <body>
-
     <div class="dashboard">
-
         @include('layouts/header-sidebar')
-
-        <!-- MAIN -->
         <div class="dashboard-app">
-
             @include('layouts/header-topbar')
-
-            <!-- Sub MAIN -->
             <div class="link-dir">
                 <h1 class="display-4">Create Chapter List</h1>
                 <ul>
@@ -38,15 +15,11 @@
                     <li><a href="javascript:void(0)" class="active-link-dir">Create Chapter List</a></li>
                 </ul>
             </div>
-
             <div class="dashboard-content side-content">
                 <a href="{{url('chapter-list')}}" class="btn text-white btn-rmv2"> Chapter List</a>
-
                 <form class="s-chapter-form" method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">
                     @csrf
-
                     <div class="institute-list">
-
                         <h3>Select Standard</h3>
                         <div class="form-group">
                             <select class="form-control" id="standard_id" name="standard_id">
@@ -77,15 +50,6 @@
                             <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
                         </div>
                         <h3>Chapter Image</h3>
-                        <!-- <div class="input-group">
-              <input type="text" class="form-control" placeholder="Search this blog">
-              <div class="input-group-append">
-                <button class="btn btn-secondary" type="button">
-                  <i class="fa fa-search"></i>
-                </button>
-              </div>
-            </div> -->
-
                         <div class="file">
                             <div class="input-group search-box-2">
                                 <input type="text" class="form-control" placeholder="Chapter Image">
