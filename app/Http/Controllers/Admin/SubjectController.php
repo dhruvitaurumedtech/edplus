@@ -159,16 +159,38 @@ class SubjectController extends Controller
         return response()->json(['streamlist' => $streamlist]);
     }
 
-    function subject_edit(Request $request)
+    function subject_edit(Request $request, $id)
     {
-        $id = $request->input('subject_id');
-        $standardlist = Standard_model::get()->toArray();
-        $streamlist = Stream_model::get()->toArray();
-        $subjectlist = Subject_model::find($id);
-        return response()->json([
-            'standardlist' => $standardlist, 'streamlist' => $streamlist,
-            'subjectlist' => $subjectlist
-        ]);
+        $id = $id;
+        $basetable_list = Base_table::find($id);
+        // echo "<pre>";
+        // print_r($basetable_list);
+        // exit;
+        $subject_list = Subject_model::where('base_table_id', $id);
+
+        $institute_for = Institute_for_model::where('status', 'active')->get();
+        $board = board::where('status', 'active')->get();
+        $medium = Medium_model::where('status', 'active')->get();
+        $class = Class_model::where('status', 'active')->get();
+        $standard = Standard_model::where('status', 'active')->get();
+        $stream = Stream_model::where('status', 'active')->get();
+        $addsubstandard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id'
+            )
+            ->where('standard.status', 'active')->paginate(10);
+
+        $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
+            ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
+            ->where('base_table.status', 'active')->get();
+        return view('subject.edit', compact('addsubstandard', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
     }
     function subject_update(Request $request)
     {

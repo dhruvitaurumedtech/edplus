@@ -59,11 +59,11 @@
                 <td>
                   <div class="d-flex">
                     @canButton('edit', 'Board')
-                    <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                    <a href="{{url('subject/edit/'.$value->base_id)}}" class="btn text-white blue-button" data-base-id="{{ $value->base_id }}" value="">Edit</a>&nbsp;&nbsp;
                     @endCanButton
                     &nbsp;&nbsp;
                     @canButton('delete', 'Board')
-                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                    <a href="{{url('subject/delete/'.$value->base_id)}}" class="btn text-white btn-danger" data-base-id="{{ $value->base_id }}" value="">Delete</a>
                     @endCanButton
                   </div>
                 </td>
