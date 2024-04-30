@@ -1457,3 +1457,8 @@ h1,
     width: 100px;
     margin-left: auto;
 }
+
+.institute-form label{
+    margin-top: 10px;
+    font-weight: 600;
+}

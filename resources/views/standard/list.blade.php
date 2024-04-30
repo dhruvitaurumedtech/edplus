@@ -135,7 +135,6 @@
 
               <div class="d-flex justify-content-end">
                 {!! $standardlist->withQueryString()->links('pagination::bootstrap-5') !!}
-
               </div>
             </div>
 
