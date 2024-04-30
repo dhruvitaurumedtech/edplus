@@ -619,7 +619,7 @@ form.institute {
 }
 
 #addmore {
-    padding: 5px !important;
+    /* padding: 9px !important; */
 }
 
 .add-chapter-btn label {
@@ -1434,17 +1434,18 @@ h1,
 
 .border-line-subject {
     border: 2px solid rgba(0, 0, 0, 0.15);
-    padding: 0px 42px 42px 42px;
+    padding: 0px 42px 35px 42px;
 }
 
 .f-icons {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    height: 50px;
-    margin-top: 25px;
-    width: 100px;
-    margin-left: auto;
+    justify-content: center;
+    align-items: center;
+    height: 70px;
+    margin-top: 35px;
+    /* width: 100px; */
+    /* margin-left: auto; */
 }
 
 .delete_buttton_subject {

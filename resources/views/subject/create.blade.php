@@ -134,28 +134,24 @@
                             @enderror
                         </div>
                         <br>
+                        
                         <div class="border-line-subject">
                             <div class="row">
                                 <div class="col-md-4">
                                     <h3>Subject Name</h3>
-                                    <input type="text" name="subject[]" id="subject" class="form-control" placeholder="Add Subject Name">
+                                    <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image">
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image">
                                 </div>
                                 <div class="col-md-2"></div>
                                 <div class="col-md-2">
                                     <div class="f-icons">
                                         <a class="btn text-white btn-rmv2" id="addmore">
-                                            <i class="fas fa-plus"></i>
-                                        </a>
-                                        <br>
-                                        <a class="btn text-white btn-rmv2" id="delete" style="">
-                                            <i class="fas fa-trash"></i>
+                                            <i class="fas fa-plus py-1"></i>
                                         </a>
                                     </div>
-
                                 </div>
                             </div>
                             <div id="container"></div>
@@ -228,25 +224,25 @@
             });
         });
 
-        //add more
 
+        // Add more 
         $(document).ready(function() {
             var maxFields = 10; // Maximum number of input fields
             var container = $('#container'); // Container selector
 
             $('#addmore').click(function() {
-                document.getElementById('delete').style.display = 'block';
-
-                if (container.children().length / 3 < maxFields) {
-                    container.append('<div class="row"><div class="col-md-4"><h3>Subject Name</h3><input type="text" name="subject[]" id="subject" class="form-control" placeholder="Add Subject Name"></div><div class="col-md-4"> <h3>Image:</h3><input type="file" name="subject_image[]" id="subject_image" class="form-control" placeholder="Select Subject Image"></div><div class="col-md-2"></div><div class="delete_buttton_subject"><a class="btn text-white btn-rmv2 delete" id="delete"><i class="fas fa-trash"></i></a></div></div>');
+                if (container.children().length / 4 < maxFields) {
+                    container.append('<div class="row"><div class="col-md-4"><h3>Subject Name</h3><input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name"></div><div class="col-md-4"> <h3>Image:</h3><input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image"></div><div class="col-md-2"></div><div class="col-md-2"><div class="f-icons"><a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a></div></div></div>');
                 } else {
                     alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
                 }
             });
 
             container.on('click', '.delete', function() {
-                $(this).parent().remove(); // Remove the parent element (input fields and delete button)
+                $(this).closest('.row').remove(); // Remove the parent row element
             });
         });
+        
     </script>
+
 </body>
