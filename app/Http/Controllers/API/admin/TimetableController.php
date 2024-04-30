@@ -8,6 +8,7 @@ use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TimetableController extends Controller
 {
@@ -44,4 +45,20 @@ class TimetableController extends Controller
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
+
+    public function lecture_type_list(Request $request){
+        try{
+            $LtypeDT = DB::table('lecture_type')->get();
+            $lecture_type = [];
+            foreach($LtypeDT as $lectureDT){
+                $lecture_type[] = array('id'=>$lectureDT->id,'name'=>$lectureDT->name);
+            }
+
+            return $this->response($lecture_type,'Data Fetch Successfully');
+        }catch(Exeption $e){
+            return $this->response($e,"Something want Wrong!!", false, 400);
+        }
+    }
+
+    
 }

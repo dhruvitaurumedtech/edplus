@@ -63,6 +63,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
+       
+    Route::post('/institute/add-lecture-type', [TimetableController::class, 'lecture_type_list']);
+    Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
 });
 
 
@@ -70,7 +73,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
+
 
 Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
 
