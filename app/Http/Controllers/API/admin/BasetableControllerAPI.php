@@ -159,16 +159,23 @@ class BasetableControllerAPI extends Controller
             $class_ids = explode(',', $request->class_id);
 
             $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+                ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->whereIN('base_table.institute_for', $institute_for_ids)
                 ->whereIN('base_table.board', $board_ids)
                 ->whereIN('base_table.medium', $medium_ids)
                 ->whereIN('base_table.institute_for_class', $class_ids)
-                ->select('standard.id', 'standard.name')
+                ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name')
                 ->distinct()
                 ->get();
             $data = [];
             foreach ($base_standard as $basestandard) {
-                $data[] = array('id' => $basestandard->id, 'name' => $basestandard->name);
+                $data[] = array(
+                    'id' => $basestandard->id,
+                    'standard_name' => $basestandard->name,
+                    'class_name' => $basestandard->class_name,
+                    'medium_name' => $basestandard->medium_name
+                );
             }
 
             return $this->response($data, "Fetch Data Successfully");
