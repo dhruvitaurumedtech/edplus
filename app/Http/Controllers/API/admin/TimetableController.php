@@ -74,7 +74,7 @@ class TimetableController extends Controller
            ->join('lecture_type','lecture_type.id','=','time_table.lecture_type')
            ->join('batches','batches.id','=','time_table.board_id')
            ->join('standard','standard.id','=','batches.standard_id')
-           ->where('batch_id',$request->batch_id)
+           ->where('time_table.batch_id',$request->batch_id)
            ->select('subject.name as subject','users.firstname','users.lastname','lecture_type.name as lecture_type_name','batches.*','standard.name as standard')
            ->get();
 
