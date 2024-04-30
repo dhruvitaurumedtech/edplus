@@ -31,7 +31,7 @@
                         <h3>Institute For</h3>
                         @foreach($institute_for as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $insval->id == old('institute_for') || $edit_value['institute_for'] == $insval->id ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $insval->id == old('institute_for') || $edit_value->institute_for == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="InstituteFor">{{ $insval->name }}</label>
                             &nbsp;
                         </div>
