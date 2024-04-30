@@ -518,112 +518,164 @@ class ExamController extends Controller
 
 
 
-
     public function update_exam(Request $request)
     {
-        $token = $request->header('Authorization');
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-        $user_id = $request->user_id;
-        $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-        if ($existingUser) {
-            try {
-                $validatedData = $request->validate([
-                    'user_id' => 'required',
-                    'institute_id' => 'required',
-                    'exam_title' => 'required|string|max:255',
-                    'total_mark' => 'required|integer',
-                    'exam_type' => 'required|string|max:255',
-                    'exam_date' => 'required|date',
-                    'start_time' => 'required|date_format:H:i:s',
-                    'end_time' => 'required|date_format:H:i:s|after:start_time',
-                    //'institute_for_id' => 'required',
-                    'board_id' => 'required',
-                    'medium_id' => 'required',
-                    'batch_id' => 'required',
-                    //'class_id' => 'required',
-                    'standard_id' => 'required',
-                    'subject_id' => 'required',
-                ]);
-                $exam_update = Exam_Model::find($request->exam_id);
-                if ($exam_update) {
-                    $exam_update->update([
-                        'user_id' => $request->user_id,
-                        'institute_id' => $request->institute_id,
-                        'batch_id' => $request->batch_id,
-                        'exam_title' => $request->exam_title,
-                        'total_mark' => $request->total_mark,
-                        'exam_type' => $request->exam_type,
-                        'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
-                        'start_time' => $request->start_time,
-                        'end_time' => $request->end_time,
-                        //'institute_for_id' => $request->institute_for_id,
-                        'board_id' => $request->board_id,
-                        'medium_id' => $request->medium_id,
-                        //'class_id' => $request->class_id,
-                        'standard_id' => $request->standard_id,
-                        'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
-                        'subject_id' => $request->subject_id,
-                    ]);
-                } else {
-                    $exam_create = Exam_Model::where('user_id', $request->user_id)
-                        ->where('institute_id', $request->institute_id)
-                        ->where('standard_id', $request->standard_id)
-                        ->where('exam_title', $request->exam_title)
-                        ->where('exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d'))
-                        ->where('start_time', $request->start_time)
-                        ->where('end_time', $request->end_time)
-                        ->get()->toArray();
-                    if (empty($exam_create)) {
-                        Exam_Model::create([
-                            'user_id' => $request->user_id,
-                            'institute_id' => $request->institute_id,
-                            'batch_id' => $request->batch_id,
-                            'exam_title' => $request->exam_title,
-                            'total_mark' => $request->total_mark,
-                            'exam_type' => $request->exam_type,
-                            'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
-                            'start_time' => $request->start_time,
-                            'end_time' => $request->end_time,
-                            //'institute_for_id' => $request->institute_for_id,
-                            'board_id' => $request->board_id,
-                            'medium_id' => $request->medium_id,
-                            //'class_id' => $request->class_id,
-                            'standard_id' => $request->standard_id,
-                            'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
-                            'subject_id' => $request->subject_id,
-                        ]);
-                    }
-                }
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'exam_title' => 'required|string|max:255',
+            'total_mark' => 'required|integer',
+            'exam_type' => 'required|string|max:255',
+            'exam_date' => 'required|date',
+            'start_time' => 'required|date_format:H:i:s',
+            'end_time' => 'required|date_format:H:i:s|after:start_time',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'batch_id' => 'required',
+            'standard_id' => 'required',
+            'subject_id' => 'required',
+        ]);
 
-                if ($exam_update) {
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Successfully Updated Exam.',
-                    ], 200, [], JSON_NUMERIC_CHECK);
-                }
-                if (empty($exam_create)) {
-                    return response()->json([
-                        'status' => 200,
-                        'message' => 'Successfully Inserted Exam.',
-                    ], 200, [], JSON_NUMERIC_CHECK);
-                } else {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'Already Created This standard Exam!.',
-                    ]);
-                }
-            } catch (ValidationException $e) {
-                return response()->json(['errors' => $e->validator->errors()->all()], 422);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            if ($request->exam_id) {
+                $exam = Exam_Model::where('id', $request->exam_id)->first();
+            } else {
+                $exam = new Exam_Model();
+            };
+            $exam->user_id = $request->user_id;
+            $exam->institute_id = $request->institute_id;
+            $exam->batch_id = $request->batch_id;
+            $exam->exam_title = $request->exam_title;
+            $exam->total_mark = $request->total_mark;
+            $exam->exam_type = $request->exam_type;
+            $exam->exam_date = Carbon::createFromFormat('d-m-Y', $request->exam_date);
+            $exam->start_time = $request->start_time;
+            $exam->end_time = $request->end_time;
+            $exam->board_id = $request->board_id;
+            $exam->medium_id = $request->medium_id;
+            $exam->standard_id = $request->standard_id;
+            $exam->stream_id = $request->stream_id;
+            $exam->subject_id = $request->subject_id;
+            $exam->save();
+            if ($request->exam_id) {
+                return $this->response([], "Successfully Updated Exam.");
+            } else {
+                return $this->response([], "Successfully Created Exam.");
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    // public function update_exam(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+    //     $user_id = $request->user_id;
+    //     $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             $validatedData = $request->validate([
+    //                 'user_id' => 'required',
+    //                 'institute_id' => 'required',
+    //                 'exam_title' => 'required|string|max:255',
+    //                 'total_mark' => 'required|integer',
+    //                 'exam_type' => 'required|string|max:255',
+    //                 'exam_date' => 'required|date',
+    //                 'start_time' => 'required|date_format:H:i:s',
+    //                 'end_time' => 'required|date_format:H:i:s|after:start_time',
+    //                 //'institute_for_id' => 'required',
+    //                 'board_id' => 'required',
+    //                 'medium_id' => 'required',
+    //                 'batch_id' => 'required',
+    //                 //'class_id' => 'required',
+    //                 'standard_id' => 'required',
+    //                 'subject_id' => 'required',
+    //             ]);
+    //             $exam_update = Exam_Model::find($request->exam_id);
+    //             if ($exam_update) {
+    //                 $exam_update->update([
+    //                     'user_id' => $request->user_id,
+    //                     'institute_id' => $request->institute_id,
+    //                     'batch_id' => $request->batch_id,
+    //                     'exam_title' => $request->exam_title,
+    //                     'total_mark' => $request->total_mark,
+    //                     'exam_type' => $request->exam_type,
+    //                     'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
+    //                     'start_time' => $request->start_time,
+    //                     'end_time' => $request->end_time,
+    //                     //'institute_for_id' => $request->institute_for_id,
+    //                     'board_id' => $request->board_id,
+    //                     'medium_id' => $request->medium_id,
+    //                     //'class_id' => $request->class_id,
+    //                     'standard_id' => $request->standard_id,
+    //                     'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
+    //                     'subject_id' => $request->subject_id,
+    //                 ]);
+    //             } else {
+    //                 $exam_create = Exam_Model::where('user_id', $request->user_id)
+    //                     ->where('institute_id', $request->institute_id)
+    //                     ->where('standard_id', $request->standard_id)
+    //                     ->where('exam_title', $request->exam_title)
+    //                     ->where('exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d'))
+    //                     ->where('start_time', $request->start_time)
+    //                     ->where('end_time', $request->end_time)
+    //                     ->get()->toArray();
+    //                 if (empty($exam_create)) {
+    //                     Exam_Model::create([
+    //                         'user_id' => $request->user_id,
+    //                         'institute_id' => $request->institute_id,
+    //                         'batch_id' => $request->batch_id,
+    //                         'exam_title' => $request->exam_title,
+    //                         'total_mark' => $request->total_mark,
+    //                         'exam_type' => $request->exam_type,
+    //                         'exam_date' => Carbon::createFromFormat('d-m-Y', $request->exam_date),
+    //                         'start_time' => $request->start_time,
+    //                         'end_time' => $request->end_time,
+    //                         //'institute_for_id' => $request->institute_for_id,
+    //                         'board_id' => $request->board_id,
+    //                         'medium_id' => $request->medium_id,
+    //                         //'class_id' => $request->class_id,
+    //                         'standard_id' => $request->standard_id,
+    //                         'stream_id' => !empty($request->stream_id) ? $request->stream_id : '',
+    //                         'subject_id' => $request->subject_id,
+    //                     ]);
+    //                 }
+    //             }
+
+    //             if ($exam_update) {
+    //                 return response()->json([
+    //                     'status' => 200,
+    //                     'message' => 'Successfully Updated Exam.',
+    //                 ], 200, [], JSON_NUMERIC_CHECK);
+    //             }
+    //             if (empty($exam_create)) {
+    //                 return response()->json([
+    //                     'status' => 200,
+    //                     'message' => 'Successfully Inserted Exam.',
+    //                 ], 200, [], JSON_NUMERIC_CHECK);
+    //             } else {
+    //                 return response()->json([
+    //                     'status' => 400,
+    //                     'message' => 'Already Created This standard Exam!.',
+    //                 ]);
+    //             }
+    //         } catch (ValidationException $e) {
+    //             return response()->json(['errors' => $e->validator->errors()->all()], 422);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
     public function fetch_exam_form_detail(Request $request)
     {
         $token = $request->header('Authorization');

@@ -55,6 +55,23 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');
     Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
 
+    Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
+    Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
+    Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
+    Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
+    Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
+    Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
+    Route::post('/banner/banner-status-update', [BannerApiController::class, 'update_status'])->name('update_status');
+    Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])->name('banner_list');
+    Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
+    Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete');
+    Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
+    Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
+    Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
+    Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
+    Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
+    Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
+
 
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);
@@ -64,9 +81,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
-       
-    Route::post('/institute/lecture-type', [TimetableController::class, 'lecture_type_list']);
-    Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
 });
 
 
@@ -74,7 +88,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-
+Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
 
 
 
@@ -95,6 +109,7 @@ Route::post('/student/attendance-student', [StudentAttendance::class, 'attendanc
 
 
 
+
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
 Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
@@ -111,28 +126,27 @@ Route::post('/institute/add-student', [InstituteApiController::class, 'add_stude
 
 
 
-Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
+
 Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
 Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
 Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
 Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
-Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
-Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
-Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
-Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
 
-Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
-Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
-Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
+
+
+
+
+
+
 Route::post('/institute/Subject-List', [InstituteApiController::class, 'subjectList']);
 Route::post('/institute/All-Subject-List', [InstituteApiController::class, 'allsubjectList']);
 Route::post('/institute/Subject-edit', [InstituteApiController::class, 'edit_subject']);
 //banner controller
-Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
-Route::post('/banner/banner-status-update', [BannerApiController::class, 'update_status'])->name('update_status');
-Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
-Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])->name('banner_list');
-Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete');
+
+
+
+
+
 
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
@@ -141,15 +155,14 @@ Route::post('/institute/attendance', [AttendanceController::class, 'attendance']
 //parents API's
 Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
 
-Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
+
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 Route::post('/institute/student_list', [StudentController::class, 'student_list']);
 Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
 Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
-Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
+
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
 
-Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
 
 
 //teacher
