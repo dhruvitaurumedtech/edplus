@@ -53,6 +53,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('add_exam');
     Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam');
     Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');
+    Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
 
 
     //new API
@@ -72,7 +73,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
 
-Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
+
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
 Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
