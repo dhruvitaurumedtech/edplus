@@ -177,7 +177,7 @@ class BasetableControllerAPI extends Controller
             //         'medium_name' => $basestandard->medium_name
             //     );
             // }
-            $base_standard = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'standard.id')
+            $base_standard = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->whereIN('base_table.institute_for', $institute_for_ids)
                 ->whereIN('base_table.board', $board_ids)
