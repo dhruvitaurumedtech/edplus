@@ -19,13 +19,13 @@ class Users extends Controller
 {
     public function list_admin(): View
     {
-        $users = User::where('role_type', [2])->paginate(10);
+        $users = User::where('role_type', [2])->orderBy('id', 'desc')->paginate(10);
         return view('admin.list', compact('users'));
     }
 
     public function list_institute(): view
     {
-        $institute = User::where('role_type', [3])->paginate(10);
+        $institute = User::where('role_type', [3])->orderBy('id', 'desc')->paginate(10);
         return view('institute.list', compact('institute'));
     }
 

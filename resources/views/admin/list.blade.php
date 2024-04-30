@@ -12,7 +12,7 @@
           <li><a href="javascript:void(0)">/</a></li>
           <li><a href="javascript:void(0)">Admin</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}">Admin List</a></li>
+          <li><a href="{{url('institute-list')}}" class="active-link-dir">Admin List</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -139,4 +139,3 @@
     </div>
   </div>
 </div>
-<script src="{{asset('mayal_assets/js/file.js')}}"></script>

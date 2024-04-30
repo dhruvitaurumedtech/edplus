@@ -1,17 +1,8 @@
-</head>
-
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">class List</h1>
         <ul>
@@ -22,70 +13,47 @@
           <li><a href="{{url('class-list')}}" class="active-link-dir">class</a></li>
         </ul>
       </div>
-
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-      </div>
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-
-        <!-- /.card-header -->
-        <!-- form start -->
         <div class="row">
           <div class="col-md-6">
             <div class="institute-form">
               <form method="post" action="{{ url('class-list/save') }}" enctype="multipart/form-data">
                 @csrf
-                <div class="card-body">
-                  <div class="form-group">
-                    <div class="row">
+                <div class="row">
 
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Class Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
-                        @error('name')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">Icon : </label>
-                        <input type="file" name="icon" onchange="previewFile_create()" class="form-control">
-                        @error('icon')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-                      <div class="col-md-12">
-                        <img src="" id="icon_create" alt="Icon" class="img-resize mt-3" style="display: none;">
-                      </div>
-                      <div class="col-md-12">
-                        <label for="exampleInputEmail1">status : </label>
-                        <select class="form-control" name="status">
-                          <option value=" ">Select Option</option>
-                          <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                          <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
-                        </select>
-                        @error('status')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
-                      </div>
-
-                    </div>
-
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">Class Name : </label>
+                    <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
+                    @error('name')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
                   </div>
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">Icon : </label>
+                    <input type="file" name="icon" onchange="previewFile_create()" class="form-control">
+                    @error('icon')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+                  <div class="col-md-12">
+                    <img src="" id="icon_create" alt="Icon" class="img-resize mt-3" style="display: none;">
+                  </div>
+                  <div class="col-md-12">
+                    <label for="exampleInputEmail1">status : </label>
+                    <select class="form-control" name="status">
+                      <option value=" ">Select Option</option>
+                      <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
+                      <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                    </select>
+                    @error('status')
+                    <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
+
                 </div>
-                <div class="col-md-12 submit-btn">
+
+                <div class="col-md-12 submit-btn mt-3">
                   <button type="submit" class="btn text-white btn-rmv2">Submit</button>
                 </div>
               </form>
@@ -131,11 +99,11 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Class')
-                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 class_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Class')
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>
                   </tr>
@@ -206,7 +174,7 @@
                   </div>
                 </div>
                 <div class="d-flex justify-content-end">
-                  <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                  <button type="submit" class="btn btn-primary blue-button" style="float: right;">Update</button>
                 </div>
               </form>
             </div>
@@ -215,96 +183,40 @@
         </div>
 
       </div>
+    </div>
+    @include('layouts/footer_new')
+  </div>
+</body>
+<script>
+  function previewFile_create() {
+    $("#icon_create").show();
+    const preview = document.getElementById("icon_create");
+    const fileInput = document.querySelector("input[type=file]");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-      <script>
-        document.querySelectorAll('.editButton').forEach(function(button) {
-          button.addEventListener('click', function() {
-            var class_id = this.getAttribute('data-user-id');
-            var baseUrl = $('meta[name="base-url"]').attr('content');
+    reader.addEventListener("load", () => {
+      preview.src = reader.result;
+    }, false);
 
-            axios.post(baseUrl + '/class-list/edit', {
-                class_id: class_id
-              })
-              .then(response => {
-                var reponse_data = response.data.class_list;
-                var iconSrc = baseUrl + '/' + reponse_data.icon;
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
 
+  function previewFile_update() {
+    $("#icon_update").show();
+    const preview = document.getElementById("icon_update");
+    const fileInput = document.getElementById("edit_icon");
+    const file = fileInput.files[0];
+    const reader = new FileReader();
 
-                $('#class_id').val(reponse_data.id);
-                $('#old_icon').val(reponse_data.icon);
-                $('#icon_update').attr('src', iconSrc);
-                $('#name').val(reponse_data.name);
-                $('#status').val(reponse_data.status);
-                $('#usereditModal').modal('show');
-              })
-              .catch(error => {
-                console.error(error);
-              });
-          });
-        });
-        document.querySelectorAll('.deletebutton').forEach(function(button) {
-          button.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent the default form submission
+    reader.addEventListener("load", () => {
+      preview.src = reader.result;
+    }, false);
 
-            var class_id = this.getAttribute('data-user-id');
-
-            // Show SweetAlert confirmation
-            Swal.fire({
-              title: 'Are you sure want to delete?',
-              icon: 'warning',
-              showCancelButton: true,
-              confirmButtonColor: '#d33',
-              cancelButtonColor: '#3085d6',
-              confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-              if (result.isConfirmed) {
-                axios.post('/class/delete', {
-                    class_id: class_id
-                  })
-                  .then(response => {
-                    location.reload(true);
-
-                  })
-                  .catch(error => {
-                    console.error(error);
-                  });
-              }
-            });
-          });
-        });
-      </script>
-
-      <script>
-        function previewFile_create() {
-          $("#icon_create").show();
-          const preview = document.getElementById("icon_create");
-          const fileInput = document.querySelector("input[type=file]");
-          const file = fileInput.files[0];
-          const reader = new FileReader();
-
-          reader.addEventListener("load", () => {
-            preview.src = reader.result;
-          }, false);
-
-          if (file) {
-            reader.readAsDataURL(file);
-          }
-        }
-
-        function previewFile_update() {
-          $("#icon_update").show();
-          const preview = document.getElementById("icon_update");
-          const fileInput = document.getElementById("edit_icon");
-          const file = fileInput.files[0];
-          const reader = new FileReader();
-
-          reader.addEventListener("load", () => {
-            preview.src = reader.result;
-          }, false);
-
-          if (file) {
-            reader.readAsDataURL(file);
-          }
-        }
-      </script>
-      @include('layouts/footer_new')
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+</script>

@@ -122,11 +122,11 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Board')
-                        <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white blue-button videocategory_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Board')
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger videocategory_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>
                   </tr>
@@ -196,57 +196,7 @@
           </div>
         </div>
         <script>
-          document.querySelectorAll('.editButton').forEach(function(button) {
-            button.addEventListener('click', function() {
-              var video_category_id = this.getAttribute('data-user-id');
-              var baseUrl = $('meta[name="base-url"]').attr('content');
 
-              axios.post(baseUrl + '/video-category-edit', {
-                  video_category_id: video_category_id
-                })
-                .then(response => {
-
-                  var reponse_data = response.data.video_category_list;
-                  $('#video_category_id').val(reponse_data.id);
-                  $('#name').val(reponse_data.name);
-                  $('#status').val(reponse_data.status);
-                  $('#usereditModal').modal('show');
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            });
-          });
-          document.querySelectorAll('.deletebutton').forEach(function(button) {
-            button.addEventListener('click', function(event) {
-              event.preventDefault(); // Prevent the default form submission
-
-              var video_category_id = this.getAttribute('data-user-id');
-
-              // Show SweetAlert confirmation
-              Swal.fire({
-                title: 'Are you sure want to delete?',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  axios.post('video-category-delete', {
-                      video_category_id: video_category_id
-                    })
-                    .then(response => {
-                      location.reload(true);
-
-                    })
-                    .catch(error => {
-                      console.error(error);
-                    });
-                }
-              });
-            });
-          });
         </script>
       </div>
     </div>

@@ -6,64 +6,107 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance_model;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use App\Traits\ApiTrait;
+
 
 class AttendanceController extends Controller
 {
+
+
+    use ApiTrait;
     /**
      * Display a listing of the resource.
      */
+    // public function attendance(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         $request->validate([
+    //             'user_id' => 'required|integer',
+    //             'institute_id' => 'required|integer',
+    //             'student_id' => 'required|integer',
+    //             'batch_id' => 'required|integer',
+    //             'subject_id' => 'required|integer',
+    //             'status' => 'required|in:P,A',
+    //         ]);
+
+    //         $existingAttendance = Attendance_model::where([
+    //             'user_id' => $request->user_id,
+    //             'institute_id' => $request->institute_id,
+    //             'student_id' => $request->student_id,
+    //             'batch_id' => $request->batch_id,
+    //             'subject_id' => $request->subject_id,
+    //             'date' => $request->date,
+    //         ])->first();
+
+    //         if ($existingAttendance) {
+    //             $existingAttendance->attendance = $request->status;
+    //             $existingAttendance->save();
+    //             return response()->json(['status' => 200, 'message' => 'Attendance updated successfully'], 200);
+    //         }
+
+    //         Attendance_model::create([
+    //             'user_id' => $request->user_id,
+    //             'institute_id' => $request->institute_id,
+    //             'student_id' => $request->student_id,
+    //             'batch_id' => $request->batch_id,
+    //             'subject_id' => $request->subject_id,
+    //             'attendance' => $request->status,
+    //             'date' => $request->date,
+    //         ]);
+
+    //         return response()->json(['status' => 200, 'message' => 'Attendance marked successfully'], 201);
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
     public function attendance(Request $request)
     {
-        $token = $request->header('Authorization');
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|integer',
+            'student_id' => 'required|integer',
+            'batch_id' => 'required|integer',
+            'subject_id' => 'required|integer',
+            'status' => 'required|in:P,A',
+        ]);
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            $request->validate([
-                'user_id' => 'required|integer',
-                'institute_id' => 'required|integer',
-                'student_id' => 'required|integer',
-                'batch_id' => 'required|integer',
-                'subject_id' => 'required|integer',
-                'status' => 'required|in:P,A',
-            ]);
-
-            $existingAttendance = Attendance_model::where([
-                'user_id' => $request->user_id,
-                'institute_id' => $request->institute_id,
-                'student_id' => $request->student_id,
-                'batch_id' => $request->batch_id,
-                'subject_id' => $request->subject_id,
-                'date' => $request->date,
-            ])->first();
-
-            if ($existingAttendance) {
-                $existingAttendance->attendance = $request->status;
-                $existingAttendance->save();
-                return response()->json(['status' => 200, 'message' => 'Attendance updated successfully'], 200);
-            }
-
-            Attendance_model::create([
-                'user_id' => $request->user_id,
-                'institute_id' => $request->institute_id,
-                'student_id' => $request->student_id,
-                'batch_id' => $request->batch_id,
-                'subject_id' => $request->subject_id,
-                'attendance' => $request->status,
-                'date' => $request->date,
-            ]);
-
-            return response()->json(['status' => 200, 'message' => 'Attendance marked successfully'], 201);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+        try {
+            Attendance_model::updateOrCreate(
+                [
+                    'user_id' => $request->user_id,
+                    'institute_id' => $request->institute_id,
+                    'student_id' => $request->student_id,
+                    'batch_id' => $request->batch_id,
+                    'subject_id' => $request->subject_id,
+                    'date' => $request->date,
+                ],
+                [
+                    'attendance' => $request->status,
+                ]
+            );
+            return $this->response([], "Attendance marked successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
 
     /**
      * Show the form for creating a new resource.

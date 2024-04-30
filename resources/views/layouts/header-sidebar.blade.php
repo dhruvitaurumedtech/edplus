@@ -25,13 +25,13 @@
         @foreach ($menu as $value)
         <div class="dashboard-nav-dropdown {{ isActiveMenu($value) }}">
             <a href="{{ isset($value['url']) && Route::has($value['url']) ? url($value['url']) : '#' }}" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ isActiveLink($value['url']) }}">
-                <i class="fas fa-graduation-cap"></i> {{ $value['menu_name'] }}
+                <i class="fas fa-graduation-cap"></i>&nbsp;{{ $value['menu_name'] }}
             </a>
             @if (!empty($value['submenus']))
             <div class="dashboard-nav-dropdown-menu " style="{{ isActiveMenu($value) ? 'display: block;' : '' }}">
                 @foreach ($value['submenus'] as $submenu)
                 <a href="{{ url($submenu['url']) }}" class="dashboard-nav-dropdown-item {{ ($submenu['url']==request()->segment(1)) ? 'active': '' }}">
-                    <i class="fas fa-angle-right"></i> {{ $submenu['menu_name'] }}
+                    <i class="fas fa-angle-right"></i>&nbsp; {{ $submenu['menu_name'] }}
                 </a>
                 @endforeach
             </div>

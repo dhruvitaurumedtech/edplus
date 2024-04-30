@@ -27,12 +27,12 @@ class RoleController extends Controller
         Roles::create([
             'role_name' => $request->input('role_name'),
         ]);
-        $roles = Roles::paginate(10);
+        $roles = Roles::orderBy('id', 'desc')->paginate(10);
         return redirect()->route('roles.list')->with('success', 'Role created successfully')->with(compact('roles'));
     }
     public function list_role()
     {
-        $roles = Roles::paginate(10);
+        $roles = Roles::orderBy('id', 'desc')->paginate(10);
         return view('role.list', compact('roles'));
     }
     public function edit_role(Request $request)

@@ -1,17 +1,8 @@
-</head>
-
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">subject List</h1>
         <ul>
@@ -22,30 +13,7 @@
           <li><a href="{{url('class-list')}}" class="active-link-dir">subject</a></li>
         </ul>
       </div>
-
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-        <div class="col-md-10 offset-md-1">
-          @if (session('error'))
-          <div class="alert alert-danger">
-            {{ session('error') }}
-          </div>
-          @endif
-        </div>
-      </div>
+      @include('layouts/alert')
       <div class="dashboard-content side-content ">
         <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
@@ -74,8 +42,6 @@
             <tbody class="myTable">
               @php $i=1 @endphp
               @foreach($addsubstandard as $value)
-
-
               <tr>
                 <td>{{$i}}</td>
                 <td>{{$value->name}}</td>
@@ -89,16 +55,23 @@
 
                   @endforeach
                 </td>
-
                 <td>{{$value->status}}</td>
+                <td>
+                  <div class="d-flex">
+                    @canButton('edit', 'Board')
+                    <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                    @endCanButton
+                    &nbsp;&nbsp;
+                    @canButton('delete', 'Board')
+                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                    @endCanButton
+                  </div>
+                </td>
               </tr>
-
               @php $i++ @endphp
-
               @endforeach
             </tbody>
           </table>
-
           <div class="d-flex justify-content-end">
             {!! $addsubstandard->withQueryString()->links('pagination::bootstrap-5') !!}
           </div>
@@ -107,7 +80,6 @@
     </div>
   </div>
   @include('layouts/footer_new')
-
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>
     document.querySelectorAll('.editButton').forEach(function(button) {

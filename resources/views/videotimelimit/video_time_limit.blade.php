@@ -1,17 +1,8 @@
-</head>
-
 <body>
-
     <div class="dashboard">
-
         @include('layouts/header-sidebar')
-
-        <!-- MAIN -->
         <div class="dashboard-app">
-
             @include('layouts/header-topbar')
-
-            <!-- Sub MAIN -->
             <div class="link-dir">
                 <h1 class="display-4">Video Time Limit</h1>
                 <ul>
@@ -22,46 +13,21 @@
                     <li><a href="{{url('class-list')}}" class="active-link-dir">class</a></li>
                 </ul>
             </div>
-
-            <script>
-                window.setTimeout(function() {
-                    $(".alert-success").slideUp(500, function() {
-                        $(this).remove();
-                    });
-                }, 3000);
-            </script>
-            <div class="row">
-                <div class="col-md-10 offset-md-1">
-                    @if (session('success'))
-                    <div class="alert alert-success">
-                        {{ session('success') }}
-                    </div>
-                    @endif
-                </div>
-            </div>
+            @include('layouts/alert')
             <div class="dashboard-content side-content">
-
-                <!-- /.card-header -->
-                <!-- form start -->
-
                 <div class="row">
                     <div class="col-md-6">
-
                         <div class="institute-form">
                             <h3 class="card-title">Video Time Limit List</h3>
                             <form method="post" action="{{ url('video-timelimit-save') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="card-body">
-
                                     <div class="form-group">
                                         <div class="row">
-
                                             <div class="col-md-12 checbox-dropdown">
                                                 <label for="exampleInputEmail1">Institute Name : </label>
-
                                                 <div class="dropdown" data-control="checkbox-dropdown">
                                                     <label class="dropdown-label">Select</label>
-
                                                     <div class="dropdown-list">
                                                         <a href="#" data-toggle="check-all" class="dropdown-option">
                                                             Check All
@@ -72,8 +38,6 @@
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
-
-
                                                     </div>
                                                     @error('institute_id')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -82,10 +46,8 @@
                                             </div>
                                             <div class="col-md-12 checbox-dropdown">
                                                 <label for="exampleInputEmail1">Teacher Name : </label>
-
                                                 <div class="dropdown" data-control="checkbox-dropdown">
                                                     <label class="dropdown-label">Select</label>
-
                                                     <div class="dropdown-list">
                                                         <a href="#" data-toggle="check-all" class="dropdown-option">
                                                             Check All
@@ -96,8 +58,6 @@
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
-
-
                                                     </div>
                                                     @error('teacher_id')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -111,10 +71,7 @@
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
-
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
@@ -126,7 +83,6 @@
                     <div class="col-md-6">
                         <div class="institute-form">
                             <h3 class="card-title">Video Time Limit List</h3>
-                            <!-- /.card-header -->
                             <form action="#">
                                 <div class="search-box">
                                     <input type="search" class="form-control myInput" name="search" placeholder="Search">
@@ -143,7 +99,6 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-
                                     @foreach($response as $values)
                                     <tr>
                                         <td>{{$values['time']}}</td>
@@ -165,9 +120,9 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                <input type="submit" class="btn text-white blue-button video_limit_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
                                                 &nbsp;&nbsp;
-                                                <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
+                                                <input type="submit" class="btn btn-danger video_limit_deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
                                             </div>
                                         </td>
                                     </tr>
@@ -176,13 +131,7 @@
                             </table>
                             </tbody>
                             </table>
-
-
-                            <div class="d-flex justify-content-end">
-
-                            </div>
                         </div>
-
                     </div>
                 </div>
             </div>
@@ -219,8 +168,6 @@
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
-
-
                                                     </div>
                                                     @error('institute_id')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -229,10 +176,8 @@
                                             </div>
                                             <div class="col-md-12 checbox-dropdown">
                                                 <label for="exampleInputEmail1">Teacher Name : </label>
-
                                                 <div class="dropdown" data-control="checkbox-dropdown">
                                                     <label class="dropdown-label">Select</label>
-
                                                     <div class="dropdown-list">
                                                         <a href="#" data-toggle="check-all" class="dropdown-option">
                                                             Check All
@@ -243,8 +188,6 @@
                                                             {{$value['firstname']}}
                                                         </label>
                                                         @endforeach
-
-
                                                     </div>
                                                     @error('teacher_id')
                                                     <div class="text-danger">{{ $message }}</div>
@@ -258,10 +201,7 @@
                                                 <div class="text-danger">{{ $message }}</div>
                                                 @enderror
                                             </div>
-
-
                                         </div>
-
                                     </div>
                                 </div>
                                 <div class="col-md-12 submit-btn">
@@ -270,82 +210,6 @@
                             </form>
                         </div>
                     </div>
-
                 </div>
-
             </div>
-
-            <script>
-                document.querySelectorAll('.editButton').forEach(function(button) {
-                    button.addEventListener('click', function() {
-                        var id = this.getAttribute('data-user-id');
-                        var baseUrl = $('meta[name="base-url"]').attr('content');
-
-                        axios.post(baseUrl + '/video-timelimit-edit', {
-                                id: id
-                            })
-                            .then(response => {
-                                var response_data = response.data.times;
-                                for (let result of response_data) {
-
-                                    var institute_id = result.institute_id;
-                                    var teacher_id = result.teacher_id;
-                                    $('#id').val(result.id);
-                                    $('#time').val(result.time);
-                                    const institute_id_result = institute_id.split(',');
-                                    for (let institute of institute_id_result) {
-                                        $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);
-                                    }
-                                    const teacher_id_result = teacher_id.split(',');
-                                    for (let teacher of teacher_id_result) {
-                                        $(`#teacher_id[value="${teacher.trim()}"]`).prop('checked', true);
-                                    }
-                                    // $('#institute_id').prop('checked', result.institute_id);
-                                    // $('#teacher_id').prop('checked', result.teacher_id);
-                                    $('#usereditModal').modal('show');
-                                }
-                            })
-                            .catch(error => {
-                                console.error(error);
-                            });
-                    });
-                });
-                document.querySelectorAll('.deletebutton').forEach(function(button) {
-                    button.addEventListener('click', function(event) {
-                        event.preventDefault(); // Prevent the default form submission
-
-                        var id = this.getAttribute('data-user-id');
-
-                        // Show SweetAlert confirmation
-                        Swal.fire({
-                            title: 'Are you sure want to delete?',
-                            icon: 'warning',
-                            showCancelButton: true,
-                            confirmButtonColor: '#d33',
-                            cancelButtonColor: '#3085d6',
-                            confirmButtonText: 'Yes, delete it!'
-                        }).then((result) => {
-                            if (result.isConfirmed) {
-                                axios.post('video-timelimit-delete', {
-                                        id: id
-                                    })
-                                    .then(response => {
-                                        location.reload(true);
-
-                                    })
-                                    .catch(error => {
-                                        console.error(error);
-                                    });
-                            }
-                        });
-                    });
-                });
-            </script>
-
-            <script>
-
-            </script>
             @include('layouts/footer_new')
-            <style>
-
-            </style>

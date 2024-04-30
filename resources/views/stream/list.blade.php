@@ -1,17 +1,10 @@
 </head>
 
 <body>
-
   <div class="dashboard">
-
     @include('layouts/header-sidebar')
-
-    <!-- MAIN -->
     <div class="dashboard-app">
-
       @include('layouts/header-topbar')
-
-      <!-- Sub MAIN -->
       <div class="link-dir">
         <h1 class="display-4">Stream List</h1>
         <ul>
@@ -22,27 +15,8 @@
           <li><a href="{{url('class-list')}}" class="active-link-dir">Stream</a></li>
         </ul>
       </div>
-
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-      </div>
+      @include('layouts/alert')
       <div class="dashboard-content side-content">
-
-        <!-- /.card-header -->
-        <!-- form start -->
         <div class="row">
           <div class="col-md-6">
             <div class="institute-form">
@@ -81,8 +55,6 @@
               </form>
             </div>
           </div>
-
-          <!-- list -->
           <div class="col-md-6">
             <div class="institute-form">
               <h3 class="card-title">Stream List</h3>
@@ -92,11 +64,6 @@
                   <i class="fas fa-search"></i>
                 </div>
               </form>
-              <!-- @canButton('add', 'Stream')
-              <a href="{{url('stream-create')}}" class="btn btn-success" style="float: right;">Create Stream </a>
-              @endCanButton -->
-              <!-- /.card-header -->
-
               <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
@@ -125,11 +92,11 @@
                     <td>
                       <div class="d-flex">
                         @canButton('edit', 'Stream')
-                        <input type="submit" class="btn text-white btn-rmv2 editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                        <input type="submit" class="btn text-white btn-rmv2 stream_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
                         @endCanButton
                         &nbsp;&nbsp;
                         @canButton('delete', 'Stream')
-                        <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                        <input type="submit" class="btn btn-danger stream_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
                         @endCanButton
                       </div>
                   </tr>
@@ -200,55 +167,6 @@
       </div>
     </div>
     <script>
-      document.querySelectorAll('.editButton').forEach(function(button) {
-        button.addEventListener('click', function() {
-          var stream_id = this.getAttribute('data-user-id');
-          var baseUrl = $('meta[name="base-url"]').attr('content');
 
-          axios.post(baseUrl + '/stream-edit', {
-              stream_id: stream_id
-            })
-            .then(response => {
-              var reponse_data = response.data.straemlist;
-              $('#stream_id').val(reponse_data.id);
-              $('#name').val(reponse_data.name);
-              $('#status').val(reponse_data.status);
-              $('#usereditModal').modal('show');
-            })
-            .catch(error => {
-              console.error(error);
-            });
-        });
-      });
-      document.querySelectorAll('.deletebutton').forEach(function(button) {
-        button.addEventListener('click', function(event) {
-          event.preventDefault(); // Prevent the default form submission
-
-          var stream_id = this.getAttribute('data-user-id');
-
-          // Show SweetAlert confirmation
-          Swal.fire({
-            title: 'Are you sure want to delete?',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#d33',
-            cancelButtonColor: '#3085d6',
-            confirmButtonText: 'Yes, delete it!'
-          }).then((result) => {
-            if (result.isConfirmed) {
-              axios.post('stream-delete', {
-                  stream_id: stream_id
-                })
-                .then(response => {
-                  location.reload(true);
-
-                })
-                .catch(error => {
-                  console.error(error);
-                });
-            }
-          });
-        });
-      });
     </script>
     @include('layouts/footer_new')

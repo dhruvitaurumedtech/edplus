@@ -1,6 +1,5 @@
 @include('layouts/header')
 <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
     <div class="content-header">
         <div class="container-fluid">
             <div class="row mb-2">
@@ -16,21 +15,15 @@
             </div><!-- /.row -->
         </div><!-- /.container-fluid -->
     </div>
-    <!-- /.content-header -->
     @include('alert')
-    <!-- Main content -->
     <section class="content">
         <div class="container-fluid">
             <div class="row">
-                <!-- left column -->
                 <div class="col-md-12">
-                    <!-- general form elements -->
                     <div class="card card-primary">
                         <div class="card-header">
                             <h3 class="card-title">Create Institute</h3>
                         </div>
-                        <!-- /.card-header -->
-                        <!-- form start -->
                         <form method="post" action="{{ url('institute/register') }}">
                             @csrf
                             <div class="card-body">

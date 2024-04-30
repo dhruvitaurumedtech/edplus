@@ -13,4 +13,11 @@
         </div>
         @endif
     </div>
+    <div class="col-md-10 offset-md-1">
+        @if (session('error'))
+        <div class="alert alert-danger">
+            {{ session('error') }}
+        </div>
+        @endif
+    </div>
 </div>
