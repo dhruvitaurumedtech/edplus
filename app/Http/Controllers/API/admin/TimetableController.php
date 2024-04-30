@@ -46,7 +46,7 @@ class TimetableController extends Controller
         }
     }
 
-    public function lecture_type_list(Request $request){
+    public function lecture_type_list(){
         try{
             $LtypeDT = DB::table('lecture_type')->get();
             $lecture_type = [];
@@ -60,5 +60,48 @@ class TimetableController extends Controller
         }
     }
 
-    
+    public function list_timetable(Request $request){
+        $validator = validator::make($request->all(),[
+            'batch_id'=>'required',
+        ]);
+
+        if($validator->fails()) 
+        return $this->response([],$validator->errors()->first(),false,400);
+
+        try{
+           $timtDT = Timetable::join('subject','subject.id','=','time_table.institute_id')
+           ->join('users','users.id','=','time_table.teacher_id')
+           ->join('lecture_type','lecture_type.id','=','time_table.lecture_type')
+           ->join('batches','batches.id','=','time_table.board_id')
+           ->join('standard','standard.id','=','batches.standard_id')
+           ->where('batch_id',$request->batch_id)
+           ->select('subject.name as subject','users.firstname','users.lastname','lecture_type.name as lecture_type_name','batches.*','standard.name as standard')
+           ->get();
+
+           foreach($timtDT as $timtable){
+            $dayofdate = date('D', strtotime($timtable->day));
+
+            $data[] = array('id'=>$timtable->id,
+            'date'=>$timtable->day,
+            'day'=>$dayofdate,
+            'start_time'=>$timtable->start_time,
+            'end_time'=>$timtable->end_time,
+            'subject_id'=>$timtable->subject_id,
+            'subject'=>$timtable->subject,
+            'lecture_type_id'=>$timtable->lecture_type,
+            'lecture_type'=>$timtable->lecture_type_name,
+            'standard_id'=>$timtable->standard_id,
+            'standard'=>$timtable->standard,
+            'batch_id'=>$timtable->batch_id,
+            'batch_name'=>$timtable->batch_name,
+            'teacher_id'=>$timtable->teacher_id,
+            'teacher'=>$timtable->firstname .' '.$timtable->lastname);
+           }
+
+           return $this->response($data,'Data Fetch Successfully');
+           
+        }catch(Exeption $e){
+            return $this->response($e,"Something want Wrong!!", false, 400);
+        }
+    }
 }
