@@ -13,6 +13,20 @@ use Illuminate\Support\Facades\DB;
 class TimetableController extends Controller
 {
     use ApiTrait;
+    public function lecture_type_list(){
+        try{
+            $LtypeDT = DB::table('lecture_type')->get();
+            $lecture_type = [];
+            foreach($LtypeDT as $lectureDT){
+                $lecture_type[] = array('id'=>$lectureDT->id,'name'=>$lectureDT->name);
+            }
+
+            return $this->response($lecture_type,'Data Fetch Successfully');
+        }catch(Exeption $e){
+            return $this->response($e,"Something want Wrong!!", false, 400);
+        }
+    }
+    //add
     public function add_timetable(Request $request){
         
         $validator = validator::make($request->all(),[
@@ -31,6 +45,16 @@ class TimetableController extends Controller
         return $this->response([],$validator->errors()->first(),false,400);
 
         try{
+
+            if ($request->id) {
+                $timetable = Timetable::find($request->id);
+                if (!$timetable) {
+                    return $this->response([],'Record Not Found',404);
+                }
+            } else {
+                $timetable = new Timetable();
+            }
+
             $timetable = new Timetable();
             $timetable->subject_id = $request->subject_id;
             $timetable->batch_id = $request->batch_id;
@@ -45,20 +69,8 @@ class TimetableController extends Controller
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
-
-    public function lecture_type_list(){
-        try{
-            $LtypeDT = DB::table('lecture_type')->get();
-            $lecture_type = [];
-            foreach($LtypeDT as $lectureDT){
-                $lecture_type[] = array('id'=>$lectureDT->id,'name'=>$lectureDT->name);
-            }
-
-            return $this->response($lecture_type,'Data Fetch Successfully');
-        }catch(Exeption $e){
-            return $this->response($e,"Something want Wrong!!", false, 400);
-        }
-    }
+    
+    
 
     public function list_timetable(Request $request){
         $validator = validator::make($request->all(),[
