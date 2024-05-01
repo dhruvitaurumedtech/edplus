@@ -115,22 +115,28 @@
 
                         <div class="border-line-subject">
                             <div class="row">
+                                <div class="col-md-1 offset-md-11">
+                                    <div class="f-icons">
+                                        <a class="btn text-white btn-rmv2 addmore">
+                                            <i class="fas fa-plus py-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
                                 <div class="col-md-4">
                                     <h3>Subject Name</h3>
                                     <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" class="form-control" onchange='openFile(event)' placeholder="Select Subject Image">
+                                    <input type="file" name="subject_image[]" class="form-control" onchange='openFile(event,"output")' placeholder="Select Subject Image">
                                 </div>
                                 <div class="col-md-2"><img src="" id='output' class="subject-img-resize mt-4" style="display: none;"></div>
 
                                 <div class="col-md-2">
-                                    <div class="f-icons">
-                                        <a class="btn text-white btn-rmv2" id="addmore">
-                                            <i class="fas fa-plus py-1"></i>
-                                        </a>
-                                    </div>
+                                    <div class="f-icons"><a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a></div>
                                 </div>
                             </div>
                             <div id="container"></div>
@@ -168,12 +174,12 @@
 
     <script>
         //image preview
-        var openFile = function(file) {
-            var input = file.target;
+        var openFile = function(file, id) {
+             var input = file.target;
             var reader = new FileReader();
             reader.onload = function() {
                 var dataURL = reader.result;
-                var output = document.getElementById('output');
+                var output = document.getElementById(id);
                 output.style.display = 'block';
 
                 output.src = dataURL;
@@ -223,11 +229,30 @@
             var maxFields = 10; // Maximum number of input fields
             var container = $('#container'); // Container selector
 
-            $('#addmore').click(function() {
+            $('.addmore').click(function() {
                 if (container.children().length / 4 < maxFields) {
-                    container.append('<div class="row"><div class="col-md-4"><h3>Subject Name</h3><input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name"></div><div class="col-md-4"> <h3>Image:</h3><input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image"></div><div class="col-md-2"></div><div class="col-md-2"><div class="f-icons"><a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a></div></div></div>');
+                    var id = container.children().length;
+                    container.append(`
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h3>Subject Name</h3>
+                            <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
+                        </div>
+                        <div class="col-md-4">
+                            <h3>Image:</h3>
+                            <input type="file" name="subject_image[]" class="form-control" onchange="openFile(event, 'output${id}')" placeholder="Select Subject Image">
+                        </div>
+                        <div class="col-md-2">
+                            <img src="" id="output${id}" class="subject-img-resize mt-4" style="display: none;">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="f-icons">
+                                <a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                `);
                 } else {
-                    alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
                 }
             });
 
