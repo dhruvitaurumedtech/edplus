@@ -46,14 +46,14 @@ class TimetableController extends Controller
 
         try{
 
-            if ($request->id) {
-                $timetable = Timetable::find($request->id);
-                if (!$timetable) {
-                    return $this->response([],'Record Not Found',404);
-                }
-            } else {
-                $timetable = new Timetable();
-            }
+            // if ($request->id) {
+            //     $timetable = Timetable::find($request->id);
+            //     if (!$timetable) {
+            //         return $this->response([],'Record Not Found',404);
+            //     }
+            // } else {
+            //     $timetable = new Timetable();
+            // }
 
             $timetable = new Timetable();
             $timetable->subject_id = $request->subject_id;
