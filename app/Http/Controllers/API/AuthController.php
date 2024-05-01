@@ -59,17 +59,34 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|exists:users,email',
             'password' => 'required',
+            'login_type' => 'required|in:1,2',
         ]);
+
+
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $credentials = $request->only('email', 'password');
-        if (Auth::attempt($credentials)) {
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return $this->response([], "User not found", false, 400);
+        }
+
+        $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
+
+        if (!in_array($user->role_type, $validRoles)) {
+            $errorMessage = ($request->login_type == 1) ? "Please use Student Application" : "Please use Institute Application";
+            return $this->response([], $errorMessage, false, 400);
+        }
+
+        if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
-            $user->token = $token;
-            $user->save();
-            $institute_id = ($user->role_type == 3) ? (Institute_detail::where('user_id', $user->id)->first()?->id ?? null) : null;
+            $user->update(['token' => $token]);
+
+            $institute_id = ($user->role_type == 3) ? (optional($user->instituteDetail)->id) : null;
+
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
@@ -80,11 +97,14 @@ class AuthController extends Controller
                 'institute_id' => $institute_id,
                 'token' => $token,
             ];
+
             return $this->response($data, "Login successful");
         } else {
             return $this->response([], "Invalid Username Or Password!", false, 400);
         }
     }
+
+
 
     public function logout(Request $request)
     {

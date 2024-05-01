@@ -151,6 +151,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/subject/delete', [SubjectController::class, 'subject_delete'])->name('subject.delete');
     Route::get('/subject/edit/{id}', [SubjectController::class, 'subject_edit'])->name('subject.edit');
     Route::post('subject/update', [SubjectController::class, 'subject_update'])->name('subject.update');
+    Route::post('/unique_subject/delete', [SubjectController::class, 'unique_subject_delete']);
 
     //chapter
     Route::get('add-lists', [ChapterController::class, 'add_lists'])->name('chapter.create');
