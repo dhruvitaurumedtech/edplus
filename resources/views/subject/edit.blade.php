@@ -24,8 +24,10 @@
             </div>
             @include('layouts/alert')
             <div class="dashboard-content side-content">
-                <form method="post" action="{{ url('subject-update') }}" enctype="multipart/form-data" class="s-chapter-form">
+                <form method="post" action="{{ url('subject/update') }}" enctype="multipart/form-data" class="s-chapter-form">
                     @csrf
+                    <input type="hidden" name="id" value="{{$id}}">
+
                     <div class="institute-list">
                         <h3>Institute For</h3>
                         @foreach($institute_for as $insval)
@@ -112,6 +114,8 @@
                         <br>
 
                         <div class="border-line-subject">
+                            @if(!empty($selected_subject_list))
+                            <!-- If $selected_subject_list is not empty, iterate over each subject -->
                             @foreach($selected_subject_list as $subject_value)
                             <div class="row">
                                 <div class="col-md-4">
@@ -132,6 +136,28 @@
                                 </div>
                             </div>
                             @endforeach
+                            @else
+                            <!-- If $selected_subject_list is empty, display form fields for adding a new subject -->
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <h3>Subject Name</h3>
+                                    <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
+                                </div>
+                                <div class="col-md-4">
+                                    <h3>Image:</h3>
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event)'>
+                                </div>
+                                <div class="col-md-2"><img src="" id='output' class="subject-img-resize mt-4"></div>
+                                <div class="col-md-2">
+                                    <div class="f-icons">
+                                        <a class="btn text-white btn-rmv2" id="addmore">
+                                            <i class="fas fa-plus py-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            @endif
+
                             <div id="container"></div>
                         </div>
                         @error('subject')

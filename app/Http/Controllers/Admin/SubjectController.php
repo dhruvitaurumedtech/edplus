@@ -26,10 +26,11 @@ class SubjectController extends Controller
             ->leftjoin('board', 'board.id', '=', 'base_table.board')
             ->select(
                 'stream.name as sname',
-                'standard.*',
+                'standard.name as standard',
                 'medium.name as medium',
                 'board.name as board',
-                'base_table.id as base_id'
+                'base_table.id as base_id',
+                'base_table.status'
             )
             ->where('standard.status', 'active')->orderBy('base_table.id', 'desc')->paginate(10);
 
@@ -162,7 +163,9 @@ class SubjectController extends Controller
     function subject_edit(Request $request, $id)
     {
         $id = $id;
-        $basetable_list = Base_table::find($id)->first()->toarray();
+        $basetable_list = Base_table::where('id', $id)->first()->toarray();
+
+
         $selected_subject_list = Subject_model::where('base_table_id', $id)->get()->toarray();
 
         $institute_for = Institute_for_model::where('status', 'active')->get();
@@ -188,26 +191,85 @@ class SubjectController extends Controller
             ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
             ->where('base_table.status', 'active')->get();
 
-        return view('subject.edit', compact('addsubstandard', 'basetable_list', 'selected_subject_list', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
+        return view('subject.edit', compact('addsubstandard', 'id', 'basetable_list', 'selected_subject_list', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
     }
     function subject_update(Request $request)
     {
-        $id = $request->input('subject_id');
-        $class = Subject_model::find($id);
+
         $request->validate([
-            'standard_id' => 'required',
-            'stream_id' => 'required',
-            'name' => ['required', 'string', 'max:255'],
+            'institute_for' => 'required',
+            'board' => 'required',
+            'medium' => 'required',
+            'institute_for_class' => 'required',
+            'standard' => 'required',
+            //'stream' => 'required',
+            //'subject' => 'required',
             'status' => 'required',
+
+
         ]);
 
-        $class->update([
-            'standard_id' => $request->input('standard_id'),
-            'stream_id' => $request->input('stream_id'),
-            'name' => $request->input('name'),
-            'status' => $request->input('status'),
-        ]);
-        return redirect()->route('subject.list')->with('success', 'Subject Updated successfully');
+        $subquery = DB::table('subject')
+            ->select(DB::raw(1))
+            ->whereColumn('subject.base_table_id', 'base_table.id')
+            ->where('subject.name', request('subject'));
+
+        $query = DB::table('base_table')
+            ->where('institute_for', request('institute_for'))
+            ->where('board', request('board'))
+            ->where('medium', request('medium'))
+            ->where('institute_for_class', request('institute_for_class'))
+            ->where('standard', request('standard'))
+            ->where('stream', request('stream'))
+            ->where('status', request('status'))
+            ->whereExists($subquery);
+
+        $exists = $query->count();
+
+        if ($exists <= 0) {
+            $subject_model = Base_table::where('id', $request->id)
+                ->update([
+                    'institute_for' => $request->institute_for,
+                    'board' => $request->board,
+                    'medium' => $request->medium,
+                    'institute_for_class' => $request->institute_for_class,
+                    'standard' => $request->standard,
+                    'stream' => $request->stream,
+                    'stream' => $request->stream,
+                    'updated_by' => Auth::id(),
+                ]);
+
+
+
+            $base_table_id = $request->id;
+
+            $subjects = $request->input('subject');
+            $subject_images = $request->file('subject_image');
+
+            if ($subjects && $subject_images) {
+
+                foreach ($subjects as $i => $subject) {
+
+                    if (isset($subject_images[$i])) {
+
+                        $subject_image = $subject_images[$i];
+                        $name = $subject_image->getClientOriginalName();
+                        $subject_image->move(public_path() . '/subject/', $name);
+
+                        // Find or create subject model based on some criteria
+                        Subject_model::where('base_table_id', $base_table_id)
+                            ->update([
+                                'image' => '/subject/' . $name,
+                                'status' => 'active',
+                                'created_by' => Auth::id()
+                            ]);
+                    }
+                }
+            }
+            return redirect()->route('subject.list')->with('success', 'Subject Updated successfully');
+        } else {
+            return redirect()->route('subject.list')->with('success', 'Already Exists!');
+        }
     }
     public function subject_delete(Request $request)
     {

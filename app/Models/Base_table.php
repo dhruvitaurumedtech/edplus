@@ -8,10 +8,9 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Base_table extends Model
 {
-    use HasFactory,SoftDeletes;
+    use HasFactory, SoftDeletes;
     protected $table = 'base_table';
     protected $fillable = [
-        'institute_for', 'board', 'medium','institute_for_class','standard','stream','status','created_by','updated_by','updated_by','updated_by'
+        'institute_for', 'board', 'medium', 'institute_for_class', 'standard', 'stream', 'status', 'created_by', 'updated_by', 'created_at', 'updated_at', 'deleted_at'
     ];
-    
 }
