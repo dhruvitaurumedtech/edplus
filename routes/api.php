@@ -88,6 +88,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/lecture-type', [TimetableController::class, 'lecture_type_list']);
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable']);
+    Route::post('/institute/repeat-list', [TimetableController::class,'for_repeat_list']);
 });
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
