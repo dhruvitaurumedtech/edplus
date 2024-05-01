@@ -24,14 +24,13 @@
             </div>
             @include('layouts/alert')
             <div class="dashboard-content side-content">
-                @foreach($basetable_list as $edit_value)
                 <form method="post" action="{{ url('subject-update') }}" enctype="multipart/form-data" class="s-chapter-form">
                     @csrf
                     <div class="institute-list">
                         <h3>Institute For</h3>
                         @foreach($institute_for as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $insval->id == old('institute_for') || $edit_value->institute_for == $insval->id ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $basetable_list['institute_for'] == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="InstituteFor">{{ $insval->name }}</label>
                             &nbsp;
                         </div>
@@ -44,7 +43,7 @@
                         <h3>Board</h3>
                         @foreach($board as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="board" id="board" value="{{ $insval->id }}" {{ $insval->id == old('board') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="board" id="board" value="{{ $insval->id }}" {{ $basetable_list['board'] == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="board">{{ $insval->name }}</label>
                             &nbsp;
                         </div>
@@ -59,7 +58,7 @@
                         <h3>Medium : </h3>
                         @foreach($medium as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="medium" id="medium" value="{{ $insval->id }}" {{ $insval->id == old('medium') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="medium" id="medium" value="{{ $insval->id }}" {{ $basetable_list['medium'] == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="medium">{{ $insval->name }}</label>
 
                         </div>
@@ -74,7 +73,7 @@
                         <h3>Institute For Class : </h3>
                         @foreach($class as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="institute_for_class" id="institute_for_class" value="{{ $insval->id }}" {{ $insval->id == old('institute_for_class') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="institute_for_class" id="institute_for_class" value="{{ $insval->id }}" {{ $basetable_list['institute_for_class'] == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="institute_for_class">{{ $insval->name }}</label>
 
                         </div>
@@ -89,7 +88,7 @@
                             <select class="form-control" name="standard">
                                 <option value=" ">Select Option</option>
                                 @foreach($standard as $insval)
-                                <option value="{{$insval->id}}" {{ $insval->id == old('standard') ? 'selected' : '' }}>{{$insval->name}}</option>
+                                <option value="{{$insval->id}}" {{ $basetable_list['standard'] == $insval->id ? 'selected' : '' }}>{{$insval->name}}</option>
                                 @endforeach
                             </select>
                             @error('standard')
@@ -103,7 +102,7 @@
                             <select class="form-control" name="stream">
                                 <option value=" ">Select Option</option>
                                 @foreach($stream as $insval)
-                                <option value="{{$insval->id}}" {{ $insval->id == old('stream') ? 'selected' : '' }}>{{$insval->name}}</option>
+                                <option value="{{$insval->id}}" {{ $basetable_list['stream'] == $insval->id ? 'selected' : '' }}>{{$insval->name}}</option>
                                 @endforeach
                             </select>
                             @error('stream')
@@ -113,16 +112,17 @@
                         <br>
 
                         <div class="border-line-subject">
+                            @foreach($selected_subject_list as $subject_value)
                             <div class="row">
                                 <div class="col-md-4">
                                     <h3>Subject Name</h3>
-                                    <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
+                                    <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name" value="{{$subject_value['name']}}">
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image">
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event)' value="{{$subject_value['image']}}">
                                 </div>
-                                <div class="col-md-2"></div>
+                                <div class="col-md-2"><img src="{{url($subject_value['image'])}}" id='output' class="subject-img-resize mt-4"></div>
                                 <div class="col-md-2">
                                     <div class="f-icons">
                                         <a class="btn text-white btn-rmv2" id="addmore">
@@ -131,6 +131,7 @@
                                     </div>
                                 </div>
                             </div>
+                            @endforeach
                             <div id="container"></div>
                         </div>
                         @error('subject')
@@ -142,8 +143,8 @@
                     <h3>Status : </h3>
                     <select class="form-control" name="status">
                         <option value=" ">Select Option</option>
-                        <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Active</option>
-                        <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Inactive</option>
+                        <option value="active" {{ $basetable_list['status'] == 'active' ? 'selected' : '' }}>Active</option>
+                        <option value="inactive" {{ $basetable_list['status'] == 'inactive' ? 'selected' : '' }}>Inactive</option>
                     </select>
                     @error('status')
                     <div class="text-danger">{{ $message }}</div>
@@ -152,7 +153,6 @@
                         <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Submit</button>
                     </div>
                 </form>
-                @endforeach
             </div>
 
 
@@ -165,6 +165,17 @@
 
 
     <script>
+        //image preview
+        var openFile = function(file) {
+            var input = file.target;
+            var reader = new FileReader();
+            reader.onload = function() {
+                var dataURL = reader.result;
+                var output = document.getElementById('output');
+                output.src = dataURL;
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
         $(document).ready(function() {
 
             $('#standard_id').on('change', function() {

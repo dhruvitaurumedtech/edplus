@@ -162,11 +162,8 @@ class SubjectController extends Controller
     function subject_edit(Request $request, $id)
     {
         $id = $id;
-        $basetable_list = Base_table::find($id);
-        // echo "<pre>";
-        // print_r($basetable_list);
-        // exit;
-        $subject_list = Subject_model::where('base_table_id', $id);
+        $basetable_list = Base_table::find($id)->first()->toarray();
+        $selected_subject_list = Subject_model::where('base_table_id', $id)->get()->toarray();
 
         $institute_for = Institute_for_model::where('status', 'active')->get();
         $board = board::where('status', 'active')->get();
@@ -190,7 +187,8 @@ class SubjectController extends Controller
         $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
             ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
             ->where('base_table.status', 'active')->get();
-        return view('subject.edit', compact('addsubstandard', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
+
+        return view('subject.edit', compact('addsubstandard', 'basetable_list', 'selected_subject_list', 'subject_list', 'institute_for', 'board', 'medium', 'class', 'standard', 'stream'));
     }
     function subject_update(Request $request)
     {

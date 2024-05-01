@@ -1473,3 +1473,7 @@ h1,
     margin-top: 10px;
     font-weight: 600;
 }
+
+.subject-img-resize {
+    height: 100px;
+}
