@@ -47,24 +47,27 @@ class ChapterController extends Controller
     public function chapter_list(Request $request)
     {
 
-        $Standards = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+        $Standards = Chapter::leftjoin('base_table', 'chapters.base_table_id', '=', 'base_table.id')
+            ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
             ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
             ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->leftjoin('subject', 'subject.id', '=', 'chapters.subject_id')
             ->select(
                 'stream.name as sname',
                 'standard.*',
                 'medium.name as medium',
                 'board.name as board',
-                'base_table.id as base_id'
+                'base_table.id as base_id',
+                'chapters.chapter_name',
+                'chapters.chapter_no',
+                'chapters.chapter_image',
+                'subject.name as subject_name',
+                'chapters.id as chapter_id'
             )
             ->where('standard.status', 'active')->paginate(10);
-        // echo "<pre>";
-        // print_r($Standards);
-        // exit;
 
-        $subjects = Subject_model::get();
-        return view('chapter.list', compact('Standards', 'subjects'));
+        return view('chapter.list', compact('Standards'));
     }
     //strandard wise data
     public function get_subjects(Request $request)
@@ -121,5 +124,8 @@ class ChapterController extends Controller
         $chapters = Chapter::where('subject_id', $subject_id)
             ->where('base_table_id', $base_id)->get();
         return response()->json(['chapters' => $chapters]);
+    }
+    function chapter_edit(Request $request, $id)
+    {
     }
 }

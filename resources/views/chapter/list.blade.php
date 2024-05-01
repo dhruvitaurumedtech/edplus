@@ -39,60 +39,59 @@
         <div class="row">
           <!-- table -->
           <div class="col-lg-12 mt-5">
-            <div class="create-title-btn">
-              <h4 class="mb-0">Chapter List</h4>
-              <a href="{{url('add-lists')}}" class="btn text-white btn-rmv2">Create Chapter</a>
-            </div>
-            <table class="table table-responsive-sm table-bordered institute-table mt-4">
-              <thead>
-                <tr>
-                  <th scope="col">No</th>
-                  <th scope="col">Standard</th>
-                  <th scope="col">Subjects</th>
-                  <th scope="col">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                @php $i=1 @endphp
-                @foreach($Standards as $value)
-                <tr>
-                  <td>{{$i}}</td>
-                  <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
-                  <td>
-                    @foreach($subjects as $sbvalue)
-                    @if($sbvalue->base_table_id == $value->base_id)
-                    <div class="d-flex align-items-center">
-                      {{$sbvalue->name}}
+            <div class="institute-form">
+              <div class="create-title-btn">
+                <h4 class="mb-0">Chapter List</h4>
+                <a href="{{url('add-lists')}}" class="btn text-white btn-rmv2">Create Chapter</a>
+              </div>
+              <table class="table table-responsive-sm table-bordered institute-table mt-4">
+                <thead>
+                  <tr>
+                    <th scope="col">No</th>
+                    <th scope="col">Standard</th>
+                    <th scope="col">Subjects</th>
+                    <th scope="col">chapter_no</th>
+                    <th scope="col">chapter_name</th>
+                    <th scope="col">chapter_image</th>
+                    <th scope="col">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @php $i=1 @endphp
+                  @foreach($Standards as $value)
+                  <tr>
+                    <td>{{$i}}</td>
+                    <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
+                    <td>
+                      {{$value->subject_name}}
+                    </td>
+                    <td>{{$value->chapter_no}}</td>
+                    <td>{{$value->chapter_name}}</td>
+                    <td><img src="{{url($value->chapter_image)}}" class="img-resize"></td>
+                    <td>
 
-                    </div>
-                    @endif
-                    @endforeach
-                  </td>
-                  <td>
-                    @foreach($subjects as $sbvalue)
-                    @if($sbvalue->base_table_id == $value->base_id)
-                    <div class="d-flex align-items-center">
-                      <a class="editButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-pen"></i></a>
+                      <div class="d-flex align-items-center">
+                        <div class="d-flex">
+                          @canButton('edit', 'Chapter')
+                          <a href="{{url('chapter/edit/'.$value->chapter_id)}}" class="btn text-white btn-rmv2" value="Edit">&nbsp;&nbsp;
+                            @endCanButton
+                            &nbsp;&nbsp;
+                            @canButton('delete', 'Chapter')
+                            <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                            @endCanButton
+                        </div>
+                      </div>
+                      <br>
+                    </td>
+                  </tr>
+                  @php $i++ @endphp
+                  @endforeach
+                </tbody>
+              </table>
+              <div class="d-flex justify-content-end">
+                {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
 
-                      <!-- <input type="submit" class="editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp; -->
-                      <a class="viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-eye"></i></a>
-                      <!-- <input type="submit" class="viewButton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View">&nbsp;&nbsp; -->
-                      <a class="deletebutton" data-subject-id="{{ $sbvalue->id }}" data-base-id="{{ $value->base_id }}" value="View"><i class="fas fa-trash-alt"></i></a>
-
-                      <!-- <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete"> -->
-                    </div>
-                    <br>
-                    @endif
-                    @endforeach
-                  </td>
-                </tr>
-                @php $i++ @endphp
-                @endforeach
-              </tbody>
-            </table>
-            <div class="d-flex justify-content-end">
-              {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
-
+              </div>
             </div>
           </div>
 

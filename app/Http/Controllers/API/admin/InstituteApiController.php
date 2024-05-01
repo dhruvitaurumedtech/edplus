@@ -4316,7 +4316,10 @@ class InstituteApiController extends Controller
         try {
             $data = Dobusinesswith_Model::all();
             if (!empty($data)) {
-                return $this->response($data, "Successfully fetch Data.");
+                foreach ($data as $value) {
+                    $response[] = ['id' => $value->id, 'name' => $value->name];
+                }
+                return $this->response($response, "Successfully fetch Data.");
             } else {
                 return $this->response([], "No data found.");
             }
