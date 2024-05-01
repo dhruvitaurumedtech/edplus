@@ -112,7 +112,8 @@ class TimetableController extends Controller
 
                 while ($current_date <= $end_date) {
                     $dayName = $current_date->format('l'); 
-                    echo "Date: " . $current_date->format('Y-m-d') . ", Day: $dayName <br>";
+                    //echo "Date: " . $current_date->format('Y-m-d') . ", Day: $dayName <br>";
+                    $lecture_date = $current_date->format('Y-m-d');
                     $current_date->modify('+1 week'); 
 
                     $timetable = new Timetable();
@@ -123,7 +124,7 @@ class TimetableController extends Controller
                     $timetable->lecture_type = $request->lecture_type;
                     $timetable->start_date = $request->start_date;
                     $timetable->end_date = $request->end_date;
-                    $timetable->lecture_date = $request->lecture_date;
+                    $timetable->lecture_date = $lecture_date;
                     $timetable->start_time = $request->start_time;
                     $timetable->end_time = $request->end_time;
                     $timetable->repeat = $request->repeat;
