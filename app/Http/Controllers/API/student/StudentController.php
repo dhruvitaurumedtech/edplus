@@ -458,35 +458,44 @@ class StudentController extends Controller
     }
 
 
-    // public function student_add_institute_request(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'institute_id' => 'required|string',
-    //     ]);
+    public function student_add_institute_request(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'user_id' => 'required|integer',
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         return $this->response([], $validator->errors()->first(), false, 400);
-    //     }
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
 
-    //     try {
-    //         $getsid = Student_detail::where('student_id', Auth::id())
-    //             ->where('institute_id', $request->institute_id)->first();
-    //         if (empty($getsid)) {
-    //             $getuid = Institute_detail::where('id', $request->institute_id)->select('user_id')->first();
-    //             $requestStudent = Student_detail::create([
-    //                 'user_id' => $getuid->user_id,
-    //                 'institute_id' => $request->institute_id,
-    //                 'student_id' => Auth::id(),
-    //                 'status' => '0',
-    //             ]);
-    //             return $this->response([], "Request added successfully");
-    //         } else {
-    //             return $this->response([], "You Already Requested", false, 400);
-    //         }
-    //     } catch (Exception $e) {
-    //         return $this->response($e, "Invalid token.", false, 400);
-    //     }
-    // }
+        try {
+            $instituteid = $request->institute_id;
+            $getsid = Student_detail::where('student_id', $request->user_id)
+                ->where('institute_id', $instituteid)->first();
+
+            if ($getsid) {
+                return $this->response([], 'You Already Requestd.', false, 400);
+            } else {
+                $getuid = Institute_detail::where('id', $instituteid)->select('user_id')->first();
+
+                if ($getuid) {
+                    $search_add = Student_detail::create([
+                        'user_id' => $getuid->user_id,
+                        'institute_id' => $request->input('institute_id'),
+                        'student_id' => $request->input('user_id'),
+                        'status' => '0',
+                    ]);
+                    return $this->response([], "Request added successfully");
+                } else {
+                    return $this->response([], "Institute ID not found.", false, 404);
+                }
+            }
+        } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
 
     // public function student_add_institute_request(Request $request)
     // {
@@ -550,78 +559,120 @@ class StudentController extends Controller
     // }
 
     //institute detail
+    // public function institute_detail123(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'institute_id' => 'required|integer',
+    //         'user_id' => 'required'
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+
+    //         if (strpos($token, 'Bearer') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $user_id = $request->input('user_id');
+    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //         if ($existingUser) {
+
+    //             $institute_id = $request->institute_id;
+    //             $institute_data = [];
+    //             $boards = [];
+
+    //             $institutedeta = Institute_detail::where('id', $institute_id)
+    //                 ->select('id', 'institute_name', 'address', 'about_us')->first();
+
+    //             $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+    //                 ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
+
+    //             $stdcount = Student_detail::where('institute_id', $institute_id)->count();
+    //             $subcount = Subject_sub::where('institute_id', $institute_id)->count();
+
+    //             $institutedetaa = array(
+    //                 'id' => $institutedeta->id,
+    //                 'institute_name' => $institutedeta->institute_name,
+    //                 'address' => $institutedeta->address,
+    //                 'about_us' => $institutedeta->about_us,
+    //                 'logo' => asset($institutedeta->logo),
+    //                 'boards' => $boards,
+    //                 'students' => $stdcount,
+    //                 'subject' => $subcount,
+    //                 'total_board' => count($boards),
+    //                 'teacher' => 0
+    //             );
+
+
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => array('institute_data' => $institutedetaa),
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function institute_detail(Request $request)
     {
-
-        $validator = \Validator::make($request->all(), [
-            'institute_id' => 'required|integer',
-            'user_id' => 'required'
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
+            $institute_data = [];
+            $boards = [];
 
-            if (strpos($token, 'Bearer') === 0) {
-                $token = substr($token, 7);
-            }
+            $institutedeta = Institute_detail::where('id', $request->institute_id)
+                ->select('id', 'institute_name', 'address', 'about_us')->first();
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-            if ($existingUser) {
+            $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+                ->where('board_sub.institute_id', $request->institute_id)->select('board.name')->get();
 
-                $institute_id = $request->institute_id;
-                $institute_data = [];
-                $boards = [];
+            $stdcount = Student_detail::where('institute_id', $request->institute_id)->count();
+            $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
 
-                $institutedeta = Institute_detail::where('id', $institute_id)
-                    ->select('id', 'institute_name', 'address', 'about_us')->first();
-
-                $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                    ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
-
-                $stdcount = Student_detail::where('institute_id', $institute_id)->count();
-                $subcount = Subject_sub::where('institute_id', $institute_id)->count();
-
-                $institutedetaa = array(
-                    'id' => $institutedeta->id,
-                    'institute_name' => $institutedeta->institute_name,
-                    'address' => $institutedeta->address,
-                    'about_us' => $institutedeta->about_us,
-                    'logo' => asset($institutedeta->logo),
-                    'boards' => $boards,
-                    'students' => $stdcount,
-                    'subject' => $subcount,
-                    'total_board' => count($boards),
-                    'teacher' => 0
-                );
-
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => array('institute_data' => $institutedetaa),
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            $institutedetaa = array(
+                'id' => $institutedeta->id,
+                'institute_name' => $institutedeta->institute_name,
+                'address' => $institutedeta->address,
+                'about_us' => $institutedeta->about_us,
+                'logo' => asset($institutedeta->logo),
+                'boards' => $boards,
+                'students' => $stdcount,
+                'subject' => $subcount,
+                'total_board' => count($boards),
+                'teacher' => 0
+            );
+            return $this->response($institutedetaa, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
@@ -837,68 +888,101 @@ class StudentController extends Controller
     }
 
     //subject wise chapert list
+    // public function subject_chapers1(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'subject_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $user_id = $request->input('user_id');
+    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //         if ($existingUser) {
+    //             $user_id = $request->user_id;
+    //             $subject_id = $request->subject_id;
+
+    //             $chapers = [];
+    //             $cptquy = Chapter::where('subject_id', $subject_id)->get();
+    //             foreach ($cptquy as $chval) {
+    //                 $subasid = Subject_model::where('id', $chval->subject_id)->select('base_table_id')->first();
+    //                 $chapers[] = array(
+    //                     "id" => $chval->id,
+    //                     "base_table_id" => $subasid->base_table_id,
+    //                     "subject_id" => $chval->subject_id,
+    //                     "chapter_name" => $chval->chapter_name,
+    //                     "chapter_no" => $chval->chapter_no,
+    //                     "chapter_image" => asset($chval->chapter_image)
+    //                 );
+    //             }
+
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => $chapers,
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function subject_chapers(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'subject_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'subject_id' => 'required|exists:subject,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
+            $chapers = [];
+            $cptquy = Chapter::where('subject_id', $request->subject_id)->get();
+            foreach ($cptquy as $chval) {
+                $subasid = Subject_model::where('id', $chval->subject_id)->select('base_table_id')->first();
+                $chapers[] = array(
+                    "id" => $chval->id,
+                    "base_table_id" => $subasid->base_table_id,
+                    "subject_id" => $chval->subject_id,
+                    "chapter_name" => $chval->chapter_name,
+                    "chapter_no" => $chval->chapter_no,
+                    "chapter_image" => asset($chval->chapter_image)
+                );
             }
-
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-            if ($existingUser) {
-                $user_id = $request->user_id;
-                $subject_id = $request->subject_id;
-
-                $chapers = [];
-                $cptquy = Chapter::where('subject_id', $subject_id)->get();
-                foreach ($cptquy as $chval) {
-                    $subasid = Subject_model::where('id', $chval->subject_id)->select('base_table_id')->first();
-                    $chapers[] = array(
-                        "id" => $chval->id,
-                        "base_table_id" => $subasid->base_table_id,
-                        "subject_id" => $chval->subject_id,
-                        "chapter_name" => $chval->chapter_name,
-                        "chapter_no" => $chval->chapter_no,
-                        "chapter_image" => asset($chval->chapter_image)
-                    );
-                }
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => $chapers,
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($chapers, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
 
     //topic videos
     public function topic_videos(Request $request)

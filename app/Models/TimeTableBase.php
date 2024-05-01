@@ -6,11 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Timetable extends Model
+class TimeTableBase extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table = 'time_table';
+    protected $table = 'time_table_base';
     protected $fillable = [
-        'time_table_base_id','subject_id','batch_id','teacher_id','lecture_type','day','start_time','end_time'
+        'subject_id','batch_id','teacher_id','lecture_type','start_date','end_date','start_time','end_time','repeat'
     ];
 }

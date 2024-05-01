@@ -47,22 +47,13 @@
                         </div>
                         <h3>Chapter Name</h3>
                         <div class="search-box-2 form-group">
-                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
+                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
                         </div>
                         <h3>Chapter Image</h3>
-                        <div class="file">
-                            <div class="input-group search-box-2">
-                                <input type="text" class="form-control" placeholder="Chapter Image">
-                                <div class="input-group-append">
-                                    <span class="btn_upload">
-                                        <input type="file" id="imag" name="chapter_image[]" title="" class="input-img  file__input--label" for="customFile" data-text-btn="Upload" />
-                                        Choose Image
-                                    </span>
-                                </div>
-                            </div>
-                            <img id="ImgPreview" src="" class="preview1 ImgPreview" />
-                            <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
+                        <div class="search-box-2 form-group">
+                            <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
                         </div>
+                        <img id="output" src="" class="preview1 ImgPreview" />
 
                         <div class="add-chapter-btn">
                             <a class="btn" id="addmore">
@@ -81,10 +72,18 @@
         </div>
         @include('layouts/footer_new')
     </div>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/main.js"></script>
     <script>
+        var openFile = function(file, id) {
+            var input = file.target;
+            var reader = new FileReader();
+            reader.onload = function() {
+                var dataURL = reader.result;
+                var output = document.getElementById(id);
+                output.style.display = 'block';
+                output.src = dataURL;
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
         $(document).ready(function() {
             $('#addmore').click(function() {
                 addChapter();
@@ -129,22 +128,11 @@
                     <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
                   </div>
                   <h3>Chapter Image</h3>
-                  <div class="file">
-                    <div class="input-group search-bo   x-2">
-                      <input type="text" class="form-control" placeholder="Chapter Image">
-                      <div class="input-group-append">
-                        <span class="btn_upload">
-                          <input type="file" id="imag" name="chapter_image[]"  title="" class="input-img  file__input--label" for="customFile"
-                            data-text-btn="Upload" />
-                          Choose Image
-                        </span>
-                      </div>
+                  <div class="search-box-2 form-group">
+                            <input class="py-2 pl-2" type="file" name="" id="">
+                        </div>
                     </div>
-                    <img id="ImgPreview" src="" class="preview1 ImgPreview" />
-                    <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
-                  </div>
-              </div>
-            </div>`;
+                </div>`;
                 $('.add-chapter-btn').before(chapterHtml);
                 $('.remove-chapter').click(function() {
                     $(this).closest('.added-chapter').remove();
