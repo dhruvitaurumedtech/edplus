@@ -25,6 +25,7 @@ return new class extends Migration
             $table->foreign('lecture_type')->references('id')->on('lecture_type');
             $table->date('start_date');
             $table->date('end_date');
+            $table->date('lecture_date');
             $table->time('start_time');
             $table->time('end_time');
             $table->unsignedBigInteger('repeat');
