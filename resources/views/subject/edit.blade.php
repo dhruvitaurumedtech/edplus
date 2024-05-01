@@ -114,25 +114,33 @@
                         <br>
 
                         <div class="border-line-subject">
+                            <div class="row">
+                                <div class="col-md-1 offset-md-11">
+                                    <div class="f-icons">
+                                        <a class="btn text-white btn-rmv2 addmore">
+                                            <i class="fas fa-plus py-1"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <hr>
                             @if(!empty($selected_subject_list))
                             <!-- If $selected_subject_list is not empty, iterate over each subject -->
                             @foreach($selected_subject_list as $subject_value)
-                            <div class="row">
+                            <div class="row" id="container_first{{$subject_value['id']}}">
                                 <div class="col-md-4">
                                     <h3>Subject Name</h3>
+                                    <input type="hidden" name="subject_id[]" value="{{$subject_value['id']}}">
                                     <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name" value="{{$subject_value['name']}}">
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event)' value="{{$subject_value['image']}}">
+                                    <input type="hidden" name="old_subject_image[]" value="{{$subject_value['image']}}">
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event, "output{{ $subject_value["id"] }}")' value="{{$subject_value['image']}}">
                                 </div>
-                                <div class="col-md-2"><img src="{{url($subject_value['image'])}}" id='output' class="subject-img-resize mt-4"></div>
+                                <div class="col-md-2"><img src="{{url($subject_value['image'])}}" id='output{{ $subject_value["id"] }}' class="subject-img-resize mt-4"></div>
                                 <div class="col-md-2">
-                                    <div class="f-icons">
-                                        <a class="btn text-white btn-rmv2" id="addmore">
-                                            <i class="fas fa-plus py-1"></i>
-                                        </a>
-                                    </div>
+                                    <div class="f-icons"><a class="btn text-white btn-rmv2 delete" data-id="{{$subject_value['id']}}"><i class="fas fa-trash py-1"></i></a></div>
                                 </div>
                             </div>
                             @endforeach
@@ -145,15 +153,11 @@
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event)'>
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event,"output")'>
                                 </div>
                                 <div class="col-md-2"><img src="" id='output' class="subject-img-resize mt-4"></div>
                                 <div class="col-md-2">
-                                    <div class="f-icons">
-                                        <a class="btn text-white btn-rmv2" id="addmore">
-                                            <i class="fas fa-plus py-1"></i>
-                                        </a>
-                                    </div>
+                                    <div class="f-icons"><a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a></div>
                                 </div>
                             </div>
                             @endif
@@ -176,7 +180,7 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                     <div class="col-md-12 submit-btn mt-3">
-                        <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Submit</button>
+                        <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Update</button>
                     </div>
                 </form>
             </div>
@@ -192,12 +196,13 @@
 
     <script>
         //image preview
-        var openFile = function(file) {
+        var openFile = function(file, id) {
             var input = file.target;
             var reader = new FileReader();
             reader.onload = function() {
                 var dataURL = reader.result;
-                var output = document.getElementById('output');
+                var output = document.getElementById(id);
+                output.style.display = 'block';
                 output.src = dataURL;
             };
             reader.readAsDataURL(input.files[0]);
@@ -240,19 +245,63 @@
 
         // Add more 
         $(document).ready(function() {
-            var maxFields = 10; // Maximum number of input fields
-            var container = $('#container'); // Container selector
+            var maxFields = 10;
+            var container = $('#container');
 
-            $('#addmore').click(function() {
+            $('.addmore').click(function() {
                 if (container.children().length / 4 < maxFields) {
-                    container.append('<div class="row"><div class="col-md-4"><h3>Subject Name</h3><input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name"></div><div class="col-md-4"> <h3>Image:</h3><input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image"></div><div class="col-md-2"></div><div class="col-md-2"><div class="f-icons"><a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a></div></div></div>');
-                } else {
-                    alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+                    var id = container.children().length;
+                    container.append(`
+                    <div class="row">
+                        <div class="col-md-4">
+                            <h3>Subject Name</h3>
+                            <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
+                        </div>
+                        <div class="col-md-4">
+                            <h3>Image:</h3>
+                            <input type="file" name="subject_image[]" class="form-control" onchange="openFile(event, 'output${id}')" placeholder="Select Subject Image">
+                        </div>
+                        <div class="col-md-2">
+                            <img src="" id="output${id}" class="subject-img-resize mt-4" style="display: none;">
+                        </div>
+                        <div class="col-md-2">
+                            <div class="f-icons">
+                                <a class="btn text-white btn-rmv2 delete"><i class="fas fa-trash py-1"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                `);         } else {
+                    alert('Maximum ' + maxFields + ' input fields allowed.');
                 }
             });
-
             container.on('click', '.delete', function() {
-                $(this).closest('.row').remove(); // Remove the parent row element
+                $(this).closest('.row').remove();
+            });
+            $('.delete').click(function() {
+                var baseUrl = $('meta[name="base-url"]').attr('content');
+
+                var subject_id = $(this).data('id');
+                Swal.fire({
+                    title: 'Are you sure want to delete?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        axios.post('/unique_subject/delete', {
+                                subject_id: subject_id
+                            })
+                            .then(response => {
+                                location.reload(true);
+
+                            })
+                            .catch(error => {
+                                console.error(error);
+                            });
+                    }
+                });
             });
         });
     </script>
