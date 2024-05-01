@@ -113,26 +113,30 @@
                 });
             });
 
+            var container = document.querySelector('.add-chapter-btn');
+            var chapterCount = 0;
 
             function addChapter() {
+                chapterCount++;
                 var chapterHtml = `
-            <div class="row mt-3 added-chapter">
-              <div class="col-lg-12">
-               <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
-                  <h3>Chapter Number</h3>
-                  <div class="search-box-2 form-group">
-                    <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
-                  </div>
-                  <h3>Chapter Name</h3>
-                  <div class="search-box-2 form-group">
-                    <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
-                  </div>
-                  <h3>Chapter Image</h3>
-                  <div class="search-box-2 form-group">
-                            <input class="py-2 pl-2" type="file" name="" id="">
-                        </div>
-                    </div>
-                </div>`;
+                        <div class="row mt-3 added-chapter">
+                            <div class="col-lg-12">
+                                <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
+                                <h3>Chapter Number</h3>
+                                <div class="search-box-2 form-group">
+                                    <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
+                                </div>
+                                <h3>Chapter Name</h3>
+                                <div class="search-box-2 form-group">
+                                    <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
+                                </div>
+                                <h3>Chapter Image</h3>
+                                <div class="search-box-2 form-group">
+                                    <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange="openFile(event, 'output${chapterCount}')">
+                                </div>
+                                <img id="output${chapterCount}" src="" class="preview1 ImgPreview" />
+                            </div>
+                        </div>`;
                 $('.add-chapter-btn').before(chapterHtml);
                 $('.remove-chapter').click(function() {
                     $(this).closest('.added-chapter').remove();

@@ -77,6 +77,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/attendance', [AttendanceController::class, 'attendance']);
     Route::post('/institute/Subject-List', [InstituteApiController::class, 'subjectList']);
     Route::post('/institute/Subject-edit', [InstituteApiController::class, 'edit_subject']);
+    Route::post('/institute/do_business_with', [InstituteApiController::class, 'do_business_with']);
 
 
     //new API
