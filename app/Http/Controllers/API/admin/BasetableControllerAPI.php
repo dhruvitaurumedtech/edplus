@@ -138,9 +138,86 @@ class BasetableControllerAPI extends Controller
         }
     }
 
+    // public function standard(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'institute_for_id' => 'required',
+    //         'board_id' => 'required',
+    //         'medium_id' => 'required',
+    //         'class_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         $institute_for_ids = explode(',', $request->institute_for_id);
+    //         $board_ids = explode(',', $request->board_id);
+    //         $medium_ids = explode(',', $request->medium_id);
+    //         $class_ids = explode(',', $request->class_id);
+
+    //         $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+    //             ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+    //             ->join('medium', 'base_table.medium', '=', 'medium.id')
+    //             ->whereIN('base_table.institute_for', $institute_for_ids)
+    //             ->whereIN('base_table.board', $board_ids)
+    //             ->whereIN('base_table.medium', $medium_ids)
+    //             ->whereIN('base_table.institute_for_class', $class_ids)
+    //             ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name')
+    //             ->distinct()
+    //             ->get();
+    //         $data = [];
+    //         foreach ($base_standard as $basestandard) {
+    //             $data[] = array(
+    //                 'id' => $basestandard->id,
+    //                 'standard_name' => $basestandard->name,
+    //                 'class_name' => $basestandard->class_name,
+    //                 'medium_name' => $basestandard->medium_name
+    //             );
+    //         }
+    //         // $base_standard = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
+    //         //     ->join('medium', 'base_table.medium', '=', 'medium.id')
+    //         //     ->whereIN('base_table.institute_for', $institute_for_ids)
+    //         //     ->whereIN('base_table.board', $board_ids)
+    //         //     ->whereIN('base_table.medium', $medium_ids)
+    //         //     ->whereIN('base_table.institute_for_class', $class_ids)
+    //         //     ->select('base_table.id', 'class.id', 'class.name as class_name', 'medium.name as medium_name')
+    //         //     ->distinct()
+    //         //     ->get();
+    //         // $base_standard = [];
+    //         // foreach ($base_standard as $basestandard) {
+    //         //     $base_class = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+    //         //         ->whereIN('base_table.id', $basestandard->id)
+    //         //         ->select('standard.id', 'standard.name')
+    //         //         ->distinct()
+    //         //         ->get();
+    //         //     $standard = [];
+    //         //     foreach ($base_class as $value2) {
+    //         //         $standard[] = array(
+    //         //             'id' => $value2->id,
+    //         //             'standard_name' => $value2->name,
+    //         //         );
+    //         //     }
+
+
+    //         $data[] = array(
+    //             'id' => $basestandard->id,
+    //             'class_name' => $basestandard->class_name,
+    //             'medium_name' => $basestandard->medium_name,
+    //             // 'standard' => $standard
+    //         );
+    //         // }
+
+    //         return $this->response($data, "Fetch Data Successfully");
+    //     } catch (Exeption $e) {
+    //         return $this->response($e, "Something want Wrong!!", false, 400);
+    //     }
+    // }
+
     public function standard(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
@@ -158,61 +235,39 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $class_ids = explode(',', $request->class_id);
 
-            $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+            $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
+                ->join('board', 'base_table.board', '=', 'board.id')
                 ->whereIN('base_table.institute_for', $institute_for_ids)
                 ->whereIN('base_table.board', $board_ids)
                 ->whereIN('base_table.medium', $medium_ids)
                 ->whereIN('base_table.institute_for_class', $class_ids)
-                ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name')
+                ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
+
             $data = [];
-            foreach ($base_standard as $basestandard) {
-                $data[] = array(
-                    'id' => $basestandard->id,
-                    'standard_name' => $basestandard->name,
-                    'class_name' => $basestandard->class_name,
-                    'medium_name' => $basestandard->medium_name
-                );
+            foreach ($base_standards as $base_standard) {
+                $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
+                if (!array_key_exists($key, $data)) {
+                    $data[$key] = [
+                        'class_name' => $base_standard->class_name,
+                        'medium_name' => $base_standard->medium_name,
+                        'board_name' => $base_standard->board_name,
+                        'std_data' => [],
+                    ];
+                }
+                $data[$key]['std_data'][] = [
+                    'id' => $base_standard->id,
+                    'standard_name' => $base_standard->name,
+                ];
             }
-            // $base_standard = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
-            //     ->join('medium', 'base_table.medium', '=', 'medium.id')
-            //     ->whereIN('base_table.institute_for', $institute_for_ids)
-            //     ->whereIN('base_table.board', $board_ids)
-            //     ->whereIN('base_table.medium', $medium_ids)
-            //     ->whereIN('base_table.institute_for_class', $class_ids)
-            //     ->select('base_table.id', 'class.id', 'class.name as class_name', 'medium.name as medium_name')
-            //     ->distinct()
-            //     ->get();
-            // $base_standard = [];
-            // foreach ($base_standard as $basestandard) {
-            //     $base_class = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
-            //         ->whereIN('base_table.id', $basestandard->id)
-            //         ->select('standard.id', 'standard.name')
-            //         ->distinct()
-            //         ->get();
-            //     $standard = [];
-            //     foreach ($base_class as $value2) {
-            //         $standard[] = array(
-            //             'id' => $value2->id,
-            //             'standard_name' => $value2->name,
-            //         );
-            //     }
-
-
-            $data[] = array(
-                'id' => $basestandard->id,
-                'class_name' => $basestandard->class_name,
-                'medium_name' => $basestandard->medium_name,
-                // 'standard' => $standard
-            );
-            // }
+            $data = array_values($data);
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+        } catch (Exception $e) {
+            return $this->response($e, "Something went Wrong!!", false, 400);
         }
     }
 
