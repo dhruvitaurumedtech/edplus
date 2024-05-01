@@ -44,18 +44,23 @@
               @foreach($addsubstandard as $value)
               <tr>
                 <td>{{$i}}</td>
-                <td>{{$value->name}}</td>
+                <td>{{$value->standard}}</td>
                 <td>{{$value->board.'-'.$value->medium}}</td>
-                <td>{{$value->sname}}</td>
+                <td>{{($value->sname)? $value->sname : 'empty'}}</td>
                 <td>
                   @foreach($subject_list as $subvalue)
                   @if($value->base_id == $subvalue->baset_id)
                   {{$subvalue->name}}<br>
                   @endif
-
                   @endforeach
                 </td>
-                <td>{{$value->status}}</td>
+                <td>
+                  @if($value->status == 'active')
+                  <button type="button" class="btn btn-success">Active</button>
+                  @else
+                  <button type="button" class="btn btn-secondary">Inactive</button>
+                  @endif
+                </td>
                 <td>
                   <div class="d-flex">
                     @canButton('edit', 'Board')
