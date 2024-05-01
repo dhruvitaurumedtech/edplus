@@ -168,7 +168,8 @@ class BasetableControllerAPI extends Controller
                 ->get();
             $data = [];
             foreach ($base_standard as $basestandard) {
-                $data[] = array('id' => $basestandard->id, 'name' => $basestandard->name);
+                $data[] = array('id' => $basestandard->id,
+                 'name' => $basestandard->name);
             }
 
             return $this->response($data, "Fetch Data Successfully");

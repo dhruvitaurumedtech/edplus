@@ -626,31 +626,29 @@ class StudentController extends Controller
 
                 $today = date('Y-m-d');
                 $todays_lecture = [];
-                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.institute_id')
-                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                    ->join('batches', 'batches.id', '=', 'time_table.board_id')
-                    ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                    ->where('time_table.batch_id', $getstdntdata->batch_id)
-                    ->where('time_table.day', $today)
-                    ->select('subject.name as subject', 'users.firstname', 'users.lastname', 'lecture_type.name as lecture_type_name', 'batches.*', 'standard.name as standard')
-                    ->paginate(2);
+                // $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.institute_id')
+                //     ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                //     ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                //     ->join('batches', 'batches.id', '=', 'time_table.board_id')
+                //     ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                //     ->where('time_table.batch_id', $getstdntdata->batch_id)
+                //     ->where('time_table.day', $today)
+                //     ->select('subject.name as subject', 'users.firstname', 'users.lastname', 'lecture_type.name as lecture_type_name', 'batches.*', 'standard.name as standard')
+                //     ->paginate(2);
 
-                foreach ($todayslect as $todayslecDT) {
-                    $todays_lecture[] = array(
-                        'subject' => $todayslecDT->subject,
-                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                        'start_time' => $todayslecDT->start_time,
-                        'end_time' => $todayslecDT->end_time,
-                    );
-                }
+                // foreach ($todayslect as $todayslecDT) {
+                //     $todays_lecture[] = array(
+                //         'subject' => $todayslecDT->subject,
+                //         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                //         'start_time' => $todayslecDT->start_time,
+                //         'end_time' => $todayslecDT->end_time,
+                //     );
+                // }
 
                 $subjects = [];
                 $result = [];
                 $announcement = [];
                 $examlist = [];
-
-
 
                 $announcQY = announcements_model::where('institute_id', $institute_id)
                     ->where('batch_id', $existingUser->batch_id)
@@ -669,7 +667,8 @@ class StudentController extends Controller
                     ->join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->where('marks.student_id', $user_id)
                     ->where('exam.institute_id', $institute_id)
-                    ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+                    ->select('marks.*', 'subject.name as subject', 'exam.subject_id',
+                     'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
                     ->orderByDesc('marks.created_at')->limit(3)->get();
                 $highestMarks = $resultQY->max('marks');
                 foreach ($resultQY as $resultDDt) {
