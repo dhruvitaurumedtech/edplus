@@ -567,7 +567,7 @@ class ExamController extends Controller
                 return $this->response([], "Successfully Created Exam.");
             }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 

@@ -90,10 +90,17 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/lecture-type', [TimetableController::class, 'lecture_type_list']);
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable']);
+    Route::post('/institute/repeat-list', [TimetableController::class,'for_repeat_list']);
+
+
+
+    // Student Api 
+    Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
+    
 });
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
-Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
+
 Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request'])->name('student_add_institute_request.get');
 Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail'])->name('institute_detail.get');
 Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');

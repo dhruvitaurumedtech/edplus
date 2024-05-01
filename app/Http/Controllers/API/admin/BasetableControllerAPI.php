@@ -304,7 +304,7 @@ class BasetableControllerAPI extends Controller
                 ->get();
             $data = [];
             foreach ($base_stream as $basestream) {
-                $data[] = array('id' => $basestream->id, 'name' => $basestream->name);
+                $data[] = array('id' => $basestream->id,'name' => $basestream->name);
             }
 
             return $this->response($data, "Fetch Data Successfully");
@@ -337,6 +337,7 @@ class BasetableControllerAPI extends Controller
             $stream_ids = explode(',', trim($request->stream));
 
             $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->leftjoin('stream', 'base_table.stream', '=', 'stream.id')
                 ->whereIn('base_table.institute_for', $institute_for_ids)
                 ->whereIn('base_table.board', $board_ids)
                 ->whereIn('base_table.medium', $medium_ids)
@@ -347,13 +348,17 @@ class BasetableControllerAPI extends Controller
                 $base_subject_query->whereIn('base_table.stream', $stream_ids);
             }
             $base_subject = $base_subject_query
-                ->select('subject.id', 'subject.name', 'subject.image')
+                ->select('subject.id', 'subject.name', 'subject.image','stream.name as stream_name','base_table.stream as stream_id')
                 ->distinct()
                 ->get();
 
             $data = [];
             foreach ($base_subject as $basesubject) {
-                $data[] = array('id' => $basesubject->id, 'name' => $basesubject->name, 'image' => $basesubject->image);
+                $data[] = array('id' => $basesubject->id,
+                'name' => $basesubject->name,
+                'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
+                'stream_id'=>$basesubject->stream_id,
+                'stream_name'=>$basesubject->stream_name);
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
