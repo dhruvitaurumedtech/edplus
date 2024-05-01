@@ -94,7 +94,7 @@ class TimetableController extends Controller
                 $timetable->start_date = $request->start_date;
                 $timetable->end_date = $request->end_date;
                 $timetable->start_time = $request->start_time;
-                lecture_date
+                $timetable->lecture_date = $request->lecture_date;
                 $timetable->end_time = $request->end_time;
                 $timetable->repeat = $request->repeat;
                 $timetable->save();
@@ -123,14 +123,14 @@ class TimetableController extends Controller
                     $timetable->lecture_type = $request->lecture_type;
                     $timetable->start_date = $request->start_date;
                     $timetable->end_date = $request->end_date;
+                    $timetable->lecture_date = $request->lecture_date;
                     $timetable->start_time = $request->start_time;
                     $timetable->end_time = $request->end_time;
                     $timetable->repeat = $request->repeat;
                     $timetable->save();
 
                 }
-                exit;
-
+               
                 
 
             }
