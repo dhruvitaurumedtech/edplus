@@ -33,18 +33,8 @@
                   </div>
                   <div class="col-md-12">
                     <label>Icon : </label>
-                    <div class="file">
-                      <div class="input-group search-box-2">
-                        <input type="text" class="form-control" placeholder="Chapter Image">
-                        <div class="input-group-append">
-                          <span class="btn_upload">
-                            <input type="file" id="imag" title="" class="input-img  file__input--label search-box" name="icon" for="customFile" data-text-btn="Upload" />
-                            Choose Image
-                          </span>
-                        </div>
-                      </div>
-                      <img id="ImgPreview" src="" class="preview1" />
-                      <i class="fas fa-times ml-3 btn-rmv1" id="removeImage1"></i>
+                    <div class="search-box-2 form-group">
+                      <input class="py-1 pl-1" type="file" name="" id="">
                     </div>
                     <!-- <label for="exampleInputEmail1">Icon : </label>
                     <input type="file" onchange="previewFile_create()" name="icon" class="form-control search-box"> -->
