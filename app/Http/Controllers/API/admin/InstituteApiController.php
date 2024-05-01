@@ -4311,4 +4311,17 @@ class InstituteApiController extends Controller
     //         ]);
     //     }
     // }
+    public function do_business_with()
+    {
+        try {
+            $data = Dobusinesswith_Model::all();
+            if (!empty($data)) {
+                return $this->response($data, "Successfully fetch Data.");
+            } else {
+                return $this->response([], "No data found.");
+            }
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }
