@@ -31,17 +31,21 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
-                    <label>Icon : </label>
-                    <div class="search-box-2 form-group">
-                      <input class="py-1 pl-1" type="file" name="" id="">
+                  <div class="col-md-8 ">
+                    <label>Image: </label>
+                    <div class="input-group search-box-2">
+                      <input type="file" name="icon" class="form-control" onchange="openFile(event)" />
+                      </span>
                     </div>
-                    <!-- <label for="exampleInputEmail1">Icon : </label>
-                    <input type="file" onchange="previewFile_create()" name="icon" class="form-control search-box"> -->
-                    @error('icon')
-                    <div class="text-danger">{{ $message }}</div>
+                  </div>
+                  <div class="col-md-4 mt-5">
+                    <img id='output' src="" class="preview1" />
+                    @error(' icon') <div class="text-danger">{{ $message }}
+                    </div>
                     @enderror
                   </div>
+
+
                   <div class="col-md-12">
                     <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize search-box" style="display: none;">
                   </div>
@@ -192,21 +196,20 @@
     </div>
   </div>
   <script>
-    function previewFile_create() {
-      $("#icon_create").show();
-      const preview = document.getElementById("icon_create");
-      const fileInput = document.querySelector("input[type=file]");
-      const file = fileInput.files[0];
-      const reader = new FileReader();
+    var openFile = function(file) {
+      var input = file.target;
+      var reader = new FileReader();
+      reader.onload = function() {
+        var dataURL = reader.result;
+        var output = document.getElementById('output');
+        output.style.display = 'block';
 
-      reader.addEventListener("load", () => {
-        preview.src = reader.result;
-      }, false);
+        output.src = dataURL;
 
-      if (file) {
-        reader.readAsDataURL(file);
-      }
-    }
+      };
+      reader.readAsDataURL(input.files[0]);
+    };
+
 
     function previewFile_update(inputElement) {
       const preview = document.getElementById("icon_update");
@@ -223,4 +226,3 @@
     }
   </script>
   @include('layouts/footer_new')
-  <script src="{{asset('mayal_assets/js/file.js')}}"></script>
