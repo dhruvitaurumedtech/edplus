@@ -29,23 +29,8 @@
         </ul>
       </div>
 
-      <script>
-        window.setTimeout(function() {
-          $(".alert-success").slideUp(500, function() {
-            $(this).remove();
-          });
-        }, 3000);
-      </script>
+      @include('layouts/alert')
 
-      <div class="row">
-        <div class="col-md-10 offset-md-1">
-          @if (session('success'))
-          <div class="alert alert-success">
-            {{ session('success') }}
-          </div>
-          @endif
-        </div>
-      </div>
 
       <div class="dashboard-content side-content">
 
@@ -328,46 +313,45 @@
 
     // Triggered on click of add button
     $(addButton).click(function() {
-        // Check maximum number of input fields
-        if (x < maxFields) {
-            x++; // Increment field counter
-            // Add input field
-            $(container).append(
-                '<div class="row">' +
-                '<div class="col-md-12 mt-5">' +
-                '<a class="btn text-white btn-rmv2 mb-2 delete"><i class="fas fa-trash"></i></a>' +
-                '<label for="chapter_no">Topic No : </label>' +
-                '<input type="text" name="topic_no[]" class="form-control" placeholder="Enter Topic No">' +
-                '</div>' +
-                '<div class="col-md-12">' +
-                '<label for="chapter_name">Topic Name : </label>' +
-                '<input type="text" name="topic_name[]" class="form-control" placeholder="Enter Topic Name">' +
-                '</div>' +
-                '<div class="col-md-12">' +
-                '<label for="chapter_name">Video Category : </label>' +
-                '<select class="form-control" name="video_category[]">' +
-                '<option>Select Option</option>' +
-                '<?php foreach ($videolist as $value) : ?>' +
-                '<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>' +
-                '<?php endforeach; ?>' +
-                '</select>' +
-                '</div>' +
-                '<div class="col-md-12">' +
-                '<label for="chapter_image">Video Upload : </label>' +
-                '<input type="file" name="topic_video[]" class="form-control" placeholder="Select Video Upload" multiple>' +
-                '</div>' +
-                '</div>'
-            );
-        } else {
-            alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
-        }
+      // Check maximum number of input fields
+      if (x < maxFields) {
+        x++; // Increment field counter
+        // Add input field
+        $(container).append(
+          '<div class="row">' +
+          '<div class="col-md-12 mt-5">' +
+          '<a class="btn text-white btn-rmv2 mb-2 delete"><i class="fas fa-trash"></i></a>' +
+          '<label for="chapter_no">Topic No : </label>' +
+          '<input type="text" name="topic_no[]" class="form-control" placeholder="Enter Topic No">' +
+          '</div>' +
+          '<div class="col-md-12">' +
+          '<label for="chapter_name">Topic Name : </label>' +
+          '<input type="text" name="topic_name[]" class="form-control" placeholder="Enter Topic Name">' +
+          '</div>' +
+          '<div class="col-md-12">' +
+          '<label for="chapter_name">Video Category : </label>' +
+          '<select class="form-control" name="video_category[]">' +
+          '<option>Select Option</option>' +
+          '<?php foreach ($videolist as $value) : ?>' +
+          '<option value="<?php echo $value->id; ?>"><?php echo $value->name; ?></option>' +
+          '<?php endforeach; ?>' +
+          '</select>' +
+          '</div>' +
+          '<div class="col-md-12">' +
+          '<label for="chapter_image">Video Upload : </label>' +
+          '<input type="file" name="topic_video[]" class="form-control" placeholder="Select Video Upload" multiple>' +
+          '</div>' +
+          '</div>'
+        );
+      } else {
+        alert('Maximum ' + maxFields + ' input fields allowed.'); // Alert when maximum is reached
+      }
     });
 
     // Triggered on click of delete button
     $(document).on('click', '.delete', function() {
-        $(this).closest('.row').remove(); // Remove the closest row
-        x--; // Decrement field counter
+      $(this).closest('.row').remove(); // Remove the closest row
+      x--; // Decrement field counter
     });
-});
-
+  });
 </script>

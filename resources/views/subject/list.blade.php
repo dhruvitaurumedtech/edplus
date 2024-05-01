@@ -17,7 +17,7 @@
       <div class="dashboard-content side-content ">
         <div class="col-lg-12 institute-form">
           <div class="create-title-btn">
-            <h4 class="mb-0">List of Institute</h4>
+            <h4 class="mb-0">Subject List</h4>
             <div class="inner-list-search">
               <input type="search" class="form-control myInput" name="search" placeholder="Search">
               <a href="{{url('create/subject')}}" class="btn text-white btn-rmv2">Create Subject</a>
@@ -59,11 +59,11 @@
                 <td>
                   <div class="d-flex">
                     @canButton('edit', 'Board')
-                    <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
+                    <a href="{{url('subject/edit/'.$value->base_id)}}" class="btn text-white blue-button" data-base-id="{{ $value->base_id }}" value="">Edit</a>&nbsp;&nbsp;
                     @endCanButton
                     &nbsp;&nbsp;
                     @canButton('delete', 'Board')
-                    <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                    <a href="{{url('subject/delete/'.$value->base_id)}}" class="btn text-white btn-danger" data-base-id="{{ $value->base_id }}" value="">Delete</a>
                     @endCanButton
                   </div>
                 </td>

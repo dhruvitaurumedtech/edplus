@@ -22,17 +22,16 @@
                     <li><a href="{{url('class-list')}}" class="active-link-dir">subject</a></li>
                 </ul>
             </div>
-
             @include('layouts/alert')
-
             <div class="dashboard-content side-content">
-                <form method="post" action="{{ url('subject-save') }}" enctype="multipart/form-data" class="s-chapter-form">
+                @foreach($basetable_list as $edit_value)
+                <form method="post" action="{{ url('subject-update') }}" enctype="multipart/form-data" class="s-chapter-form">
                     @csrf
                     <div class="institute-list">
                         <h3>Institute For</h3>
                         @foreach($institute_for as $insval)
                         <div class="form-check form-check-inline">
-                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $insval->id == old('institute_for') ? 'checked' : '' }}>
+                            <input class="form-check-input" type="radio" name="institute_for" id="InstituteFor" value="{{ $insval->id }}" {{ $insval->id == old('institute_for') || $edit_value->institute_for == $insval->id ? 'checked' : '' }}>
                             <label class="form-check-label" for="InstituteFor">{{ $insval->name }}</label>
                             &nbsp;
                         </div>
@@ -153,7 +152,7 @@
                         <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Submit</button>
                     </div>
                 </form>
-
+                @endforeach
             </div>
 
 
