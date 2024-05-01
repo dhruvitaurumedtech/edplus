@@ -356,7 +356,7 @@ class BasetableControllerAPI extends Controller
             foreach ($base_subject as $basesubject) {
                 $data[] = array('id' => $basesubject->id,
                 'name' => $basesubject->name,
-                'image' => $basesubject->image,
+                'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
                 'stream_id'=>$basesubject->stream_id,
                 'stream_name'=>$basesubject->stream_name);
             }
