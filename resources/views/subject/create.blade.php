@@ -121,9 +121,10 @@
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image">
+                                    <input type="file" name="subject_image[]" class="form-control" onchange='openFile(event)' placeholder="Select Subject Image">
                                 </div>
-                                <div class="col-md-2"></div>
+                                <div class="col-md-2"><img src="" id='output' class="subject-img-resize mt-4" style="display: none;"></div>
+
                                 <div class="col-md-2">
                                     <div class="f-icons">
                                         <a class="btn text-white btn-rmv2" id="addmore">
@@ -166,6 +167,21 @@
 
 
     <script>
+        //image preview
+        var openFile = function(file) {
+            var input = file.target;
+            var reader = new FileReader();
+            reader.onload = function() {
+                var dataURL = reader.result;
+                var output = document.getElementById('output');
+                output.style.display = 'block';
+
+                output.src = dataURL;
+
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
+
         $(document).ready(function() {
 
             $('#standard_id').on('change', function() {
