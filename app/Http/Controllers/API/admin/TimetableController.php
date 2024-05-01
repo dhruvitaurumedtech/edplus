@@ -4,11 +4,13 @@ namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Timetable;
+use App\Models\TimeTableBase;
 use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use DateTime;
 
 class TimetableController extends Controller
 {
@@ -26,6 +28,20 @@ class TimetableController extends Controller
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
+
+    public function for_repeat_list(){
+        try{
+            $timtblretDT = DB::table('timetable_repeat')->get();
+            $timetable_repeat = [];
+            foreach($timtblretDT as $reotreDT){
+                $timetable_repeat[] = array('id'=>$reotreDT->id,'name'=>$reotreDT->name);
+            }
+
+            return $this->response($timetable_repeat,'Data Fetch Successfully');
+        }catch(Exeption $e){
+            return $this->response($e,"Something want Wrong!!", false, 400);
+        }
+    }
     //add
     public function add_timetable(Request $request){
         
@@ -35,7 +51,7 @@ class TimetableController extends Controller
             'batch_id'=>'required',
             'teacher_id'=>'required',
             'lecture_type'=>'required',
-            'day'=>'required',
+            'start_date'=>'required',
             'start_time'=>'required',
             'end_time'=>'required',
 
@@ -55,15 +71,71 @@ class TimetableController extends Controller
             //     $timetable = new Timetable();
             // }
 
-            $timetable = new Timetable();
-            $timetable->subject_id = $request->subject_id;
-            $timetable->batch_id = $request->batch_id;
-            $timetable->teacher_id = $request->teacher_id;
-            $timetable->lecture_type = $request->lecture_type;
-            $timetable->day = $request->day;
-            $timetable->start_time = $request->start_time;
-            $timetable->end_time = $request->end_time;
-            $timetable->save();
+            $timetablebase = new TimeTableBase();
+            $timetablebase->subject_id = $request->subject_id;
+            $timetablebase->batch_id = $request->batch_id;
+            $timetablebase->teacher_id = $request->teacher_id;
+            $timetablebase->lecture_type = $request->lecture_type;
+            $timetablebase->start_date = $request->start_date;
+            $timetablebase->end_date = $request->end_date;
+            $timetablebase->start_time = $request->start_time;
+            $timetablebase->end_time = $request->end_time;
+            $timetablebase->repeat = $request->repeat;
+            $timetablebase->save();
+            
+            $lastInsertedId = $timetablebase->id;
+            if($request->repeat == 1){
+                $timetable = new Timetable();
+                $timetable->time_table_base_id = $lastInsertedId;
+                $timetable->subject_id = $request->subject_id;
+                $timetable->batch_id = $request->batch_id;
+                $timetable->teacher_id = $request->teacher_id;
+                $timetable->lecture_type = $request->lecture_type;
+                $timetable->start_date = $request->start_date;
+                $timetable->end_date = $request->end_date;
+                $timetable->start_time = $request->start_time;
+                lecture_date
+                $timetable->end_time = $request->end_time;
+                $timetable->repeat = $request->repeat;
+                $timetable->save();
+
+            }elseif($request->repeat == 2){
+                $start_date = $request->start_date;
+                $dayName = date('l', strtotime($start_date));
+                $end_date = $request->end_date;
+
+                $start_date = $request->start_date;
+                $end_date = $request->end_date;
+
+                $current_date = new DateTime($start_date);
+                $end_date = new DateTime($end_date);
+
+                while ($current_date <= $end_date) {
+                    $dayName = $current_date->format('l'); 
+                    echo "Date: " . $current_date->format('Y-m-d') . ", Day: $dayName <br>";
+                    $current_date->modify('+1 week'); 
+
+                    $timetable = new Timetable();
+                    $timetable->time_table_base_id = $lastInsertedId;
+                    $timetable->subject_id = $request->subject_id;
+                    $timetable->batch_id = $request->batch_id;
+                    $timetable->teacher_id = $request->teacher_id;
+                    $timetable->lecture_type = $request->lecture_type;
+                    $timetable->start_date = $request->start_date;
+                    $timetable->end_date = $request->end_date;
+                    $timetable->start_time = $request->start_time;
+                    $timetable->end_time = $request->end_time;
+                    $timetable->repeat = $request->repeat;
+                    $timetable->save();
+
+                }
+                exit;
+
+                
+
+            }
+
+
             return $this->response($timetable,'data save');
         }catch(Exeption $e){
             return $this->response($e,"Something want Wrong!!", false, 400);
