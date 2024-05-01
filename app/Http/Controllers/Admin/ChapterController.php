@@ -77,7 +77,9 @@ class ChapterController extends Controller
     //chapter_save
     public function chapter_save(Request $request)
     {
-
+        echo "<pre>";
+        print_r($request->all());
+        exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',

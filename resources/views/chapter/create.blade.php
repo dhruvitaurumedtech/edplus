@@ -47,12 +47,13 @@
                         </div>
                         <h3>Chapter Name</h3>
                         <div class="search-box-2 form-group">
-                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control">
+                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
                         </div>
                         <h3>Chapter Image</h3>
                         <div class="search-box-2 form-group">
-                            <input class="py-2 pl-2" type="file" name="" id="">
+                            <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
                         </div>
+                        <img id="output" src="" class="preview1 ImgPreview" />
 
                         <div class="add-chapter-btn">
                             <a class="btn" id="addmore">
@@ -71,10 +72,18 @@
         </div>
         @include('layouts/footer_new')
     </div>
-    <script src="../js/jquery-3.7.1.min.js"></script>
-    <script src="../js/bootstrap.bundle.min.js"></script>
-    <script src="../js/main.js"></script>
     <script>
+        var openFile = function(file, id) {
+            var input = file.target;
+            var reader = new FileReader();
+            reader.onload = function() {
+                var dataURL = reader.result;
+                var output = document.getElementById(id);
+                output.style.display = 'block';
+                output.src = dataURL;
+            };
+            reader.readAsDataURL(input.files[0]);
+        };
         $(document).ready(function() {
             $('#addmore').click(function() {
                 addChapter();
