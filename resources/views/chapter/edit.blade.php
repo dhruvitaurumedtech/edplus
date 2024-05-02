@@ -4,7 +4,7 @@
         <div class="dashboard-app">
             @include('layouts/header-topbar')
             <div class="link-dir">
-                <h1 class="display-4">Create Chapter List</h1>
+                <h1 class="display-4">Edit Chapter List</h1>
                 <ul>
                     <li><a href="index.php">Home</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
@@ -42,20 +42,19 @@
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                         <h3>Chapter Number</h3>
-                        <div class="border-line-chapter">
-                            <div class="search-box-2 form-group">
-                                <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
-                            </div>
-                            <h3>Chapter Name</h3>
-                            <div class="search-box-2 form-group">
-                                <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
-                            </div>
-                            <h3>Chapter Image</h3>
-                            <div class="search-box-2 form-group">
-                                <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
-                            </div>
-                            <img id="output" src="" class="preview1 ImgPreview" />
+                        <div class="search-box-2 form-group">
+                            <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
                         </div>
+                        <h3>Chapter Name</h3>
+                        <div class="search-box-2 form-group">
+                            <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
+                        </div>
+                        <h3>Chapter Image</h3>
+                        <div class="search-box-2 form-group">
+                            <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
+                        </div>
+                        <img id="output" src="" class="preview1 ImgPreview" />
+
                         <div class="add-chapter-btn">
                             <a class="btn" id="addmore">
                                 <i class="fas fa-plus"></i>
@@ -90,19 +89,15 @@
                 addChapter();
             });
             $(document).ready(function() {
-
                 $('#standard_id').on('change', function() {
                     var standard_id = $(this).val();
                     axios.post('chapter/get-subject', {
                             standard_id: standard_id,
                         })
                         .then(function(response) {
-
                             var secondDropdown = document.getElementById('subject');
                             secondDropdown.innerHTML = ''; // Clear existing options
-
                             secondDropdown.appendChild(new Option('Select Subject', ''));
-
                             response.data.subject.forEach(function(subjects) {
                                 var option = new Option(subjects.name, subjects.id);
                                 secondDropdown.appendChild(option);
@@ -113,15 +108,12 @@
                         });
                 });
             });
-
             var container = document.querySelector('.add-chapter-btn');
             var chapterCount = 0;
 
             function addChapter() {
                 chapterCount++;
                 var chapterHtml = `
-                <br>
-                <div class="border-line-chapter">
                         <div class="row mt-3 added-chapter">
                             <div class="col-lg-12">
                                 <i class="fas fa-times btn-rmv2 ml-3 remove-chapter"></i>
@@ -147,11 +139,9 @@
                 $('#imageInput').change(function() {
                     readURL(this);
                 });
-
             }
         });
     </script>
-
 </body>
 
 </html>
