@@ -28,7 +28,7 @@ return new class extends Migration
             $table->date('lecture_date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->unsignedBigInteger('repeat');
+            $table->string('repeat');
             $table->timestamps();
             $table->softDeletes();
         });
