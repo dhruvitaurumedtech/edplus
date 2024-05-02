@@ -982,6 +982,122 @@ class StudentController extends Controller
         }
     }
 
+    // public function topic_videos1(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'subject_id' => 'required|exists:subject,id',
+    //         'institute_id' => 'required|exists:institute_detail,id',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         $user_id = $request->user_id;
+    //         $subject_id = $request->subject_id;
+    //         $chapter_id = $request->chapter_id;
+    //         $institute_id = $request->institute_id;
+    //         //$video_cayegory = $request->video_cayegory;
+
+    //         $topics = [];
+    //         $category = [];
+    //         $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+    //             ->select(
+    //                 'do_business_with.id',
+    //                 'do_business_with.name',
+    //                 'video_categories.id as vid',
+    //                 'video_categories.name as vname'
+    //             )
+    //             ->whereIn('do_business_with.id', function ($query) {
+    //                 $query->select('topic.video_category_id')
+    //                     ->from('topic')
+    //                     ->groupBy('topic.video_category_id');
+    //             })
+    //             ->get();
+    //         $topicqry = [];
+    //         foreach ($catgry as $catvd) {
+    //             $topics = [];
+    //             $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
+    //                 ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
+    //                 ->where('topic.subject_id', $subject_id)
+    //                 ->when($chapter_id, function ($query, $chapter_id) {
+    //                     return $query->where('topic.chapter_id', $chapter_id);
+    //                 })
+    //                 ->where('topic.institute_id', $institute_id)
+    //                 ->where('topic.video_category_id', $catvd->vid)
+    //                 ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+    //                 ->orderByDesc('topic.created_at')
+    //                 ->get();
+    //             $response = [];
+    //             foreach ($topicqry as $topval) {
+    //                 if (Auth::user()->role_type == 6) {
+    //                     $batchID = Student_detail::where('institute_id', $institute_id)
+    //                         ->where('student_id', $user_id)->first();
+    //                     $std_batchidd = $batchID->batch_id;
+
+    //                     $vidasbt = VideoAssignToBatch::where('batch_id', $std_batchidd)
+    //                         ->where('video_id', $topval->id)
+    //                         ->where('standard_id', $topval->standard_id)
+    //                         ->where('chapter_id', $topval->chapter_id)
+    //                         ->where('subject_id', $topval->subject_id)
+    //                         ->select('id')->first();
+    //                     if (!empty($vidasbt->id)) {
+    //                         $topics[] = array(
+    //                             "id" => $topval->id,
+    //                             "topic_no" => $topval->topic_no,
+    //                             "topic_name" => $topval->topic_name . '',
+    //                             "topic_video" => asset($topval->topic_video),
+    //                             "subject_id" => $topval->subject_id,
+    //                             "subject_name" => $topval->sname,
+    //                             "chapter_id" => $topval->chapter_id,
+    //                             "chapter_name" => $topval->chname,
+    //                             "status" => True
+    //                         );
+    //                     }
+    //                 } else {
+
+    //                     $batch_list = Batches_model::where('institute_id', $institute_id)
+    //                         ->where('user_id', $user_id)
+    //                         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+    //                         ->select('*')
+    //                         ->get();
+    //                     $batch_response = [];
+    //                     foreach ($batch_list as $value) {
+    //                         $batch_response[] = [
+    //                             'batch_id' => $value->id,
+    //                             'batch_name' => $value->batch_name,
+    //                         ];
+    //                     }
+
+    //                     $topics[] = array(
+    //                         "id" => $topval->id,
+    //                         "topic_no" => $topval->topic_no,
+    //                         "topic_name" => $topval->topic_name . '',
+    //                         "topic_video" => asset($topval->topic_video),
+    //                         "subject_id" => $topval->subject_id,
+    //                         "subject_name" => $topval->sname,
+    //                         "chapter_id" => $topval->chapter_id,
+    //                         "chapter_name" => $topval->chname,
+    //                         "status" => false,
+    //                         "batch_list" => $batch_response,
+    //                     );
+    //                 }
+    //             }
+    //             $category[] = array(
+    //                 'id' => $catvd->id,
+    //                 'category_name' => $catvd->name,
+    //                 'parent_category_id' => $catvd->vid,
+    //                 'parent_category_name' => $catvd->vname,
+    //                 'topics' => $topics
+    //             );
+    //         }
+    //         return $this->response($category, "Successfully fetch data.");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
+
 
 
     //topic videos
@@ -1011,6 +1127,7 @@ class StudentController extends Controller
             }
 
             $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+            dd($existingUser);
             if ($existingUser) {
 
                 $user_id = $request->user_id;
