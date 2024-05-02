@@ -101,6 +101,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail'])->name('institute_detail.get');
     Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
     Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
+    Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
+    Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
+    Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
+    Route::post('/student/exams-student', [StudentController::class, 'exams_list'])->name('exams_list.get');
 });
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
@@ -110,10 +114,9 @@ Route::post('/student/homescreen-student', [StudentController::class, 'homescree
 Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
 
 
-Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
-Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
-Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
-Route::post('/student/exams-student', [StudentController::class, 'exams_list'])->name('exams_list.get');
+
+
+
 Route::post('/student/remove-institute-student', [StudentController::class, 'remove_institute'])->name('remove_institute.get');
 Route::post('/student/exam-result-student', [StudentController::class, 'exam_result'])->name('exam_result.get');
 Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data'])->name('attendance_data.get');
