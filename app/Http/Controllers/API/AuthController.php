@@ -83,7 +83,8 @@ class AuthController extends Controller
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
-            $user->update(['token' => $token]);
+            $user->token = $token;
+            $user->save();
 
             $institute_id = ($user->role_type == 3) ? (optional($user->instituteDetail)->id) : null;
 
