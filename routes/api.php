@@ -78,6 +78,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/Subject-List', [InstituteApiController::class, 'subjectList']);
     Route::post('/institute/Subject-edit', [InstituteApiController::class, 'edit_subject']);
     Route::post('/institute/do_business_with', [InstituteApiController::class, 'do_business_with']);
+    Route::post('/institute/All-Subject-List', [InstituteApiController::class, 'allsubjectList']);
+    Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
 
 
     //new API
@@ -95,12 +97,16 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
+
     // Student Api 
     Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
     Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request'])->name('student_add_institute_request.get');
     Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail'])->name('institute_detail.get');
     Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
     Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
+
+    //new API
+    Route::post('/student/list-timetable-student', [StudentController::class, 'timetable_list'])->name('timetable_list.get');
     Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
     Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
     Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
@@ -108,20 +114,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/remove-institute-student', [StudentController::class, 'remove_institute'])->name('remove_institute.get');
     Route::post('/student/exam-result-student', [StudentController::class, 'exam_result'])->name('exam_result.get');
     Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data'])->name('attendance_data.get');
+    Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
+    Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
 });
-
-Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
-
-
-
-Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
-
-
-
-
-
-
-
 
 
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
@@ -132,44 +127,15 @@ Route::post('/institute/get-class', [InstituteApiController::class, 'get_class']
 
 Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 
-Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
+
 Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
 Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
 Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
-
-
-
-
-
-
-
-
-Route::post('/institute/All-Subject-List', [InstituteApiController::class, 'allsubjectList']);
-
-//banner controller
-
-
-
-
-
-
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-
-
-
 //parents API's
 Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
-
-
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-
-
-
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
-
-
-
-//teacher
 Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
 // Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
 Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);

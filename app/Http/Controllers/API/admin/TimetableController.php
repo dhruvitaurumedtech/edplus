@@ -83,28 +83,18 @@ class TimetableController extends Controller
             $timetablebase->repeat = $request->repeat;
             $timetablebase->save();
             
-            $lastInsertedId = $timetablebase->id;
-           
-                $start_date = $request->start_date;
-                $dayName = date('l', strtotime($start_date));
-                $end_date = $request->end_date;
+                $lastInsertedId = $timetablebase->id;
 
-                $start_date = $request->start_date;
-                $end_date = $request->end_date;
+                $start_date = new DateTime($request->start_date);
+                $end_date = new DateTime($request->end_date);
 
-                $current_date = new DateTime($start_date);
-                $end_date = new DateTime($end_date);
-
+                foreach(explode(',',$request->repeat) as $repeat){
+                
+                $current_date = clone $start_date;
                 while ($current_date <= $end_date) {
-                    $dayName = $current_date->format('l'); 
-                    //echo "Date: " . $current_date->format('Y-m-d') . ", Day: $dayName <br>";
-                    $lecture_date = $current_date->format('Y-m-d');
+                   if($current_date->format('l') === $repeat){
 
-                    if($request->repeat == 1){
-                        $current_date->modify('+1 week'); 
-                    }else{
-                        $current_date->modify('+1 day'); 
-                    }
+                    $lecture_date = $current_date->format('Y-m-d');
 
                     $timetable = new Timetable();
                     $timetable->time_table_base_id = $lastInsertedId;
@@ -117,13 +107,16 @@ class TimetableController extends Controller
                     $timetable->lecture_date = $lecture_date;
                     $timetable->start_time = $request->start_time;
                     $timetable->end_time = $request->end_time;
-                    $timetable->repeat = $request->repeat;
+                    $timetable->repeat = $repeat;
                     $timetable->save();
 
+                   }
+
+                    $current_date->modify('+1 day'); 
                 }
+            }
 
-
-            return $this->response($timetable,'data save');
+            return $this->response([],'data save');
         }catch(Exeption $e){
             return $this->response($e,"Something want Wrong!!", false, 400);
         }

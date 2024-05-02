@@ -42,168 +42,298 @@ class StudentController extends Controller
 {
 
     use ApiTrait;
+
     public function homescreen_student(Request $request)
     {
-        $token = $request->header('Authorization');
-
-
-        if (strpos($token, 'Bearer') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
-            'per_page' => 'required|integer',
+        $validator = Validator::make($request->all(), [
+            'per_page' => 'required',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-
-            $user_id = $request->user_id;
+            $user_id = Auth::id();
             $search_keyword = $request->search;
             $perPage = $request->input('per_page', 10);
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-            if ($existingUser) {
+            $banners = Banner_model::where('status', 'active')
+                ->whereIn('user_id', explode(',', '1'))
+                ->paginate($perPage);
+            $banners_data = [];
 
-                //banner
-                $banners = Banner_model::where('status', 'active')
-                    ->whereIn('user_id', explode(',', '1'))
-                    ->paginate($perPage);
-                $banners_data = [];
-
-                foreach ($banners as $value) {
-                    $imgpath = asset($value->banner_image);
-                    $banners_data[] = array(
-                        'id' => $value->id,
-                        'banner_image' => $imgpath,
-                    );
-                }
-                //$perPage = 10;
-                //student searched response 
-                $allinstitute = Institute_detail::where('status', 'active')
-                    ->where(function ($query) use ($search_keyword) {
-                        $query->where('unique_id', 'like', '%' . $search_keyword . '%')
-                            ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
-                    })
-                    ->orderByDesc('created_at')
-                    ->paginate($perPage);
-
-                $search_list = [];
-                foreach ($allinstitute as $value) {
-                    $search_list[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name,
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                    );
-                }
-
-                //student search history
-                $searchhistory = Search_history::where('user_id', $user_id)->paginate($perPage);
-                $searchhistory_list = [];
-                foreach ($searchhistory as $value) {
-                    // Check if the title already exists in the $searchhistory_list array
-                    $existingTitles = array_column($searchhistory_list, 'title');
-                    if (!in_array($value->title, $existingTitles)) {
-
-                        $searchhistory_list[] = [
-                            'id' => $value->id,
-                            'institute_id' => $value->institute_id,
-                            'user_id' => $value->user_id,
-                            'title' => $value->title,
-                        ];
-                    }
-                }
-
-                //requested institute
-                $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
-                    ->where('students_details.student_id', $user_id)
-                    ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
-                    ->orderByDesc('institute_detail.created_at')
-                    ->paginate($perPage);
-
-                $requested_institute = [];
-                foreach ($requestnstitute as $value) {
-                    $requested_institute[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name,
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                        'status' => $value->sstatus,
-                    );
-                }
-
-                //join with
-                $ctdmy = date('Y-m');
-                $joininstitute = Institute_detail::where('status', 'active')
-                    ->whereIn('id', function ($query) use ($user_id) {
-                        $query->select('institute_id')
-                            ->where('student_id', $user_id)
-                            ->where('status', '=', '1')
-                            ->from('students_details')
-                            ->whereNull('deleted_at');
-                    })
-                    ->where('end_academic_year', '>=', $ctdmy)
-                    ->paginate($perPage); // ->where('end_academic_year', '>=', now())
-                $join_with = [];
-                foreach ($joininstitute as $value) {
-                    $join_with[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                    );
-                }
-
-                $parentsdt = Parents::where('student_id', $user_id)
-                    ->orderByDesc('created_at')
-                    ->get();
-
-                $veryfy = [];
-                foreach ($parentsdt as $checkvery) {
-                    $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
-                }
-                if ($parentsdt->isEmpty()) {
-                    $studentparents = '0';
-                } else {
-                    $studentparents = '1';
-                }
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => array(
-                        'banner' => $banners_data,
-                        'search_list' => $search_list,
-                        'searchhistory_list' => $searchhistory_list,
-                        'requested_institute' => $requested_institute,
-                        'join_with' => $join_with,
-                        'parents_detail' => $studentparents,
-                        'parents_verification' => $veryfy
-                    ),
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                    'data' => []
-                ], 400);
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                );
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            //$perPage = 10;
+            //student searched response 
+            $allinstitute = Institute_detail::where('status', 'active')
+                ->where(function ($query) use ($search_keyword) {
+                    $query->where('unique_id', 'like', '%' . $search_keyword . '%')
+                        ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
+                })
+                ->orderByDesc('created_at')
+                ->paginate($perPage);
+
+            $search_list = [];
+            foreach ($allinstitute as $value) {
+                $search_list[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name,
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                );
+            }
+
+            //student search history
+            $searchhistory = Search_history::where('user_id', $user_id)->paginate($perPage);
+            $searchhistory_list = [];
+            foreach ($searchhistory as $value) {
+                // Check if the title already exists in the $searchhistory_list array
+                $existingTitles = array_column($searchhistory_list, 'title');
+                if (!in_array($value->title, $existingTitles)) {
+
+                    $searchhistory_list[] = [
+                        'id' => $value->id,
+                        'institute_id' => (int) $value->institute_id,
+                        'user_id' => $value->user_id,
+                        'title' => $value->title,
+                    ];
+                }
+            }
+
+            //requested institute
+            $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
+                ->where('students_details.student_id', $user_id)
+                ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
+                ->orderByDesc('institute_detail.created_at')
+                ->paginate($perPage);
+
+            $requested_institute = [];
+            foreach ($requestnstitute as $value) {
+                $requested_institute[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name,
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                    'status' => (int)$value->sstatus,
+                );
+            }
+
+            //join with
+            $ctdmy = date('Y-m');
+            $joininstitute = Institute_detail::where('status', 'active')
+                ->whereIn('id', function ($query) use ($user_id) {
+                    $query->select('institute_id')
+                        ->where('student_id', $user_id)
+                        ->where('status', '=', '1')
+                        ->from('students_details')
+                        ->whereNull('deleted_at');
+                })
+                ->where('end_academic_year', '>=', $ctdmy)
+                ->paginate($perPage);
+            $join_with = [];
+            foreach ($joininstitute as $value) {
+                $join_with[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                );
+            }
+
+            $parentsdt = Parents::where('student_id', $user_id)
+                ->orderByDesc('created_at')
+                ->get();
+
+            $veryfy = [];
+            foreach ($parentsdt as $checkvery) {
+                $veryfy[] = array('relation' => $checkvery->relation, 'verify' => (int) $checkvery->verify);
+            }
+            if ($parentsdt->isEmpty()) {
+                $studentparents = 0;
+            } else {
+                $studentparents = 1;
+            }
+            $data = [
+                'banner' => $banners_data,
+                'search_list' => $search_list,
+                'searchhistory_list' => $searchhistory_list,
+                'requested_institute' => $requested_institute,
+                'join_with' => $join_with,
+                'parents_detail' => $studentparents,
+                'parents_verification' => $veryfy
+            ];
+            return $this->response($data, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    // public function homescreen_student(Request $request)
+    // {
+    //     $token = $request->header('Authorization');
+
+
+    //     if (strpos($token, 'Bearer') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required|integer',
+    //         'per_page' => 'required|integer',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+
+    //         $user_id = $request->user_id;
+    //         $search_keyword = $request->search;
+    //         $perPage = $request->input('per_page', 10);
+    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //         if ($existingUser) {
+
+    //             //banner
+    //             $banners = Banner_model::where('status', 'active')
+    //                 ->whereIn('user_id', explode(',', '1'))
+    //                 ->paginate($perPage);
+    //             $banners_data = [];
+
+    //             foreach ($banners as $value) {
+    //                 $imgpath = asset($value->banner_image);
+    //                 $banners_data[] = array(
+    //                     'id' => $value->id,
+    //                     'banner_image' => $imgpath,
+    //                 );
+    //             }
+    //             //$perPage = 10;
+    //             //student searched response 
+    //             $allinstitute = Institute_detail::where('status', 'active')
+    //                 ->where(function ($query) use ($search_keyword) {
+    //                     $query->where('unique_id', 'like', '%' . $search_keyword . '%')
+    //                         ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
+    //                 })
+    //                 ->orderByDesc('created_at')
+    //                 ->paginate($perPage);
+
+    //             $search_list = [];
+    //             foreach ($allinstitute as $value) {
+    //                 $search_list[] = array(
+    //                     'id' => $value->id,
+    //                     'institute_name' => $value->institute_name,
+    //                     'address' => $value->address,
+    //                     'logo' => asset($value->logo),
+    //                 );
+    //             }
+
+    //             //student search history
+    //             $searchhistory = Search_history::where('user_id', $user_id)->paginate($perPage);
+    //             $searchhistory_list = [];
+    //             foreach ($searchhistory as $value) {
+    //                 // Check if the title already exists in the $searchhistory_list array
+    //                 $existingTitles = array_column($searchhistory_list, 'title');
+    //                 if (!in_array($value->title, $existingTitles)) {
+
+    //                     $searchhistory_list[] = [
+    //                         'id' => $value->id,
+    //                         'institute_id' => $value->institute_id,
+    //                         'user_id' => $value->user_id,
+    //                         'title' => $value->title,
+    //                     ];
+    //                 }
+    //             }
+
+    //             //requested institute
+    //             $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
+    //                 ->where('students_details.student_id', $user_id)
+    //                 ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
+    //                 ->orderByDesc('institute_detail.created_at')
+    //                 ->paginate($perPage);
+
+    //             $requested_institute = [];
+    //             foreach ($requestnstitute as $value) {
+    //                 $requested_institute[] = array(
+    //                     'id' => $value->id,
+    //                     'institute_name' => $value->institute_name,
+    //                     'address' => $value->address,
+    //                     'logo' => asset($value->logo),
+    //                     'status' => $value->sstatus,
+    //                 );
+    //             }
+
+    //             //join with
+    //             $ctdmy = date('Y-m');
+    //             $joininstitute = Institute_detail::where('status', 'active')
+    //                 ->whereIn('id', function ($query) use ($user_id) {
+    //                     $query->select('institute_id')
+    //                         ->where('student_id', $user_id)
+    //                         ->where('status', '=', '1')
+    //                         ->from('students_details')
+    //                         ->whereNull('deleted_at');
+    //                 })
+    //                 ->where('end_academic_year', '>=', $ctdmy)
+    //                 ->paginate($perPage); // ->where('end_academic_year', '>=', now())
+    //             $join_with = [];
+    //             foreach ($joininstitute as $value) {
+    //                 $join_with[] = array(
+    //                     'id' => $value->id,
+    //                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
+    //                     'address' => $value->address,
+    //                     'logo' => asset($value->logo),
+    //                 );
+    //             }
+
+    //             $parentsdt = Parents::where('student_id', $user_id)
+    //                 ->orderByDesc('created_at')
+    //                 ->get();
+
+    //             $veryfy = [];
+    //             foreach ($parentsdt as $checkvery) {
+    //                 $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
+    //             }
+    //             if ($parentsdt->isEmpty()) {
+    //                 $studentparents = '0';
+    //             } else {
+    //                 $studentparents = '1';
+    //             }
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => array(
+    //                     'banner' => $banners_data,
+    //                     'search_list' => $search_list,
+    //                     'searchhistory_list' => $searchhistory_list,
+    //                     'requested_institute' => $requested_institute,
+    //                     'join_with' => $join_with,
+    //                     'parents_detail' => $studentparents,
+    //                     'parents_verification' => $veryfy
+    //                 ),
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //                 'data' => []
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
 
 
     public function student_searchhistory_add(Request $request)
@@ -738,225 +868,405 @@ class StudentController extends Controller
         }
     }
 
-    //student added detail
+
     public function student_added_detail(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'institute_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-
-            $token = $request->header('Authorization');
-
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-            if ($existingUser) {
-                $user_id = $request->user_id;
-                $institute_id = $request->institute_id;
-
-                $getstdntdata = Student_detail::where('student_id', $request->user_id)
-                    ->where('institute_id', $request->institute_id)->first();
-
-                //banner
-
-                $bannerss = Banner_model::where('status', 'active')
-                    ->Where('institute_id', $institute_id)
-                    //->Where('user_id', $user_id)
+            $user_id = Auth::id();
+            $existingUser = User::where('id', $user_id)->first();
+            $institute_id = $request->institute_id;
+            $getstdntdata = Student_detail::where('student_id', $user_id)
+                ->where('institute_id', $request->institute_id)->first();
+            $bannerss = Banner_model::where('status', 'active')
+                ->Where('institute_id', $institute_id)
+                ->paginate(10);
+            if ($bannerss->isEmpty()) {
+                $banners = Banner_model::where('status', 'active')
+                    ->Where('user_id', '1')
                     ->paginate(10);
-
-                if ($bannerss->isEmpty()) {
-
-                    $banners = Banner_model::where('status', 'active')
-                        ->Where('user_id', '1')
-                        ->paginate(10);
-                } else {
-                    $banners = $bannerss;
-                }
-                $banners_data = [];
-
-                foreach ($banners as $value) {
-                    $imgpath = asset($value->banner_image);
-                    $banners_data[] = array(
-                        'id' => $value->id,
-                        'banner_image' => $imgpath,
-                    );
-                }
-
-                $today = date('Y-m-d');
-                $todays_lecture = [];
-                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                    ->where('time_table.batch_id', $getstdntdata->batch_id)
-                    ->where('time_table.lecture_date', $today)
-                    ->select(
-                        'subject.name as subject',
-                        'users.firstname',
-                        'users.lastname',
-                        'lecture_type.name as lecture_type_name',
-                        'time_table.start_time',
-                        'time_table.end_time',
-                        'time_table.lecture_date'
-                    )
-                    ->paginate(2);
-
-                foreach ($todayslect as $todayslecDT) {
-                    $todays_lecture[] = array(
-                        'subject' => $todayslecDT->subject,
-                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                        'lecture_date' => $todayslecDT->lecture_date,
-                        'lecture_type' => $todayslecDT->lecture_type_name,
-                        'start_time' => $todayslecDT->start_time,
-                        'end_time' => $todayslecDT->end_time,
-                    );
-                }
-
-                $subjects = [];
-                $result = [];
-                $announcement = [];
-                $examlist = [];
-
-                $announcQY = announcements_model::where('institute_id', $institute_id)
-                    ->where('batch_id', $existingUser->batch_id)
-                    ->whereRaw("FIND_IN_SET('6', role_type)")
-                    ->orderByDesc('created_at')
-                    ->get();
-                foreach ($announcQY as $announcDT) {
-                    $announcement[] = array(
-                        'title' => $announcDT->title,
-                        'desc' => $announcDT->detail,
-                        'time' => $announcDT->created_at
-                    );
-                }
-
-                $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
-                    ->join('subject', 'subject.id', '=', 'exam.subject_id')
-                    ->where('marks.student_id', $user_id)
-                    ->where('exam.institute_id', $institute_id)
-                    ->select(
-                        'marks.*',
-                        'subject.name as subject',
-                        'exam.subject_id',
-                        'exam.total_mark',
-                        'exam.exam_type',
-                        'exam.exam_date',
-                        'exam.exam_title'
-                    )
-                    ->orderByDesc('marks.created_at')->limit(3)->get();
-                $highestMarks = $resultQY->max('marks');
-                foreach ($resultQY as $resultDDt) {
-                    $result[] = array(
-                        'subject' => $resultDDt->subject,
-                        'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                        'total_marks' => $resultDDt->total_marks,
-                        'achiveddmarks_marks' => boolval($resultDDt->mark),
-                        'date' => $resultDDt->exam_date,
-                        'class_highest' => $highestMarks
-                    );
-                }
-
-
-                $subdta = Student_detail::where('student_id', $user_id)
-                    ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
-
-                if (!empty($subdta)) {
-                    $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
-                    foreach ($subjecqy as $subjcdt) {
-                        if ($subjcdt->image) {
-                            $img = asset($subjcdt->image);
-                        } else {
-                            $img = asset('default.jpg');
-                        }
-                        $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
-                    }
-
-                    //upcoming exams
-                    $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
-                    $subjectIds = explode(',', $stdetail->subject_id);
-                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
-                        ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                        ->where('institute_id', $stdetail->institute_id)
-                        ->where('batch_id', $stdetail->batch_id)
-                        ->where('exam.board_id', $stdetail->board_id)
-                        ->where('exam.medium_id', $stdetail->medium_id)
-                        //->where('exam.class_id', $stdetail->class_id)
-                        ->where('exam.standard_id', $stdetail->standard_id)
-                        ->orWhere('exam.stream_id', $stdetail->stream_id)
-                        ->whereIN('exam.subject_id', $subjectIds)
-                        ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                        ->orderBy('exam.created_at', 'desc')
-                        ->limit(3)
-                        ->get();
-
-                    foreach ($exams as $examsDT) {
-                        $examlist[] = array(
-                            'exam_title' => $examsDT->exam_title,
-                            'total_mark' => $examsDT->total_mark,
-                            'exam_type' => $examsDT->exam_type,
-                            'subject' => $examsDT->subject,
-                            'standard' => $examsDT->standard,
-                            'date' => $examsDT->exam_date,
-                            'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
-                        );
-                    }
-                }
-
-                //total attend lecture
-                $totalattendlec = [];
-                $cumnth = date('Y-m');
-
-                $totalattlec = Attendance_model::where('institute_id', $institute_id)
-                    ->where('student_id', $user_id)
-                    ->where('created_at', 'like', '%' . $cumnth . '%')
-                    ->where('attendance', 'P')->count();
-                $totalattendlec = array('total_lectures' => '170', 'attend_lectures' => $totalattlec, 'miss_lectures' => '7');
-
-                $studentdata = array(
-                    'banners_data' => $banners_data,
-                    'todays_lecture' => $todays_lecture,
-                    'announcement' => $announcement,
-                    'upcoming_exams' => $examlist,
-                    'subjects' => $subjects,
-                    'result' => $result,
-                    'attendance' => $totalattendlec
-                );
-
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => $studentdata,
-                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                $banners = $bannerss;
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            $banners_data = [];
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                );
+            }
+            $today = date('Y-m-d');
+            $todays_lecture = [];
+            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->where('time_table.batch_id', $getstdntdata->batch_id)
+                ->where('time_table.lecture_date', $today)
+                ->select(
+                    'subject.name as subject',
+                    'users.firstname',
+                    'users.lastname',
+                    'lecture_type.name as lecture_type_name',
+                    'time_table.start_time',
+                    'time_table.end_time',
+                    'time_table.lecture_date'
+                )
+                ->paginate(2);
+            foreach ($todayslect as $todayslecDT) {
+                $todays_lecture[] = array(
+                    'subject' => $todayslecDT->subject,
+                    'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                    'lecture_date' => $todayslecDT->lecture_date,
+                    'lecture_type' => $todayslecDT->lecture_type_name,
+                    'start_time' => $todayslecDT->start_time,
+                    'end_time' => $todayslecDT->end_time,
+                );
+            }
+            $subjects = [];
+            $result = [];
+            $announcement = [];
+            $examlist = [];
+            $announcQY = announcements_model::where('institute_id', $institute_id)
+                ->where('batch_id', $existingUser->batch_id)
+                ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->orderByDesc('created_at')
+                ->get();
+            foreach ($announcQY as $announcDT) {
+                $announcement[] = array(
+                    'title' => $announcDT->title,
+                    'desc' => $announcDT->detail,
+                    'time' => $announcDT->created_at
+                );
+            }
+            $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+                ->join('subject', 'subject.id', '=', 'exam.subject_id')
+                ->where('marks.student_id', $user_id)
+                ->where('exam.institute_id', $institute_id)
+                ->select(
+                    'marks.*',
+                    'subject.name as subject',
+                    'exam.subject_id',
+                    'exam.total_mark',
+                    'exam.exam_type',
+                    'exam.exam_date',
+                    'exam.exam_title'
+                )
+                ->orderByDesc('marks.created_at')->limit(3)->get();
+            $highestMarks = $resultQY->max('marks');
+            foreach ($resultQY as $resultDDt) {
+                $result[] = array(
+                    'subject' => $resultDDt->subject,
+                    'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
+                    'total_marks' => $resultDDt->total_marks,
+                    'achiveddmarks_marks' => boolval($resultDDt->mark),
+                    'date' => $resultDDt->exam_date,
+                    'class_highest' => $highestMarks
+                );
+            }
+            $subdta = Student_detail::where('student_id', $user_id)
+                ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+            if (!empty($subdta)) {
+                $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
+                foreach ($subjecqy as $subjcdt) {
+                    if ($subjcdt->image) {
+                        $img = asset($subjcdt->image);
+                    } else {
+                        $img = asset('default.jpg');
+                    }
+                    $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
+                }
+                $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+                $subjectIds = explode(',', $stdetail->subject_id);
+                $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                    ->join('standard', 'standard.id', '=', 'exam.standard_id')
+                    ->where('institute_id', $stdetail->institute_id)
+                    ->where('batch_id', $stdetail->batch_id)
+                    ->where('exam.board_id', $stdetail->board_id)
+                    ->where('exam.medium_id', $stdetail->medium_id)
+                    ->where('exam.standard_id', $stdetail->standard_id)
+                    ->orWhere('exam.stream_id', $stdetail->stream_id)
+                    ->whereIN('exam.subject_id', $subjectIds)
+                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                    ->orderBy('exam.created_at', 'desc')
+                    ->limit(3)
+                    ->get();
+                foreach ($exams as $examsDT) {
+                    $examlist[] = array(
+                        'exam_title' => $examsDT->exam_title,
+                        'total_mark' => $examsDT->total_mark,
+                        'exam_type' => $examsDT->exam_type,
+                        'subject' => $examsDT->subject,
+                        'standard' => $examsDT->standard,
+                        'date' => $examsDT->exam_date,
+                        'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                    );
+                }
+            }
+            $totalattendlec = [];
+            $cumnth = date('Y-m');
+            $totalattlec = Attendance_model::where('institute_id', $institute_id)
+                ->where('student_id', $user_id)
+                ->where('created_at', 'like', '%' . $cumnth . '%')
+                ->where('attendance', 'P')->count();
+
+            $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
+                ->where('batch_id', $getstdntdata->batch_id)
+                ->count();
+            $totalattendlec = array(
+                'total_lectures' => $totllect,
+                'attend_lectures' => $totalattlec,
+                'miss_lectures' => $totllect - $totalattlec
+            );
+            $studentdata = [
+                'banners_data' => $banners_data,
+                'todays_lecture' => $todays_lecture,
+                'announcement' => $announcement,
+                'upcoming_exams' => $examlist,
+                'subjects' => $subjects,
+                'result' => $result,
+                'attendance' => $totalattendlec
+            ];
+            return $this->response($studentdata, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+    // //student added detail
+    // public function student_added_detail(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+
+    //         $token = $request->header('Authorization');
+
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $user_id = $request->input('user_id');
+    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //         if ($existingUser) {
+    //             $user_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+
+    //             $getstdntdata = Student_detail::where('student_id', $request->user_id)
+    //                 ->where('institute_id', $request->institute_id)->first();
+
+    //             //banner
+
+    //             $bannerss = Banner_model::where('status', 'active')
+    //                 ->Where('institute_id', $institute_id)
+    //                 //->Where('user_id', $user_id)
+    //                 ->paginate(10);
+
+    //             if ($bannerss->isEmpty()) {
+
+    //                 $banners = Banner_model::where('status', 'active')
+    //                     ->Where('user_id', '1')
+    //                     ->paginate(10);
+    //             } else {
+    //                 $banners = $bannerss;
+    //             }
+    //             $banners_data = [];
+
+    //             foreach ($banners as $value) {
+    //                 $imgpath = asset($value->banner_image);
+    //                 $banners_data[] = array(
+    //                     'id' => $value->id,
+    //                     'banner_image' => $imgpath,
+    //                 );
+    //             }
+
+    //             $today = date('Y-m-d');
+    //             $todays_lecture = [];
+    //             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+    //                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
+    //                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+    //                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+    //                 ->where('time_table.batch_id', $getstdntdata->batch_id)
+    //                 ->where('time_table.lecture_date', $today)
+    //                 ->select(
+    //                     'subject.name as subject',
+    //                     'users.firstname',
+    //                     'users.lastname',
+    //                     'lecture_type.name as lecture_type_name',
+    //                     'time_table.start_time',
+    //                     'time_table.end_time',
+    //                     'time_table.lecture_date'
+    //                 )
+    //                 ->paginate(2);
+
+    //             foreach ($todayslect as $todayslecDT) {
+    //                 $todays_lecture[] = array(
+    //                     'subject' => $todayslecDT->subject,
+    //                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+    //                     'lecture_date' => $todayslecDT->lecture_date,
+    //                     'lecture_type' => $todayslecDT->lecture_type_name,
+    //                     'start_time' => $todayslecDT->start_time,
+    //                     'end_time' => $todayslecDT->end_time,
+    //                 );
+    //             }
+
+    //             $subjects = [];
+    //             $result = [];
+    //             $announcement = [];
+    //             $examlist = [];
+
+    //             $announcQY = announcements_model::where('institute_id', $institute_id)
+    //                 ->where('batch_id', $existingUser->batch_id)
+    //                 ->whereRaw("FIND_IN_SET('6', role_type)")
+    //                 ->orderByDesc('created_at')
+    //                 ->get();
+    //             foreach ($announcQY as $announcDT) {
+    //                 $announcement[] = array(
+    //                     'title' => $announcDT->title,
+    //                     'desc' => $announcDT->detail,
+    //                     'time' => $announcDT->created_at
+    //                 );
+    //             }
+
+    //             $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+    //                 ->join('subject', 'subject.id', '=', 'exam.subject_id')
+    //                 ->where('marks.student_id', $user_id)
+    //                 ->where('exam.institute_id', $institute_id)
+    //                 ->select(
+    //                     'marks.*',
+    //                     'subject.name as subject',
+    //                     'exam.subject_id',
+    //                     'exam.total_mark',
+    //                     'exam.exam_type',
+    //                     'exam.exam_date',
+    //                     'exam.exam_title'
+    //                 )
+    //                 ->orderByDesc('marks.created_at')->limit(3)->get();
+    //             $highestMarks = $resultQY->max('marks');
+    //             foreach ($resultQY as $resultDDt) {
+    //                 $result[] = array(
+    //                     'subject' => $resultDDt->subject,
+    //                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
+    //                     'total_marks' => $resultDDt->total_marks,
+    //                     'achiveddmarks_marks' => boolval($resultDDt->mark),
+    //                     'date' => $resultDDt->exam_date,
+    //                     'class_highest' => $highestMarks
+    //                 );
+    //             }
+
+
+    //             $subdta = Student_detail::where('student_id', $user_id)
+    //                 ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+
+    //             if (!empty($subdta)) {
+    //                 $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
+    //                 foreach ($subjecqy as $subjcdt) {
+    //                     if ($subjcdt->image) {
+    //                         $img = asset($subjcdt->image);
+    //                     } else {
+    //                         $img = asset('default.jpg');
+    //                     }
+    //                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
+    //                 }
+
+    //                 //upcoming exams
+    //                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+    //                 $subjectIds = explode(',', $stdetail->subject_id);
+    //                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+    //                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
+    //                     ->where('institute_id', $stdetail->institute_id)
+    //                     ->where('batch_id', $stdetail->batch_id)
+    //                     ->where('exam.board_id', $stdetail->board_id)
+    //                     ->where('exam.medium_id', $stdetail->medium_id)
+    //                     //->where('exam.class_id', $stdetail->class_id)
+    //                     ->where('exam.standard_id', $stdetail->standard_id)
+    //                     ->orWhere('exam.stream_id', $stdetail->stream_id)
+    //                     ->whereIN('exam.subject_id', $subjectIds)
+    //                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+    //                     ->orderBy('exam.created_at', 'desc')
+    //                     ->limit(3)
+    //                     ->get();
+
+    //                 foreach ($exams as $examsDT) {
+    //                     $examlist[] = array(
+    //                         'exam_title' => $examsDT->exam_title,
+    //                         'total_mark' => $examsDT->total_mark,
+    //                         'exam_type' => $examsDT->exam_type,
+    //                         'subject' => $examsDT->subject,
+    //                         'standard' => $examsDT->standard,
+    //                         'date' => $examsDT->exam_date,
+    //                         'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+    //                     );
+    //                 }
+    //             }
+
+    //             //total attend lecture
+    //             $totalattendlec = [];
+    //             $cumnth = date('Y-m');
+
+    //             $totalattlec = Attendance_model::where('institute_id', $institute_id)
+    //                 ->where('student_id', $user_id)
+    //                 ->where('created_at', 'like', '%' . $cumnth . '%')
+    //                 ->where('attendance', 'P')->count();
+
+    //             $totllect = Timetable::where('lecture_date','like', '%' . $cumnth . '%')
+    //             ->where('batch_id', $getstdntdata->batch_id)
+    //             ->count();
+
+    //             $totalattendlec = array('total_lectures' => $totllect,
+    //              'attend_lectures' => $totalattlec, 
+    //              'miss_lectures' => $totllect - $totalattlec);
+
+    //             $studentdata = array(
+    //                 'banners_data' => $banners_data,
+    //                 'todays_lecture' => $todays_lecture,
+    //                 'announcement' => $announcement,
+    //                 'upcoming_exams' => $examlist,
+    //                 'subjects' => $subjects,
+    //                 'result' => $result,
+    //                 'attendance' => $totalattendlec
+    //             );
+
+
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => $studentdata,
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
 
     //subject wise chapert list
     // public function subject_chapers1(Request $request)
@@ -2397,6 +2707,57 @@ class StudentController extends Controller
         }
     }
 
+    //timetable list
+    public function timetable_list(Request $request)
+    {
+
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $stdntdata = Student_detail::where('student_id', auth::id())
+                ->where('institute_id', $request->institute_id)->first();
+
+            $lectures = [];
+            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->where('time_table.batch_id', $stdntdata->batch_id)
+                ->where('time_table.lecture_date', $request->date)
+                ->select(
+                    'subject.name as subject',
+                    'users.firstname',
+                    'users.lastname',
+                    'lecture_type.name as lecture_type_name',
+                    'time_table.start_time',
+                    'time_table.end_time',
+                    'time_table.lecture_date'
+                )
+                ->get();
+
+            foreach ($todayslect as $todayslecDT) {
+                $lectures[] = array(
+                    'subject' => $todayslecDT->subject,
+                    'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                    'lecture_date' => $todayslecDT->lecture_date,
+                    'lecture_type' => $todayslecDT->lecture_type_name,
+                    'start_time' => $todayslecDT->start_time,
+                    'end_time' => $todayslecDT->end_time,
+                );
+            }
+
+            return $this->response($lectures, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
 
 
     // public function child_detail(Request $request)
