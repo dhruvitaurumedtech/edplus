@@ -47,27 +47,45 @@ class ChapterController extends Controller
     public function chapter_list(Request $request)
     {
 
-        $Standards = Chapter::leftjoin('base_table', 'chapters.base_table_id', '=', 'base_table.id')
+        // $Standards = Chapter::leftjoin('base_table', 'chapters.base_table_id', '=', 'base_table.id')
+        //     ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
+        //     ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+        //     ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+        //     ->leftjoin('board', 'board.id', '=', 'base_table.board')
+        //     ->leftjoin('subject', 'subject.id', '=', 'chapters.subject_id')
+        //     ->select(
+        //         'stream.name as sname',
+        //         'standard.*',
+        //         'medium.name as medium',
+        //         'board.name as board',
+        //         'base_table.id as base_id',
+        //         'chapters.chapter_name',
+        //         'chapters.chapter_no',
+        //         'chapters.chapter_image',
+        //         'subject.name as subject_name',
+        //         'chapters.id as chapter_id'
+        //     )
+        //     ->where('standard.status', 'active')->paginate(10);
+
+        // return view('chapter.list', compact('Standards'));
+        $Standards = Chapter::join('base_table', 'chapters.base_table_id', '=', 'base_table.id')
             ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
             ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
             ->leftjoin('board', 'board.id', '=', 'base_table.board')
-            ->leftjoin('subject', 'subject.id', '=', 'chapters.subject_id')
             ->select(
                 'stream.name as sname',
-                'standard.*',
+                'chapters.*',
+                'standard.name as standard_name',
                 'medium.name as medium',
                 'board.name as board',
-                'base_table.id as base_id',
-                'chapters.chapter_name',
-                'chapters.chapter_no',
-                'chapters.chapter_image',
-                'subject.name as subject_name',
-                'chapters.id as chapter_id'
+                'base_table.id as base_id'
             )
-            ->where('standard.status', 'active')->paginate(10);
+            ->paginate(10);
 
-        return view('chapter.list', compact('Standards'));
+        $subjects = Subject_model::get();
+
+        return view('chapter.list', compact('Standards', 'subjects'));
     }
     //strandard wise data
     public function get_subjects(Request $request)
@@ -103,16 +121,29 @@ class ChapterController extends Controller
             $chapter_imageFile = $request->file('chapter_image')[$i];
             $imagePath = $chapter_imageFile->store('chapter', 'public');
 
-            $base_table = Chapter::create([
+            // $base_table = Chapter::create([
+            //     'subject_id' => $request->input('subject'),
+            //     'base_table_id' => $request->input('standard_id'),
+            //     'chapter_no' => $request->input('chapter_no')[$i],
+            //     'chapter_name' => $chapterName,
+            //     'chapter_image' => $imagePath,
+            //     //'status' => $request->input('status'),
+            // ]);
+            $base_table = Chapter::firstOrCreate([
                 'subject_id' => $request->input('subject'),
                 'base_table_id' => $request->input('standard_id'),
                 'chapter_no' => $request->input('chapter_no')[$i],
+            ], [
                 'chapter_name' => $chapterName,
                 'chapter_image' => $imagePath,
-                //'status' => $request->input('status'),
             ]);
+
+            if (!$base_table->wasRecentlyCreated) {
+                return redirect()->route('chapter.create')->with('success', 'Record already exists!');
+            } else {
+                return redirect()->route('chapter.list')->with('success', 'Record inserted successfully');
+            }
         }
-        return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
     }
 
     //chapter_lists
