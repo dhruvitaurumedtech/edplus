@@ -84,22 +84,7 @@ class TimetableController extends Controller
             $timetablebase->save();
             
             $lastInsertedId = $timetablebase->id;
-            if($request->repeat == 1){
-                $timetable = new Timetable();
-                $timetable->time_table_base_id = $lastInsertedId;
-                $timetable->subject_id = $request->subject_id;
-                $timetable->batch_id = $request->batch_id;
-                $timetable->teacher_id = $request->teacher_id;
-                $timetable->lecture_type = $request->lecture_type;
-                $timetable->start_date = $request->start_date;
-                $timetable->end_date = $request->end_date;
-                $timetable->start_time = $request->start_time;
-                $timetable->lecture_date = $request->lecture_date;
-                $timetable->end_time = $request->end_time;
-                $timetable->repeat = $request->repeat;
-                $timetable->save();
-
-            }elseif($request->repeat == 2){
+           
                 $start_date = $request->start_date;
                 $dayName = date('l', strtotime($start_date));
                 $end_date = $request->end_date;
@@ -120,6 +105,7 @@ class TimetableController extends Controller
                     }else{
                         $current_date->modify('+1 day'); 
                     }
+
                     $timetable = new Timetable();
                     $timetable->time_table_base_id = $lastInsertedId;
                     $timetable->subject_id = $request->subject_id;
@@ -135,10 +121,6 @@ class TimetableController extends Controller
                     $timetable->save();
 
                 }
-               
-                
-
-            }
 
 
             return $this->response($timetable,'data save');
