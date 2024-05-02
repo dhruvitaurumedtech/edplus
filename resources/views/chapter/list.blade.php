@@ -59,31 +59,37 @@
                 <tbody>
 
                   @php
-                  $encounteredIds = [];
+                  $encounteredStandardIds = [];
+                  $encounteredSubjectIds = [];
                   $i = 1;
                   @endphp
-
                   @foreach($Standards as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    @if(!in_array($value->base_id, $encounteredIds))
-                    <td rowspan="3">
-                      {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
-
-                    </td>
+                    @if(!in_array($value->base_id, $encounteredStandardIds))
                     @php
-                    $encounteredIds[] = $value->base_id;
+                    $rowCount = $Standards->where('base_id', $value->base_id)->count();
+                    $encounteredStandardIds[] = $value->base_id;
                     @endphp
-                    @endif
-                    <td>
-                      @foreach($subjects as $subject_value)
-
-                      @if($subject_value->id == $value->subject_id)
-                      {{$subject_value->name}}
-                      @endif
-
-                      @endforeach
+                    <td rowspan="{{ $rowCount }}">
+                      {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
                     </td>
+                    @php $encounteredStandardIds[] = $value->base_id; @endphp
+                    @endif
+
+                    @foreach($subjects as $subject_value)
+                    @if($subject_value->id == $value->subject_id && !in_array($value->subject_id, $encounteredSubjectIds))
+                    @php
+                    $rowCounts = $Standards->where('subject_id', $value->subject_id)->count();
+                    $encounteredSubjectIds[] = $value->subject_id;
+                    @endphp
+                    <td rowspan="{{$rowCounts}}">
+                      {{$subject_value->name}}
+                    </td>
+
+                    @php $encounteredSubjectIds[] = $value->subject_id; @endphp
+                    @endif
+                    @endforeach
 
                     <td>{{$value->chapter_no}}</td>
                     <td>{{$value->chapter_name}}</td>
@@ -92,11 +98,11 @@
                       <div class="d-flex align-items-center">
                         <div class="d-flex">
                           @canButton('edit', 'Chapter')
-                          <a href="{{url('chapter/edit/'.$value->chapter_id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
+                          <a href="{{url('chapter/edit/'.$value->id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
                           @endCanButton
                           &nbsp;&nbsp;
                           @canButton('delete', 'Chapter')
-                          <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                          <input type="submit" class="btn btn-danger chapter_delete" data-user-id="{{ $value->chapter_id }}" value="Delete">
                           @endCanButton
                         </div>
                       </div>
@@ -104,6 +110,7 @@
                   </tr>
                   @php $i++ @endphp
                   @endforeach
+
                 </tbody>
 
               </table>

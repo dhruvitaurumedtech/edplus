@@ -26,48 +26,16 @@ class ChapterController extends Controller
             )
             ->where('standard.status', 'active')->get();
 
-        // $Standards = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
-        //     ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
-        //     ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
-        //     ->leftjoin('board', 'board.id', '=', 'base_table.board')
-        //     ->select(
-        //         'stream.name as sname',
-        //         'standard.*',
-        //         'medium.name as medium',
-        //         'board.name as board',
-        //         'base_table.id as base_id'
-        //     )
-        //     ->where('standard.status', 'active')->paginate(10);
+
 
         $subjects = Subject_model::get();
-        // return view('chapter.create',compact('Standard','Standards','subjects'));
 
-        return view('chapter.create', compact('Standard'));
+        return view('chapter.create', compact('Standard', 'subjects'));
     }
     public function chapter_list(Request $request)
     {
 
-        // $Standards = Chapter::leftjoin('base_table', 'chapters.base_table_id', '=', 'base_table.id')
-        //     ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
-        //     ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
-        //     ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
-        //     ->leftjoin('board', 'board.id', '=', 'base_table.board')
-        //     ->leftjoin('subject', 'subject.id', '=', 'chapters.subject_id')
-        //     ->select(
-        //         'stream.name as sname',
-        //         'standard.*',
-        //         'medium.name as medium',
-        //         'board.name as board',
-        //         'base_table.id as base_id',
-        //         'chapters.chapter_name',
-        //         'chapters.chapter_no',
-        //         'chapters.chapter_image',
-        //         'subject.name as subject_name',
-        //         'chapters.id as chapter_id'
-        //     )
-        //     ->where('standard.status', 'active')->paginate(10);
 
-        // return view('chapter.list', compact('Standards'));
         $Standards = Chapter::join('base_table', 'chapters.base_table_id', '=', 'base_table.id')
             ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
@@ -82,6 +50,8 @@ class ChapterController extends Controller
                 'base_table.id as base_id'
             )
             ->paginate(10);
+
+
 
         $subjects = Subject_model::get();
 
@@ -102,12 +72,12 @@ class ChapterController extends Controller
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
-            'chapter_no' => 'required|array', // Ensuring chapter_no is an array
-            'chapter_no.*' => 'required', // Validating each chapter_no element
-            'chapter_name' => 'required|array', // Ensuring chapter_name is an array
-            'chapter_name.*' => 'required', // Validating each chapter_name element
-            'chapter_image' => 'required|array', // Ensuring chapter_image is an array
-            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048', // Validating each chapter_image element
+            'chapter_no' => 'required|array',
+            'chapter_no.*' => 'required',
+            'chapter_name' => 'required|array',
+            'chapter_name.*' => 'required',
+            'chapter_image' => 'required|array',
+            'chapter_image.*' => 'required|mimes:svg,jpeg,png,pdf|max:2048',
         ], [
             'chapter_no.*.required' => 'Chapter number is required.',
             'chapter_name.*.required' => 'Chapter name is required.',
@@ -121,29 +91,16 @@ class ChapterController extends Controller
             $chapter_imageFile = $request->file('chapter_image')[$i];
             $imagePath = $chapter_imageFile->store('chapter', 'public');
 
-            // $base_table = Chapter::create([
-            //     'subject_id' => $request->input('subject'),
-            //     'base_table_id' => $request->input('standard_id'),
-            //     'chapter_no' => $request->input('chapter_no')[$i],
-            //     'chapter_name' => $chapterName,
-            //     'chapter_image' => $imagePath,
-            //     //'status' => $request->input('status'),
-            // ]);
-            $base_table = Chapter::firstOrCreate([
+            $base_table = Chapter::create([
                 'subject_id' => $request->input('subject'),
                 'base_table_id' => $request->input('standard_id'),
                 'chapter_no' => $request->input('chapter_no')[$i],
-            ], [
                 'chapter_name' => $chapterName,
                 'chapter_image' => $imagePath,
+                //'status' => $request->input('status'),
             ]);
-
-            if (!$base_table->wasRecentlyCreated) {
-                return redirect()->route('chapter.create')->with('success', 'Record already exists!');
-            } else {
-                return redirect()->route('chapter.list')->with('success', 'Record inserted successfully');
-            }
         }
+        return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
     }
 
     //chapter_lists
@@ -159,6 +116,26 @@ class ChapterController extends Controller
     function chapter_edit(Request $request, $id)
     {
         $Standard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('chapters', 'chapters.base_table_id', '=', 'base_table.id')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id',
+                'chapters.subject_id',
+                'chapters.id as chapter_id',
+                'chapters.chapter_no',
+                'chapters.chapter_name',
+                'chapters.chapter_image'
+            )
+            ->where('standard.status', 'active')
+            ->where('chapters.id', $id)->get();
+        $Standard_list = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
             ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
             ->leftjoin('board', 'board.id', '=', 'base_table.board')
@@ -169,11 +146,54 @@ class ChapterController extends Controller
                 'board.name as board',
                 'base_table.id as base_id'
             )
-            ->where('standard.status', 'active')->get();
+            ->where('standard.status', 'active')
+            ->get();
+        $subject = Subject_model::get();
+        return view('chapter.edit', compact('Standard', 'subject', 'Standard_list'));
+    }
+    public function chapter_update(Request $request)
+    {
 
+        $request->validate([
+            'standard_id' => 'required',
+            'subject' => 'required',
+            'chapter_no' => 'required|array',
+            'chapter_no.*' => 'required',
+            'chapter_name' => 'required|array',
+            'chapter_name.*' => 'required',
+        ], [
+            'chapter_no.*.required' => 'Chapter number is required.',
+            'chapter_name.*.required' => 'Chapter name is required.',
+        ]);
+        foreach ($request->chapter_name as $i => $chapterName) {
+            $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
-        $subjects = Subject_model::get();
+            if ($request->hasFile('chapter_image')) {
+                $chapter_imageFile = $request->file('chapter_image')[$i];
+                $imagePath = $chapter_imageFile->store('chapter', 'public');
+                $chapter->chapter_image = $imagePath;
+            }
+            $chapter->base_table_id = $request->input('standard_id')[$i];
+            $chapter->subject_id = $request->input('subject')[$i];
+            $chapter->chapter_no = $request->input('chapter_no')[$i];
+            $chapter->chapter_name = $chapterName;
 
-        return view('chapter.edit', compact('Standard'));
+            $chapter->save();
+        }
+
+        return redirect()->route('chapter.list')->with('success', 'Chapters Updated Successfully');
+    }
+    function chapter_delete(Request $request)
+    {
+        $chapter_id = $request->input('id');
+        $class_list = Chapter::where('id', $chapter_id);
+
+        if (!$class_list) {
+            return redirect()->route('chapter.list')->with('error', 'Chapters not found');
+        }
+
+        $class_list->delete();
+
+        return redirect()->route('chapter.list')->with('success', 'Chapters deleted successfully');
     }
 }

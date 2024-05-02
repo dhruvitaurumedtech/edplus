@@ -161,6 +161,8 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter-save', [ChapterController::class, 'chapter_save'])->name('chapter.save');
     Route::post('chapter-list', [ChapterController::class, 'chapter_lists']);
     Route::get('chapter/edit/{id}', [ChapterController::class, 'chapter_edit']);
+    Route::post('chapter/update', [ChapterController::class, 'chapter_update']);
+    Route::post('chapter-delete', [ChapterController::class, 'chapter_delete'])->name('chapter.delete');
 
     //topic
     Route::get('add-topic', [TopicController::class, 'index'])->name('add.topic');
