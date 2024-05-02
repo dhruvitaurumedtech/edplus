@@ -101,6 +101,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail'])->name('institute_detail.get');
     Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
     Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
+
+    //new API
+    Route::post('/student/list-timetable', [StudentController::class, 'timetable_list'])->name('timetable_list.get');
 });
 
 Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');

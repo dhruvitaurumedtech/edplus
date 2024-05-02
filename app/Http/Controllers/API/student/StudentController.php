@@ -1961,7 +1961,51 @@ class StudentController extends Controller
         }
     }
 
-    
+    //timetable list
+    public function timetable_list(Request $request){
+        
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+            'institute_id'=>'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $stdntdata = Student_detail::where('student_id', auth::id())
+                    ->where('institute_id', $request->institute_id)->first();
+
+            $lectures = [];
+                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                    ->where('time_table.batch_id', $stdntdata->batch_id)
+                    ->where('time_table.lecture_date', $request->date)
+                    ->select('subject.name as subject', 
+                    'users.firstname', 'users.lastname',
+                     'lecture_type.name as lecture_type_name', 
+                     'time_table.start_time','time_table.end_time','time_table.lecture_date')
+                    ->get();
+
+                foreach ($todayslect as $todayslecDT) {
+                    $lectures[] = array(
+                        'subject' => $todayslecDT->subject,
+                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'lecture_date'=>$todayslecDT->lecture_date,
+                        'lecture_type'=>$todayslecDT->lecture_type_name,
+                        'start_time' => $todayslecDT->start_time,
+                        'end_time' => $todayslecDT->end_time,
+                    );
+                }
+
+            return $this->response($lectures, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 
     // public function child_detail(Request $request)
     // {
