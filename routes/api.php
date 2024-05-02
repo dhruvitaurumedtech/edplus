@@ -103,7 +103,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
 
     //new API
-    Route::post('/student/list-timetable', [StudentController::class, 'timetable_list'])->name('timetable_list.get');
+    Route::post('/student/list-timetable-student', [StudentController::class, 'timetable_list'])->name('timetable_list.get');
     Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
     Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
     Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
