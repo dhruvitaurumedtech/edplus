@@ -127,5 +127,22 @@ class ChapterController extends Controller
     }
     function chapter_edit(Request $request, $id)
     {
+        $Standard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id'
+            )
+            ->where('standard.status', 'active')->get();
+
+
+        $subjects = Subject_model::get();
+
+        return view('chapter.edit', compact('Standard'));
     }
 }

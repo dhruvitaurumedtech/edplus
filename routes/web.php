@@ -160,7 +160,7 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter/get-subject', [ChapterController::class, 'get_subjects']);
     Route::post('chapter-save', [ChapterController::class, 'chapter_save'])->name('chapter.save');
     Route::post('chapter-list', [ChapterController::class, 'chapter_lists']);
-    Route::post('chapter/edit/{id}', [ChapterController::class, 'chapter_edit']);
+    Route::get('chapter/edit/{id}', [ChapterController::class, 'chapter_edit']);
 
     //topic
     Route::get('add-topic', [TopicController::class, 'index'])->name('add.topic');

@@ -73,12 +73,12 @@
                       <div class="d-flex align-items-center">
                         <div class="d-flex">
                           @canButton('edit', 'Chapter')
-                          <a href="{{url('chapter/edit/'.$value->chapter_id)}}" class="btn text-white btn-rmv2" value="Edit">&nbsp;&nbsp;
-                            @endCanButton
-                            &nbsp;&nbsp;
-                            @canButton('delete', 'Chapter')
-                            <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                            @endCanButton
+                          <a href="{{url('chapter/edit/'.$value->chapter_id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
+                          @endCanButton
+                          &nbsp;&nbsp;
+                          @canButton('delete', 'Chapter')
+                          <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
+                          @endCanButton
                         </div>
                       </div>
                       <br>
