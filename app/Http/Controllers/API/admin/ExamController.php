@@ -676,19 +676,22 @@ class ExamController extends Controller
     //         ], 400);
     //     }
     // }
+
+
     public function fetch_exam_form_detail(Request $request)
     {
-        $token = $request->header('Authorization');
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
 
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $institute_id = $request->institute_id;
-        $user_id = $request->user_id;
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
+
+        try {
+            $user_id  = Auth::id();
             $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
-                ->where('institute_for_sub.institute_id', $institute_id)
+                ->where('institute_for_sub.institute_id', $request->institute_id)
                 ->where('institute_for_sub.user_id', $user_id)
                 ->select('institute_for.*')->get();
 
@@ -700,7 +703,7 @@ class ExamController extends Controller
                 ];
             }
             $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')
-                ->where('board_sub.institute_id', $institute_id)
+                ->where('board_sub.institute_id', $request->institute_id)
                 ->where('board_sub.user_id', $user_id)
                 ->select('board.*')->get()->toarray();
             $board_list = [];
@@ -711,7 +714,7 @@ class ExamController extends Controller
                 ];
             }
             $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
-                ->where('medium_sub.institute_id', $institute_id)
+                ->where('medium_sub.institute_id', $request->institute_id)
                 ->where('medium_sub.user_id', $user_id)
                 ->select('medium.*')->get();
             $medium_list = [];
@@ -722,7 +725,7 @@ class ExamController extends Controller
                 ];
             }
             $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
-                ->where('class_sub.institute_id', $institute_id)
+                ->where('class_sub.institute_id', $request->institute_id)
                 ->where('class_sub.user_id', $user_id)
                 ->select('class.*')->get();
 
@@ -734,7 +737,7 @@ class ExamController extends Controller
                 ];
             }
             $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
-                ->where('standard_sub.institute_id', $institute_id)
+                ->where('standard_sub.institute_id', $request->institute_id)
                 ->where('standard_sub.user_id', $user_id)
                 ->select('standard.*')->get();
 
@@ -746,8 +749,8 @@ class ExamController extends Controller
                 ];
             }
             $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
-                ->where('stream_sub.institute_id', $institute_id)
-                ->where('stream_sub.user_id', $user_id)
+                ->where('stream_sub.institute_id', $request->institute_id)
+                ->where('stream_sub.user_id', $request->user_id)
                 ->select('stream.*')->get();
             $stream_list = [];
             foreach ($stream as $stream_value) {
@@ -757,7 +760,7 @@ class ExamController extends Controller
                 ];
             }
             $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
-                ->where('subject_sub.institute_id', $institute_id)
+                ->where('subject_sub.institute_id', $request->institute_id)
                 ->where('subject_sub.user_id', $user_id)
                 ->select('subject.*')->get();
             $subject_list = [];
@@ -768,7 +771,7 @@ class ExamController extends Controller
                 ];
             }
 
-            $batches = Batches_model::where('institute_id', $institute_id)
+            $batches = Batches_model::where('institute_id', $request->institute_id)
                 ->where('user_id', $user_id)->get();
             $batches_list = [];
             foreach ($batches as $batches_value) {
@@ -789,16 +792,9 @@ class ExamController extends Controller
                 'batches_list' => $batches_list
 
             ];
-            return response()->json([
-                'status' => 200,
-                'message' => 'Successfully Fetch data.',
-                'data' => $response_data
-            ], 200, [], JSON_NUMERIC_CHECK);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($response_data, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 }
