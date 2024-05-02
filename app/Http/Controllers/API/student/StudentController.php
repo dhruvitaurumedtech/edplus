@@ -737,24 +737,28 @@ class StudentController extends Controller
 
                 $today = date('Y-m-d');
                 $todays_lecture = [];
-                // $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.institute_id')
-                //     ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                //     ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                //     ->join('batches', 'batches.id', '=', 'time_table.board_id')
-                //     ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                //     ->where('time_table.batch_id', $getstdntdata->batch_id)
-                //     ->where('time_table.day', $today)
-                //     ->select('subject.name as subject', 'users.firstname', 'users.lastname', 'lecture_type.name as lecture_type_name', 'batches.*', 'standard.name as standard')
-                //     ->paginate(2);
+                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                    ->where('time_table.batch_id', $getstdntdata->batch_id)
+                    ->where('time_table.lecture_date', $today)
+                    ->select('subject.name as subject', 
+                    'users.firstname', 'users.lastname',
+                     'lecture_type.name as lecture_type_name', 
+                     'time_table.start_time','time_table.end_time','time_table.lecture_date')
+                    ->paginate(2);
 
-                // foreach ($todayslect as $todayslecDT) {
-                //     $todays_lecture[] = array(
-                //         'subject' => $todayslecDT->subject,
-                //         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                //         'start_time' => $todayslecDT->start_time,
-                //         'end_time' => $todayslecDT->end_time,
-                //     );
-                // }
+                foreach ($todayslect as $todayslecDT) {
+                    $todays_lecture[] = array(
+                        'subject' => $todayslecDT->subject,
+                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'lecture_date'=>$todayslecDT->lecture_date,
+                        'lecture_type'=>$todayslecDT->lecture_type_name,
+                        'start_time' => $todayslecDT->start_time,
+                        'end_time' => $todayslecDT->end_time,
+                    );
+                }
 
                 $subjects = [];
                 $result = [];
@@ -1957,6 +1961,7 @@ class StudentController extends Controller
         }
     }
 
+    
 
     // public function child_detail(Request $request)
     // {
