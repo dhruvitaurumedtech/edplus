@@ -1937,146 +1937,227 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+
     //remove institute from student 
+    // public function remove_institute(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+    //         $institute_id = $request->institute_id;
+    //         $student_id = $request->user_id;
+
+    //         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //         if ($existingUser) {
+    //             $gette = Student_detail::where('student_id', $student_id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->first();
+    //             if (!empty($gette)) {
+    //                 $remove = Student_detail::where('student_id', $student_id)
+    //                     ->where('institute_id', $institute_id)
+    //                     ->delete();
+    //                 return response()->json([
+    //                     'success' => 200,
+    //                     'message' => 'Institute Remove',
+    //                     'data' => []
+    //                 ], 200);
+    //             } else {
+    //                 return response()->json([
+    //                     'success' => 200,
+    //                     'message' => 'Data not found',
+    //                     'data' => []
+    //                 ], 200);
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
     public function remove_institute(Request $request)
     {
-
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'institute_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
             $institute_id = $request->institute_id;
-            $student_id = $request->user_id;
-
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                $gette = Student_detail::where('student_id', $student_id)
+            $student_id = Auth::id();
+            $gette = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $institute_id)
+                ->first();
+            if (!empty($gette)) {
+                $remove = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)
-                    ->first();
-                if (!empty($gette)) {
-                    $remove = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $institute_id)
-                        ->delete();
-                    return response()->json([
-                        'success' => 200,
-                        'message' => 'Institute Remove',
-                        'data' => []
-                    ], 200);
-                } else {
-                    return response()->json([
-                        'success' => 200,
-                        'message' => 'Data not found',
-                        'data' => []
-                    ], 200);
-                }
+                    ->delete();
+                return $this->response([], "Institute Removed");
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                return $this->response([], "Data not found", false, 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
     //exam result
+    // public function exam_result(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'exam_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $student_id = $request->user_id;
+    //         $exam_id = $request->exam_id;
+
+    //         $existingUser = User::where('token', $token)->where('id', $student_id)->first();
+    //         if ($existingUser) {
+
+    //             $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+    //                 ->where('exam.id', $exam_id)
+    //                 ->where('institute_detail.end_academic_year', '>=', now())
+    //                 ->first();
+    //             $result = [];
+    //             if (!empty($stdetails)) {
+
+    //                 $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+    //                     ->join('subject', 'subject.id', '=', 'exam.subject_id')
+    //                     ->where('marks.student_id', $student_id)
+    //                     ->where('marks.exam_id', $exam_id)
+    //                     ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+    //                     ->orderByDesc('marks.created_at')->limit(3)->first();
+
+    //                 $highestMarks = Marks_model::where('exam_id', $exam_id)->max('mark');
+
+
+    //                 if (!empty($resulttQY)) {
+    //                     $result[] = array(
+    //                         'subject' => $resulttQY->subjectname,
+    //                         'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
+    //                         'total_marks' => $resulttQY->total_mark,
+    //                         'achiveddmarks_marks' => $resulttQY->mark,
+    //                         'date' => $resulttQY->exam_date,
+    //                         'class_highest' => $highestMarks
+    //                     );
+    //                 }
+    //             }
+
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Result Fetch Successfully',
+    //                 'data' => $result
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function exam_result(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'exam_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'exam_id' => 'required|exists:exam,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
+            $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+                ->where('exam.id', $request->exam_id)
+                ->where('institute_detail.end_academic_year', '>=', now())
+                ->first();
 
-            $student_id = $request->user_id;
-            $exam_id = $request->exam_id;
+            $result = [];
+            if (!empty($stdetails)) {
 
-            $existingUser = User::where('token', $token)->where('id', $student_id)->first();
-            if ($existingUser) {
+                $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+                    ->join('subject', 'subject.id', '=', 'exam.subject_id')
+                    ->where('marks.student_id', AUth::id())
+                    ->where('marks.exam_id', $request->exam_id)
+                    ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+                    ->orderByDesc('marks.created_at')->limit(3)->first();
 
-                $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
-                    ->where('exam.id', $exam_id)
-                    ->where('institute_detail.end_academic_year', '>=', now())
-                    ->first();
-
-                $result = [];
-                if (!empty($stdetails)) {
-
-                    $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
-                        ->join('subject', 'subject.id', '=', 'exam.subject_id')
-                        ->where('marks.student_id', $student_id)
-                        ->where('marks.exam_id', $exam_id)
-                        ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
-                        ->orderByDesc('marks.created_at')->limit(3)->first();
-
-                    $highestMarks = Marks_model::where('exam_id', $exam_id)->max('mark');
+                $highestMarks = Marks_model::where('exam_id', $request->exam_id)->max('mark');
 
 
-                    if (!empty($resulttQY)) {
-                        $result[] = array(
-                            'subject' => $resulttQY->subjectname,
-                            'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
-                            'total_marks' => $resulttQY->total_mark,
-                            'achiveddmarks_marks' => $resulttQY->mark,
-                            'date' => $resulttQY->exam_date,
-                            'class_highest' => $highestMarks
-                        );
-                    }
+                if (!empty($resulttQY)) {
+                    $result[] = array(
+                        'subject' => $resulttQY->subjectname,
+                        'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
+                        'total_marks' => $resulttQY->total_mark,
+                        'achiveddmarks_marks' => $resulttQY->mark,
+                        'date' => $resulttQY->exam_date,
+                        'class_highest' => $highestMarks
+                    );
                 }
-
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Result Fetch Successfully',
-                    'data' => $result
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($result, "Result Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+
     // public function student_list(Request $request)
     // {
     //     $token = $request->header('Authorization');
