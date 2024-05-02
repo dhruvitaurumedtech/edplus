@@ -76,14 +76,15 @@ class AuthController extends Controller
         $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
 
         if (!in_array($user->role_type, $validRoles)) {
-            $errorMessage = ($request->login_type == 1) ? "Please use Student Application" : "Please use Institute Application";
+            $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
             return $this->response([], $errorMessage, false, 400);
         }
 
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
-            $user->update(['token' => $token]);
+            $user->token = $token;
+            $user->save();
 
             $institute_id = ($user->role_type == 3) ? (optional($user->instituteDetail)->id) : null;
 
