@@ -4091,7 +4091,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($batch_response, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
 

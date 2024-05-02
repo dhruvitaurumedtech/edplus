@@ -925,7 +925,14 @@ class StudentController extends Controller
                     ->where('student_id', $user_id)
                     ->where('created_at', 'like', '%' . $cumnth . '%')
                     ->where('attendance', 'P')->count();
-                $totalattendlec = array('total_lectures' => '170', 'attend_lectures' => $totalattlec, 'miss_lectures' => '7');
+
+                $totllect = Timetable::where('lecture_date','like', '%' . $cumnth . '%')
+                ->where('batch_id', $getstdntdata->batch_id)
+                ->count();
+
+                $totalattendlec = array('total_lectures' => $totllect,
+                 'attend_lectures' => $totalattlec, 
+                 'miss_lectures' => $totllect - $totalattlec);
 
                 $studentdata = array(
                     'banners_data' => $banners_data,
@@ -2439,7 +2446,7 @@ class StudentController extends Controller
 
             return $this->response($lectures, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
 
