@@ -15,6 +15,7 @@
                     <li><a href="javascript:void(0)" class="active-link-dir">Create Chapter List</a></li>
                 </ul>
             </div>
+            @include('layouts/alert')
             <div class="dashboard-content side-content">
                 <a href="{{url('chapter-list')}}" class="btn text-white btn-rmv2"> Chapter List</a>
                 <form class="s-chapter-form" method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">

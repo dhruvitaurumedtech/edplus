@@ -284,7 +284,69 @@ class StudentController extends Controller
     //     }
     // }
 
+    // public function student_parents_details_add(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'user_id' => 'required|exists:users,id',
+    //         'parents.*.firstname' => 'required',
+    //         'parents.*.lastname' => 'required',
+    //         'parents.*.email' => 'required|email|unique:users,email',
+    //         'parents.*.mobile' => 'required',
+    //         'parents.*.relation' => 'required',
+    //     ]);
 
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         $student_id = Auth::id();
+    //         $parents = json_decode($request->parents, true);
+    //         foreach ($parents as $parentData) {
+    //             $requiredFields = ['firstname', 'lastname', 'email', 'mobile', 'relation'];
+    //             foreach ($requiredFields as $field) {
+    //                 if (empty($parentData[$field])) {
+    //                     return $this->response([], "ucfirst($field) . ' is a required field", false, 400);
+    //                 }
+    //             }
+    //             if (User::where('email', $parentData['email'])->exists()) {
+    //                 return $this->response([], "Email already exists", false, 400);
+    //             }
+    //             $user = User::create([
+    //                 'firstname' => $parentData['firstname'],
+    //                 'lastname' => $parentData['lastname'],
+    //                 'email' => $parentData['email'],
+    //                 'mobile' => $parentData['mobile'],
+    //                 'role_type' => '5'
+    //             ]);
+    //             $parent = Parents::create([
+    //                 'student_id' => $student_id,
+    //                 'parent_id' => $user->id,
+    //                 'institute_id' => $request->input('institute_id'),
+    //                 'relation' => $parentData['relation'],
+    //                 'verify' => '0',
+    //             ]);
+
+    //             if (empty($parent->id)) {
+    //                 $user->delete();
+    //                 return response()->json([
+    //                     'success' => 500,
+    //                     'message' => 'Data not added successfully',
+    //                     'data' => [],
+    //                 ], 500);
+    //             }
+    //             $data = [
+    //                 'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
+    //                 'email' => $parentData['email'],
+    //                 'id' => $parent->id
+    //             ];
+    //             //Mail::to($parentData['email'])->send(new WelcomeMail($data));
+    //         }
+    //         return $this->response([], "Parent details uploaded successfully");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
 
 
 
@@ -743,18 +805,23 @@ class StudentController extends Controller
                     ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                     ->where('time_table.batch_id', $getstdntdata->batch_id)
                     ->where('time_table.lecture_date', $today)
-                    ->select('subject.name as subject', 
-                    'users.firstname', 'users.lastname',
-                     'lecture_type.name as lecture_type_name', 
-                     'time_table.start_time','time_table.end_time','time_table.lecture_date')
+                    ->select(
+                        'subject.name as subject',
+                        'users.firstname',
+                        'users.lastname',
+                        'lecture_type.name as lecture_type_name',
+                        'time_table.start_time',
+                        'time_table.end_time',
+                        'time_table.lecture_date'
+                    )
                     ->paginate(2);
 
                 foreach ($todayslect as $todayslecDT) {
                     $todays_lecture[] = array(
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                        'lecture_date'=>$todayslecDT->lecture_date,
-                        'lecture_type'=>$todayslecDT->lecture_type_name,
+                        'lecture_date' => $todayslecDT->lecture_date,
+                        'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $todayslecDT->start_time,
                         'end_time' => $todayslecDT->end_time,
                     );
@@ -1105,623 +1172,992 @@ class StudentController extends Controller
 
 
     //topic videos
+    // public function topic_videos(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'subject_id' => 'required',
+    //         'institute_id' => 'required',
+    //         //'video_cayegory'=>'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //         dd($existingUser);
+    //         if ($existingUser) {
+
+    //             $user_id = $request->user_id;
+    //             $subject_id = $request->subject_id;
+    //             $chapter_id = $request->chapter_id;
+    //             $institute_id = $request->institute_id;
+    //             //$video_cayegory = $request->video_cayegory;
+
+    //             $topics = [];
+    //             $category = [];
+    //             $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+    //                 ->select(
+    //                     'do_business_with.id',
+    //                     'do_business_with.name',
+    //                     'video_categories.id as vid',
+    //                     'video_categories.name as vname'
+    //                 )
+    //                 ->whereIn('do_business_with.id', function ($query) {
+    //                     $query->select('topic.video_category_id')
+    //                         ->from('topic')
+    //                         ->groupBy('topic.video_category_id');
+    //                 })
+    //                 ->get();
+
+
+    //             // if ($existingUser->role_type != 6) {
+    //             //     $batch_list = Batches_model::where('institute_id', $institute_id)
+    //             //         ->where('user_id', $user_id)
+    //             //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+    //             //         ->select('*')
+    //             //         ->get();
+    //             //     foreach ($batch_list as $value) {
+    //             //         $batch_response[] = [
+    //             //             'batch_id' => $value->id,
+    //             //             'batch_name' => $value->batch_name,
+    //             //         ];
+    //             //     }
+    //             // }
+    //             $topicqry = [];
+    //             foreach ($catgry as $catvd) {
+
+    //                 $topics = [];
+    //                 $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
+    //                     ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
+    //                     ->where('topic.subject_id', $subject_id)
+    //                     //->where('topic.chapter_id', $chapter_id)
+    //                     ->when($chapter_id, function ($query, $chapter_id) {
+    //                         return $query->where('topic.chapter_id', $chapter_id);
+    //                     })
+    //                     ->where('topic.institute_id', $institute_id)
+    //                     ->where('topic.video_category_id', $catvd->vid)
+    //                     ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+    //                     ->orderByDesc('topic.created_at')
+    //                     ->get();
+    //                 // echo "<pre>";
+    //                 // print_r($topicqry);
+    //                 // exit;
+    //                 $response = [];
+    //                 foreach ($topicqry as $topval) {
+    //                     if ($existingUser->role_type == 6) {
+    //                         $batchID = Student_detail::where('institute_id', $institute_id)
+    //                             ->where('student_id', $user_id)->first();
+    //                         $std_batchidd = $batchID->batch_id;
+
+    //                         $vidasbt = VideoAssignToBatch::where('batch_id', $std_batchidd)
+    //                             ->where('video_id', $topval->id)
+    //                             ->where('standard_id', $topval->standard_id)
+    //                             ->where('chapter_id', $topval->chapter_id)
+    //                             ->where('subject_id', $topval->subject_id)
+    //                             ->select('id')->first();
+    //                         if (!empty($vidasbt->id)) {
+    //                             $topics[] = array(
+    //                                 "id" => $topval->id,
+    //                                 "topic_no" => $topval->topic_no,
+    //                                 "topic_name" => $topval->topic_name . '',
+    //                                 "topic_video" => asset($topval->topic_video),
+    //                                 "subject_id" => $topval->subject_id,
+    //                                 "subject_name" => $topval->sname,
+    //                                 "chapter_id" => $topval->chapter_id,
+    //                                 "chapter_name" => $topval->chname,
+    //                                 "status" => True
+    //                             );
+    //                             //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
+    //                             // $category[] = array('id' => $catvd->id, 
+    //                             // 'category_name' => $catvd->name, 
+    //                             // 'parent_category_id' => $catvd->vid,
+    //                             //  'parent_category_name' => $catvd->vname,
+    //                             //  'topics' => $topics);
+    //                         }
+    //                     } else {
+
+    //                         $batch_list = Batches_model::where('institute_id', $institute_id)
+    //                             ->where('user_id', $user_id)
+    //                             ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+    //                             ->select('*')
+    //                             ->get();
+    //                         $batch_response = [];
+    //                         foreach ($batch_list as $value) {
+    //                             $batch_response[] = [
+    //                                 'batch_id' => $value->id,
+    //                                 'batch_name' => $value->batch_name,
+    //                             ];
+    //                         }
+
+    //                         $topics[] = array(
+    //                             "id" => $topval->id,
+    //                             "topic_no" => $topval->topic_no,
+    //                             "topic_name" => $topval->topic_name . '',
+    //                             "topic_video" => asset($topval->topic_video),
+    //                             "subject_id" => $topval->subject_id,
+    //                             "subject_name" => $topval->sname,
+    //                             "chapter_id" => $topval->chapter_id,
+    //                             "chapter_name" => $topval->chname,
+    //                             "status" => false,
+    //                             "batch_list" => $batch_response,
+    //                         );
+    //                         //$category[$catvd->name] = array('id' => $catvd->id,
+    //                         // $category[] = array('id' => $catvd->id,
+    //                         //  'category_name' => $catvd->name,
+    //                         //   'parent_category_id' => $catvd->vid, 
+    //                         //   'parent_category_name' => $catvd->vname,
+    //                         //    'topics' => $topics);
+    //                     }
+    //                 }
+    //                 $category[] = array(
+    //                     'id' => $catvd->id,
+    //                     'category_name' => $catvd->name,
+    //                     'parent_category_id' => $catvd->vid,
+    //                     'parent_category_name' => $catvd->vname,
+    //                     'topics' => $topics
+    //                 );
+    //             }
+
+    //             //$response = $category;
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => $category,
+
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
     public function topic_videos(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'subject_id' => 'required',
-            'institute_id' => 'required',
-            //'video_cayegory'=>'required',
+        $validator = Validator::make($request->all(), [
+            'subject_id' => 'required|exists:subject,id',
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
+            $user_id = Auth::id();
+            $subject_id = $request->subject_id;
+            $chapter_id = $request->chapter_id;
+            $institute_id = $request->institute_id;
+            $category = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
+                ->select(
+                    'do_business_with.id',
+                    'do_business_with.name',
+                    'video_categories.id as vid',
+                    'video_categories.name as vname'
+                )
+                ->whereIn('do_business_with.id', function ($query) {
+                    $query->select('topic.video_category_id')
+                        ->from('topic')
+                        ->groupBy('topic.video_category_id');
+                })
+                ->get();
 
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            dd($existingUser);
-            if ($existingUser) {
-
-                $user_id = $request->user_id;
-                $subject_id = $request->subject_id;
-                $chapter_id = $request->chapter_id;
-                $institute_id = $request->institute_id;
-                //$video_cayegory = $request->video_cayegory;
-
-                $topics = [];
-                $category = [];
-                $catgry = Dobusinesswith_Model::join('video_categories', 'video_categories.id', '=', 'do_business_with.category_id')
-                    ->select(
-                        'do_business_with.id',
-                        'do_business_with.name',
-                        'video_categories.id as vid',
-                        'video_categories.name as vname'
-                    )
-                    ->whereIn('do_business_with.id', function ($query) {
-                        $query->select('topic.video_category_id')
-                            ->from('topic')
-                            ->groupBy('topic.video_category_id');
+            $response = [];
+            foreach ($category as $catvd) {
+                $topics = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
+                    ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
+                    ->when($chapter_id, function ($query, $chapter_id) {
+                        return $query->where('topic.chapter_id', $chapter_id);
                     })
+                    ->where('topic.subject_id', $subject_id)
+                    ->where('topic.institute_id', $institute_id)
+                    ->where('topic.video_category_id', $catvd->vid)
+                    ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
+                    ->orderByDesc('topic.created_at')
                     ->get();
 
+                $topicsArray = [];
+                foreach ($topics as $topval) {
+                    $status = Auth::user()->role_type == 6 ? VideoAssignToBatch::where('batch_id', Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first()->batch_id)
+                        ->where('video_id', $topval->id)
+                        ->where('standard_id', $topval->standard_id)
+                        ->where('chapter_id', $topval->chapter_id)
+                        ->where('subject_id', $topval->subject_id)
+                        ->exists() : false;
 
-                // if ($existingUser->role_type != 6) {
-                //     $batch_list = Batches_model::where('institute_id', $institute_id)
-                //         ->where('user_id', $user_id)
-                //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                //         ->select('*')
-                //         ->get();
-                //     foreach ($batch_list as $value) {
-                //         $batch_response[] = [
-                //             'batch_id' => $value->id,
-                //             'batch_name' => $value->batch_name,
-                //         ];
-                //     }
-                // }
-                $topicqry = [];
-                foreach ($catgry as $catvd) {
+                    $batch_response = [];
+                    if (!$status) {
+                        $batch_list = Batches_model::where('institute_id', $institute_id)
+                            ->where('user_id', $user_id)
+                            ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                            ->select('id', 'batch_name')
+                            ->get();
 
-                    $topics = [];
-                    $topicqry = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
-                        ->join('chapters', 'chapters.id', '=', 'topic.chapter_id')
-                        ->where('topic.subject_id', $subject_id)
-                        //->where('topic.chapter_id', $chapter_id)
-                        ->when($chapter_id, function ($query, $chapter_id) {
-                            return $query->where('topic.chapter_id', $chapter_id);
-                        })
-                        ->where('topic.institute_id', $institute_id)
-                        ->where('topic.video_category_id', $catvd->vid)
-                        ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
-                        ->orderByDesc('topic.created_at')
-                        ->get();
-                    // echo "<pre>";
-                    // print_r($topicqry);
-                    // exit;
-                    $response = [];
-                    foreach ($topicqry as $topval) {
-                        if ($existingUser->role_type == 6) {
-                            $batchID = Student_detail::where('institute_id', $institute_id)
-                                ->where('student_id', $user_id)->first();
-                            $std_batchidd = $batchID->batch_id;
-
-                            $vidasbt = VideoAssignToBatch::where('batch_id', $std_batchidd)
-                                ->where('video_id', $topval->id)
-                                ->where('standard_id', $topval->standard_id)
-                                ->where('chapter_id', $topval->chapter_id)
-                                ->where('subject_id', $topval->subject_id)
-                                ->select('id')->first();
-                            if (!empty($vidasbt->id)) {
-                                $topics[] = array(
-                                    "id" => $topval->id,
-                                    "topic_no" => $topval->topic_no,
-                                    "topic_name" => $topval->topic_name . '',
-                                    "topic_video" => asset($topval->topic_video),
-                                    "subject_id" => $topval->subject_id,
-                                    "subject_name" => $topval->sname,
-                                    "chapter_id" => $topval->chapter_id,
-                                    "chapter_name" => $topval->chname,
-                                    "status" => True
-                                );
-                                //$category[$catvd->name] = array('id' => $catvd->id, 'category_name' => $catvd->name, 'parent_category_id' => $catvd->vid, 'parent_category_name' => $catvd->vname, 'topics' => $topics);
-                                // $category[] = array('id' => $catvd->id, 
-                                // 'category_name' => $catvd->name, 
-                                // 'parent_category_id' => $catvd->vid,
-                                //  'parent_category_name' => $catvd->vname,
-                                //  'topics' => $topics);
-                            }
-                        } else {
-
-                            $batch_list = Batches_model::where('institute_id', $institute_id)
-                                ->where('user_id', $user_id)
-                                ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                                ->select('*')
-                                ->get();
-                            $batch_response = [];
-                            foreach ($batch_list as $value) {
-                                $batch_response[] = [
-                                    'batch_id' => $value->id,
-                                    'batch_name' => $value->batch_name,
-                                ];
-                            }
-
-                            $topics[] = array(
-                                "id" => $topval->id,
-                                "topic_no" => $topval->topic_no,
-                                "topic_name" => $topval->topic_name . '',
-                                "topic_video" => asset($topval->topic_video),
-                                "subject_id" => $topval->subject_id,
-                                "subject_name" => $topval->sname,
-                                "chapter_id" => $topval->chapter_id,
-                                "chapter_name" => $topval->chname,
-                                "status" => false,
-                                "batch_list" => $batch_response,
-                            );
-                            //$category[$catvd->name] = array('id' => $catvd->id,
-                            // $category[] = array('id' => $catvd->id,
-                            //  'category_name' => $catvd->name,
-                            //   'parent_category_id' => $catvd->vid, 
-                            //   'parent_category_name' => $catvd->vname,
-                            //    'topics' => $topics);
-                        }
+                        $batch_response = $batch_list->map(function ($batch) {
+                            return [
+                                'batch_id' => $batch->id,
+                                'batch_name' => $batch->batch_name,
+                            ];
+                        })->toArray();
                     }
-                    $category[] = array(
-                        'id' => $catvd->id,
-                        'category_name' => $catvd->name,
-                        'parent_category_id' => $catvd->vid,
-                        'parent_category_name' => $catvd->vname,
-                        'topics' => $topics
-                    );
+
+                    $topicsArray[] = [
+                        "id" => $topval->id,
+                        "topic_no" => $topval->topic_no,
+                        "topic_name" => $topval->topic_name . '',
+                        "topic_video" => asset($topval->topic_video),
+                        "subject_id" => $topval->subject_id,
+                        "subject_name" => $topval->sname,
+                        "chapter_id" => $topval->chapter_id,
+                        "chapter_name" => $topval->chname,
+                        "status" => $status,
+                        "batch_list" => $batch_response,
+                    ];
                 }
 
-                //$response = $category;
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => $category,
-
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                $response[] = [
+                    'id' => $catvd->id,
+                    'category_name' => $catvd->name,
+                    'parent_category_id' => $catvd->vid,
+                    'parent_category_name' => $catvd->vname,
+                    'topics' => $topicsArray
+                ];
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+
+            return $this->response($response, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+    // public function profile_detail(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         try {
+    //             if ($existingUser->role_type == 6) {
+    //                 $student_id = $request->user_id;
+    //             } else {
+    //                 $user_id = $request->user_id;
+    //                 $student_id = $request->student_id;
+    //             }
+
+    //             $studentUser = User::where('id', $student_id)->first();
+
+    //             $institute_id = $request->institute_id;
+
+    //             $institutes = [];
+
+    //             $joininstitute = Institute_detail::where('status', 'active')
+    //                 ->whereIn('id', function ($query) use ($student_id) {
+    //                     $query->select('institute_id')
+    //                         ->where('student_id', $student_id)
+    //                         ->where('status', '=', '1')
+    //                         ->from('students_details');
+    //                 })
+    //                 ->when($institute_id, function ($query, $institute_id) {
+    //                     return $query->where('id', $institute_id);
+    //                 })
+    //                 ->get();
+
+    //             foreach ($joininstitute as $value) {
+    //                 $substdnt = Student_detail::where('student_id', $student_id)
+    //                     ->where('institute_id', $value->id)->first();
+
+    //                 $subids = explode(',', $substdnt->subject_id);
+    //                 $subjectids = Subject_model::whereIN('id', $subids)->get();
+    //                 $subs = [];
+    //                 foreach ($subjectids as $subDT) {
+    //                     $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
+    //                 }
+    //                 $institutes[] = array(
+    //                     'id' => $value->id,
+    //                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
+    //                     'address' => $value->address,
+    //                     'logo' => asset($value->logo),
+    //                     'subjects' => $subs //subject enroll with us
+    //                 );
+    //             }
+
+    //             //
+    //             $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
+    //                 ->join('board', 'board.id', '=', 'students_details.board_id')
+    //                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+    //                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
+    //                 ->where('students_details.student_id', $student_id)
+    //                 ->where('students_details.status', '=', '1')
+    //                 ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
+
+    //             //parents
+    //             $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
+    //                 ->where('parents.student_id', $student_id)->get();
+    //             $parents_dt = [];
+    //             foreach ($parentsQY as $parentsDT) {
+    //                 $parents_dt[] = array(
+    //                     'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
+    //                     'email' => $parentsDT->email,
+    //                     'mobile' => $parentsDT->mobile,
+    //                     'relation' => $parentsDT->relation
+    //                 );
+    //             }
+    //             //
+    //             if ($studentUser->image) {
+    //                 $img = $studentUser->image;
+    //             } else {
+    //                 $img = asset('default.jpg');
+    //             }
+    //             $userdetail = array(
+    //                 'id' => $studentUser->id,
+    //                 'unique_id' => $studentUser->unique_id . '',
+    //                 'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
+    //                 'email' => $studentUser->email,
+    //                 'mobile' => $studentUser->mobile . '',
+    //                 'image' => $img . '',
+    //                 'dob' => $studentUser->dob,
+    //                 'address' => $studentUser->address,
+    //                 'standard' => $sdtls ? $sdtls->standard . '(' . $sdtls->stream . ')' : '',
+    //                 'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
+    //                 'school' => $studentUser->school_name,
+    //                 'area' => $studentUser->area,
+    //                 'institutes' => $institutes,
+    //                 'parents' => $parents_dt
+    //             );
+
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch data.',
+    //                 'data' => $userdetail,
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } catch (\Exception $e) {
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Something went wrong',
+    //                 'data' => array('error' => $e->getMessage()),
+    //             ], 500);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
+
 
     public function profile_detail(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
+        $validator = Validator::make($request->all(), []);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
-            try {
-                if ($existingUser->role_type == 6) {
-                    $student_id = $request->user_id;
-                } else {
-                    $user_id = $request->user_id;
-                    $student_id = $request->student_id;
-                }
-
-                $studentUser = User::where('id', $student_id)->first();
-
-                $institute_id = $request->institute_id;
-
-                $institutes = [];
-
-                $joininstitute = Institute_detail::where('status', 'active')
-                    ->whereIn('id', function ($query) use ($student_id) {
-                        $query->select('institute_id')
-                            ->where('student_id', $student_id)
-                            ->where('status', '=', '1')
-                            ->from('students_details');
-                    })
-                    ->when($institute_id, function ($query, $institute_id) {
-                        return $query->where('id', $institute_id);
-                    })
-                    ->get();
-
-                foreach ($joininstitute as $value) {
-                    $substdnt = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $value->id)->first();
-
-                    $subids = explode(',', $substdnt->subject_id);
-                    $subjectids = Subject_model::whereIN('id', $subids)->get();
-                    $subs = [];
-                    foreach ($subjectids as $subDT) {
-                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
-                    }
-                    $institutes[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                        'subjects' => $subs //subject enroll with us
-                    );
-                }
-
-                //
-                $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
-                    ->join('board', 'board.id', '=', 'students_details.board_id')
-                    ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                    ->join('medium', 'medium.id', '=', 'students_details.medium_id')
-                    ->where('students_details.student_id', $student_id)
-                    ->where('students_details.status', '=', '1')
-                    ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
-
-                //parents
-                $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
-                    ->where('parents.student_id', $student_id)->get();
-                $parents_dt = [];
-                foreach ($parentsQY as $parentsDT) {
-                    $parents_dt[] = array(
-                        'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
-                        'email' => $parentsDT->email,
-                        'mobile' => $parentsDT->mobile,
-                        'relation' => $parentsDT->relation
-                    );
-                }
-                //
-                if ($studentUser->image) {
-                    $img = $studentUser->image;
-                } else {
-                    $img = asset('default.jpg');
-                }
-                $userdetail = array(
-                    'id' => $studentUser->id,
-                    'unique_id' => $studentUser->unique_id . '',
-                    'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
-                    'email' => $studentUser->email,
-                    'mobile' => $studentUser->mobile . '',
-                    'image' => $img . '',
-                    'dob' => $studentUser->dob,
-                    'address' => $studentUser->address,
-                    'standard' => $sdtls ? $sdtls->standard . '(' . $sdtls->stream . ')' : '',
-                    'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
-                    'school' => $studentUser->school_name,
-                    'area' => $studentUser->area,
-                    'institutes' => $institutes,
-                    'parents' => $parents_dt
-                );
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => $userdetail,
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Something went wrong',
-                    'data' => array('error' => $e->getMessage()),
-                ], 500);
+        try {
+            if (Auth::user()->role_type == 6) {
+                $student_id = $request->user_id;
+            } else {
+                $student_id = $request->student_id;
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+
+            $studentUser = User::where('id', $student_id)->first();
+
+            $institute_id = $request->institute_id;
+
+            $institutes = [];
+
+            $joininstitute = Institute_detail::where('status', 'active')
+                ->whereIn('id', function ($query) use ($student_id) {
+                    $query->select('institute_id')
+                        ->where('student_id', $student_id)
+                        ->where('status', '=', '1')
+                        ->from('students_details');
+                })
+                ->when($institute_id, function ($query, $institute_id) {
+                    return $query->where('id', $institute_id);
+                })
+                ->get();
+
+            foreach ($joininstitute as $value) {
+                $substdnt = Student_detail::where('student_id', $student_id)
+                    ->where('institute_id', $value->id)->first();
+
+                $subids = explode(',', $substdnt->subject_id);
+                $subjectids = Subject_model::whereIN('id', $subids)->get();
+                $subs = [];
+                foreach ($subjectids as $subDT) {
+                    $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
+                }
+                $institutes[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                    'subjects' => $subs
+                );
+            }
+            $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->join('board', 'board.id', '=', 'students_details.board_id')
+                ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->join('medium', 'medium.id', '=', 'students_details.medium_id')
+                ->where('students_details.student_id', $student_id)
+                ->where('students_details.status', '=', '1')
+                ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
+
+            $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
+                ->where('parents.student_id', $student_id)->get();
+            $parents_dt = [];
+            foreach ($parentsQY as $parentsDT) {
+                $parents_dt[] = array(
+                    'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
+                    'email' => $parentsDT->email,
+                    'mobile' => $parentsDT->mobile,
+                    'relation' => $parentsDT->relation
+                );
+            }
+            if ($studentUser->image) {
+                $img = $studentUser->image;
+            } else {
+                $img = asset('default.jpg');
+            }
+            $userdetail = array(
+                'id' => $studentUser->id,
+                'unique_id' => $studentUser->unique_id . '',
+                'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
+                'email' => $studentUser->email,
+                'mobile' => $studentUser->mobile . '',
+                'image' => $img . '',
+                'dob' => $studentUser->dob,
+                'address' => $studentUser->address,
+                'standard' => $sdtls ? $sdtls->standard . '(' . $sdtls->stream . ')' : '',
+                'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
+                'school' => $studentUser->school_name,
+                'area' => $studentUser->area,
+                'institutes' => $institutes,
+                'parents' => $parents_dt
+            );
+            return $this->response($userdetail, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+    // public function student_edit_profile(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+    //         $user_id = $request->user_id;
+    //         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //         if ($existingUser) {
+    //             if ($request->file('image')) {
+    //                 $iconFile = $request->file('image');
+    //                 $imagePath = $iconFile->store('profile', 'public');
+    //             } else {
+    //                 $imagePath = null;
+    //             }
+
+
+    //             $updt = User::where('id', $user_id)
+    //                 ->update([
+    //                     'firstname' => $request->firstname,
+    //                     'lastname' => $request->lastname,
+    //                     //'email'=>$request->email,
+    //                     'mobile' => $request->mobile,
+    //                     'address' => $request->address,
+    //                     'dob' => $request->dob,
+    //                     'school_name' => $request->school_name,
+    //                     'image' => $imagePath,
+    //                     'area' => $request->area
+    //                 ]);
+
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Updated Successfully!',
+    //                 'data' => []
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
 
     public function student_edit_profile(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-        ]);
+        $validator = Validator::make($request->all(), []);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-            $user_id = $request->user_id;
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                if ($request->file('image')) {
-                    $iconFile = $request->file('image');
-                    $imagePath = $iconFile->store('profile', 'public');
-                } else {
-                    $imagePath = null;
-                }
-
-
-                $updt = User::where('id', $user_id)
-                    ->update([
-                        'firstname' => $request->firstname,
-                        'lastname' => $request->lastname,
-                        //'email'=>$request->email,
-                        'mobile' => $request->mobile,
-                        'address' => $request->address,
-                        'dob' => $request->dob,
-                        'school_name' => $request->school_name,
-                        'image' => $imagePath,
-                        'area' => $request->area
-                    ]);
-
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Updated Successfully!',
-                    'data' => []
-                ], 200);
+            $user = Auth::user();
+            $user->firstname = $request->firstname;
+            $user->lastname = $request->lastname;
+            $user->mobile = $request->mobile;
+            $user->address = $request->address;
+            $user->dob = $request->dob;
+            $user->school_name = $request->school_name;
+            $user->area = $request->area;
+            if ($request->file('image')) {
+                $iconFile = $request->file('image');
+                $imagePath = $iconFile->store('profile', 'public');
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                $imagePath = null;
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            $user->image = $imagePath;
+            $user->save();
+            return $this->response([], "Updated Successfully!");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+    // public function exams_list(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         //'institute_id'=>'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+    //         $institute_id = $request->institute_id;
+    //         $student_id = $request->user_id;
+
+    //         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //         if ($existingUser) {
+    //             // $stdetail = Student_detail::where('institute_id',$institute_id)
+    //             // ->where('student_id',$student_id)
+    //             // ->whereNull('deleted_at')
+    //             // ->first();
+
+    //             $stdetails = Student_detail::where('student_id', $student_id)
+    //                 ->when($institute_id, function ($query, $institute_id) {
+    //                     return $query->where('institute_id', $institute_id);
+    //                 })
+    //                 ->whereNull('deleted_at')
+    //                 ->get();
+
+    //             $examlist = [];
+    //             if (!empty($stdetails)) {
+    //                 foreach ($stdetails as $stdetail) {
+    //                     $subjectIds = explode(',', $stdetail->subject_id);
+    //                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+    //                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
+    //                         ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+    //                         ->where('institute_detail.end_academic_year', '>=', now())
+    //                         ->where('exam.board_id', $stdetail->board_id)
+    //                         ->where('exam.medium_id', $stdetail->medium_id)
+    //                         //->where('exam.class_id', $stdetail->class_id)
+    //                         ->where('exam.standard_id', $stdetail->standard_id)
+    //                         ->where('exam.institute_id', $stdetail->institute_id)
+    //                         ->where('exam.batch_id', $stdetail->batch_id)
+    //                         ->orWhere('exam.stream_id', $stdetail->stream_id)
+    //                         ->whereIN('exam.subject_id', $subjectIds)
+
+    //                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
+    //                         ->orderByDesc('exam.created_at')
+    //                         ->get();
+
+    //                     foreach ($exams as $examsDT) {
+    //                         $examlist[] = array(
+    //                             'institute_id' => $examsDT->institute_id,
+    //                             'institute_name' => $examsDT->institute_name,
+    //                             'exam_id' => $examsDT->id,
+    //                             'exam_title' => $examsDT->exam_title,
+    //                             'total_mark' => $examsDT->total_mark,
+    //                             'exam_type' => $examsDT->exam_type,
+    //                             'subject' => $examsDT->subject,
+    //                             'standard' => $examsDT->standard,
+    //                             'date' => $examsDT->exam_date,
+    //                             'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+    //                         );
+    //                     }
+    //                 }
+    //             }
+
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Exams List',
+    //                 'data' => $examlist
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
 
     public function exams_list(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            //'institute_id'=>'required',
-        ]);
+        $validator = Validator::make($request->all(), []);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
             $institute_id = $request->institute_id;
-            $student_id = $request->user_id;
+            $student_id = Auth::id();
+            $stdetails = Student_detail::where('student_id', $student_id)
+                ->when($institute_id, function ($query, $institute_id) {
+                    return $query->where('institute_id', $institute_id);
+                })
+                ->whereNull('deleted_at')
+                ->get();
 
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                // $stdetail = Student_detail::where('institute_id',$institute_id)
-                // ->where('student_id',$student_id)
-                // ->whereNull('deleted_at')
-                // ->first();
+            $examlist = [];
+            if (!empty($stdetails)) {
+                foreach ($stdetails as $stdetail) {
+                    $subjectIds = explode(',', $stdetail->subject_id);
+                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                        ->join('standard', 'standard.id', '=', 'exam.standard_id')
+                        ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+                        ->where('institute_detail.end_academic_year', '>=', now())
+                        ->where('exam.board_id', $stdetail->board_id)
+                        ->where('exam.medium_id', $stdetail->medium_id)
+                        //->where('exam.class_id', $stdetail->class_id)
+                        ->where('exam.standard_id', $stdetail->standard_id)
+                        ->where('exam.institute_id', $stdetail->institute_id)
+                        ->where('exam.batch_id', $stdetail->batch_id)
+                        ->orWhere('exam.stream_id', $stdetail->stream_id)
+                        ->whereIN('exam.subject_id', $subjectIds)
+                        ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
+                        ->orderByDesc('exam.created_at')
+                        ->get();
 
-                $stdetails = Student_detail::where('student_id', $student_id)
-                    ->when($institute_id, function ($query, $institute_id) {
-                        return $query->where('institute_id', $institute_id);
-                    })
-                    ->whereNull('deleted_at')
-                    ->get();
-
-                $examlist = [];
-                if (!empty($stdetails)) {
-                    foreach ($stdetails as $stdetail) {
-                        $subjectIds = explode(',', $stdetail->subject_id);
-                        $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
-                            ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                            ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
-                            ->where('institute_detail.end_academic_year', '>=', now())
-                            ->where('exam.board_id', $stdetail->board_id)
-                            ->where('exam.medium_id', $stdetail->medium_id)
-                            //->where('exam.class_id', $stdetail->class_id)
-                            ->where('exam.standard_id', $stdetail->standard_id)
-                            ->where('exam.institute_id', $stdetail->institute_id)
-                            ->where('exam.batch_id', $stdetail->batch_id)
-                            ->orWhere('exam.stream_id', $stdetail->stream_id)
-                            ->whereIN('exam.subject_id', $subjectIds)
-
-                            ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
-                            ->orderByDesc('exam.created_at')
-                            ->get();
-
-                        foreach ($exams as $examsDT) {
-                            $examlist[] = array(
-                                'institute_id' => $examsDT->institute_id,
-                                'institute_name' => $examsDT->institute_name,
-                                'exam_id' => $examsDT->id,
-                                'exam_title' => $examsDT->exam_title,
-                                'total_mark' => $examsDT->total_mark,
-                                'exam_type' => $examsDT->exam_type,
-                                'subject' => $examsDT->subject,
-                                'standard' => $examsDT->standard,
-                                'date' => $examsDT->exam_date,
-                                'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
-                            );
-                        }
+                    foreach ($exams as $examsDT) {
+                        $examlist[] = array(
+                            'institute_id' => $examsDT->institute_id,
+                            'institute_name' => $examsDT->institute_name,
+                            'exam_id' => $examsDT->id,
+                            'exam_title' => $examsDT->exam_title,
+                            'total_mark' => $examsDT->total_mark,
+                            'exam_type' => $examsDT->exam_type,
+                            'subject' => $examsDT->subject,
+                            'standard' => $examsDT->standard,
+                            'date' => $examsDT->exam_date,
+                            'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                        );
                     }
                 }
-
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Exams List',
-                    'data' => $examlist
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($examlist, "Exams List");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
+
+
     //remove institute from student 
+    // public function remove_institute(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+    //         $institute_id = $request->institute_id;
+    //         $student_id = $request->user_id;
+
+    //         $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //         if ($existingUser) {
+    //             $gette = Student_detail::where('student_id', $student_id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->first();
+    //             if (!empty($gette)) {
+    //                 $remove = Student_detail::where('student_id', $student_id)
+    //                     ->where('institute_id', $institute_id)
+    //                     ->delete();
+    //                 return response()->json([
+    //                     'success' => 200,
+    //                     'message' => 'Institute Remove',
+    //                     'data' => []
+    //                 ], 200);
+    //             } else {
+    //                 return response()->json([
+    //                     'success' => 200,
+    //                     'message' => 'Data not found',
+    //                     'data' => []
+    //                 ], 200);
+    //             }
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
     public function remove_institute(Request $request)
     {
-
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'institute_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
             $institute_id = $request->institute_id;
-            $student_id = $request->user_id;
-
-            $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-            if ($existingUser) {
-                $gette = Student_detail::where('student_id', $student_id)
+            $student_id = Auth::id();
+            $gette = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $institute_id)
+                ->first();
+            if (!empty($gette)) {
+                $remove = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)
-                    ->first();
-                if (!empty($gette)) {
-                    $remove = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $institute_id)
-                        ->delete();
-                    return response()->json([
-                        'success' => 200,
-                        'message' => 'Institute Remove',
-                        'data' => []
-                    ], 200);
-                } else {
-                    return response()->json([
-                        'success' => 200,
-                        'message' => 'Data not found',
-                        'data' => []
-                    ], 200);
-                }
+                    ->delete();
+                return $this->response([], "Institute Removed");
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                return $this->response([], "Data not found", false, 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 
     //exam result
+    // public function exam_result(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'user_id' => 'required',
+    //         'exam_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
+
+    //     try {
+    //         $token = $request->header('Authorization');
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
+
+    //         $student_id = $request->user_id;
+    //         $exam_id = $request->exam_id;
+
+    //         $existingUser = User::where('token', $token)->where('id', $student_id)->first();
+    //         if ($existingUser) {
+
+    //             $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+    //                 ->where('exam.id', $exam_id)
+    //                 ->where('institute_detail.end_academic_year', '>=', now())
+    //                 ->first();
+    //             $result = [];
+    //             if (!empty($stdetails)) {
+
+    //                 $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+    //                     ->join('subject', 'subject.id', '=', 'exam.subject_id')
+    //                     ->where('marks.student_id', $student_id)
+    //                     ->where('marks.exam_id', $exam_id)
+    //                     ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+    //                     ->orderByDesc('marks.created_at')->limit(3)->first();
+
+    //                 $highestMarks = Marks_model::where('exam_id', $exam_id)->max('mark');
+
+
+    //                 if (!empty($resulttQY)) {
+    //                     $result[] = array(
+    //                         'subject' => $resulttQY->subjectname,
+    //                         'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
+    //                         'total_marks' => $resulttQY->total_mark,
+    //                         'achiveddmarks_marks' => $resulttQY->mark,
+    //                         'date' => $resulttQY->exam_date,
+    //                         'class_highest' => $highestMarks
+    //                     );
+    //                 }
+    //             }
+
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Result Fetch Successfully',
+    //                 'data' => $result
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
+
+
     public function exam_result(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
-            'user_id' => 'required',
-            'exam_id' => 'required',
+        $validator = Validator::make($request->all(), [
+            'exam_id' => 'required|exists:exam,id',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
+            $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
+                ->where('exam.id', $request->exam_id)
+                ->where('institute_detail.end_academic_year', '>=', now())
+                ->first();
 
-            $student_id = $request->user_id;
-            $exam_id = $request->exam_id;
+            $result = [];
+            if (!empty($stdetails)) {
 
-            $existingUser = User::where('token', $token)->where('id', $student_id)->first();
-            if ($existingUser) {
+                $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+                    ->join('subject', 'subject.id', '=', 'exam.subject_id')
+                    ->where('marks.student_id', AUth::id())
+                    ->where('marks.exam_id', $request->exam_id)
+                    ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+                    ->orderByDesc('marks.created_at')->limit(3)->first();
 
-                $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
-                    ->where('exam.id', $exam_id)
-                    ->where('institute_detail.end_academic_year', '>=', now())
-                    ->first();
-
-                $result = [];
-                if (!empty($stdetails)) {
-
-                    $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
-                        ->join('subject', 'subject.id', '=', 'exam.subject_id')
-                        ->where('marks.student_id', $student_id)
-                        ->where('marks.exam_id', $exam_id)
-                        ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
-                        ->orderByDesc('marks.created_at')->limit(3)->first();
-
-                    $highestMarks = Marks_model::where('exam_id', $exam_id)->max('mark');
+                $highestMarks = Marks_model::where('exam_id', $request->exam_id)->max('mark');
 
 
-                    if (!empty($resulttQY)) {
-                        $result[] = array(
-                            'subject' => $resulttQY->subjectname,
-                            'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
-                            'total_marks' => $resulttQY->total_mark,
-                            'achiveddmarks_marks' => $resulttQY->mark,
-                            'date' => $resulttQY->exam_date,
-                            'class_highest' => $highestMarks
-                        );
-                    }
+                if (!empty($resulttQY)) {
+                    $result[] = array(
+                        'subject' => $resulttQY->subjectname,
+                        'title' => $resulttQY->exam_title . '(' . $resulttQY->exam_type . ')',
+                        'total_marks' => $resulttQY->total_mark,
+                        'achiveddmarks_marks' => $resulttQY->mark,
+                        'date' => $resulttQY->exam_date,
+                        'class_highest' => $highestMarks
+                    );
                 }
-
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Result Fetch Successfully',
-                    'data' => $result
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
             }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($result, "Result Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+
     // public function student_list(Request $request)
     // {
     //     $token = $request->header('Authorization');
@@ -2006,6 +2442,7 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
 
     // public function child_detail(Request $request)
     // {

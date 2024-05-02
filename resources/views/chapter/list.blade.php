@@ -57,19 +57,38 @@
                   </tr>
                 </thead>
                 <tbody>
-                  @php $i=1 @endphp
+
+                  @php
+                  $encounteredIds = [];
+                  $i = 1;
+                  @endphp
+
                   @foreach($Standards as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    <td>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</td>
-                    <td>
-                      {{$value->subject_name}}
+                    @if(!in_array($value->base_id, $encounteredIds))
+                    <td rowspan="3">
+                      {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
+
                     </td>
+                    @php
+                    $encounteredIds[] = $value->base_id;
+                    @endphp
+                    @endif
+                    <td>
+                      @foreach($subjects as $subject_value)
+
+                      @if($subject_value->id == $value->subject_id)
+                      {{$subject_value->name}}
+                      @endif
+
+                      @endforeach
+                    </td>
+
                     <td>{{$value->chapter_no}}</td>
                     <td>{{$value->chapter_name}}</td>
                     <td><img src="{{url($value->chapter_image)}}" class="img-resize"></td>
                     <td>
-
                       <div class="d-flex align-items-center">
                         <div class="d-flex">
                           @canButton('edit', 'Chapter')
@@ -81,12 +100,12 @@
                           @endCanButton
                         </div>
                       </div>
-                      <br>
                     </td>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
                 </tbody>
+
               </table>
               <div class="d-flex justify-content-end">
                 {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
