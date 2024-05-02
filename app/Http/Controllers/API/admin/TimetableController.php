@@ -114,8 +114,12 @@ class TimetableController extends Controller
                     $dayName = $current_date->format('l'); 
                     //echo "Date: " . $current_date->format('Y-m-d') . ", Day: $dayName <br>";
                     $lecture_date = $current_date->format('Y-m-d');
-                    $current_date->modify('+1 week'); 
 
+                    if($request->repeat == 1){
+                        $current_date->modify('+1 week'); 
+                    }else{
+                        $current_date->modify('+1 day'); 
+                    }
                     $timetable = new Timetable();
                     $timetable->time_table_base_id = $lastInsertedId;
                     $timetable->subject_id = $request->subject_id;
