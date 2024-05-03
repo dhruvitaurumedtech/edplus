@@ -476,9 +476,9 @@ class TeacherController extends Controller
             $announcement = [];
             $examlist = [];
             $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
-            $announcQY = announcements_model::where('institute_id', $institute_id)
-                ->whereRaw("FIND_IN_SET('4', role_type)")
-                ->get();
+            $announcQY = Common_announcement::where('institute_id', $institute_id)->Where('teacher_id', $teacher_id)->get();
+            // ->whereRaw("FIND_IN_SET('4', role_type)")
+
             foreach ($announcQY as $announcDT) {
                 $announcement[] = array(
                     'title' => $announcDT->title,
