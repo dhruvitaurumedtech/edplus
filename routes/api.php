@@ -127,7 +127,6 @@ Route::middleware(['auth:api'])->group(function () {
 
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
 Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
-Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
 
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
 // Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');

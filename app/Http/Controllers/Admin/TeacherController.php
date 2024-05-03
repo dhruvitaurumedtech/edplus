@@ -22,7 +22,7 @@ use Illuminate\Http\Request;
 
 class TeacherController extends Controller
 {
-
+    use ApiTrait;
     public function homescreen_teacher(Request $request)
     {
         $token = $request->header('Authorization');
@@ -444,134 +444,107 @@ class TeacherController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
+
         try {
-            $token = $request->header('Authorization');
-
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-
-            $teacher_id = $request->input('teacher_id');
-            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
-            if ($existingUser) {
-                $teacher_id = $request->teacher_id;
-                $institute_id = $request->institute_id;
+            $teacher_id = $request->teacher_id;
+            $institute_id = $request->institute_id;
 
 
-                //banner
+            //banner
 
-                $bannerss = Banner_model::where('status', 'active')
-                    ->Where('institute_id', $institute_id)
-                    ->Where('user_id', $teacher_id)
+            $bannerss = Banner_model::where('status', 'active')
+                ->Where('institute_id', $institute_id)
+                ->Where('user_id', $teacher_id)
+                ->paginate(10);
+
+            if ($bannerss->isEmpty()) {
+
+                $banners = Banner_model::where('status', 'active')
+                    ->Where('user_id', '1')
                     ->paginate(10);
-
-                if ($bannerss->isEmpty()) {
-
-                    $banners = Banner_model::where('status', 'active')
-                        ->Where('user_id', '1')
-                        ->paginate(10);
-                } else {
-                    $banners = $bannerss;
-                }
-                $banners_data = [];
-
-                foreach ($banners as $value) {
-                    $imgpath = asset($value->banner_image);
-                    $banners_data[] = array(
-                        'id' => $value->id,
-                        'banner_image' => $imgpath,
-                    );
-                }
-
-                $todays_lecture = [];
-                $subjects = [];
-                $result = [];
-                $announcement = [];
-                $examlist = [];
-
-
-                $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
-                $announcQY = announcements_model::where('institute_id', $institute_id)
-                    ->whereRaw("FIND_IN_SET('4', role_type)")
-                    ->get();
-                foreach ($announcQY as $announcDT) {
-                    $announcement[] = array(
-                        'title' => $announcDT->title,
-                        'desc' => $announcDT->detail,
-                        'time' => $announcDT->created_at
-                    );
-                }
-                $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
-                    ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                    ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                    ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-                    ->Rightjoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-
-                    ->where('teacher_detail.teacher_id', $teacher_id)
-                    ->where('teacher_detail.institute_id', $institute_id)
-                    ->whereNull('teacher_detail.deleted_at')
-                    ->select(
-                        'board.name as board_name',
-                        'standard.name as standard_name',
-                        'medium.name as medium_name',
-                        'teacher_assign_batch.batch_id',
-                        'batches.batch_name'
-                    )
-                    ->get()
-                    ->toArray();
-
-                echo "<pre>";
-                print_r($teacher_data);
-                exit;
-                // $teacher_data = [];
-
-                // TeacherAssignBatch::join('batches.id', '=', 'teacher_assign_batch.batch_id')
-                //     ->where('teacher_assign_batch.teacher_id', $teacher_id)
-                //     ->select('batches.batch_name')
-                //     ->get()->toaaray();
-                $teacher_response = [];
-                foreach ($teacher_data as $value) {
-
-                    $teacher_response = [
-                        'board' => $value['board_name'],
-                        'standard' => $value['standard_name'],
-                        'medium' => $value['medium_name']
-
-                    ];
-                }
-
-                $studentdata = array(
-                    'banners_data' => $banners_data,
-                    'todays_lecture' => $todays_lecture,
-                    'announcement' => $announcement,
-                    'class_detail' => $teacher_response,
-                );
-
-
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => $studentdata,
-                ], 200, [], JSON_NUMERIC_CHECK);
             } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
+                $banners = $bannerss;
             }
+            $banners_data = [];
+
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                );
+            }
+
+            $todays_lecture = [];
+            $subjects = [];
+            $result = [];
+            $announcement = [];
+            $examlist = [];
+
+
+            $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
+            $announcQY = announcements_model::where('institute_id', $institute_id)
+                ->whereRaw("FIND_IN_SET('4', role_type)")
+                ->get();
+            foreach ($announcQY as $announcDT) {
+                $announcement[] = array(
+                    'title' => $announcDT->title,
+                    'desc' => $announcDT->detail,
+                    'time' => $announcDT->created_at
+                );
+            }
+            $teacher_data = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->leftJoin('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
+                ->Rightjoin('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.institute_id', $institute_id)
+                ->whereNull('teacher_detail.deleted_at')
+                ->select(
+                    'board.name as board_name',
+                    'standard.name as standard_name',
+                    'medium.name as medium_name',
+                    'teacher_assign_batch.batch_id',
+                    'batches.batch_name'
+                )
+                ->get()
+                ->toArray();
+
+            echo "<pre>";
+            print_r($teacher_data);
+            exit;
+            // $teacher_data = [];
+
+            // TeacherAssignBatch::join('batches.id', '=', 'teacher_assign_batch.batch_id')
+            //     ->where('teacher_assign_batch.teacher_id', $teacher_id)
+            //     ->select('batches.batch_name')
+            //     ->get()->toaaray();
+            $teacher_response = [];
+            foreach ($teacher_data as $value) {
+
+                $teacher_response = [
+                    'board' => $value['board_name'],
+                    'standard' => $value['standard_name'],
+                    'medium' => $value['medium_name']
+
+                ];
+            }
+
+            $studentdata = array(
+                'banners_data' => $banners_data,
+                'todays_lecture' => $todays_lecture,
+                'announcement' => $announcement,
+                'class_detail' => $teacher_response,
+            );
+
+
+            return $this->response($data, "Successfully fetch data.");
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 }
