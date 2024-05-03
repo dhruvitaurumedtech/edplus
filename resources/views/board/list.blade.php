@@ -33,15 +33,15 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <label for="exampleInputEmail1">Icon : </label>
                     <input type="file" onchange="previewFile()" name="icon" id="nicon" class="form-control">
                     @error('icon')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
-                    <img src="" id="icon" alt="Icon" class="mt-2  mb-4 img-resize" style="display: none;">
+                  <div class="col-md-6">
+                    <img src="" id="icon" alt="Icon" class="img-resize mt-4" style="display: none;">
                   </div>
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">status : </label>
@@ -153,7 +153,7 @@
                           <div class="text-danger">{{ $message }}</div>
                           @enderror
                         </div>
-                        <div class="col-md-9">
+                        <div class="col-md-8">
                           <label for="exampleInputEmail1">Icon : </label>
                           <input type="hidden" name="old_icon" id="old_icon">
                           <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
@@ -161,8 +161,8 @@
                           <div class="text-danger">{{ $message }}</div>
                           @enderror
                         </div>
-                        <div class="col-md-3">
-                          <img src="" id="icon_update" alt="Icon" class="mt-4">
+                        <div class="col-md-4">
+                          <img src="" id="icon_update" alt="Icon" class="mt-4 img-resize">
                         </div>
 
                         <div class="col-md-12">

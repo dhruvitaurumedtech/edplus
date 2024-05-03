@@ -28,13 +28,20 @@ class ClassController extends Controller
     function create_class()
     {
         $classlist = Class_model::paginate(10);
-        return view('class.create', compact('classlist'));
+        return view('class.list', compact('classlist'));
     }
     function class_list_save(Request $request)
     {
         $request->validate([
-            'icon' => 'required|image|mimes:svg|max:2048',
-            'name' => 'required|unique:class,name',
+            'icon' => 'required|image|mimes:svg,png,jpg,jpeg|max:2048',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('class', 'name')
+                    ->ignore($request->input('name'))
+                    ->whereNull('deleted_at'),
+            ],
             'status' => 'required',
         ]);
         $iconFile = $request->file('icon');

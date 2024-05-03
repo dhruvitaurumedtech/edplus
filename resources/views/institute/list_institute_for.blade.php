@@ -31,24 +31,21 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-8 ">
+                  <div class="col-md-6">
                     <label>Image: </label>
                     <div class="input-group search-box-2">
                       <input type="file" name="icon" class="form-control" onchange="openFile(event)" />
                       </span>
                     </div>
                   </div>
-                  <div class="col-md-4 mt-5">
-                    <img id='output' src="" class="preview1" />
+                  <div class="col-md-6 mt-5">
+                    <img id='output' src="" class="img-resize" style="display: none;" />
                     @error(' icon') <div class="text-danger">{{ $message }}
                     </div>
                     @enderror
                   </div>
 
 
-                  <div class="col-md-12">
-                    <img src="" id="icon_create" alt="Icon" class="mt-2  mb-4 img-resize search-box" style="display: none;">
-                  </div>
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">status : </label>
                     <select class="form-control search-box" name="status">
@@ -156,7 +153,7 @@
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                       </div>
-                      <div class="col-md-9">
+                      <div class="col-md-8">
                         <label for="exampleInputEmail1">Icon : </label>
                         <input type="hidden" name="old_icon" id="old_icon">
                         <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
@@ -164,7 +161,7 @@
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
                       </div>
-                      <div class="col-md-3">
+                      <div class="col-md-4">
                         <img src="" id="icon_update" alt="Icon" class="img-resize mt-3">
                       </div>
 

@@ -129,9 +129,9 @@ class InstituteController extends Controller
     }
     public function institute_for_save(Request $request)
     {
-        // dd($request->all());exit;
         $request->validate([
-            'icon' => 'required|image|mimes:svg|max:2048',
+            'icon' => 'required|image|mimes:svg,png,jpg,jpeg|max:2048',
+
             'name' => [
                 'required',
                 'string',
