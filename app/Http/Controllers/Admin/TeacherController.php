@@ -256,7 +256,6 @@ class TeacherController extends Controller
                         'batch_id' => $values_batch['id'],
                     ]);
                 }
-
                 $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
                     Teacher_model::create([
@@ -273,7 +272,7 @@ class TeacherController extends Controller
                     ]);
                 }
             }
-            $student_details = User::where('id', $request->teacher_id)->update([
+            User::where('id', $request->teacher_id)->update([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
                 'address' => $request->address,
@@ -282,9 +281,6 @@ class TeacherController extends Controller
                 'employee_type' => $request->employee_type,
                 'qualification' => $request->qualification,
             ]);
-            if (!$student_details) {
-                return response()->json(['error' => 'Teacher not found'], 404);
-            }
             return $this->response([], "Teacher added successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
