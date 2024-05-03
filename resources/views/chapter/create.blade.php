@@ -55,7 +55,7 @@
                             <div class="search-box-2 form-group">
                                 <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
                             </div>
-                            <img id="output" src="" class="preview1 ImgPreview" />
+                            <img id="output" src="" class="img-resize" />
                         </div>
                         <div class="add-chapter-btn">
                             <a class="btn" id="addmore">
