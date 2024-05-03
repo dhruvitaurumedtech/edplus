@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Base_table;
 use App\Models\board;
 use App\Models\Class_model;
 use App\Models\Institute_for_model;
@@ -47,12 +48,8 @@ class BasetableControllerAPI extends Controller
 
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
-            $base_board = board::join('base_table', 'base_table.board', '=', 'board.id')
-                ->whereIN('base_table.board', $institute_for_ids)
-                ->select('board.id', 'board.name', 'board.icon')
-                ->distinct()
-                ->get();
-            $data = [];
+            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->distinct()->pluck('board');
+            $base_board = board::whereIn('id', $getBoardsId)->get();
             foreach ($base_board as $baseboard) {
                 $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon));
             }
@@ -304,7 +301,7 @@ class BasetableControllerAPI extends Controller
                 ->get();
             $data = [];
             foreach ($base_stream as $basestream) {
-                $data[] = array('id' => $basestream->id,'name' => $basestream->name);
+                $data[] = array('id' => $basestream->id, 'name' => $basestream->name);
             }
 
             return $this->response($data, "Fetch Data Successfully");
@@ -348,17 +345,19 @@ class BasetableControllerAPI extends Controller
                 $base_subject_query->whereIn('base_table.stream', $stream_ids);
             }
             $base_subject = $base_subject_query
-                ->select('subject.id', 'subject.name', 'subject.image','stream.name as stream_name','base_table.stream as stream_id')
+                ->select('subject.id', 'subject.name', 'subject.image', 'stream.name as stream_name', 'base_table.stream as stream_id')
                 ->distinct()
                 ->get();
 
             $data = [];
             foreach ($base_subject as $basesubject) {
-                $data[] = array('id' => $basesubject->id,
-                'name' => $basesubject->name,
-                'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
-                'stream_id'=>$basesubject->stream_id,
-                'stream_name'=>$basesubject->stream_name);
+                $data[] = array(
+                    'id' => $basesubject->id,
+                    'name' => $basesubject->name,
+                    'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
+                    'stream_id' => $basesubject->stream_id,
+                    'stream_name' => $basesubject->stream_name
+                );
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
