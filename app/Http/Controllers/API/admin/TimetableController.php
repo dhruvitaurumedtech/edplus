@@ -61,7 +61,7 @@ class TimetableController extends Controller
         return $this->response([],$validator->errors()->first(),false,400);
 
         try{
-
+            DB::beginTransaction();
             // if ($request->id) {
             //     $timetable = Timetable::find($request->id);
             //     if (!$timetable) {
@@ -115,9 +115,10 @@ class TimetableController extends Controller
                     $current_date->modify('+1 day'); 
                 }
             }
-
+            DB::commit();
             return $this->response([],'data save');
         }catch(Exeption $e){
+            DB::rollback();
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
