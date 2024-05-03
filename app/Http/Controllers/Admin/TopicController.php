@@ -58,6 +58,26 @@ class TopicController extends Controller
         $institute_list = Institute_detail::where('user_id', Auth::user()->id)->get();
         return view('topic.list', compact('Standard', 'topics', 'subjects', 'videolist', 'institute_list'));
     }
+    function list_topic(Request $request)
+    {
+        $Standard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
+            ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+            ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+            ->leftjoin('board', 'board.id', '=', 'base_table.board')
+            ->select(
+                'stream.name as sname',
+                'standard.*',
+                'medium.name as medium',
+                'board.name as board',
+                'base_table.id as base_id'
+            )
+            ->where('standard.status', 'active')->get();
+        $institute_list = Institute_detail::where('user_id', Auth::user()->id)->get();
+        $subjects = Subject_model::get();
+        $videolist = VideoCategory::get();
+
+        return view('topic.create', compact('Standard', 'institute_list', 'subjects', 'videolist'));
+    }
     public function get_chapter(Request $request)
     {
         $subject_id = $request->subject_id;
@@ -66,14 +86,16 @@ class TopicController extends Controller
     }
     public function topic_save(Request $request)
     {
-        // echo "<pre>";print_r($request->all());exit;
+        // echo "<pre>";
+        // print_r($request->all());
+        // exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
             'chapter_id' => 'required',
             'topic_no.*' => 'required',
-            'topic_name' => 'required|string',
-            'topic_name.*' => 'required|string',
+            'topic_name' => 'required',
+            'topic_name.*' => 'required',
             'video_category_id.*' => 'required',
             'video_upload.*' => 'required|mimes:mp4,mov,avi|max:10240',
         ]);
@@ -105,7 +127,7 @@ class TopicController extends Controller
             return back()->with('Success!', 'Data Added!');
         }
 
-        return redirect()->route('add.topic')->with('success', 'Topic Created Successfully');
+        return redirect()->route('list.topic')->with('success', 'Topic Created Successfully');
     }
     public function topic_list(Request $request)
     {

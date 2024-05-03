@@ -139,4 +139,3 @@
     </div>
   </div>
 </div>
-<script src="{{asset('mayal_assets/js/file.js')}}"></script>
