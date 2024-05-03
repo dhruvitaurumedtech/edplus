@@ -2244,6 +2244,7 @@ class InstituteApiController extends Controller
     //         $batch_id = $request->batch_id;
     //         $studentdtls = Student_detail::where('student_id', $student_id)
     //             ->where('institute_id', $institute_id)->first();
+                
     //         $insdelQY = Standard_sub::where('board_id', $request->board_id)
     //             ->where('medium_id', $request->medium_id)
     //             ->where('standard_id', $request->standard_id)
@@ -2254,6 +2255,7 @@ class InstituteApiController extends Controller
     //             return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
     //         }
     //         if (!empty($studentdtls)) {
+                
     //             $studentupdetail = [
     //                 'user_id' => $user_id,
     //                 'institute_id' => $request->institute_id,
@@ -2276,6 +2278,7 @@ class InstituteApiController extends Controller
     //             $studentdetail = Student_detail::where('student_id', $student_id)
     //                 ->where('institute_id', $institute_id)
     //                 ->update($studentupdetail);
+
     //             if (!empty($studentdetail) && !empty($request->first_name)) {
     //                 //student detail update
     //                 $student_details = User::find($student_id);
@@ -2288,9 +2291,9 @@ class InstituteApiController extends Controller
     //                     'mobile' => $request->mobile_no,
     //                 ]);
 
-    //                 $response = Student_detail::where('institute_id', $request->institute_id)
-    //                     ->where('student_id', $request->student_id)->first();
-
+    //                 $response = Student_detail::where('institute_id', $institute_id)
+    //                     ->where('student_id', $student_id)->first();
+                    
     //                 $reject_list = Student_detail::find($response->id);
     //                 $data = $reject_list->update(['status' => '1']);
 
@@ -2312,7 +2315,7 @@ class InstituteApiController extends Controller
     //                 return $this->response([], 'Not Inserted.', false, 400);
     //             }
     //         } else {
-
+                
     //             if ($existingUser->role_type != 6 && empty($request->student_id)) {
     //                 $data = user::create([
     //                     'firstname' => $request->first_name,
@@ -2326,7 +2329,7 @@ class InstituteApiController extends Controller
     //             } else {
     //                 $student_id = $student_id;
     //             }
-    //             $student_id = $request->user_id;
+                
     //             if (!empty($student_id)) {
     //                 $studentdetail = [
     //                     'user_id' => $user_id,
@@ -2345,11 +2348,11 @@ class InstituteApiController extends Controller
 
 
     //                 if ($request->stream_id == 'null' || $request->stream_id == '') {
-    //                     $studentupdetail['stream_id'] = null;
+    //                     $studentdetail['stream_id'] = null;
     //                 }
-
+                    
     //                 $studentdetailadd = Student_detail::create($studentdetail);
-
+                    
     //                 return $this->response([], 'Successfully Insert Student.');
     //             } else {
     //                 return $this->response([], 'Not Inserted.', false, 400);
@@ -2365,33 +2368,19 @@ class InstituteApiController extends Controller
 
     public function add_student(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
-        // echo "<pre>";print_r($request->all());exit;
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $institute_id = $request->institute_id;
-        $user_id = $request->user_id;
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
+        
             try {
-
+                DB::beginTransaction();
+                $institute_id = $request->institute_id;
+                $existingUser = User::where('id', $request->user_id)->first();
                 if ($existingUser->role_type == 6) {
                     $student_id = $request->user_id;
                     $institute_id = $request->institute_id;
@@ -2407,39 +2396,14 @@ class InstituteApiController extends Controller
                 $studentdtls = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)->first();
 
-
-                if ($existingUser->role_type == 6) {
-                    $student_id = $request->user_id;
-                    $institute_id = $request->institute_id;
-                    $getuidfins = Institute_detail::where('id', $institute_id)->first();
-                    $user_id = $getuidfins->user_id;
-                } else {
-                    $student_id = $request->student_id;
-                    $institute_id = $request->institute_id;
-                    $user_id = $request->user_id;
-                }
-
-                $studentdtls = Student_detail::where('student_id', $student_id)
-                    ->where('institute_id', $institute_id)->first();
-
-                // if ($request->stream_id != null) {
-                //     $stream_id = $request->stream_id;
-                // } else {
-                //     $stream_id = null;
-                // }
-
                 $insdelQY = Standard_sub::where('board_id', $request->board_id)
                     ->where('medium_id', $request->medium_id)
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
                     ->first();
-                if (empty($insdelQY)) {
-                    return response()->json([
-                        'status' => 400,
-                        'message' => 'institute are not working for this standard Please Select Currect Data.',
-                        'data' => []
-                    ], 400, [], JSON_NUMERIC_CHECK);
-                }
+                    if (empty($insdelQY)) {
+                        return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
+                    }
 
                 if (!empty($studentdtls)) {
 
@@ -2465,6 +2429,7 @@ class InstituteApiController extends Controller
                     $studentdetail = Student_detail::where('student_id', $student_id)
                         ->where('institute_id', $institute_id)
                         ->update($studentupdetail);
+
                     if (!empty($studentdetail) && !empty($request->first_name)) {
                         //student detail update
                         $student_details = User::find($student_id);
@@ -2477,8 +2442,8 @@ class InstituteApiController extends Controller
                             'mobile' => $request->mobile_no,
                         ]);
 
-                        $response = Student_detail::where('institute_id', $request->institute_id)
-                            ->where('student_id', $request->student_id)->first();
+                        $response = Student_detail::where('institute_id', $institute_id)
+                            ->where('student_id', $student_id)->first();
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
@@ -2497,15 +2462,9 @@ class InstituteApiController extends Controller
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 
-                        return response()->json([
-                            'status' => 200,
-                            'message' => 'Successfully Update Student.',
-                        ], 200, [], JSON_NUMERIC_CHECK);
+                        return $this->response([], 'Successfully Update Student.');
                     } else {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'Not Inserted.',
-                        ]);
+                        return $this->response([], 'Not Inserted.', false, 400);
                     }
                 } else {
 
@@ -2522,11 +2481,8 @@ class InstituteApiController extends Controller
                     } else {
                         $student_id = $student_id;
                     }
-                    $student_id = $request->user_id;
-                    //print_r($student_id);exit;
+                    
                     if (!empty($student_id)) {
-
-
                         $studentdetail = [
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
@@ -2544,35 +2500,21 @@ class InstituteApiController extends Controller
 
 
                         if ($request->stream_id == 'null' || $request->stream_id == '') {
-                            $studentupdetail['stream_id'] = null;
+                            $studentdetail['stream_id'] = null;
                         }
-
+                        
                         $studentdetailadd = Student_detail::create($studentdetail);
-
-                        return response()->json([
-                            'status' => 200,
-                            'message' => 'Successfully Insert Student.',
-                        ], 200, [], JSON_NUMERIC_CHECK);
+                        return $this->response([], 'Successfully Insert Student.');
                     } else {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'Not Inserted.',
-                        ]);
+                        return $this->response([], 'Not Inserted.', false, 400);
                     }
                 }
-            } catch (\Exception $e) {
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Something went wrong',
-                    'data' => array('error' => $e->getMessage()),
-                ], 500);
-            }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
-        }
+                DB::commit();
+                } catch (\Exception $e) {
+                    DB::rollback();
+                    return $this->response($e, "Invalid token.", false, 400);
+                }
+        
     }
 
     //institute all detail
