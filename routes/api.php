@@ -85,7 +85,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
     Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
-
+    Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);
@@ -101,7 +101,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list']);
 
 
-
+    // parent api
+    Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
 
     // Student Api 
     Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
@@ -141,8 +142,7 @@ Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'ins
 
 // Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
 
-Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 //parents API's
-Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
+
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
