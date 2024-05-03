@@ -80,7 +80,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/do_business_with', [InstituteApiController::class, 'do_business_with']);
     Route::post('/institute/All-Subject-List', [InstituteApiController::class, 'allsubjectList']);
     Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
-
+    Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
+    Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);
