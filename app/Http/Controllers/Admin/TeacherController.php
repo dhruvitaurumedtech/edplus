@@ -330,27 +330,18 @@ class TeacherController extends Controller
             'institute_id' => 'required|integer',
             'teacher_id' => 'required'
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-            $teacher_id = $request->input('teacher_id');
-
             $institute_id = $request->institute_id;
-            $institute_data = [];
             $boards = [];
-
             $institutedeta = Institute_detail::where('id', $institute_id)
                 ->select('id', 'institute_name', 'address', 'about_us')->first();
-
             $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
                 ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
-
-            $stdcount = Teacher_model::where('institute_id', $institute_id)->where('teacher_id', $teacher_id)->count();
+            $stdcount = Teacher_model::where('institute_id', $institute_id)->count();
             $subcount = Subject_sub::where('institute_id', $institute_id)->count();
-
             $institutedetaa = array(
                 'id' => $institutedeta->id,
                 'institute_name' => $institutedeta->institute_name,
@@ -363,8 +354,6 @@ class TeacherController extends Controller
                 'total_board' => count($boards),
                 'teacher' => 0
             );
-
-
             return $this->response($institutedetaa, "Successfully fetch data.");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
