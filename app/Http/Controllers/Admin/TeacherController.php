@@ -283,7 +283,7 @@ class TeacherController extends Controller
                 'qualification' => $request->qualification,
             ]);
             if (!$student_details) {
-                return $this->response([], "Teacher Not Found", false, 400);
+                return response()->json(['error' => 'Teacher not found'], 404);
             }
             return $this->response([], "Teacher added successfully");
         } catch (\Exception $e) {
