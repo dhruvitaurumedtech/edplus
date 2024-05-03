@@ -109,14 +109,15 @@ class BasetableControllerAPI extends Controller
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
             $medium_ids = explode(',', $request->medium_id);
-
-            $base_class = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
-                ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->whereIN('base_table.board', $board_ids)
-                ->whereIN('base_table.medium', $medium_ids)
-                ->select('class.id', 'class.name', 'class.icon')
-                ->distinct()
-                ->get();
+            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
+            // $base_class = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
+            //     ->whereIN('base_table.institute_for', $institute_for_ids)
+            //     ->whereIN('base_table.board', $board_ids)
+            //     ->whereIN('base_table.medium', $medium_ids)
+            //     ->select('class.id', 'class.name', 'class.icon')
+            //     ->distinct()
+            //     ->get();
+            $base_class =  Class_model::whereIn('id', $getClassId)->get();
             $data = [];
             foreach ($base_class as $baseclass) {
                 $data[] = array(
