@@ -443,25 +443,19 @@ class TeacherController extends Controller
             'teacher_id' => 'required',
             'institute_id' => 'required',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $teacher_id = $request->teacher_id;
             $institute_id = $request->institute_id;
-
-
             //banner
-
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->Where('user_id', $teacher_id)
                 ->paginate(10);
 
             if ($bannerss->isEmpty()) {
-
                 $banners = Banner_model::where('status', 'active')
                     ->Where('user_id', '1')
                     ->paginate(10);
@@ -469,7 +463,6 @@ class TeacherController extends Controller
                 $banners = $bannerss;
             }
             $banners_data = [];
-
             foreach ($banners as $value) {
                 $imgpath = asset($value->banner_image);
                 $banners_data[] = array(
@@ -477,14 +470,11 @@ class TeacherController extends Controller
                     'banner_image' => $imgpath,
                 );
             }
-
             $todays_lecture = [];
             $subjects = [];
             $result = [];
             $announcement = [];
             $examlist = [];
-
-
             $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
             $announcQY = announcements_model::where('institute_id', $institute_id)
                 ->whereRaw("FIND_IN_SET('4', role_type)")
@@ -514,36 +504,23 @@ class TeacherController extends Controller
                 )
                 ->get()
                 ->toArray();
-
-            echo "<pre>";
-            print_r($teacher_data);
-            exit;
-            // $teacher_data = [];
-
-            // TeacherAssignBatch::join('batches.id', '=', 'teacher_assign_batch.batch_id')
-            //     ->where('teacher_assign_batch.teacher_id', $teacher_id)
-            //     ->select('batches.batch_name')
-            //     ->get()->toaaray();
             $teacher_response = [];
             foreach ($teacher_data as $value) {
-
                 $teacher_response = [
                     'board' => $value['board_name'],
                     'standard' => $value['standard_name'],
-                    'medium' => $value['medium_name']
+                    'medium' => $value['medium_name'],
+                    'batch' => $value['batch_name']
 
                 ];
             }
-
             $studentdata = array(
                 'banners_data' => $banners_data,
                 'todays_lecture' => $todays_lecture,
                 'announcement' => $announcement,
                 'class_detail' => $teacher_response,
             );
-
-
-            return $this->response($data, "Successfully fetch data.");
+            return $this->response($studentdata, "Successfully fetch data.");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
