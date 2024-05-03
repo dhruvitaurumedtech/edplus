@@ -241,87 +241,53 @@ class TeacherController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => false,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-            $token = $request->header('Authorization');
+            $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
+            foreach ($subject as $value) {
+                $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                    ->select('*')->get()->toarray();
 
-            $teacher_id = $request->input('teacher_id');
-            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
-            if ($existingUser) {
-
-                $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
-
-                foreach ($subject as $value) {
-                    $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-                        ->select('*')->get()->toarray();
-
-                    foreach ($batch_list as $values_batch) {
-                        Batch_assign_teacher_model::create([
-                            'teacher_id' => $request->teacher_id,
-                            'batch_id' => $values_batch['id'],
-                        ]);
-                    }
-
-                    $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
-                    foreach ($base_table_response as $value2) {
-                        Teacher_model::create([
-                            'institute_id' => $request->institute_id,
-                            'teacher_id' => $request->teacher_id,
-                            'institute_for_id' => $value2['institute_for'],
-                            'board_id' => $value2['board'],
-                            'medium_id' => $value2['medium'],
-                            'class_id' => $value2['institute_for_class'],
-                            'standard_id' => $value2['standard'],
-                            'stream_id' => $value2['stream'],
-                            'subject_id' => $value['id'],
-                            'status' => '1',
-                        ]);
-                    }
+                foreach ($batch_list as $values_batch) {
+                    Batch_assign_teacher_model::create([
+                        'teacher_id' => $request->teacher_id,
+                        'batch_id' => $values_batch['id'],
+                    ]);
                 }
-                $student_details = User::where('id', $request->teacher_id)->update([
-                    'firstname' => $request->firstname,
-                    'lastname' => $request->lastname,
-                    'address' => $request->address,
-                    'email' => $request->email,
-                    'mobile' => $request->mobile,
-                    'employee_type' => $request->employee_type,
-                    'qualification' => $request->qualification,
-                ]);
 
-
-                if (!$student_details) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'User not found',
-                    ], 404);
+                $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
+                foreach ($base_table_response as $value2) {
+                    Teacher_model::create([
+                        'institute_id' => $request->institute_id,
+                        'teacher_id' => $request->teacher_id,
+                        'institute_for_id' => $value2['institute_for'],
+                        'board_id' => $value2['board'],
+                        'medium_id' => $value2['medium'],
+                        'class_id' => $value2['institute_for_class'],
+                        'standard_id' => $value2['standard'],
+                        'stream_id' => $value2['stream'],
+                        'subject_id' => $value['id'],
+                        'status' => '1',
+                    ]);
                 }
-                return response()->json([
-                    'success' => true,
-                    'message' => 'Teacher added successfully',
-                ], 200);
-            } else {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Invalid token.',
-                ], 400);
             }
+            $student_details = User::where('id', $request->teacher_id)->update([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'address' => $request->address,
+                'email' => $request->email,
+                'mobile' => $request->mobile,
+                'employee_type' => $request->employee_type,
+                'qualification' => $request->qualification,
+            ]);
+            if (!$student_details) {
+                return $this->response([], "Teacher Not Found", false, 400);
+            }
+            return $this->response([], "Teacher added successfully");
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Something went wrong',
-                'error' => $e->getMessage(),
-            ], 500);
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
     public function institute_detail(Request $request)

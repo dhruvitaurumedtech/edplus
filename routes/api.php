@@ -127,10 +127,10 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
     Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
+    Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
 });
 
 // Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
-Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
 
 
 
