@@ -459,13 +459,9 @@ class InstituteApiController extends Controller
         }
     }
 
-
-
-
     public function register_institute(Request $request)
     {
-
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
             'institute_for_id' => 'required',
             'institute_board_id' => 'required',
@@ -486,51 +482,31 @@ class InstituteApiController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
+
         try {
+            DB::beginTransaction();
             $subadminPrefix = 'ist_';
             $startNumber = 101;
-
             $lastInsertedId = DB::table('institute_detail')->orderBy('id', 'desc')->value('unique_id');
-            // echo $lastInsertedId;exit;
             if (!is_null($lastInsertedId)) {
                 $number = substr($lastInsertedId, 3);
                 $numbers = str_replace('_', '', $number);
-
                 $newID = $numbers + 1;
             } else {
                 $newID = $startNumber;
             }
-
             $paddedNumber = str_pad($newID, 3, '0', STR_PAD_LEFT);
-
             $unique_id = $subadminPrefix . $paddedNumber;
-
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
-            //institute_detail
-            //acedamic year
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
             $nextYear = date("d-m-Y", strtotime($nextYearDate));
             $dateString = $currentDate . " / " . $nextYear;
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
-                // 'youtube_link' => $request->input('youtube_link'),
-                // 'whatsaap_link' => $request->input('whatsaap_link'),
-                // 'facebook_link' => $request->input('facebook_link'),
-                // 'instagram_link' => $request->input('instagram_link'),
-                // 'website_link' => $request->input('website_link'),
-                // 'gst_slab' => $request->input('gst_slab'),
-                // 'gst_number' => $request->input('gst_number'),
-                // 'close_time' => $request->input('close_time'),
-                // 'open_time' => $request->input('open_time'),
                 'logo' => $imagePath,
                 'about_us' => $request->about_us,
                 'user_id' => $request->input('user_id'),
@@ -548,10 +524,8 @@ class InstituteApiController extends Controller
             ]);
             $lastInsertedId = $instituteDetail->id;
             $institute_name = $instituteDetail->institute_name;
-
             $subjectid = explode(',', $request->input('subject_id'));
             $sectsbbsiqy = Subject_model::whereIN('id', $subjectid)->pluck('base_table_id')->toArray();
-
             $uniqueArray = array_unique($sectsbbsiqy);
             $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
             foreach ($basedtqy as $svaluee) {
@@ -565,18 +539,11 @@ class InstituteApiController extends Controller
                 $insfor = Institute_for_sub::where('institute_id', $lastInsertedId)
                     ->where('institute_for_id', $institute_for)->first();
                 if (empty($insfor)) {
-
                     $createinstitutefor = Institute_for_sub::create([
                         'user_id' => $request->input('user_id'),
                         'institute_id' => $lastInsertedId,
                         'institute_for_id' => $institute_for,
                     ]);
-
-                    if (!$createinstitutefor) {
-                        $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->first();
-                        $delt = $instituteFordet->delete();
-                    }
                 }
 
                 $bordsubr = Institute_board_sub::where('institute_id', $lastInsertedId)
@@ -590,15 +557,6 @@ class InstituteApiController extends Controller
                         'institute_for_id' => $institute_for,
                         'board_id' => $board,
                     ]);
-
-                    if (!$createboard) {
-                        $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->first();
-                        $instituteFordet->delete();
-
-                        $instituteForSub = Institute_for_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-                    }
                 }
 
                 $medadded = Medium_sub::where('institute_id', $lastInsertedId)
@@ -614,18 +572,6 @@ class InstituteApiController extends Controller
                         'board_id' => $board,
                         'medium_id' => $medium,
                     ]);
-
-                    if (!$createmedium) {
-                        $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->first();
-                        $instituteFordet->delete();
-
-                        Institute_for_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Institute_board_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-                    }
                 }
 
                 $addedclas = Class_sub::where('institute_id', $lastInsertedId)
@@ -643,21 +589,6 @@ class InstituteApiController extends Controller
                         'medium_id' => $medium,
                         'class_id' => $institute_for_class,
                     ]);
-
-                    if (!$createclass) {
-                        $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->first();
-                        $instituteFordet->delete();
-
-                        Institute_for_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Institute_board_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Medium_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-                    }
                 }
 
                 $stndsubd = Standard_sub::where('institute_id', $lastInsertedId)
@@ -677,29 +608,8 @@ class InstituteApiController extends Controller
                         'class_id' => $institute_for_class,
                         'standard_id' => $standard,
                     ]);
-
-                    if (!$createstnd) {
-                        $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->first();
-                        $instituteFordet->delete();
-
-                        Institute_for_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Institute_board_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Medium_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-
-                        Class_sub::where('institute_id', $lastInsertedId)
-                            ->where('user_id', $request->input('user_id'))->delete();
-                    }
                 }
-
-
                 if ($stream != null) {
-
                     $addedsrm = Stream_sub::where('institute_id', $lastInsertedId)
                         ->where('institute_for_id', $institute_for)
                         ->where('board_id', $board)
@@ -720,102 +630,35 @@ class InstituteApiController extends Controller
                             'standard_id' => $standard,
                             'stream_id' => $stream,
                         ]);
-
-                        if (!$createstrem) {
-                            $instituteFordet = Institute_detail::where('id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->first();
-                            $instituteFordet->delete();
-
-                            Institute_for_sub::where('institute_id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->delete();
-
-                            Institute_board_sub::where('institute_id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->delete();
-
-                            Medium_sub::where('institute_id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->delete();
-
-                            Class_sub::where('institute_id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->delete();
-
-                            Standard_sub::where('institute_id', $lastInsertedId)
-                                ->where('user_id', $request->input('user_id'))->delete();
-                        }
                     }
                 }
             }
-
-            //end new code
-
-            //dobusiness
-            try {
-                $institute_work_id = explode(',', $request->input('institute_work_id'));
-                foreach ($institute_work_id as $value) {
-                    if ($value == 'other') {
-                        $instituteforadd = Dobusinesswith_Model::create([
-                            'name' => $request->input('do_businesswith_name'),
-                            'category_id' => $request->input('category_id'), //video category table id
-                            'created_by' => $request->input('user_id'),
-                            'status' => 'active',
-                        ]);
-                        $dobusinesswith_id = $instituteforadd->id;
-                    } else {
-                        $dobusinesswith_id = $value;
-                    }
-
-                    $addeddobusn = Dobusinesswith_sub::where('institute_id', $lastInsertedId)
-                        ->where('do_business_with_id', $dobusinesswith_id)
-                        ->first();
-
-                    if (empty($addeddobusn)) {
-                        Dobusinesswith_sub::create([
-                            'user_id' => $request->input('user_id'),
-                            'institute_id' => $lastInsertedId,
-                            'do_business_with_id' => $dobusinesswith_id,
-                        ]);
-                    }
+            $institute_work_id = explode(',', $request->input('institute_work_id'));
+            foreach ($institute_work_id as $value) {
+                if ($value == 'other') {
+                    $instituteforadd = Dobusinesswith_Model::create([
+                        'name' => $request->input('do_businesswith_name'),
+                        'category_id' => $request->input('category_id'),
+                        'created_by' => $request->input('user_id'),
+                        'status' => 'active',
+                    ]);
+                    $dobusinesswith_id = $instituteforadd->id;
+                } else {
+                    $dobusinesswith_id = $value;
                 }
-            } catch (\Exception $e) {
 
-                Subject_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
+                $addeddobusn = Dobusinesswith_sub::where('institute_id', $lastInsertedId)
+                    ->where('do_business_with_id', $dobusinesswith_id)
+                    ->first();
 
-                Standard_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Stream_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Standard_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Class_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Medium_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Institute_board_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Institute_for_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                Dobusinesswith_sub::where('institute_id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->delete();
-
-                $indel = Institute_detail::where('id', $lastInsertedId)
-                    ->where('user_id', $request->input('user_id'))->forceDelete();
-
-
-                return response()->json([
-                    'success' => 500,
-                    'message' => 'Server Error',
-                    'error' => $e->getMessage(),
-                ], 500);
+                if (empty($addeddobusn)) {
+                    Dobusinesswith_sub::create([
+                        'user_id' => $request->input('user_id'),
+                        'institute_id' => $lastInsertedId,
+                        'do_business_with_id' => $dobusinesswith_id,
+                    ]);
+                }
             }
-
-            //institute_for_sub
             $intitute_for_id = explode(',', $request->input('institute_for_id'));
             foreach ($intitute_for_id as $value) {
                 if ($value == 5) {
@@ -832,18 +675,10 @@ class InstituteApiController extends Controller
                 } else {
                     $institute_for_id = $value;
                 }
-                // Institute_for_sub::create([
-                //     'user_id' => $request->input('user_id'),
-                //     'institute_id' => $lastInsertedId,
-                //     'institute_for_id' => $institute_for_id,
-                // ]);
-
             }
-
             //board_sub
             $institute_board_id = explode(',', $request->input('institute_board_id'));
             foreach ($institute_board_id as $value) {
-                //other
                 if ($value == 4) {
                     $instituteboardadd = board::create([
                         'name' => $request->input('institute_board'),
@@ -859,132 +694,557 @@ class InstituteApiController extends Controller
                     $instituteboard_id = $value;
                 }
                 //end other
-
-                // Institute_board_sub::create([
-                //     'user_id' => $request->input('user_id'),
-                //     'institute_id' => $lastInsertedId,
-                //     'board_id' => $instituteboard_id,
-                // ]);
             }
-
-            // class
-            // $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
-            // foreach ($institute_for_class_id as $value) {
-
-            //     Class_sub::create([
-            //         'user_id' => $request->input('user_id'),
-            //         'institute_id' => $lastInsertedId,
-            //         'class_id' => $value,
-            //     ]);
-            // }
-
-            //medium
-            // $institute_medium_id = explode(',', $request->input('institute_medium_id'));
-            // foreach ($institute_medium_id as $value) {
-            //     Medium_sub::create([
-            //         'user_id' => $request->input('user_id'),
-            //         'institute_id' => $lastInsertedId,
-            //         'medium_id' => $value,
-            //     ]);
-            // }
-
-            //standard
-
-            //$standard_id = explode(',', $request->input('standard_id'));
-            // foreach ($standard_id as $value) {
-            //     Standard_sub::create([
-            //         'user_id' => $request->input('user_id'),
-            //         'institute_id' => $lastInsertedId,
-            //         'standard_id' => $value,
-            //     ]);
-            // }
-
-            //stream
-
-            // if ($request->input('stream_id')) {
-            //     $stream = explode(',', $request->input('stream_id'));
-            //     foreach ($stream as $value) {
-            //         Stream_sub::create([
-            //             'user_id' => $request->input('user_id'),
-            //             'institute_id' => $lastInsertedId,
-            //             'stream_id' => $value,
-            //         ]);
-            //     }
-            // }
-
-            //subject
 
             $subject_id = explode(',', $request->input('subject_id'));
-
             foreach ($subject_id as $value) {
-                try {
-                    $suadeed = Subject_sub::where('institute_id', $lastInsertedId)
-                        ->where('subject_id', $value)->get();
-                    if (empty($suadeed)) {
-                        Subject_sub::create([
-                            'user_id' => $request->input('user_id'),
-                            'institute_id' => $lastInsertedId,
-                            'subject_id' => $value,
-                        ]);
-                    }
-                } catch (\Exception $e) {
-
-                    Subject_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Standard_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Stream_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Standard_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Class_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Medium_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Institute_board_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Institute_for_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    Dobusinesswith_sub::where('institute_id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->delete();
-
-                    $indel = Institute_detail::where('id', $lastInsertedId)
-                        ->where('user_id', $request->input('user_id'))->forceDelete();
-
-
-                    return response()->json([
-                        'success' => 500,
-                        'message' => 'Server Error',
-                        'error' => $e->getMessage(),
-                    ], 500);
+                $suadeed = Subject_sub::where('institute_id', $lastInsertedId)
+                    ->where('subject_id', $value)->get();
+                if (empty($suadeed)) {
+                    Subject_sub::create([
+                        'user_id' => $request->input('user_id'),
+                        'institute_id' => $lastInsertedId,
+                        'subject_id' => $value,
+                    ]);
                 }
             }
-
-            return response()->json([
-                'success' => 200,
-                'message' => 'institute create Successfully',
-                'data' => [
-                    'institute_id' => $lastInsertedId,
-                    'institute_name' => $institute_name,
-                    'logo' => asset($imagePath)
-                ]
-            ], 200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Error creating institute',
-                'error' => $e->getMessage(),
-            ], 500);
+            $data = [
+                'institute_id' => $lastInsertedId,
+                'institute_name' => $institute_name,
+                'logo' => asset($imagePath)
+            ];
+            DB::commit();
+            return $this->response($data, "institute create Successfully");
+        } catch (Exception $e) {
+            DB::rollback();
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+    // public function register_institute123(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'user_id' => 'required|integer',
+    //         'institute_for_id' => 'required',
+    //         'institute_board_id' => 'required',
+    //         'institute_for_class_id' => 'required',
+    //         'institute_medium_id' => 'required',
+    //         'institute_work_id' => 'required',
+    //         'standard_id' => 'required',
+    //         'subject_id' => 'required',
+    //         'institute_name' => 'required|string',
+    //         'address' => 'required|string',
+    //         'contact_no' => 'required|integer|min:10',
+    //         'email' => 'required|email|unique:institute_detail,email',
+    //         'logo' => 'required',
+    //         'country' => 'required',
+    //         'state' => 'required',
+    //         'city' => 'required',
+    //         'pincode' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+    //     try {
+    //         $subadminPrefix = 'ist_';
+    //         $startNumber = 101;
+
+    //         $lastInsertedId = DB::table('institute_detail')->orderBy('id', 'desc')->value('unique_id');
+    //         // echo $lastInsertedId;exit;
+    //         if (!is_null($lastInsertedId)) {
+    //             $number = substr($lastInsertedId, 3);
+    //             $numbers = str_replace('_', '', $number);
+
+    //             $newID = $numbers + 1;
+    //         } else {
+    //             $newID = $startNumber;
+    //         }
+
+    //         $paddedNumber = str_pad($newID, 3, '0', STR_PAD_LEFT);
+
+    //         $unique_id = $subadminPrefix . $paddedNumber;
+
+    //         $iconFile = $request->file('logo');
+    //         $imagePath = $iconFile->store('icon', 'public');
+    //         //institute_detail
+    //         //acedamic year
+    //         $currentDate = date("d-m-Y");
+    //         $nextYearDate = date("d-m-Y", strtotime("+1 year"));
+    //         $nextYear = date("d-m-Y", strtotime($nextYearDate));
+    //         $dateString = $currentDate . " / " . $nextYear;
+    //         $instituteDetail = Institute_detail::create([
+    //             'unique_id' => $unique_id,
+    //             // 'youtube_link' => $request->input('youtube_link'),
+    //             // 'whatsaap_link' => $request->input('whatsaap_link'),
+    //             // 'facebook_link' => $request->input('facebook_link'),
+    //             // 'instagram_link' => $request->input('instagram_link'),
+    //             // 'website_link' => $request->input('website_link'),
+    //             // 'gst_slab' => $request->input('gst_slab'),
+    //             // 'gst_number' => $request->input('gst_number'),
+    //             // 'close_time' => $request->input('close_time'),
+    //             // 'open_time' => $request->input('open_time'),
+    //             'logo' => $imagePath,
+    //             'about_us' => $request->about_us,
+    //             'user_id' => $request->input('user_id'),
+    //             'institute_name' => $request->input('institute_name'),
+    //             'address' => $request->input('address'),
+    //             'contact_no' => $request->input('contact_no'),
+    //             'email' => $request->input('email'),
+    //             'country' => $request->input('country'),
+    //             'state' => $request->input('state'),
+    //             'city' => $request->input('city'),
+    //             'pincode' => $request->input('pincode'),
+    //             'status' => 'active',
+    //             'start_academic_year' => $currentDate,
+    //             'end_academic_year' => $nextYear
+    //         ]);
+    //         $lastInsertedId = $instituteDetail->id;
+    //         $institute_name = $instituteDetail->institute_name;
+
+    //         $subjectid = explode(',', $request->input('subject_id'));
+    //         $sectsbbsiqy = Subject_model::whereIN('id', $subjectid)->pluck('base_table_id')->toArray();
+
+    //         $uniqueArray = array_unique($sectsbbsiqy);
+    //         $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
+    //         foreach ($basedtqy as $svaluee) {
+    //             $institute_for = $svaluee->institute_for;
+    //             $board = $svaluee->board;
+    //             $medium = $svaluee->medium;
+    //             $institute_for_class = $svaluee->institute_for_class;
+    //             $standard = $svaluee->standard;
+    //             $stream = $svaluee->stream;
+
+    //             $insfor = Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('institute_for_id', $institute_for)->first();
+    //             if (empty($insfor)) {
+
+    //                 $createinstitutefor = Institute_for_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for,
+    //                 ]);
+
+    //                 if (!$createinstitutefor) {
+    //                     $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->first();
+    //                     $delt = $instituteFordet->delete();
+    //                 }
+    //             }
+
+    //             $bordsubr = Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('institute_for_id', $institute_for)
+    //                 ->where('board_id', $board)->first();
+
+    //             if (empty($bordsubr)) {
+    //                 $createboard = Institute_board_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for,
+    //                     'board_id' => $board,
+    //                 ]);
+
+    //                 if (!$createboard) {
+    //                     $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->first();
+    //                     $instituteFordet->delete();
+
+    //                     $instituteForSub = Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+    //                 }
+    //             }
+
+    //             $medadded = Medium_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('institute_for_id', $institute_for)
+    //                 ->where('board_id', $board)
+    //                 ->where('medium_id', $medium)
+    //                 ->first();
+    //             if (empty($medadded)) {
+    //                 $createmedium = Medium_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for,
+    //                     'board_id' => $board,
+    //                     'medium_id' => $medium,
+    //                 ]);
+
+    //                 if (!$createmedium) {
+    //                     $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->first();
+    //                     $instituteFordet->delete();
+
+    //                     Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+    //                 }
+    //             }
+
+    //             $addedclas = Class_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('institute_for_id', $institute_for)
+    //                 ->where('board_id', $board)
+    //                 ->where('medium_id', $medium)
+    //                 ->where('class_id', $institute_for_class)
+    //                 ->first();
+    //             if (empty($addedclas)) {
+    //                 $createclass = Class_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for,
+    //                     'board_id' => $board,
+    //                     'medium_id' => $medium,
+    //                     'class_id' => $institute_for_class,
+    //                 ]);
+
+    //                 if (!$createclass) {
+    //                     $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->first();
+    //                     $instituteFordet->delete();
+
+    //                     Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Medium_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+    //                 }
+    //             }
+
+    //             $stndsubd = Standard_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('institute_for_id', $institute_for)
+    //                 ->where('board_id', $board)
+    //                 ->where('medium_id', $medium)
+    //                 ->where('class_id', $institute_for_class)
+    //                 ->where('standard_id', $standard)
+    //                 ->first();
+    //             if (empty($stndsubd)) {
+    //                 $createstnd = Standard_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for,
+    //                     'board_id' => $board,
+    //                     'medium_id' => $medium,
+    //                     'class_id' => $institute_for_class,
+    //                     'standard_id' => $standard,
+    //                 ]);
+
+    //                 if (!$createstnd) {
+    //                     $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->first();
+    //                     $instituteFordet->delete();
+
+    //                     Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Medium_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+
+    //                     Class_sub::where('institute_id', $lastInsertedId)
+    //                         ->where('user_id', $request->input('user_id'))->delete();
+    //                 }
+    //             }
+
+
+    //             if ($stream != null) {
+
+    //                 $addedsrm = Stream_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('institute_for_id', $institute_for)
+    //                     ->where('board_id', $board)
+    //                     ->where('medium_id', $medium)
+    //                     ->where('class_id', $institute_for_class)
+    //                     ->where('standard_id', $standard)
+    //                     ->where('stream_id', $stream)
+    //                     ->first();
+
+    //                 if (empty($addedsrm)) {
+    //                     $createstrem = Stream_sub::create([
+    //                         'user_id' => $request->input('user_id'),
+    //                         'institute_id' => $lastInsertedId,
+    //                         'institute_for_id' => $institute_for,
+    //                         'board_id' => $board,
+    //                         'medium_id' => $medium,
+    //                         'class_id' => $institute_for_class,
+    //                         'standard_id' => $standard,
+    //                         'stream_id' => $stream,
+    //                     ]);
+
+    //                     if (!$createstrem) {
+    //                         $instituteFordet = Institute_detail::where('id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->first();
+    //                         $instituteFordet->delete();
+
+    //                         Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->delete();
+
+    //                         Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->delete();
+
+    //                         Medium_sub::where('institute_id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->delete();
+
+    //                         Class_sub::where('institute_id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->delete();
+
+    //                         Standard_sub::where('institute_id', $lastInsertedId)
+    //                             ->where('user_id', $request->input('user_id'))->delete();
+    //                     }
+    //                 }
+    //             }
+    //         }
+
+    //         //end new code
+
+    //         //dobusiness
+    //         try {
+    //             $institute_work_id = explode(',', $request->input('institute_work_id'));
+    //             foreach ($institute_work_id as $value) {
+    //                 if ($value == 'other') {
+    //                     $instituteforadd = Dobusinesswith_Model::create([
+    //                         'name' => $request->input('do_businesswith_name'),
+    //                         'category_id' => $request->input('category_id'), //video category table id
+    //                         'created_by' => $request->input('user_id'),
+    //                         'status' => 'active',
+    //                     ]);
+    //                     $dobusinesswith_id = $instituteforadd->id;
+    //                 } else {
+    //                     $dobusinesswith_id = $value;
+    //                 }
+
+    //                 $addeddobusn = Dobusinesswith_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('do_business_with_id', $dobusinesswith_id)
+    //                     ->first();
+
+    //                 if (empty($addeddobusn)) {
+    //                     Dobusinesswith_sub::create([
+    //                         'user_id' => $request->input('user_id'),
+    //                         'institute_id' => $lastInsertedId,
+    //                         'do_business_with_id' => $dobusinesswith_id,
+    //                     ]);
+    //                 }
+    //             }
+    //         } catch (\Exception $e) {
+
+    //             Subject_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Standard_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Stream_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Standard_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Class_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Medium_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             Dobusinesswith_sub::where('institute_id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->delete();
+
+    //             $indel = Institute_detail::where('id', $lastInsertedId)
+    //                 ->where('user_id', $request->input('user_id'))->forceDelete();
+
+
+    //             return response()->json([
+    //                 'success' => 500,
+    //                 'message' => 'Server Error',
+    //                 'error' => $e->getMessage(),
+    //             ], 500);
+    //         }
+
+    //         //institute_for_sub
+    //         $intitute_for_id = explode(',', $request->input('institute_for_id'));
+    //         foreach ($intitute_for_id as $value) {
+    //             if ($value == 5) {
+    //                 $instituteforadd = institute_for_model::create([
+    //                     'name' => $request->input('institute_for'),
+    //                     'status' => 'active',
+    //                 ]);
+    //                 $institute_for_id = $instituteforadd->id;
+    //                 Institute_for_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'institute_for_id' => $institute_for_id,
+    //                 ]);
+    //             } else {
+    //                 $institute_for_id = $value;
+    //             }
+    //             // Institute_for_sub::create([
+    //             //     'user_id' => $request->input('user_id'),
+    //             //     'institute_id' => $lastInsertedId,
+    //             //     'institute_for_id' => $institute_for_id,
+    //             // ]);
+
+    //         }
+
+    //         //board_sub
+    //         $institute_board_id = explode(',', $request->input('institute_board_id'));
+    //         foreach ($institute_board_id as $value) {
+    //             //other
+    //             if ($value == 4) {
+    //                 $instituteboardadd = board::create([
+    //                     'name' => $request->input('institute_board'),
+    //                     'status' => 'active',
+    //                 ]);
+    //                 $instituteboard_id = $instituteboardadd->id;
+    //                 Institute_board_sub::create([
+    //                     'user_id' => $request->input('user_id'),
+    //                     'institute_id' => $lastInsertedId,
+    //                     'board_id' => $instituteboard_id,
+    //                 ]);
+    //             } else {
+    //                 $instituteboard_id = $value;
+    //             }
+    //             //end other
+
+    //             // Institute_board_sub::create([
+    //             //     'user_id' => $request->input('user_id'),
+    //             //     'institute_id' => $lastInsertedId,
+    //             //     'board_id' => $instituteboard_id,
+    //             // ]);
+    //         }
+
+    //         // class
+    //         // $institute_for_class_id = explode(',', $request->input('institute_for_class_id'));
+    //         // foreach ($institute_for_class_id as $value) {
+
+    //         //     Class_sub::create([
+    //         //         'user_id' => $request->input('user_id'),
+    //         //         'institute_id' => $lastInsertedId,
+    //         //         'class_id' => $value,
+    //         //     ]);
+    //         // }
+
+    //         //medium
+    //         // $institute_medium_id = explode(',', $request->input('institute_medium_id'));
+    //         // foreach ($institute_medium_id as $value) {
+    //         //     Medium_sub::create([
+    //         //         'user_id' => $request->input('user_id'),
+    //         //         'institute_id' => $lastInsertedId,
+    //         //         'medium_id' => $value,
+    //         //     ]);
+    //         // }
+
+    //         //standard
+
+    //         //$standard_id = explode(',', $request->input('standard_id'));
+    //         // foreach ($standard_id as $value) {
+    //         //     Standard_sub::create([
+    //         //         'user_id' => $request->input('user_id'),
+    //         //         'institute_id' => $lastInsertedId,
+    //         //         'standard_id' => $value,
+    //         //     ]);
+    //         // }
+
+    //         //stream
+
+    //         // if ($request->input('stream_id')) {
+    //         //     $stream = explode(',', $request->input('stream_id'));
+    //         //     foreach ($stream as $value) {
+    //         //         Stream_sub::create([
+    //         //             'user_id' => $request->input('user_id'),
+    //         //             'institute_id' => $lastInsertedId,
+    //         //             'stream_id' => $value,
+    //         //         ]);
+    //         //     }
+    //         // }
+
+    //         //subject
+
+    //         $subject_id = explode(',', $request->input('subject_id'));
+
+    //         foreach ($subject_id as $value) {
+    //             try {
+    //                 $suadeed = Subject_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('subject_id', $value)->get();
+    //                 if (empty($suadeed)) {
+    //                     Subject_sub::create([
+    //                         'user_id' => $request->input('user_id'),
+    //                         'institute_id' => $lastInsertedId,
+    //                         'subject_id' => $value,
+    //                     ]);
+    //                 }
+    //             } catch (\Exception $e) {
+
+    //                 Subject_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Standard_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Stream_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Standard_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Class_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Medium_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Institute_board_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Institute_for_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 Dobusinesswith_sub::where('institute_id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->delete();
+
+    //                 $indel = Institute_detail::where('id', $lastInsertedId)
+    //                     ->where('user_id', $request->input('user_id'))->forceDelete();
+
+
+    //                 return response()->json([
+    //                     'success' => 500,
+    //                     'message' => 'Server Error',
+    //                     'error' => $e->getMessage(),
+    //                 ], 500);
+    //             }
+    //         }
+
+    //         return response()->json([
+    //             'success' => 200,
+    //             'message' => 'institute create Successfully',
+    //             'data' => [
+    //                 'institute_id' => $lastInsertedId,
+    //                 'institute_name' => $institute_name,
+    //                 'logo' => asset($imagePath)
+    //             ]
+    //         ], 200);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Error creating institute',
+    //             'error' => $e->getMessage(),
+    //         ], 500);
+    //     }
+    // }
 
     // function get_board(Request $request)
     // {
@@ -1954,7 +2214,154 @@ class InstituteApiController extends Controller
     // }
 
 
+    // public function add_student123(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_id' => 'required',
+    //         'user_id' => 'required',
+    //     ]);
 
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         DB::beginTransaction();
+    //         $institute_id = $request->institute_id;
+    //         $user_id = $request->user_id;
+    //         $existingUser = User::where('id', $request->user_id)->first();
+    //         if ($existingUser->role_type == 6) {
+    //             $student_id = $request->user_id;
+    //             $institute_id = $request->institute_id;
+    //             $getuidfins = Institute_detail::where('id', $institute_id)->first();
+    //             $user_id = $getuidfins->user_id;
+    //         } else {
+    //             $student_id = $request->student_id;
+    //             $institute_id = $request->institute_id;
+    //             $user_id = $request->user_id;
+    //         }
+
+    //         $batch_id = $request->batch_id;
+    //         $studentdtls = Student_detail::where('student_id', $student_id)
+    //             ->where('institute_id', $institute_id)->first();
+    //         $insdelQY = Standard_sub::where('board_id', $request->board_id)
+    //             ->where('medium_id', $request->medium_id)
+    //             ->where('standard_id', $request->standard_id)
+    //             ->where('institute_id', $institute_id)
+    //             ->first();
+
+    //         if (empty($insdelQY)) {
+    //             return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
+    //         }
+    //         if (!empty($studentdtls)) {
+    //             $studentupdetail = [
+    //                 'user_id' => $user_id,
+    //                 'institute_id' => $request->institute_id,
+    //                 'student_id' => $student_id,
+    //                 'institute_for_id' => $insdelQY->institute_for_id,
+    //                 'board_id' =>  $request->board_id,
+    //                 'medium_id' => $request->medium_id,
+    //                 'class_id' => $insdelQY->class_id,
+    //                 'standard_id' => $request->standard_id,
+    //                 'stream_id' => $request->stream_id,
+    //                 'subject_id' => $request->subject_id,
+    //                 'batch_id' => $batch_id,
+    //                 'status' => '1',
+    //             ];
+
+    //             if ($request->stream_id == 'null' || $request->stream_id == '') {
+    //                 $studentupdetail['stream_id'] = null;
+    //             }
+
+    //             $studentdetail = Student_detail::where('student_id', $student_id)
+    //                 ->where('institute_id', $institute_id)
+    //                 ->update($studentupdetail);
+    //             if (!empty($studentdetail) && !empty($request->first_name)) {
+    //                 //student detail update
+    //                 $student_details = User::find($student_id);
+    //                 $data = $student_details->update([
+    //                     'firstname' => $request->first_name,
+    //                     'lastname' => $request->last_name,
+    //                     'dob' => $request->date_of_birth,
+    //                     'address' => $request->address,
+    //                     'email' => $request->email_id,
+    //                     'mobile' => $request->mobile_no,
+    //                 ]);
+
+    //                 $response = Student_detail::where('institute_id', $request->institute_id)
+    //                     ->where('student_id', $request->student_id)->first();
+
+    //                 $reject_list = Student_detail::find($response->id);
+    //                 $data = $reject_list->update(['status' => '1']);
+
+
+    //                 $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
+    //                     ->where('parents.student_id', $student_id)
+    //                     ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
+    //                     ->get();
+    //                 foreach ($prnts as $prdetail) {
+    //                     $parDT = [
+    //                         'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+    //                         'email' => $prdetail,
+    //                         'id' => $prdetail->id
+    //                     ];
+    //                     Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
+    //                 }
+    //                 return $this->response([], 'Successfully Update Student.');
+    //             } else {
+    //                 return $this->response([], 'Not Inserted.', false, 400);
+    //             }
+    //         } else {
+
+    //             if ($existingUser->role_type != 6 && empty($request->student_id)) {
+    //                 $data = user::create([
+    //                     'firstname' => $request->first_name,
+    //                     'lastname' => $request->last_name,
+    //                     'dob' => $request->date_of_birth,
+    //                     'address' => $request->address,
+    //                     'email' => $request->email_id,
+    //                     'mobile' => $request->mobile_no,
+    //                 ]);
+    //                 $student_id = $data->id;
+    //             } else {
+    //                 $student_id = $student_id;
+    //             }
+    //             $student_id = $request->user_id;
+    //             if (!empty($student_id)) {
+    //                 $studentdetail = [
+    //                     'user_id' => $user_id,
+    //                     'institute_id' => $request->institute_id,
+    //                     'student_id' => $student_id,
+    //                     'institute_for_id' => $insdelQY->institute_for_id,
+    //                     'board_id' =>  $request->board_id,
+    //                     'medium_id' => $request->medium_id,
+    //                     'class_id' => $insdelQY->class_id,
+    //                     'standard_id' => $request->standard_id,
+    //                     'batch_id' => $batch_id,
+    //                     'stream_id' => $request->stream_id,
+    //                     'subject_id' => $request->subject_id,
+    //                     'status' => '0',
+    //                 ];
+
+
+    //                 if ($request->stream_id == 'null' || $request->stream_id == '') {
+    //                     $studentupdetail['stream_id'] = null;
+    //                 }
+
+    //                 $studentdetailadd = Student_detail::create($studentdetail);
+
+    //                 return $this->response([], 'Successfully Insert Student.');
+    //             } else {
+    //                 return $this->response([], 'Not Inserted.', false, 400);
+    //             }
+    //         }
+    //         DB::commit();
+    //         return $this->response([], "Banner created Successfully");
+    //     } catch (Exception $e) {
+    //         DB::rollback();
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
 
     public function add_student(Request $request)
     {
@@ -2026,7 +2433,6 @@ class InstituteApiController extends Controller
                     ->where('standard_id', $request->standard_id)
                     ->where('institute_id', $institute_id)
                     ->first();
-
                 if (empty($insdelQY)) {
                     return response()->json([
                         'status' => 400,
