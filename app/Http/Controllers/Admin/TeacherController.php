@@ -19,6 +19,7 @@ use App\Models\TeacherAssignBatch;
 use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
+use App\Traits\ApiTrait;
 
 class TeacherController extends Controller
 {
