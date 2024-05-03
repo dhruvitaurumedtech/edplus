@@ -133,21 +133,22 @@ class TimetableController extends Controller
         return $this->response([],$validator->errors()->first(),false,400);
 
         try{
-           $timtDT = Timetable::join('subject','subject.id','=','time_table.institute_id')
+           $timtDT = Timetable::join('subject','subject.id','=','time_table.subject_id')
            ->join('users','users.id','=','time_table.teacher_id')
            ->join('lecture_type','lecture_type.id','=','time_table.lecture_type')
-           ->join('batches','batches.id','=','time_table.board_id')
+           ->join('batches','batches.id','=','time_table.batch_id')
            ->join('standard','standard.id','=','batches.standard_id')
            ->where('time_table.batch_id',$request->batch_id)
-           ->select('subject.name as subject','users.firstname','users.lastname','lecture_type.name as lecture_type_name','batches.*','standard.name as standard')
+           ->select('subject.name as subject','users.firstname',
+           'users.lastname','lecture_type.name as lecture_type_name',
+           'batches.batch_name','batches.standard_id','time_table.*','standard.name as standard')
            ->get();
 
            foreach($timtDT as $timtable){
-            $dayofdate = date('D', strtotime($timtable->day));
-
+            
             $data[] = array('id'=>$timtable->id,
-            'date'=>$timtable->day,
-            'day'=>$dayofdate,
+            'date'=>$timtable->lecture_date,
+            'day'=>$timtable->repeat,
             'start_time'=>$timtable->start_time,
             'end_time'=>$timtable->end_time,
             'subject_id'=>$timtable->subject_id,
