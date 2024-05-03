@@ -162,69 +162,70 @@ class TeacherController extends Controller
     }
 
 
-    public function teacher_add_institute_request(Request $request)
-    {
-        $validator = \Validator::make($request->all(), [
-            'teacher_id' => 'required|integer',
-            'institute_id' => 'required|string',
-        ]);
+    // public function teacher_add_institute_request(Request $request)
+    // {
+    //     $validator = \Validator::make($request->all(), [
+    //         'teacher_id' => 'required|integer',
+    //         'institute_id' => 'required|string',
+    //     ]);
 
-        if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
-        }
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'data' => array('errors' => $errorMessages),
+    //         ], 400);
+    //     }
 
-        try {
-            $token = $request->header('Authorization');
+    //     try {
+    //         $token = $request->header('Authorization');
 
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
+    //         if (strpos($token, 'Bearer ') === 0) {
+    //             $token = substr($token, 7);
+    //         }
 
-            $user_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-            if ($existingUser) {
-                $instituteid = $request->institute_id;
-                $getsid = Student_detail::where('student_id', $request->user_id)
-                    ->where('institute_id', $instituteid)->first();
-                if ($getsid) {
-                } else {
-                    $getuid = Institute_detail::where('id', $instituteid)->select('user_id')->first();
+    //         $user_id = $request->input('user_id');
+    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
+    //         if ($existingUser) {
+    //             $instituteid = $request->institute_id;
+    //             $getsid = Student_detail::where('student_id', $request->user_id)
+    //                 ->where('institute_id', $instituteid)->first();
+    //             if ($getsid) {
+    //             } else {
+    //                 $getuid = Institute_detail::where('id', $instituteid)->select('user_id')->first();
 
-                    $search_add = Student_detail::create([
-                        'user_id' => $getuid->user_id,
-                        'institute_id' => $request->input('institute_id'),
-                        'student_id' => $request->input('user_id'),
-                        'status' => '0',
-                    ]);
-                }
+    //                 $search_add = Student_detail::create([
+    //                     'user_id' => $getuid->user_id,
+    //                     'institute_id' => $request->input('institute_id'),
+    //                     'student_id' => $request->input('user_id'),
+    //                     'status' => '0',
+    //                 ]);
+    //             }
 
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Request added successfully',
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
-            }
-        } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
-        }
-    }
+    //             return response()->json([
+    //                 'success' => 200,
+    //                 'message' => 'Request added successfully',
+    //             ], 200);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Invalid token.',
+    //             ], 400);
+    //         }
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => 500,
+    //             'message' => 'Something went wrong',
+    //             'data' => array('error' => $e->getMessage()),
+    //         ], 500);
+    //     }
+    // }
 
 
     public function add_teacher(Request $request)
     {
+
         $validator = \Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
