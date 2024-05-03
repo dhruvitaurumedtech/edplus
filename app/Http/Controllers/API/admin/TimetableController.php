@@ -125,7 +125,7 @@ class TimetableController extends Controller
     
     
 
-    public function list_timetable(Request $request){
+    public function list_timetable_institute(Request $request){
         $validator = validator::make($request->all(),[
             'batch_id'=>'required',
         ]);
