@@ -26,178 +26,138 @@ class TeacherController extends Controller
     use ApiTrait;
     public function homescreen_teacher(Request $request)
     {
-        $token = $request->header('Authorization');
-
-
-        if (strpos($token, 'Bearer') === 0) {
-            $token = substr($token, 7);
-        }
-
         $validator = \Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
             'per_page' => 'required|integer',
         ]);
-
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-
             $teacher_id = $request->teacher_id;
             $search_keyword = $request->search;
             $perPage = $request->input('per_page', 10);
-            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
-            if ($existingUser) {
-
-                $banners = Banner_model::where('status', 'active')
-                    ->whereIn('user_id', explode(',', '1'))
-                    ->paginate($perPage);
-                $banners_data = [];
-
-                foreach ($banners as $value) {
-                    $imgpath = asset($value->banner_image);
-                    $banners_data[] = array(
+            $banners = Banner_model::where('status', 'active')
+                ->whereIn('user_id', explode(',', '1'))
+                ->paginate($perPage);
+            $banners_data = [];
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                );
+            }
+            $perPage = 10;
+            $allinstitute = Institute_detail::where('status', 'active')
+                ->where(function ($query) use ($search_keyword) {
+                    $query->where('unique_id', 'like', '%' . $search_keyword . '%')
+                        ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
+                })->paginate($perPage);
+            $search_list = [];
+            foreach ($allinstitute as $value) {
+                $search_list[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name,
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                );
+            }
+            //student search history
+            $searchhistory = Search_history::where('user_id', $teacher_id)->paginate($perPage);
+            $searchhistory_list = [];
+            foreach ($searchhistory as $value) {
+                // Check if the title already exists in the $searchhistory_list array
+                $existingTitles = array_column($searchhistory_list, 'title');
+                if (!in_array($value->title, $existingTitles)) {
+                    $searchhistory_list[] = [
                         'id' => $value->id,
-                        'banner_image' => $imgpath,
-                    );
-                }
-                $perPage = 10;
-                //student searched response 
-                $allinstitute = Institute_detail::where('status', 'active')
-                    ->where(function ($query) use ($search_keyword) {
-                        $query->where('unique_id', 'like', '%' . $search_keyword . '%')
-                            ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
-                    })->paginate($perPage);
-                // echo "<pre>";
-                // print_r($allinstitute);
-                // exit;
-
-                $search_list = [];
-                foreach ($allinstitute as $value) {
-                    $search_list[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name,
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                    );
-                }
-
-                //student search history
-                $searchhistory = Search_history::where('user_id', $teacher_id)->paginate($perPage);
-                $searchhistory_list = [];
-                foreach ($searchhistory as $value) {
-                    // Check if the title already exists in the $searchhistory_list array
-                    $existingTitles = array_column($searchhistory_list, 'title');
-                    if (!in_array($value->title, $existingTitles)) {
-
-                        $searchhistory_list[] = [
-                            'id' => $value->id,
-                            'institute_id' => $value->institute_id,
-                            'user_id' => $value->user_id,
-                            'title' => $value->title,
-                        ];
-                    }
-                }
-
-                //requested institute
-                $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
-                    ->where('teacher_detail.status', '!=', '1')
-                    ->where('teacher_detail.teacher_id', $teacher_id)
-                    ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')->paginate($perPage);
-
-                $requested_institute = [];
-                foreach ($requestnstitute as $value) {
-                    $requested_institute[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name,
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                        'status' => $value->sstatus,
-                    );
-                }
-
-                //join with
-
-                $joininstitute = Institute_detail::where('institute_detail.status', 'active')
-                    ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
-                    ->where('teacher_detail.teacher_id', $teacher_id)
-                    ->where('teacher_detail.status', '1')
-                    ->whereNull('teacher_detail.deleted_at')
-                    ->where('institute_detail.end_academic_year', '>=', now())
-                    ->whereNull('institute_detail.deleted_at')
-                    ->select('institute_detail.*')
-                    ->paginate($perPage);
-
-
-                // echo "<pre>";
-                // print_r($joininstitute);
-                // exit; // ->where('end_academic_year', '>=', now())
-                $join_with = [];
-                foreach ($joininstitute as $value) {
-                    $join_with[] = array(
-                        'id' => $value->id,
-                        'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
-                        'address' => $value->address,
-                        'logo' => asset($value->logo),
-                    );
-                }
-                $announcement = Common_announcement::whereRaw("FIND_IN_SET($request->teacher_id, teacher_id)")
-                    ->select('*')->get()->toarray();
-                $announcement_response = [];
-                foreach ($announcement as $value) {
-                    $announcement_response[] = [
-                        'date' => !empty($value['created_at']) ? $value['created_at'] : '',
-                        'title' => !empty($value['title']) ? $value['title'] : '',
-                        'announcement' => !empty($value['announcement']) ? $value['announcement'] : '',
+                        'institute_id' => $value->institute_id,
+                        'user_id' => $value->user_id,
+                        'title' => $value->title,
                     ];
                 }
-
-
-                // $parentsdt = Parents::where('student_id', $user_id)->get();
-
-                // $veryfy = [];
-                // foreach ($parentsdt as $checkvery) {
-                //     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
-                // }
-                // if ($parentsdt->isEmpty()) {
-
-                //     $studentparents = '0';
-                // } else {
-                //     $studentparents = '1';
-                // }
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => array(
-                        'banner' => $banners_data,
-                        'search_list' => $search_list,
-                        'searchhistory_list' => $searchhistory_list,
-                        'requested_institute' => $requested_institute,
-                        'join_with' => $join_with,
-                        'announcement' => $announcement_response
-                        // 'parents_detail' => $studentparents,
-                        // 'parents_verification' => $veryfy
-                    ),
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                    'data' => []
-                ], 400);
             }
+
+            //requested institute
+            $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
+                ->where('teacher_detail.status', '!=', '1')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')->paginate($perPage);
+
+            $requested_institute = [];
+            foreach ($requestnstitute as $value) {
+                $requested_institute[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name,
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                    'status' => $value->sstatus,
+                );
+            }
+
+            //join with
+
+            $joininstitute = Institute_detail::where('institute_detail.status', 'active')
+                ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status', '1')
+                ->whereNull('teacher_detail.deleted_at')
+                ->where('institute_detail.end_academic_year', '>=', now())
+                ->whereNull('institute_detail.deleted_at')
+                ->select('institute_detail.*')
+                ->paginate($perPage);
+
+
+            // echo "<pre>";
+            // print_r($joininstitute);
+            // exit; // ->where('end_academic_year', '>=', now())
+            $join_with = [];
+            foreach ($joininstitute as $value) {
+                $join_with[] = array(
+                    'id' => $value->id,
+                    'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
+                    'address' => $value->address,
+                    'logo' => asset($value->logo),
+                );
+            }
+            $announcement = Common_announcement::whereRaw("FIND_IN_SET($request->teacher_id, teacher_id)")
+                ->select('*')->get()->toarray();
+            $announcement_response = [];
+            foreach ($announcement as $value) {
+                $announcement_response[] = [
+                    'date' => !empty($value['created_at']) ? $value['created_at'] : '',
+                    'title' => !empty($value['title']) ? $value['title'] : '',
+                    'announcement' => !empty($value['announcement']) ? $value['announcement'] : '',
+                ];
+            }
+
+
+            // $parentsdt = Parents::where('student_id', $user_id)->get();
+
+            // $veryfy = [];
+            // foreach ($parentsdt as $checkvery) {
+            //     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
+            // }
+            // if ($parentsdt->isEmpty()) {
+
+            //     $studentparents = '0';
+            // } else {
+            //     $studentparents = '1';
+            // }
+            $final_repsonse = [
+                'banner' => $banners_data,
+                'search_list' => $search_list,
+                'searchhistory_list' => $searchhistory_list,
+                'requested_institute' => $requested_institute,
+                'join_with' => $join_with,
+                'announcement' => $announcement_response
+
+            ];
+
+            return $this->response($final_repsonse, "Successfully fetch data.");
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
 

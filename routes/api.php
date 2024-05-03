@@ -86,7 +86,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
 
-    
+
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);
     Route::post('/institute/base-board', [BasetableControllerAPI::class, 'board']);
@@ -122,8 +122,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
     Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
+    Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
 });
-Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
+
 // Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
 Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
 Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
