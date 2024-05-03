@@ -1521,7 +1521,7 @@ class InstituteApiController extends Controller
                     $subject_array[] = [
                         'id' => $subject_value->id,
                         'subject_value' => $subject_value->name,
-                        'image' => asset($subject_value->image),
+                        'image' => !empty($subject_value->image) ? asset($subject_value->image) : '',
                     ];
                 }
 
