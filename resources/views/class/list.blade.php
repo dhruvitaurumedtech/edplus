@@ -29,14 +29,14 @@
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <label for="exampleInputEmail1">Icon : </label>
                     <input type="file" name="icon" onchange="previewFile_create()" class="form-control">
                     @error('icon')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
                   </div>
-                  <div class="col-md-12">
+                  <div class="col-md-6">
                     <img src="" id="icon_create" alt="Icon" class="img-resize mt-3" style="display: none;">
                   </div>
                   <div class="col-md-12">

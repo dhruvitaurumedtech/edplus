@@ -21,8 +21,15 @@ class MediumController extends Controller
     function medium_list_save(Request $request)
     {
         $request->validate([
-            'icon' => 'required|image|mimes:svg|max:2048',
-            'name' => ['required', 'string', 'max:255', Rule::unique('medium', 'name')],
+            'icon' => 'required|image|mimes:svg,png,jpg,jpeg|max:2048',
+            'name' => [
+                'required',
+                'string',
+                'max:255',
+                Rule::unique('medium', 'name')
+                    ->ignore($request->input('name'))
+                    ->whereNull('deleted_at'),
+            ],
             'status' => 'required',
         ]);
         $iconFile = $request->file('icon');

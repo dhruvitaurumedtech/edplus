@@ -120,16 +120,17 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
+Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
+Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
+
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
-Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
-Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
+// Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
+// Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
 // Route::post('/institute/get-subject-or-stream', [InstituteApiController::class, 'get_subject_stream'])->name('get_subject_stream.get');
 
-Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
 
 
-Route::post('/institute/get-student', [StudentController::class, 'get_student'])->name('get_student');
-Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
+// Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
 Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
 Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 //parents API's
