@@ -332,69 +332,42 @@ class TeacherController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
-
-            if (strpos($token, 'Bearer') === 0) {
-                $token = substr($token, 7);
-            }
-
             $teacher_id = $request->input('teacher_id');
-            $existingUser = User::where('token', $token)->where('id', $teacher_id)->first();
-            if ($existingUser) {
 
-                $institute_id = $request->institute_id;
-                $institute_data = [];
-                $boards = [];
+            $institute_id = $request->institute_id;
+            $institute_data = [];
+            $boards = [];
 
-                $institutedeta = Institute_detail::where('id', $institute_id)
-                    ->select('id', 'institute_name', 'address', 'about_us')->first();
+            $institutedeta = Institute_detail::where('id', $institute_id)
+                ->select('id', 'institute_name', 'address', 'about_us')->first();
 
-                $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                    ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
+            $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+                ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
 
-                $stdcount = Teacher_model::where('institute_id', $institute_id)->count();
-                $subcount = Subject_sub::where('institute_id', $institute_id)->count();
+            $stdcount = Teacher_model::where('institute_id', $institute_id)->where('teacher_id', $teacher_id)->count();
+            $subcount = Subject_sub::where('institute_id', $institute_id)->count();
 
-                $institutedetaa = array(
-                    'id' => $institutedeta->id,
-                    'institute_name' => $institutedeta->institute_name,
-                    'address' => $institutedeta->address,
-                    'about_us' => $institutedeta->about_us,
-                    'logo' => asset($institutedeta->logo),
-                    'boards' => $boards,
-                    'students' => $stdcount,
-                    'subject' => $subcount,
-                    'total_board' => count($boards),
-                    'teacher' => 0
-                );
+            $institutedetaa = array(
+                'id' => $institutedeta->id,
+                'institute_name' => $institutedeta->institute_name,
+                'address' => $institutedeta->address,
+                'about_us' => $institutedeta->about_us,
+                'logo' => asset($institutedeta->logo),
+                'boards' => $boards,
+                'students' => $stdcount,
+                'subject' => $subcount,
+                'total_board' => count($boards),
+                'teacher' => 0
+            );
 
 
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch data.',
-                    'data' => array('institute_data' => $institutedetaa),
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
-            }
+            return $this->response($institutedetaa, "Successfully fetch data.");
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response($e, "Invalid token.", false, 400);
         }
     }
     public function teacher_added_detail(Request $request)

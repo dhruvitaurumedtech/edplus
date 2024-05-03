@@ -121,13 +121,15 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data'])->name('attendance_data.get');
     Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
     Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
+
+    //teacher Api
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
+    Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
 });
 
 // Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);
 Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
-Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
 
 
 
