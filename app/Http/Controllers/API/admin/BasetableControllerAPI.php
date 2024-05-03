@@ -75,12 +75,8 @@ class BasetableControllerAPI extends Controller
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
-            $base_medium = Medium_model::join('base_table', 'base_table.medium', '=', 'medium.id')
-                ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->whereIN('base_table.board', $board_ids)
-                ->select('medium.id', 'medium.name', 'medium.icon')
-                ->distinct()
-                ->get();
+            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
+            $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
             $data = [];
             foreach ($base_medium as $basemedium) {
                 $data[] = array(
