@@ -50,13 +50,14 @@
                     <th scope="col">No</th>
                     <th scope="col">Standard</th>
                     <th scope="col">Subjects</th>
-                    <!-- <th scope="col">chapter_no</th>
+                    <th scope="col">chapter_no</th>
                     <th scope="col">chapter_name</th>
-                    <th scope="col">chapter_image</th> -->
+                    <th scope="col">chapter_image</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
                 <tbody>
+
                   @php
                   $encounteredStandardIds = [];
                   $encounteredSubjectIds = [];
@@ -65,26 +66,36 @@
                   @foreach($Standards as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    <td rowspan="">
+                    @if(!in_array($value->base_id, $encounteredStandardIds))
+                    @php
+                    $rowCount = $Standards->where('base_id', $value->base_id)->count();
+                    $encounteredStandardIds[] = $value->base_id;
+                    @endphp
+                    <td rowspan="{{ $rowCount }}">
                       {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
                     </td>
+                    @endif
 
                     @foreach($subjects as $subject_value)
-                    @if($subject_value->id == $value->subject_id)
-                    <td rowspan="">
+                    @if($subject_value->id == $value->subject_id && !in_array($value->subject_id, $encounteredSubjectIds))
+                    @php
+                    $rowCounts = $Standards->where('subject_id', $value->subject_id)->count();
+                    $encounteredSubjectIds[] = $value->subject_id;
+                    @endphp
+                    <td rowspan="{{$rowCounts}}">
                       {{$subject_value->name}}
                     </td>
-
                     @endif
                     @endforeach
+
+                    <td>{{$value->chapter_no}}</td>
+                    <td>{{$value->chapter_name}}</td>
+                    <td><img src="{{url($value->chapter_image)}}" class="img-resize"></td>
                     <td>
                       <div class="d-flex align-items-center">
                         <div class="d-flex">
                           @canButton('edit', 'Chapter')
                           <a href="{{url('chapter/edit/'.$value->id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
-                          @endCanButton
-                          @canButton('edit', 'Chapter')
-                          <a href="{{url('chapter/edit/'.$value->id)}}" class="btn text-white btn-rmv2" value="Edit">View</a>&nbsp;&nbsp;
                           @endCanButton
                           &nbsp;&nbsp;
                           @canButton('delete', 'Chapter')
