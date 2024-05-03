@@ -2704,92 +2704,151 @@ class InstituteApiController extends Controller
     //     }
     // }
     //student list for add exam marks
+    // public function student_list_for_add_marks123(Request $request)
+    // {
+
+    //     $validator = \Validator::make($request->all(), [
+    //         'institute_id' => 'required',
+    //         'user_id' => 'required',
+    //         'exam_id' => 'required',
+    //         'batch_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         $errorMessages = array_values($validator->errors()->all());
+    //         return response()->json([
+    //             'success' => 400,
+    //             'message' => 'Validation error',
+    //             'errors' => $errorMessages,
+    //         ], 400);
+    //     }
+
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
+    //     if ($existingUser) {
+    //         $institute_id = $request->institute_id;
+    //         $user_id = $request->user_id;
+    //         $exam_id = $request->exam_id;
+    //         $batch_id = $request->batch_id;
+    //         $examdt = Exam_Model::where('id', $exam_id)->first();
+
+    //         if (!empty($examdt)) {
+
+    //             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+    //                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+    //                 ->where('students_details.institute_id', $institute_id)
+    //                 ->where('students_details.user_id', $user_id)
+    //                 ->where('students_details.board_id', $examdt->board_id)
+    //                 ->where('students_details.medium_id', $examdt->medium_id)
+    //                 ->where('students_details.batch_id', $examdt->batch_id)
+    //                 //->where('students_details.class_id', $examdt->class_id)
+    //                 ->where('students_details.standard_id', $examdt->standard_id)
+    //                 //->where('students_details.stream_id', $examdt->stream_id)
+    //                 ->when($examdt->stream_id, function ($query, $stream_id) {
+    //                     return $query->where('students_details.stream_id', $stream_id);
+    //                 })
+    //                 ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+    //                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
+
+    //             $studentsDET = [];
+    //             foreach ($studentDT as $stddt) {
+    //                 $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+    //                 $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
+    //                 $studentsDET[] = array(
+    //                     'student_id' => $stddt->student_id,
+    //                     'exam_id' => $request->exam_id,
+    //                     'batch_id' => $request->batch_id,
+    //                     'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : 0,
+    //                     'firstname' => $stddt->firstname,
+    //                     'lastname' => $stddt->lastname,
+    //                     'total_mark' => $examdt->total_mark,
+    //                     'standard' => $stddt->standardname,
+    //                     'subject' => $subjectqy->name
+    //                 );
+    //             }
+    //             return response()->json([
+    //                 'status' => 200,
+    //                 'message' => 'Successfully fetch Data.',
+    //                 'data' => $studentsDET
+    //             ], 200, [], JSON_NUMERIC_CHECK);
+    //         } else {
+    //             return response()->json([
+    //                 'status' => 400,
+    //                 'message' => 'Exam not found.',
+    //                 'data' => []
+    //             ], 400, [], JSON_NUMERIC_CHECK);
+    //         }
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ]);
+    //     }
+    // }
+
+
     public function student_list_for_add_marks(Request $request)
     {
-
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-            'user_id' => 'required',
             'exam_id' => 'required',
             'batch_id' => 'required',
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'errors' => $errorMessages,
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-        if ($existingUser) {
+        try {
             $institute_id = $request->institute_id;
-            $user_id = $request->user_id;
+            $user_id = Auth::id();
             $exam_id = $request->exam_id;
-            $batch_id = $request->batch_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
+            $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+                ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->where('students_details.institute_id', $institute_id)
+                ->where('students_details.user_id', $user_id)
+                ->where('students_details.board_id', $examdt->board_id)
+                ->where('students_details.medium_id', $examdt->medium_id)
+                ->where('students_details.batch_id', $examdt->batch_id)
+                //->where('students_details.class_id', $examdt->class_id)
+                ->where('students_details.standard_id', $examdt->standard_id)
+                //->where('students_details.stream_id', $examdt->stream_id)
+                ->when($examdt->stream_id, function ($query, $stream_id) {
+                    return $query->where('students_details.stream_id', $stream_id);
+                })
+                ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
-            if (!empty($examdt)) {
-
-                $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
-                    ->join('standard', 'standard.id', '=', 'students_details.standard_id')
-                    ->where('students_details.institute_id', $institute_id)
-                    ->where('students_details.user_id', $user_id)
-                    ->where('students_details.board_id', $examdt->board_id)
-                    ->where('students_details.medium_id', $examdt->medium_id)
-                    ->where('students_details.batch_id', $examdt->batch_id)
-                    //->where('students_details.class_id', $examdt->class_id)
-                    ->where('students_details.standard_id', $examdt->standard_id)
-                    //->where('students_details.stream_id', $examdt->stream_id)
-                    ->when($examdt->stream_id, function ($query, $stream_id) {
-                        return $query->where('students_details.stream_id', $stream_id);
-                    })
-                    ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
-                    ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
-
-                $studentsDET = [];
-                foreach ($studentDT as $stddt) {
-                    $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
-                    $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
-                    $studentsDET[] = array(
-                        'student_id' => $stddt->student_id,
-                        'exam_id' => $request->exam_id,
-                        'batch_id' => $request->batch_id,
-                        'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : 0,
-                        'firstname' => $stddt->firstname,
-                        'lastname' => $stddt->lastname,
-                        'total_mark' => $examdt->total_mark,
-                        'standard' => $stddt->standardname,
-                        'subject' => $subjectqy->name
-                    );
-                }
-                return response()->json([
-                    'status' => 200,
-                    'message' => 'Successfully fetch Data.',
-                    'data' => $studentsDET
-                ], 200, [], JSON_NUMERIC_CHECK);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Exam not found.',
-                    'data' => []
-                ], 400, [], JSON_NUMERIC_CHECK);
+            $studentsDET = [];
+            foreach ($studentDT as $stddt) {
+                $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
+                $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
+                $studentsDET[] = array(
+                    'student_id' => $stddt->student_id,
+                    'exam_id' => $request->exam_id,
+                    'batch_id' => $request->batch_id,
+                    'marks' => !empty($marksofstd->mark) ? (float)$marksofstd->mark : 0,
+                    'firstname' => $stddt->firstname,
+                    'lastname' => $stddt->lastname,
+                    'total_mark' => $examdt->total_mark,
+                    'standard' => $stddt->standardname,
+                    'subject' => $subjectqy->name
+                );
             }
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ]);
+            return $this->response($studentsDET, "Successfully fetch Data.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
+
     // student list with marks
     // public function student_list_with_marks(Request $request)
     // {
@@ -3359,29 +3418,41 @@ class InstituteApiController extends Controller
 
     public function delete_account(Request $request)
     {
-
-        $userId = $request->user_id;
-        $token = $request->header('Authorization');
-
-        if (strpos($token, 'Bearer ') === 0) {
-            $token = substr($token, 7);
-        }
-
-        $existingUser = User::where('token', $token)->where('id', $userId)->first();
-        if ($existingUser) {
-
-            user::where('id', $userId)->delete();
-            return response()->json([
-                'status' => '200',
-                'message' => 'Delete Account Successfully!',
-            ]);
-        } else {
-            return response()->json([
-                'status' => 400,
-                'message' => 'Invalid token.',
-            ], 400);
+        try {
+            $user = Auth::user();
+            $user->delete();
+            return $this->response([], "Delete Account Successfully!");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+
+    // public function delete_account123(Request $request)
+    // {
+
+    //     $userId = $request->user_id;
+    //     $token = $request->header('Authorization');
+
+    //     if (strpos($token, 'Bearer ') === 0) {
+    //         $token = substr($token, 7);
+    //     }
+
+    //     $existingUser = User::where('token', $token)->where('id', $userId)->first();
+    //     if ($existingUser) {
+
+    //         user::where('id', $userId)->delete();
+    //         return response()->json([
+    //             'status' => '200',
+    //             'message' => 'Delete Account Successfully!',
+    //         ]);
+    //     } else {
+    //         return response()->json([
+    //             'status' => 400,
+    //             'message' => 'Invalid token.',
+    //         ], 400);
+    //     }
+    // }
 
 
     public function  roles(Request $request)
