@@ -47,9 +47,10 @@ class ChapterController extends Controller
                 'standard.name as standard_name',
                 'medium.name as medium',
                 'board.name as board',
-                'base_table.id as base_id'
+                'base_table.id as base_id',
             )
             ->paginate(10);
+
 
 
 
@@ -86,21 +87,27 @@ class ChapterController extends Controller
             'chapter_image.*.max' => 'Chapter image may not be greater than 2048 kilobytes in size.',
         ]);
 
+        $exists = Chapter::where('subject_id', $request->input('subject'))
+            ->where('base_table_id', $request->input('standard_id'))
+            ->exists();
+        if ($exists) {
+            return redirect()->route('chapter.list')->with('success', 'Already Exists!');
+        } else {
+            foreach ($request->chapter_name as $i => $chapterName) {
+                $chapter_imageFile = $request->file('chapter_image')[$i];
+                $imagePath = $chapter_imageFile->store('chapter', 'public');
 
-        foreach ($request->chapter_name as $i => $chapterName) {
-            $chapter_imageFile = $request->file('chapter_image')[$i];
-            $imagePath = $chapter_imageFile->store('chapter', 'public');
-
-            $base_table = Chapter::create([
-                'subject_id' => $request->input('subject'),
-                'base_table_id' => $request->input('standard_id'),
-                'chapter_no' => $request->input('chapter_no')[$i],
-                'chapter_name' => $chapterName,
-                'chapter_image' => $imagePath,
-                //'status' => $request->input('status'),
-            ]);
+                $base_table = Chapter::create([
+                    'subject_id' => $request->input('subject'),
+                    'base_table_id' => $request->input('standard_id'),
+                    'chapter_no' => $request->input('chapter_no')[$i],
+                    'chapter_name' => $chapterName,
+                    'chapter_image' => $imagePath,
+                    //'status' => $request->input('status'),
+                ]);
+            }
+            return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
         }
-        return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
     }
 
     //chapter_lists
@@ -165,20 +172,28 @@ class ChapterController extends Controller
             'chapter_no.*.required' => 'Chapter number is required.',
             'chapter_name.*.required' => 'Chapter name is required.',
         ]);
-        foreach ($request->chapter_name as $i => $chapterName) {
-            $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
+        $exists = Chapter::where('subject_id', $request->input('subject'))
+            ->where('base_table_id', $request->input('standard_id'))
+            ->exists();
+        if ($exists > 0) {
+            echo "hi";
+            return redirect()->route('chapter.list')->with('success', 'Already Exists!');
+        } else {
+            foreach ($request->chapter_name as $i => $chapterName) {
+                $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
-            if ($request->hasFile('chapter_image')) {
-                $chapter_imageFile = $request->file('chapter_image')[$i];
-                $imagePath = $chapter_imageFile->store('chapter', 'public');
-                $chapter->chapter_image = $imagePath;
+                if ($request->hasFile('chapter_image')) {
+                    $chapter_imageFile = $request->file('chapter_image')[$i];
+                    $imagePath = $chapter_imageFile->store('chapter', 'public');
+                    $chapter->chapter_image = $imagePath;
+                }
+                $chapter->base_table_id = $request->input('standard_id')[$i];
+                $chapter->subject_id = $request->input('subject')[$i];
+                $chapter->chapter_no = $request->input('chapter_no')[$i];
+                $chapter->chapter_name = $chapterName;
+
+                $chapter->save();
             }
-            $chapter->base_table_id = $request->input('standard_id')[$i];
-            $chapter->subject_id = $request->input('subject')[$i];
-            $chapter->chapter_no = $request->input('chapter_no')[$i];
-            $chapter->chapter_name = $chapterName;
-
-            $chapter->save();
         }
 
         return redirect()->route('chapter.list')->with('success', 'Chapters Updated Successfully');
