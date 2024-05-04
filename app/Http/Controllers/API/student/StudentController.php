@@ -2059,13 +2059,15 @@ class StudentController extends Controller
                     //     return $this->response([], 'email is already exist', false, 400);
                     // }
                     else {
-                        $user = User::create([
-                            'firstname' => $parentData['firstname'],
-                            'lastname' => $parentData['lastname'],
-                            'email' => $parentData['email'],
-                            'mobile' => $parentData['mobile'],
-                            'role_type' => '5'
-                        ]);
+                        $user = User::updateOrCreate(
+                            ['email' => $parentData['email']],
+                            [
+                                'firstname' => $parentData['firstname'],
+                                'lastname' => $parentData['lastname'],
+                                'mobile' => $parentData['mobile'],
+                                'role_type' => '5'
+                            ]
+                        );
                         $parent_id = $user->id;
                         if (!empty($parent_id)) {
                             $parnsad = Parents::create([
