@@ -2061,7 +2061,8 @@ class StudentController extends Controller
                     else {
                         $user = User::where('email', $parentData['email'])->first();
                         if (!empty($user)) {
-                            $user_data = User::find('email', $parentData['email']);
+                            // echo "<pre>";print_r($user['email']);exit;
+                            $user_data = User::where('id', $user->id);
                             $user_data->update([
                                 'firstname' => $parentData['firstname'],
                                 'lastname' => $parentData['lastname'],
