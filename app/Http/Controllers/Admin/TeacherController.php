@@ -12,6 +12,7 @@ use App\Models\board;
 use App\Models\Common_announcement;
 use App\Models\Institute_detail;
 use App\Models\Search_history;
+use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
@@ -21,6 +22,7 @@ use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
+use Dotenv\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -469,6 +471,57 @@ class TeacherController extends Controller
             return $this->response([], "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
+
+
+    //timetable list
+    public function timetable_list_teache(Request $request)
+    {
+
+        $validator = \Validator::make($request->all(), [
+            'date' => 'required',
+            'batch_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            
+            $teacher_id = Auth::id();
+            $lectures = [];
+            $todaysletech = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->where('time_table.batch_id', $request->batch_id)
+                ->where('time_table.lecture_date', $request->date)
+                ->where('time_table.teacher_id', $teacher_id)
+                ->select(
+                    'subject.name as subject',
+                    'standard.name as standard',
+                    'lecture_type.name as lecture_type_name',
+                    'time_table.start_time',
+                    'time_table.end_time',
+                    'time_table.lecture_date'
+                )
+                ->get();
+
+            foreach ($todaysletech as $todaysDT) {
+                $lectures[] = array(
+                    'subject' => $todaysDT->subject,
+                    'standard'=>$todaysDT->standard,
+                    'lecture_date' => $todaysDT->lecture_date,
+                    'lecture_type' => $todaysDT->lecture_type_name,
+                    'start_time' => $todaysDT->start_time,
+                    'end_time' => $todaysDT->end_time,
+                );
+            }
+
+            return $this->response($lectures, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
 }
