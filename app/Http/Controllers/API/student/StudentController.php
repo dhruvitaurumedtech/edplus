@@ -523,18 +523,17 @@ class StudentController extends Controller
                         'mobile' => $parentData['mobile'],
                         'role_type' => '5'
                     ]);
-                    $userId = $user->id;
-                    if (!empty($userId)) {
+                    $parent_id = $user->id;
+                    if (!empty($parent_id)) {
                         $parnsad = Parents::create([
-                            'student_id' => $student_id,
-                            'parent_id' => $userId,
+                            'student_id' =>  auth()->id(),
+                            'parent_id' => $parent_id,
                             // 'institute_id' => $request->input('institute_id'),
                             'relation' => $parentData['relation'],
                             'verify' => '0',
                         ]);
                         if (empty($parnsad->id)) {
-                            User::where('id', $userId)->delete();
-
+                            User::where('id', $parent_id)->delete();
                             return $this->response([], 'Data not added Successfuly.');
                         }
                     } else {
