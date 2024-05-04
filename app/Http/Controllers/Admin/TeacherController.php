@@ -462,10 +462,10 @@ class TeacherController extends Controller
                 ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->get();
-
-            echo "<pre>";
-            print_r($teacher_Data);
-            exit;
+            $teacher_response = [];
+            foreach ($teacher_Data as $value) {
+                $teacher_response = [];
+            }
 
 
             return $this->response([], "Data Fetch Successfully");
