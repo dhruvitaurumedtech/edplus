@@ -461,14 +461,30 @@ class TeacherController extends Controller
                 ->join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
                 ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
                 ->get();
+            $teacher_response = [];
 
-            echo "<pre>";
-            print_r($teacher_Data);
-            exit;
+            foreach ($teacher_Data as $value) {
+                $subject_data = Subject_model::whereIn('id', explode(',', $value->subject_id))->get()->toarray();
+                $subject_response = [];
 
-
-            return $this->response([], "Data Fetch Successfully");
+                foreach ($subject_data as $subject_value) {
+                    $subject_response[] = [
+                        'subject_name' => $subject_value['name']
+                    ];
+                }
+                // exit;
+                $teacher_response = [
+                    'teacher_id' => $value->teacher_id,
+                    'board' => $value->board_name,
+                    'medium' => $value->medium_name,
+                    'standard' => $value->standard_name,
+                    'batch' => $value->batch_name,
+                    'subject_list' => $subject_response,
+                ];
+            }
+            return $this->response($teacher_response, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }

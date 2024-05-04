@@ -2004,7 +2004,6 @@ class StudentController extends Controller
         $validator = Validator::make($request->all(), [
             'firstname' => 'required|string',
             'lastname' => 'required|string',
-            'email' => 'required',
             'mobile' => 'required|string',
             'address' => 'required|string',
             'dob' => 'required|date',
@@ -2044,7 +2043,7 @@ class StudentController extends Controller
                 $parents = json_decode($request->parents, true);
 
                 foreach ($parents as $parentData) {
-                    $emilfin = user::where('email', $parentData['email'])->first();
+                    // $emilfin = user::where('email', $parentData['email'])->first();
                     if ($parentData['firstname'] == '') {
                         return $this->response([], 'firstname Requied field are missing', false, 400);
                     } elseif ($parentData['lastname'] == '') {
@@ -2055,16 +2054,31 @@ class StudentController extends Controller
                         return $this->response([], 'mobile Requied field are missing', false, 400);
                     } elseif ($parentData['relation'] == '') {
                         return $this->response([], 'relation Requied field are missing', false, 400);
-                    } elseif (!empty($emilfin)) {
-                        return $this->response([], 'email is already exist', false, 400);
-                    } else {
-                        $user = User::create([
-                            'firstname' => $parentData['firstname'],
-                            'lastname' => $parentData['lastname'],
-                            'email' => $parentData['email'],
-                            'mobile' => $parentData['mobile'],
-                            'role_type' => '5'
-                        ]);
+                    }
+                    //  elseif (!empty($emilfin)) {
+                    //     return $this->response([], 'email is already exist', false, 400);
+                    // }
+                    else {
+                        $user = User::where('email', $parentData['email'])->first();
+                        if (!empty($user)) {
+                            // echo "<pre>";print_r($user['email']);exit;
+                            $user_data = User::where('id', $user->id);
+                            $user_data->update([
+                                'firstname' => $parentData['firstname'],
+                                'lastname' => $parentData['lastname'],
+                                'email' => $parentData['email'],
+                                'mobile' => $parentData['mobile'],
+                                'role_type' => '5'
+                            ]);
+                        } else {
+                            $user = User::create([
+                                'firstname' => $parentData['firstname'],
+                                'lastname' => $parentData['lastname'],
+                                'email' => $parentData['email'],
+                                'mobile' => $parentData['mobile'],
+                                'role_type' => '5'
+                            ]);
+                        }
                         $parent_id = $user->id;
                         if (!empty($parent_id)) {
                             $parnsad = Parents::create([
