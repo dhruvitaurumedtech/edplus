@@ -1864,6 +1864,7 @@ class StudentController extends Controller
                 })
                 ->get();
 
+
             foreach ($joininstitute as $value) {
                 $substdnt = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $value->id)->first();
@@ -2027,46 +2028,47 @@ class StudentController extends Controller
             }
             $user->image = $imagePath;
             $user->save();
+            if (!empty($request->parents)) {
+                $parents = json_decode($request->parents, true);
 
-            $parents = json_decode($request->parents, true);
-
-            foreach ($parents as $parentData) {
-                $emilfin = user::where('email', $parentData['email'])->first();
-                if ($parentData['firstname'] == '') {
-                    return $this->response([], 'firstname Requied field are missing', false, 400);
-                } elseif ($parentData['lastname'] == '') {
-                    return $this->response([], 'lastname Requied field are missing', false, 400);
-                } elseif ($parentData['email'] == '') {
-                    return $this->response([], 'email Requied field are missing', false, 400);
-                } elseif ($parentData['mobile'] == '') {
-                    return $this->response([], 'mobile Requied field are missing', false, 400);
-                } elseif ($parentData['relation'] == '') {
-                    return $this->response([], 'relation Requied field are missing', false, 400);
-                } elseif (!empty($emilfin)) {
-                    return $this->response([], 'email is already exist', false, 400);
-                } else {
-                    $user = User::create([
-                        'firstname' => $parentData['firstname'],
-                        'lastname' => $parentData['lastname'],
-                        'email' => $parentData['email'],
-                        'mobile' => $parentData['mobile'],
-                        'role_type' => '5'
-                    ]);
-                    $parent_id = $user->id;
-                    if (!empty($parent_id)) {
-                        $parnsad = Parents::create([
-                            'student_id' =>  auth()->id(),
-                            'parent_id' => $parent_id,
-                            // 'institute_id' => $request->input('institute_id'),
-                            'relation' => $parentData['relation'],
-                            'verify' => '0',
-                        ]);
-                        if (empty($parnsad->id)) {
-                            User::where('id', $parent_id)->delete();
-                            return $this->response([], 'Data not added Successfuly.');
-                        }
+                foreach ($parents as $parentData) {
+                    $emilfin = user::where('email', $parentData['email'])->first();
+                    if ($parentData['firstname'] == '') {
+                        return $this->response([], 'firstname Requied field are missing', false, 400);
+                    } elseif ($parentData['lastname'] == '') {
+                        return $this->response([], 'lastname Requied field are missing', false, 400);
+                    } elseif ($parentData['email'] == '') {
+                        return $this->response([], 'email Requied field are missing', false, 400);
+                    } elseif ($parentData['mobile'] == '') {
+                        return $this->response([], 'mobile Requied field are missing', false, 400);
+                    } elseif ($parentData['relation'] == '') {
+                        return $this->response([], 'relation Requied field are missing', false, 400);
+                    } elseif (!empty($emilfin)) {
+                        return $this->response([], 'email is already exist', false, 400);
                     } else {
-                        return $this->response([], 'Data not added Successfuly', false, 500);
+                        $user = User::create([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5'
+                        ]);
+                        $parent_id = $user->id;
+                        if (!empty($parent_id)) {
+                            $parnsad = Parents::create([
+                                'student_id' =>  auth()->id(),
+                                'parent_id' => $parent_id,
+                                // 'institute_id' => $request->input('institute_id'),
+                                'relation' => $parentData['relation'],
+                                'verify' => '0',
+                            ]);
+                            if (empty($parnsad->id)) {
+                                User::where('id', $parent_id)->delete();
+                                return $this->response([], 'Data not added Successfuly.');
+                            }
+                        } else {
+                            return $this->response([], 'Data not added Successfuly', false, 500);
+                        }
                     }
                 }
             }
