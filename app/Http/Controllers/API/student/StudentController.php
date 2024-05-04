@@ -494,128 +494,62 @@ class StudentController extends Controller
         ]);
 
         if ($validator->fails()) {
-            $errorMessages = array_values($validator->errors()->all());
-            return response()->json([
-                'success' => 400,
-                'message' => 'Validation error',
-                'data' => array('errors' => $errorMessages),
-            ], 400);
+            return $this->response([], $validator->errors()->first(), false, 400);
         }
 
         try {
-            $token = $request->header('Authorization');
 
-            if (strpos($token, 'Bearer ') === 0) {
-                $token = substr($token, 7);
-            }
-
-            $student_id = $request->input('user_id');
-            $existingUser = User::where('token', $token)->where('id', $student_id)->first();
-            if ($existingUser) {
-                // Iterate over each parent in the request
-                $parents = json_decode($request->parents, true);
-                // dd($parents);
-                // echo 'hello';
-                // print_r($parents);exit;
-                foreach ($parents as $parentData) {
-                    // Create a user for each parent
-                    $emilfin = user::where('email', $parentData['email'])->first();
-                    $tomail = $parentData['email'];
-                    if ($parentData['firstname'] == '') {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'firstname Requied field are missing',
-                        ], 400);
-                    } elseif ($parentData['lastname'] == '') {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'lastname Requied field are missing',
-                        ], 400);
-                    } elseif ($parentData['email'] == '') {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'email Requied field are missing',
-                        ], 400);
-                    } elseif ($parentData['mobile'] == '') {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'mobile Requied field are missing',
-                        ], 400);
-                    } elseif ($parentData['relation'] == '') {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'relation Requied field are missing',
-                        ], 400);
-                    } elseif (!empty($emilfin)) {
-                        return response()->json([
-                            'status' => 400,
-                            'message' => 'email is already exist',
-                        ], 400);
-                    } else {
-                        $user = User::create([
-                            'firstname' => $parentData['firstname'],
-                            'lastname' => $parentData['lastname'],
-                            'email' => $parentData['email'],
-                            'mobile' => $parentData['mobile'],
-                            'role_type' => '5'
+            $parents = json_decode($request->parents, true);
+            foreach ($parents as $parentData) {
+                $emilfin = user::where('email', $parentData['email'])->first();
+                $tomail = $parentData['email'];
+                if ($parentData['firstname'] == '') {
+                    return $this->response([], 'firstname Requied field are missing', false, 400);
+                } elseif ($parentData['lastname'] == '') {
+                    return $this->response([], 'lastname Requied field are missing', false, 400);
+                } elseif ($parentData['email'] == '') {
+                    return $this->response([], 'email Requied field are missing', false, 400);
+                } elseif ($parentData['mobile'] == '') {
+                    return $this->response([], 'mobile Requied field are missing', false, 400);
+                } elseif ($parentData['relation'] == '') {
+                    return $this->response([], 'relation Requied field are missing', false, 400);
+                } elseif (!empty($emilfin)) {
+                    return $this->response([], 'email is already exist', false, 400);
+                } else {
+                    $user = User::create([
+                        'firstname' => $parentData['firstname'],
+                        'lastname' => $parentData['lastname'],
+                        'email' => $parentData['email'],
+                        'mobile' => $parentData['mobile'],
+                        'role_type' => '5'
+                    ]);
+                    $parent_id = $user->id;
+                    if (!empty($parent_id)) {
+                        $parnsad = Parents::create([
+                            'student_id' =>  auth()->id(),
+                            'parent_id' => $parent_id,
+                            // 'institute_id' => $request->input('institute_id'),
+                            'relation' => $parentData['relation'],
+                            'verify' => '0',
                         ]);
-
-                        // Retrieve the ID of the newly created user
-                        $userId = $user->id;
-
-                        // Create a parent record associated with the user
-                        if (!empty($userId)) {
-                            $parnsad = Parents::create([
-                                'student_id' => $student_id,
-                                'parent_id' => $userId,
-                                'institute_id' => $request->input('institute_id'),
-                                'relation' => $parentData['relation'],
-                                'verify' => '0',
-                            ]);
-
-                            if (empty($parnsad->id)) {
-                                User::where('id', $userId)->delete();
-                                return response()->json([
-                                    'success' => 500,
-                                    'message' => 'Data not added Successfuly',
-                                    'data' => [],
-                                ], 500);
-                            }
-                        } else {
-                            return response()->json([
-                                'success' => 500,
-                                'message' => 'Data not added Successfuly',
-                                'data' => [],
-                            ], 500);
+                        if (empty($parnsad->id)) {
+                            User::where('id', $parent_id)->delete();
+                            return $this->response([], 'Data not added Successfuly.');
                         }
-
-                        $data = [
-                            'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
-                            'email' => $tomail,
-                            'id' => $parnsad->id
-                        ];
-
-                        //Mail::to($tomail)->send(new WelcomeMail($data));
+                    } else {
+                        return $this->response([], 'Data not added Successfuly', false, 500);
                     }
+                    $data = [
+                        'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
+                        'email' => $tomail,
+                        'id' => $parnsad->id
+                    ];
+                    //Mail::to($tomail)->send(new WelcomeMail($data));
                 }
-
-                return response()->json([
-                    'success' => 200,
-                    'message' => 'Parent details uploaded successfully',
-                    'data' => []
-                ], 200);
-            } else {
-                return response()->json([
-                    'status' => 400,
-                    'message' => 'Invalid token.',
-                ], 400);
             }
+            return $this->response([], 'Parent details uploaded successfully');
         } catch (\Exception $e) {
-            return response()->json([
-                'success' => 500,
-                'message' => 'Something went wrong',
-                'data' => array('error' => $e->getMessage()),
-            ], 500);
+            return $this->response([], "Invalid token.", false, 400);
         }
     }
 

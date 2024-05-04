@@ -165,10 +165,12 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter-delete', [ChapterController::class, 'chapter_delete'])->name('chapter.delete');
 
     //topic
-    Route::get('add-topic', [TopicController::class, 'index'])->name('add.topic');
+    Route::get('topic-list', [TopicController::class, 'index'])->name('list.topic');
+    Route::get('create/topic', [TopicController::class, 'list_topic'])->name('create.topic');
+
     Route::post('chapter/get-chapter', [TopicController::class, 'get_chapter']);
     Route::post('topic-save', [TopicController::class, 'topic_save'])->name('topic.save');
-    Route::post('topic-list', [TopicController::class, 'topic_list']);
+    // Route::post('topic-list', [TopicController::class, 'topic_list']);
 
     Route::get('video-time-limit', [Videotimelimitcontroller::class, 'list'])->name('videolimit.list'); //uploded video time limit
     Route::post('video-timelimit-save', [Videotimelimitcontroller::class, 'save'])->name('videolimit.save');

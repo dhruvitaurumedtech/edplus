@@ -138,7 +138,7 @@
                                 <div class="search-box-2 form-group">
                                     <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange="openFile(event, 'output${chapterCount}')">
                                 </div>
-                                <img id="output${chapterCount}" src="" class="preview1 ImgPreview" />
+                                <img id="output${chapterCount}" src="" class="img-resize" style="display:none"/>
                             </div>
                         </div>`;
                 $('.add-chapter-btn').before(chapterHtml);
