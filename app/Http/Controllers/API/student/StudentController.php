@@ -1888,7 +1888,7 @@ class StudentController extends Controller
                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->where('students_details.student_id', $student_id)
                 ->where('students_details.status', '=', '1')
-                ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
+                ->select('students_details.*', 'standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
 
             $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                 ->where('parents.student_id', $student_id)->get();
@@ -1920,7 +1920,11 @@ class StudentController extends Controller
                 'school' => $studentUser->school_name,
                 'area' => $studentUser->area,
                 'institutes' => $institutes,
-                'parents' => $parents_dt
+                'parents' => $parents_dt,
+                'country' => $sdtls ? $sdtls->country : '',
+                'state' => $sdtls ? $sdtls->state : '',
+                'city' => $sdtls ? $sdtls->city : '',
+                'pincode' => $sdtls ? $sdtls->pincode : '',
             );
             return $this->response($userdetail, "Successfully fetch data.");
         } catch (Exception $e) {
