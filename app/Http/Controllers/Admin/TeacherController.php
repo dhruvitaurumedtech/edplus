@@ -471,8 +471,8 @@ class TeacherController extends Controller
             return $this->response([], "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
-
-
+        }
+    }
     //timetable list
     public function timetable_list_teache(Request $request)
     {
@@ -487,7 +487,7 @@ class TeacherController extends Controller
         }
 
         try {
-            
+
             $teacher_id = Auth::id();
             $lectures = [];
             $todaysletech = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
@@ -511,7 +511,7 @@ class TeacherController extends Controller
             foreach ($todaysletech as $todaysDT) {
                 $lectures[] = array(
                     'subject' => $todaysDT->subject,
-                    'standard'=>$todaysDT->standard,
+                    'standard' => $todaysDT->standard,
                     'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
                     'start_time' => $todaysDT->start_time,
