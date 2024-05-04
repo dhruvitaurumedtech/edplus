@@ -464,13 +464,24 @@ class TeacherController extends Controller
                 ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
                 ->get();
             $teacher_response = [];
+
             foreach ($teacher_Data as $value) {
+                $subject_data = Subject_model::whereIn('id', explode(',', $value->subject_id))->get()->toarray();
+                $subject_response = [];
+
+                foreach ($subject_data as $subject_value) {
+                    $subject_response[] = [
+                        'subject_name' => $subject_value['name']
+                    ];
+                }
+                // exit;
                 $teacher_response = [
                     'teacher_id' => $value->teacher_id,
                     'board' => $value->board_name,
                     'medium' => $value->medium_name,
                     'standard' => $value->standard_name,
                     'batch' => $value->batch_name,
+                    'subject_list' => $subject_response,
                 ];
             }
             return $this->response($teacher_response, "Data Fetch Successfully");
