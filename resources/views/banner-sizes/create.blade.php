@@ -44,6 +44,12 @@
                     <div class="col-lg-7">
                         <div class="institute-form">
                             <h3>BannerSize List</h3>
+                            <form action="#">
+                                <div class="search-box">
+                                    <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                            </form>
                             <div class="card-body">
                                 <table class="table table-js table-bordered table-responsive mt-4">
                                     <thead>
@@ -55,7 +61,7 @@
                                             <th>Action</th>
                                         </tr>
                                     </thead>
-                                    <tbody>
+                                    <tbody class="myTable">
                                         @foreach ($bannerSizes as $bannerSize)
                                         <tr>
                                             <td>{{ $bannerSize->id }}</td>

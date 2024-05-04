@@ -19,6 +19,7 @@
           <div class="row">
             <div class="col-lg-6">
               <div class="institute-form">
+                <h3>Banner create</h3>
                 <form method="post" action="{{ url('banner/save') }}" enctype="multipart/form-data">
                   @csrf
                   @if(auth::user()->role_type == '3')
@@ -68,8 +69,17 @@
               </div>
             </div>
             <div class="col-lg-6">
+
               <div class="">
                 <div class="institute-form">
+                  <h3>Banner List</h3>
+
+                  <form action="#">
+                    <div class="search-box">
+                      <input type="search" class="form-control myInput" name="search" placeholder="Search">
+                      <i class="fas fa-search"></i>
+                    </div>
+                  </form> <br>
                   <table class="table table-js table-bordered">
                     <thead>
                       <tr>

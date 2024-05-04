@@ -108,6 +108,7 @@
             </div>
         </div>
     </div>
+    @include('layouts/footer_new')
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script>
         $(document).ready(function() {

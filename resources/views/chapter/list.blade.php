@@ -59,35 +59,21 @@
                 <tbody>
 
                   @php
-                  $encounteredStandardIds = [];
-                  $encounteredSubjectIds = [];
                   $i = 1;
                   @endphp
                   @foreach($Standards as $value)
                   <tr>
                     <td>{{$i}}</td>
-                    @if(!in_array($value->base_id, $encounteredStandardIds))
-                    @php
-                    $rowCount = $Standards->where('base_id', $value->base_id)->count();
-                    $encounteredStandardIds[] = $value->base_id;
-                    @endphp
-                    <td rowspan="{{ $rowCount }}">
+                    <td>
                       {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
                     </td>
-                    @endif
-
                     @foreach($subjects as $subject_value)
-                    @if($subject_value->id == $value->subject_id && !in_array($value->subject_id, $encounteredSubjectIds))
-                    @php
-                    $rowCounts = $Standards->where('subject_id', $value->subject_id)->count();
-                    $encounteredSubjectIds[] = $value->subject_id;
-                    @endphp
-                    <td rowspan="{{$rowCounts}}">
+                    @if($subject_value->id == $value->subject_id)
+                    <td>
                       {{$subject_value->name}}
                     </td>
                     @endif
                     @endforeach
-
                     <td>{{$value->chapter_no}}</td>
                     <td>{{$value->chapter_name}}</td>
                     <td><img src="{{url($value->chapter_image)}}" class="img-resize"></td>
@@ -107,14 +93,10 @@
                   </tr>
                   @php $i++ @endphp
                   @endforeach
-
-
                 </tbody>
-
               </table>
               <div class="d-flex justify-content-end">
                 {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
-
               </div>
             </div>
           </div>
