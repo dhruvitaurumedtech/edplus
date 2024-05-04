@@ -461,14 +461,19 @@ class TeacherController extends Controller
                 ->join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
                 ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
                 ->get();
             $teacher_response = [];
             foreach ($teacher_Data as $value) {
-                $teacher_response = [];
+                $teacher_response = [
+                    'teacher_id' => $value->teacher_id,
+                    'board' => $value->board_name,
+                    'medium' => $value->medium_name,
+                    'standard' => $value->standard_name,
+                    'batch' => $value->batch_name,
+                ];
             }
-
-
-            return $this->response([], "Data Fetch Successfully");
+            return $this->response($teacher_response, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }

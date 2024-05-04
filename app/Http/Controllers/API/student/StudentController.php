@@ -2054,9 +2054,11 @@ class StudentController extends Controller
                         return $this->response([], 'mobile Requied field are missing', false, 400);
                     } elseif ($parentData['relation'] == '') {
                         return $this->response([], 'relation Requied field are missing', false, 400);
-                    } elseif (!empty($emilfin)) {
-                        return $this->response([], 'email is already exist', false, 400);
-                    } else {
+                    }
+                    //  elseif (!empty($emilfin)) {
+                    //     return $this->response([], 'email is already exist', false, 400);
+                    // }
+                    else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
