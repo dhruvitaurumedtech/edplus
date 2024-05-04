@@ -2043,7 +2043,7 @@ class StudentController extends Controller
                 $parents = json_decode($request->parents, true);
 
                 foreach ($parents as $parentData) {
-                    $emilfin = user::where('email', $parentData['email'])->first();
+                    // $emilfin = user::where('email', $parentData['email'])->first();
                     if ($parentData['firstname'] == '') {
                         return $this->response([], 'firstname Requied field are missing', false, 400);
                     } elseif ($parentData['lastname'] == '') {
@@ -2059,7 +2059,7 @@ class StudentController extends Controller
                     //     return $this->response([], 'email is already exist', false, 400);
                     // }
                     else {
-                        $user = User::where('email', $parentData['email'])->get()->first();
+                        $user = User::where('email', $parentData['email'])->first();
                         if (!empty($user)) {
                             $user_data = User::find('email', $parentData['email']);
                             $user_data->update([
