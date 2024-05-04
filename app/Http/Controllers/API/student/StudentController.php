@@ -2006,7 +2006,7 @@ class StudentController extends Controller
             'lastname' => 'required|string',
             'mobile' => 'required|string',
             'address' => 'required|string',
-            'dob' => 'required',
+            'dob' => 'required|date',
             'school_name' => 'required|string',
             'country' => 'required|string',
             'state' => 'required|string',
