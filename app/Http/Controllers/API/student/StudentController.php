@@ -2001,7 +2001,19 @@ class StudentController extends Controller
 
     public function student_edit_profile(Request $request)
     {
-        $validator = Validator::make($request->all(), []);
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'email' => 'required',
+            'mobile' => 'required|string',
+            'address' => 'required|string',
+            'dob' => 'required|date',
+            'school_name' => 'required|string',
+            'country' => 'required|string',
+            'state' => 'required|string',
+            'city' => 'required|string',
+            'pincode' => 'required|string',
+        ]);
 
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);

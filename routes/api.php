@@ -128,6 +128,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
     Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
     Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
+    Route::post('/teacher/second_homescreen', [TeacherController::class, 'second_homescreen']);
 });
 
 // Route::post('/teacher/add-institute-request-teacher', [TeacherController::class, 'teacher_add_institute_request']);

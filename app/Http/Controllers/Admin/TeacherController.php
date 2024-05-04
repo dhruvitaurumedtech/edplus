@@ -22,6 +22,7 @@ use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TeacherController extends Controller
 {
@@ -382,17 +383,17 @@ class TeacherController extends Controller
                 )
                 ->paginate(2);
 
-                foreach ($todayslect as $todayslecDT) {
-                    $todays_lecture[] = array(
-                        'subject' => $todayslecDT->subject,
-                        'standard'=>$todayslecDT->standard,
-                        'lecture_date' => $todayslecDT->lecture_date,
-                        'lecture_type' => $todayslecDT->lecture_type_name,
-                        'start_time' => $todayslecDT->start_time,
-                        'end_time' => $todayslecDT->end_time,
-                    );
-                }
-            
+            foreach ($todayslect as $todayslecDT) {
+                $todays_lecture[] = array(
+                    'subject' => $todayslecDT->subject,
+                    'standard' => $todayslecDT->standard,
+                    'lecture_date' => $todayslecDT->lecture_date,
+                    'lecture_type' => $todayslecDT->lecture_type_name,
+                    'start_time' => $todayslecDT->start_time,
+                    'end_time' => $todayslecDT->end_time,
+                );
+            }
+
             $announcQY = Common_announcement::where('institute_id', $institute_id)->Where('teacher_id', $teacher_id)->get();
             // ->whereRaw("FIND_IN_SET('4', role_type)")
 
@@ -439,6 +440,34 @@ class TeacherController extends Controller
             );
             return $this->response($studentdata, "Successfully fetch data.");
         } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function second_homescreen(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $teacher_Data = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
+                ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->get();
+
+            echo "<pre>";
+            print_r($teacher_Data);
+            exit;
+
+
+            return $this->response([], "Data Fetch Successfully");
+        } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
