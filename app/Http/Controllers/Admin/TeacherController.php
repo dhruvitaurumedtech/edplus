@@ -524,4 +524,6 @@ class TeacherController extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
+
+    
 }

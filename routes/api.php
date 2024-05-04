@@ -99,6 +99,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable']);
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable_institute']);
     Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list']);
+    Route::post('/institute/edit-timetable', [TimetableController::class, 'edit_timetable']);
 
 
     // parent api

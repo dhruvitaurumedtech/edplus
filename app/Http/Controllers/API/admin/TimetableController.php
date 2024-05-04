@@ -170,4 +170,48 @@ class TimetableController extends Controller
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
+
+    //edit time table
+    public function edit_timetable(Request $request){
+        $validator = validator::make($request->all(),[
+            
+            'subject_id'=>'required',
+            'teacher_id'=>'required',
+            'lecture_type'=>'required',
+            'start_time'=>'required',
+            'end_time'=>'required',
+
+        ]);
+
+        if($validator->fails()) 
+        return $this->response([],$validator->errors()->first(),false,400);
+
+        try{
+            DB::beginTransaction();
+            
+                $timetableedit = Timetable::find($request->id);
+                if (!$timetableedit) {
+                    return $this->response([],'Record Not Found',404);
+                }
+
+            
+            $timetableedit->subject_id = $request->subject_id;
+            //$timetableedit->batch_id = $request->batch_id;
+            $timetableedit->teacher_id = $request->teacher_id;
+            $timetableedit->lecture_type = $request->lecture_type;
+            //$timetableedit->start_date = $request->start_date;
+            //$timetableedit->end_date = $request->end_date;
+            $timetableedit->start_time = $request->start_time;
+            $timetableedit->end_time = $request->end_time;
+            //$timetableedit->repeat = $request->repeat;
+            $timetableedit->save();
+            
+               
+            DB::commit();
+            return $this->response([],'data save');
+        }catch(Exeption $e){
+            DB::rollback();
+            return $this->response($e,"Something want Wrong!!", false, 400);
+        }
+    }
 }
