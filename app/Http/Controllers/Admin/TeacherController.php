@@ -16,10 +16,12 @@ use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\TeacherAssignBatch;
+use App\Models\Timetable;
 use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
+use Illuminate\Support\Facades\Auth;
 
 class TeacherController extends Controller
 {
@@ -360,7 +362,37 @@ class TeacherController extends Controller
             $result = [];
             $announcement = [];
             $examlist = [];
-            $todays_lecture[] = array('subject' => 'Chemistry', 'teacher' => 'Dianne Russell', 'time' => '03:30 To 05:00 PM');
+
+            $user_id = Auth::id();
+            $today = date('Y-m-d');
+            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->where('time_table.teacher_id', $user_id)
+                ->where('time_table.lecture_date', $today)
+                ->select(
+                    'subject.name as subject',
+                    'standard.name as standard',
+                    'lecture_type.name as lecture_type_name',
+                    'time_table.start_time',
+                    'time_table.end_time',
+                    'time_table.lecture_date'
+                )
+                ->paginate(2);
+
+                foreach ($todayslect as $todayslecDT) {
+                    $todays_lecture[] = array(
+                        'subject' => $todayslecDT->subject,
+                        'standard'=>$todayslecDT->standard,
+                        'lecture_date' => $todayslecDT->lecture_date,
+                        'lecture_type' => $todayslecDT->lecture_type_name,
+                        'start_time' => $todayslecDT->start_time,
+                        'end_time' => $todayslecDT->end_time,
+                    );
+                }
+            
             $announcQY = Common_announcement::where('institute_id', $institute_id)->Where('teacher_id', $teacher_id)->get();
             // ->whereRaw("FIND_IN_SET('4', role_type)")
 
