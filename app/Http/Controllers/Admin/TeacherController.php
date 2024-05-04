@@ -469,12 +469,12 @@ class TeacherController extends Controller
                 $subject_data = Subject_model::whereIn('id', explode(',', $value->subject_id))->get()->toarray();
                 
                 
+
                 foreach ($subject_data as $subject_value) {
                     $subject_response[] = [
                         'subject_name' => $subject_value['name']
                     ];
                 }
-                // exit;
                 $teacher_response = [
                     'teacher_id' => $value->teacher_id,
                     'board' => $value->board_name,
