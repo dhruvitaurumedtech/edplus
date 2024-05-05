@@ -144,7 +144,7 @@ class TimetableController extends Controller
            'users.lastname','lecture_type.name as lecture_type_name',
            'batches.batch_name','batches.standard_id','time_table.*','standard.name as standard')
            ->get();
-
+           $data = [];
            foreach($timtDT as $timtable){
             
             $data[] = array('id'=>$timtable->id,
