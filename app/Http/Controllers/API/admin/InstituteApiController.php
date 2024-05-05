@@ -699,7 +699,8 @@ class InstituteApiController extends Controller
             $subject_id = explode(',', $request->input('subject_id'));
             foreach ($subject_id as $value) {
                 $suadeed = Subject_sub::where('institute_id', $lastInsertedId)
-                    ->where('subject_id', $value)->get();
+                    ->where('subject_id', $value)->first();
+                    
                 if (empty($suadeed)) {
                     Subject_sub::create([
                         'user_id' => $request->input('user_id'),
