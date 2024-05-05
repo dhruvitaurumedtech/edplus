@@ -85,8 +85,16 @@ class AuthController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
             $user->save();
-
-            $institute_id = ($user->role_type == 3) ? (optional($user->instituteDetail)->id) : null;
+            $userdata=user::join('institute_detail','institute_detail.user_id','=','users.id')
+                  ->where('users.email',$request->email)
+                  ->select('institute_detail.id')
+                  ->first();
+            if(!empty($userdata->id)){
+                $institute_id = $userdata->id;
+            } else{
+                $institute_id = null;
+            }     
+                
 
             $data = [
                 'user_id' => $user->id,
