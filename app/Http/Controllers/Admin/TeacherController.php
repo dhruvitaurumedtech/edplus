@@ -190,11 +190,6 @@ class TeacherController extends Controller
             } else {
                 return $this->response([], "Already Sended Request!");
             }
-
-            return response()->json([
-                'success' => 200,
-                'message' => 'Request added successfully',
-            ], 200);
             return $this->response([], "Request added successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -301,6 +296,7 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
     public function teacher_added_detail(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -380,41 +376,23 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            // $teacher_data = Batches_model::join('teacher_assign_batch', 'teacher_assign_batch.batch_id', '=', 'batches.id')
-            //     ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-            //     ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
-            //     ->get()->toarray();
-            // echo "<pre>";
-            // print_r($teacher_data);
-            // exit;
-
-            $teacher_data = Teacher_model::join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-                ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-                ->join('board', 'board.id', '=', 'batches.board_id')
-                ->join('medium', 'medium.id', '=', 'batches.medium_id')
-                ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('teacher_detail.teacher_id', $request->teacher_id)
-                ->where('teacher_detail.institute_id', $request->institute_id)
-                ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
-                ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
-                // ->groupBy('teacher_detail.id', 'board.name', 'medium.name', 'standard.name', 'batches.batch_name')
-                //, 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name'
+            $teacher_data = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+                ->Join('board', 'board.id', '=', 'batches.board_id')
+                ->Join('medium', 'medium.id', '=', 'batches.medium_id')
+                ->Join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->where('teacher_assign_batch.teacher_id', $teacher_id)
+                ->where('batches.institute_id', $institute_id)
+                //->whereNull('teacher_detail.deleted_at')
+                ->select(
+                    'board.name as board_name',
+                    'standard.name as standard_name',
+                    'medium.name as medium_name',
+                    'teacher_assign_batch.batch_id',
+                    'batches.batch_name'
+                )
                 ->get()
                 ->toArray();
-
-            // $teacher_Data = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
-            //     ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-            //     ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-            //     ->join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-            //     ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-            //     ->where('teacher_detail.teacher_id', $request->teacher_id)
-            //     ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
-            //     ->distinct()
-            //     ->get();
-            echo "<pre>";
-            print_r($teacher_data);
-            exit;
-
+                    
             $teacher_response = [];
             foreach ($teacher_data as $value) {
                 $teacher_response[] = [
@@ -436,6 +414,7 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
     public function second_homescreen(Request $request)
     {
         $validator = \Validator::make($request->all(), [
