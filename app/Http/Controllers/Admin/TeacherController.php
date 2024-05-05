@@ -167,65 +167,39 @@ class TeacherController extends Controller
     }
 
 
-    // public function teacher_add_institute_request(Request $request)
-    // {
-    //     $validator = \Validator::make($request->all(), [
-    //         'teacher_id' => 'required|integer',
-    //         'institute_id' => 'required|string',
-    //     ]);
+    public function join_with_teacher(Request $request)
+    {
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id' => 'required',
 
-    //     if ($validator->fails()) {
-    //         $errorMessages = array_values($validator->errors()->all());
-    //         return response()->json([
-    //             'success' => 400,
-    //             'message' => 'Validation error',
-    //             'data' => array('errors' => $errorMessages),
-    //         ], 400);
-    //     }
+        ]);
 
-    //     try {
-    //         $token = $request->header('Authorization');
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
 
-    //         if (strpos($token, 'Bearer ') === 0) {
-    //             $token = substr($token, 7);
-    //         }
+        try {
+            $teacher = Teacher_model::where('teacher_id', $request->teacher_id)->where('institute_id', $request->institute_id)->where('status', '0')->get()->toarray();
+            if (empty($teacher)) {
+                Teacher_model::create([
+                    'teacher_id' => $request->teacher_id,
+                    'institute_id' => $request->institute_id,
+                    'status' => '0',
+                ]);
+            } else {
+                return $this->response([], "Already Sended Request!");
+            }
 
-    //         $user_id = $request->input('user_id');
-    //         $existingUser = User::where('token', $token)->where('id', $user_id)->first();
-    //         if ($existingUser) {
-    //             $instituteid = $request->institute_id;
-    //             $getsid = Student_detail::where('student_id', $request->user_id)
-    //                 ->where('institute_id', $instituteid)->first();
-    //             if ($getsid) {
-    //             } else {
-    //                 $getuid = Institute_detail::where('id', $instituteid)->select('user_id')->first();
-
-    //                 $search_add = Student_detail::create([
-    //                     'user_id' => $getuid->user_id,
-    //                     'institute_id' => $request->input('institute_id'),
-    //                     'student_id' => $request->input('user_id'),
-    //                     'status' => '0',
-    //                 ]);
-    //             }
-
-    //             return response()->json([
-    //                 'success' => 200,
-    //                 'message' => 'Request added successfully',
-    //             ], 200);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 400,
-    //                 'message' => 'Invalid token.',
-    //             ], 400);
-    //         }
-    //     } catch (\Exception $e) {
-    //         return response()->json([
-    //             'success' => 500,
-    //             'message' => 'Something went wrong',
-    //             'data' => array('error' => $e->getMessage()),
-    //         ], 500);
-    //     }
-    // }
+            return response()->json([
+                'success' => 200,
+                'message' => 'Request added successfully',
+            ], 200);
+            return $this->response([], "Request added successfully");
+        } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 
 
     public function add_teacher(Request $request)
@@ -467,8 +441,8 @@ class TeacherController extends Controller
             $subject_response = [];
             foreach ($teacher_Data as $value) {
                 $subject_data = Subject_model::whereIn('id', explode(',', $value->subject_id))->get()->toarray();
-                
-                
+
+
 
                 foreach ($subject_data as $subject_value) {
                     $subject_response[] = [
@@ -540,6 +514,4 @@ class TeacherController extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
-
-    
 }
