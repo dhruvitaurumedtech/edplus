@@ -376,14 +376,13 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            $teacher_data = Teacher_model::Join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-                ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+            $teacher_data = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
                 ->Join('board', 'board.id', '=', 'batches.board_id')
                 ->Join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->Join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('teacher_detail.teacher_id', $teacher_id)
-                ->where('teacher_detail.institute_id', $institute_id)
-                ->whereNull('teacher_detail.deleted_at')
+                ->where('teacher_assign_batch.teacher_id', $teacher_id)
+                ->where('batches.institute_id', $institute_id)
+                //->whereNull('teacher_detail.deleted_at')
                 ->select(
                     'board.name as board_name',
                     'standard.name as standard_name',
