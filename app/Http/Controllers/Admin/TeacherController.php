@@ -22,16 +22,18 @@ use App\Models\User;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
-use Dotenv\Validator;
+use Carbon\Carbon;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TeacherController extends Controller
 {
     use ApiTrait;
     public function homescreen_teacher(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
             'per_page' => 'required|integer',
         ]);
@@ -169,7 +171,7 @@ class TeacherController extends Controller
 
     public function join_with_teacher(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'teacher_id' => 'required',
 
@@ -200,7 +202,7 @@ class TeacherController extends Controller
     public function add_teacher(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
             'mobile' => 'required',
@@ -263,7 +265,7 @@ class TeacherController extends Controller
     }
     public function institute_detail(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'teacher_id' => 'required'
         ]);
@@ -299,7 +301,7 @@ class TeacherController extends Controller
 
     public function teacher_added_detail(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'teacher_id' => 'required',
             'institute_id' => 'required',
         ]);
@@ -417,7 +419,7 @@ class TeacherController extends Controller
 
     public function second_homescreen(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'teacher_id' => 'required',
         ]);
@@ -425,27 +427,34 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $teacher_Data = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
-                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->join('teacher_assign_batch', 'teacher_assign_batch.teacher_id', '=', 'teacher_detail.teacher_id')
-                ->join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-                ->where('teacher_detail.teacher_id', $request->teacher_id)
-                ->select('teacher_detail.*', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name', 'batches.batch_name')
-                ->get();
+            $teacher_data = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+            ->Join('board', 'board.id', '=', 'batches.board_id')
+            ->Join('medium', 'medium.id', '=', 'batches.medium_id')
+            ->Join('standard', 'standard.id', '=', 'batches.standard_id')
+            ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
+            ->where('batches.standard_id', $request->standard_id)
+            ->select(
+                'board.name as board_name',
+                'standard.name as standard_name',
+                'medium.name as medium_name',
+                'teacher_assign_batch.batch_id',
+                'batches.batch_name',
+                'batches.subjects'
+            )
+            ->get();
             $teacher_response = [];
 
-            foreach ($teacher_Data as $value) {
-                $subject_data = Subject_model::whereIn('id', explode(',', $value->subject_id))->get();
-
-
+            foreach ($teacher_data as $value) {
+                $subject_data = Subject_model::whereIn('id', explode(',', $value->subjects))->get();
                 $subject_response = [];
                 foreach ($subject_data as $subject_value) {
-                    $subject_response[] = array('subject_name' => $subject_value->name);
+                    $subject_response[] = array(
+                        'id' => $subject_value->id, 
+                        'subject_name' => $subject_value->name,
+                        'image'=>!empty($subject_value->image)?url($subject_value->image):'');
                 }
 
                 $teacher_response[] = [
-                    'teacher_id' => $value->teacher_id,
                     'board' => $value->board_name,
                     'medium' => $value->medium_name,
                     'standard' => $value->standard_name,
@@ -462,7 +471,7 @@ class TeacherController extends Controller
     public function timetable_list_teache(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'date' => 'required',
             'batch_id' => 'required',
         ]);
@@ -509,4 +518,73 @@ class TeacherController extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
+    public function get_teacher_request_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $user = Auth::user();
+            $request_list = Teacher_model::where('institute_id', $request->institute_id)
+                ->where('status', '0')
+                ->get();
+            if (!empty($request_list)) {
+                $response = $request_list->filter(function ($value) {
+                    return $user_data = User::find($value->teacher_id);
+                })->map(function ($value) {
+                    $user_data = User::find($value->teacher_id);
+                    return [
+                        'teacher_id' => $user_data->id,
+                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
+                        'photo' => $user_data->image,
+                    ];
+                })->toArray();
+                return $this->response($response, "Fetch teacher request list.");
+            } else {
+                return $this->response([], "teacher not found.", false, 400);
+            }
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+     }
+     public function teacher_reject_request(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'teacher_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
+            return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+     }
+     public function get_teacher_reject_request_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $teacher_id = Teacher_model::where('institute_id', $request->institute_id)
+                ->where('status', '2')
+                ->where('created_at', '>=', Carbon::now()->subDays(15))
+                ->pluck('teacher_id');
+            if (!empty($teacher_id)) {
+                $response = User::whereIn('id', $teacher_id)
+                    ->get(['id', 'firstname', 'lastname', 'image'])
+                    ->map(function ($user) {
+                        return [
+                            'teacher_id' => $user->id,
+                            'name' => $user->firstname . ' ' . $user->lastname,
+                            'photo' => $user->image,
+                        ];
+                    })->toArray();
+                return $this->response($response, "Fetch teacher Reject list.");
+            }
+            return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+     }
 }

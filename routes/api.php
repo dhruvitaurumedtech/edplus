@@ -101,26 +101,26 @@ Route::middleware(['auth:api'])->group(function () {
 
 
     // parent api
-    Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
+    Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list']);
 
     // Student Api 
-    Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add'])->name('student_searchhistory_add.get');
-    Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request'])->name('student_add_institute_request.get');
-    Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail'])->name('institute_detail.get');
-    Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->name('subject_chapers.get');
-    Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos'])->name('topic_videos.get');
+    Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add']);
+    Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request']);
+    Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail']);
+    Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers']);
+    Route::post('/student/topicwise-videos-student', [StudentController::class, 'topic_videos']);
 
     //new API
-    Route::post('/student/list-timetable-student', [StudentController::class, 'timetable_list'])->name('timetable_list.get');
-    Route::post('/student/profile-student', [StudentController::class, 'profile_detail'])->name('profile_detail.get');
-    Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile'])->name('student_edit_profile.get');
-    Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add'])->name('student_patents_details_add.get');
-    Route::post('/student/exams-student', [StudentController::class, 'exams_list'])->name('exams_list.get');
-    Route::post('/student/remove-institute-student', [StudentController::class, 'remove_institute'])->name('remove_institute.get');
-    Route::post('/student/exam-result-student', [StudentController::class, 'exam_result'])->name('exam_result.get');
-    Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data'])->name('attendance_data.get');
-    Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student'])->name('homescreen_student.get');
-    Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail'])->name('student_added_detail.get');
+    Route::post('/student/list-timetable-student', [StudentController::class, 'timetable_list']);
+    Route::post('/student/profile-student', [StudentController::class, 'profile_detail']);
+    Route::post('/student/profile-edit-student', [StudentController::class, 'student_edit_profile']);
+    Route::post('/student/add-parents-details-student', [StudentController::class, 'student_parents_details_add']);
+    Route::post('/student/exams-student', [StudentController::class, 'exams_list']);
+    Route::post('/student/remove-institute-student', [StudentController::class, 'remove_institute']);
+    Route::post('/student/exam-result-student', [StudentController::class, 'exam_result']);
+    Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data']);
+    Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student']);
+    Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail']);
 
     //teacher Api
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
@@ -130,6 +130,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/second_homescreen', [TeacherController::class, 'second_homescreen']);
     Route::post('/teacher/timetable-list-teacher', [TeacherController::class, 'timetable_list_teache']);
     Route::post('/teacher/join-with-teacher', [TeacherController::class, 'join_with_teacher']);
+    Route::post('/teacher/get-teacher-request-list', [TeacherController::class, 'get_teacher_request_list']);
+    Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request']);
+    Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
 });
 
 
