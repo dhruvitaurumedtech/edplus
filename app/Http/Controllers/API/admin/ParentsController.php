@@ -26,7 +26,7 @@ class ParentsController extends Controller
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                 ->where('parents.parent_id', Auth::id())->where('parents.verify', '1')
-                ->select('users.firstname', 'users.lastname', 'institute_detail.institute_name')->get();
+                ->select('users.firstname', 'users.lastname', 'institute_detail.institute_name','parents.student_id')->get();
             foreach ($chilsdata as $chilDT) {
                 $subids = explode(',', $chilDT->subject_id);
                 $subjectQY = Subject_model::whereIN('id', $subids);
