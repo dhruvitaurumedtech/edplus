@@ -1265,18 +1265,14 @@ class StudentController extends Controller
     //         ], 500);
     //     }
     // }
-
-
     public function subject_chapers(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'subject_id' => 'required|exists:subject,id',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $chapers = [];
             $cptquy = Chapter::where('subject_id', $request->subject_id)->get();
@@ -1296,7 +1292,6 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
     // public function topic_videos1(Request $request)
     // {
     //     $validator = Validator::make($request->all(), [

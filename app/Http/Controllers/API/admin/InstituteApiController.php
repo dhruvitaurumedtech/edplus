@@ -700,7 +700,7 @@ class InstituteApiController extends Controller
             foreach ($subject_id as $value) {
                 $suadeed = Subject_sub::where('institute_id', $lastInsertedId)
                     ->where('subject_id', $value)->first();
-                    
+
                 if (empty($suadeed)) {
                     Subject_sub::create([
                         'user_id' => $request->input('user_id'),
@@ -2245,7 +2245,7 @@ class InstituteApiController extends Controller
     //         $batch_id = $request->batch_id;
     //         $studentdtls = Student_detail::where('student_id', $student_id)
     //             ->where('institute_id', $institute_id)->first();
-                
+
     //         $insdelQY = Standard_sub::where('board_id', $request->board_id)
     //             ->where('medium_id', $request->medium_id)
     //             ->where('standard_id', $request->standard_id)
@@ -2256,7 +2256,7 @@ class InstituteApiController extends Controller
     //             return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
     //         }
     //         if (!empty($studentdtls)) {
-                
+
     //             $studentupdetail = [
     //                 'user_id' => $user_id,
     //                 'institute_id' => $request->institute_id,
@@ -2294,7 +2294,7 @@ class InstituteApiController extends Controller
 
     //                 $response = Student_detail::where('institute_id', $institute_id)
     //                     ->where('student_id', $student_id)->first();
-                    
+
     //                 $reject_list = Student_detail::find($response->id);
     //                 $data = $reject_list->update(['status' => '1']);
 
@@ -2316,7 +2316,7 @@ class InstituteApiController extends Controller
     //                 return $this->response([], 'Not Inserted.', false, 400);
     //             }
     //         } else {
-                
+
     //             if ($existingUser->role_type != 6 && empty($request->student_id)) {
     //                 $data = user::create([
     //                     'firstname' => $request->first_name,
@@ -2330,7 +2330,7 @@ class InstituteApiController extends Controller
     //             } else {
     //                 $student_id = $student_id;
     //             }
-                
+
     //             if (!empty($student_id)) {
     //                 $studentdetail = [
     //                     'user_id' => $user_id,
@@ -2351,9 +2351,9 @@ class InstituteApiController extends Controller
     //                 if ($request->stream_id == 'null' || $request->stream_id == '') {
     //                     $studentdetail['stream_id'] = null;
     //                 }
-                    
+
     //                 $studentdetailadd = Student_detail::create($studentdetail);
-                    
+
     //                 return $this->response([], 'Successfully Insert Student.');
     //             } else {
     //                 return $this->response([], 'Not Inserted.', false, 400);
@@ -2377,38 +2377,113 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        
-            try {
-                DB::beginTransaction();
+
+        try {
+            // DB::beginTransaction();
+            $institute_id = $request->institute_id;
+            $existingUser = User::where('id', $request->user_id)->first();
+            if ($existingUser->role_type == 6) {
+                $student_id = $request->user_id;
                 $institute_id = $request->institute_id;
-                $existingUser = User::where('id', $request->user_id)->first();
-                if ($existingUser->role_type == 6) {
-                    $student_id = $request->user_id;
-                    $institute_id = $request->institute_id;
-                    $getuidfins = Institute_detail::where('id', $institute_id)->first();
-                    $user_id = $getuidfins->user_id;
-                } else {
-                    $student_id = $request->student_id;
-                    $institute_id = $request->institute_id;
-                    $user_id = $request->user_id;
+                $getuidfins = Institute_detail::where('id', $institute_id)->first();
+                $user_id = $getuidfins->user_id;
+            } else {
+                $student_id = $request->student_id;
+                $institute_id = $request->institute_id;
+                $user_id = $request->user_id;
+            }
+
+            $batch_id = $request->batch_id;
+            $studentdtls = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $institute_id)->first();
+            $insdelQY = Standard_sub::where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->where('institute_id', $institute_id)
+                ->first();
+            if (empty($insdelQY)) {
+                return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
+            }
+
+            if (!empty($studentdtls)) {
+
+                $studentupdetail = [
+                    'user_id' => $user_id,
+                    'institute_id' => $request->institute_id,
+                    'student_id' => $student_id,
+                    'institute_for_id' => $insdelQY->institute_for_id,
+                    'board_id' =>  $request->board_id,
+                    'medium_id' => $request->medium_id,
+                    'class_id' => $insdelQY->class_id,
+                    'standard_id' => $request->standard_id,
+                    'stream_id' => $request->stream_id,
+                    'subject_id' => $request->subject_id,
+                    'batch_id' => $batch_id,
+                    'status' => '1',
+                ];
+
+                if ($request->stream_id == 'null' || $request->stream_id == '') {
+                    $studentupdetail['stream_id'] = null;
                 }
 
-                $batch_id = $request->batch_id;
-                $studentdtls = Student_detail::where('student_id', $student_id)
-                    ->where('institute_id', $institute_id)->first();
-
-                $insdelQY = Standard_sub::where('board_id', $request->board_id)
-                    ->where('medium_id', $request->medium_id)
-                    ->where('standard_id', $request->standard_id)
+                $studentdetail = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)
-                    ->first();
-                    if (empty($insdelQY)) {
-                        return $this->response([], 'institute are not working for this standard Please Select Currect Data.', false, 400);
+                    ->update($studentupdetail);
+
+                if (!empty($studentdetail) && !empty($request->first_name)) {
+                    //student detail update
+                    $student_details = User::find($student_id);
+                    $data = $student_details->update([
+                        'firstname' => $request->first_name,
+                        'lastname' => $request->last_name,
+                        'dob' => $request->date_of_birth,
+                        'address' => $request->address,
+                        'email' => $request->email_id,
+                        'mobile' => $request->mobile_no,
+                    ]);
+
+                    $response = Student_detail::where('institute_id', $institute_id)
+                        ->where('student_id', $student_id)->first();
+
+                    $reject_list = Student_detail::find($response->id);
+                    $data = $reject_list->update(['status' => '1']);
+
+
+                    $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
+                        ->where('parents.student_id', $student_id)
+                        ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
+                        ->get();
+                    foreach ($prnts as $prdetail) {
+                        $parDT = [
+                            'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
+                            'email' => $prdetail,
+                            'id' => $prdetail->id
+                        ];
+                        Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                     }
 
-                if (!empty($studentdtls)) {
+                    return $this->response([], 'Successfully Update Student.');
+                } else {
+                    return $this->response([], 'Not Inserted.', false, 400);
+                }
+            } else {
 
-                    $studentupdetail = [
+                if ($existingUser->role_type != 6 && empty($request->student_id)) {
+                    $data = user::create([
+                        'firstname' => $request->first_name,
+                        'lastname' => $request->last_name,
+                        'dob' => $request->date_of_birth,
+                        'address' => $request->address,
+                        'email' => $request->email_id,
+                        'mobile' => $request->mobile_no,
+                    ]);
+                    $student_id = $data->id;
+                } else {
+                    $student_id = $student_id;
+                }
+
+                if (!empty($student_id)) {
+                    $studentdetail = [
                         'user_id' => $user_id,
                         'institute_id' => $request->institute_id,
                         'student_id' => $student_id,
@@ -2417,105 +2492,28 @@ class InstituteApiController extends Controller
                         'medium_id' => $request->medium_id,
                         'class_id' => $insdelQY->class_id,
                         'standard_id' => $request->standard_id,
+                        'batch_id' => $batch_id,
                         'stream_id' => $request->stream_id,
                         'subject_id' => $request->subject_id,
-                        'batch_id' => $batch_id,
-                        'status' => '1',
+                        'status' => '0',
                     ];
 
+
                     if ($request->stream_id == 'null' || $request->stream_id == '') {
-                        $studentupdetail['stream_id'] = null;
+                        $studentdetail['stream_id'] = null;
                     }
 
-                    $studentdetail = Student_detail::where('student_id', $student_id)
-                        ->where('institute_id', $institute_id)
-                        ->update($studentupdetail);
-
-                    if (!empty($studentdetail) && !empty($request->first_name)) {
-                        //student detail update
-                        $student_details = User::find($student_id);
-                        $data = $student_details->update([
-                            'firstname' => $request->first_name,
-                            'lastname' => $request->last_name,
-                            'dob' => $request->date_of_birth,
-                            'address' => $request->address,
-                            'email' => $request->email_id,
-                            'mobile' => $request->mobile_no,
-                        ]);
-
-                        $response = Student_detail::where('institute_id', $institute_id)
-                            ->where('student_id', $student_id)->first();
-
-                        $reject_list = Student_detail::find($response->id);
-                        $data = $reject_list->update(['status' => '1']);
-
-
-                        $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
-                            ->where('parents.student_id', $student_id)
-                            ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
-                            ->get();
-                        foreach ($prnts as $prdetail) {
-                            $parDT = [
-                                'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
-                                'email' => $prdetail,
-                                'id' => $prdetail->id
-                            ];
-                            Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
-                        }
-
-                        return $this->response([], 'Successfully Update Student.');
-                    } else {
-                        return $this->response([], 'Not Inserted.', false, 400);
-                    }
+                    $studentdetailadd = Student_detail::create($studentdetail);
+                    return $this->response([], 'Successfully Insert Student.');
                 } else {
-
-                    if ($existingUser->role_type != 6 && empty($request->student_id)) {
-                        $data = user::create([
-                            'firstname' => $request->first_name,
-                            'lastname' => $request->last_name,
-                            'dob' => $request->date_of_birth,
-                            'address' => $request->address,
-                            'email' => $request->email_id,
-                            'mobile' => $request->mobile_no,
-                        ]);
-                        $student_id = $data->id;
-                    } else {
-                        $student_id = $student_id;
-                    }
-                    
-                    if (!empty($student_id)) {
-                        $studentdetail = [
-                            'user_id' => $user_id,
-                            'institute_id' => $request->institute_id,
-                            'student_id' => $student_id,
-                            'institute_for_id' => $insdelQY->institute_for_id,
-                            'board_id' =>  $request->board_id,
-                            'medium_id' => $request->medium_id,
-                            'class_id' => $insdelQY->class_id,
-                            'standard_id' => $request->standard_id,
-                            'batch_id' => $batch_id,
-                            'stream_id' => $request->stream_id,
-                            'subject_id' => $request->subject_id,
-                            'status' => '0',
-                        ];
-
-
-                        if ($request->stream_id == 'null' || $request->stream_id == '') {
-                            $studentdetail['stream_id'] = null;
-                        }
-                        
-                        $studentdetailadd = Student_detail::create($studentdetail);
-                        return $this->response([], 'Successfully Insert Student.');
-                    } else {
-                        return $this->response([], 'Not Inserted.', false, 400);
-                    }
+                    return $this->response([], 'Not Inserted.', false, 400);
                 }
-                DB::commit();
-                } catch (\Exception $e) {
-                    DB::rollback();
-                    return $this->response($e, "Invalid token.", false, 400);
-                }
-        
+            }
+            // DB::commit();
+        } catch (\Exception $e) {
+            // DB::rollback();
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 
     //institute all detail
