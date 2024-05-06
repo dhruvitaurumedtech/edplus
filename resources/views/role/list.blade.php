@@ -15,8 +15,9 @@
       </div>
       @include('layouts/alert')
       <div class="dashboard-content side-content">
-
+      
         <div class="row">
+          
           <div class="col-lg-6 mt-3">
             <div class="institute-form">
               <form class="s-chapter-form" action="{{ url('roles/save') }}" method="post">
@@ -90,6 +91,7 @@
             {!! $roles->withQueryString()->links('pagination::bootstrap-5') !!}
           </div>
         </div>
+
       </div>
     </div>
     @include('layouts/footer_new')
