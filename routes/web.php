@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\NewAnnouncementController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\VideoCategoryController;
 use App\Http\Controllers\Users;
@@ -224,6 +225,13 @@ Route::middleware('auth')->group(function () {
     Route::post('/banner-sizes/edit', [BannerSizeController::class, 'edit']);
     Route::post('/banner-sizes/update', [BannerSizeController::class, 'update']);
     Route::post('banner-sizes/destroy', [BannerSizeController::class, 'destroy']);
+
+
+
+    // code by keval
+    Route::get('announcement-create-new', [NewAnnouncementController::class, 'announcement_create'])->name('announcement-create-new');
+    Route::post('fetch-users', [NewAnnouncementController::class, 'fetchUsers'])->name('fetch.users');
+    Route::post('announcement/publish', [NewAnnouncementController::class, 'saveAnnouncement'])->name('annoucement.publish');
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');
