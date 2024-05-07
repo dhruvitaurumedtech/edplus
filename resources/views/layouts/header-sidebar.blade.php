@@ -20,8 +20,6 @@
         }
         @endphp
 
-
-
         @foreach ($menu as $value)
         <div class="dashboard-nav-dropdown {{ isActiveMenu($value) }}">
             <a href="{{ isset($value['url']) && Route::has($value['url']) ? url($value['url']) : '#' }}" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ isActiveLink($value['url']) }}">
