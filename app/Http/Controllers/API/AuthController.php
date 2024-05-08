@@ -29,6 +29,7 @@ class AuthController extends Controller
             'mobile' => 'required|min:10',
             'role_type' => 'required|integer|exists:roles,id',
             'confirm_password' => 'required|string|same:password',
+            'device_key' => 'nullable',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
@@ -44,6 +45,7 @@ class AuthController extends Controller
             $user->mobile = $request->mobile;
             $user->role_type = $request->role_type;
             $user->otp_num = rand(100000, 999999);
+            $user->device_key = $request->device_key;
             $user->save();
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
@@ -60,6 +62,7 @@ class AuthController extends Controller
             'email' => 'required|email|exists:users,email',
             'password' => 'required',
             'login_type' => 'required|in:1,2',
+            'device_key' => 'nullable',
         ]);
 
 
@@ -84,17 +87,18 @@ class AuthController extends Controller
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
+            $user->device_key = $request->device_key;
             $user->save();
-            $userdata=user::join('institute_detail','institute_detail.user_id','=','users.id')
-                  ->where('users.email',$request->email)
-                  ->select('institute_detail.id')
-                  ->first();
-            if(!empty($userdata->id)){
+            $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
+                ->where('users.email', $request->email)
+                ->select('institute_detail.id')
+                ->first();
+            if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
-            } else{
+            } else {
                 $institute_id = null;
-            }     
-                
+            }
+
 
             $data = [
                 'user_id' => $user->id,
