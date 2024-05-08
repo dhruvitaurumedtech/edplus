@@ -2517,191 +2517,165 @@ class InstituteApiController extends Controller
     }
 
     //institute all detail
-    // public function institute_details(Request $request)
-    // {
+    public function institute_details(Request $request)
+    {
 
-    //     $validator = \Validator::make($request->all(), [
-    //         'institute_id' => 'required',
-    //         'user_id' => 'required',
-    //     ]);
+        $validator = \Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
 
-    //     if ($validator->fails()) {
-    //         $errorMessages = array_values($validator->errors()->all());
-    //         return response()->json([
-    //             'success' => 400,
-    //             'message' => 'Validation error',
-    //             'errors' => $errorMessages,
-    //         ], 400);
-    //     }
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
 
-    //     $token = $request->header('Authorization');
+        try{
+            $institute_id = $request->institute_id;
 
-    //     if (strpos($token, 'Bearer ') === 0) {
-    //         $token = substr($token, 7);
-    //     }
+            $instituteDTS = Institute_detail::where('id', $institute_id)->first();
+            $user_id = $instituteDTS->user_id;
 
-    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-    //     if ($existingUser) {
-
-    //         $institute_id = $request->institute_id;
-
-    //         $instituteDTS = Institute_detail::where('id', $institute_id)->first();
-    //         $user_id = $instituteDTS->user_id;
-
-    //         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
-    //             ->where('institute_for_sub.institute_id', $institute_id)
-    //             ->where('institute_for_sub.user_id', $user_id)
-    //             ->select('institute_for.*')
-    //             ->distinct()->get();
-    //         $institute_fors = [];
-    //         foreach ($institute_for as $inst_forsd) {
-    //             $board = Board::join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
-    //                 $join->on('board.id', '=', 'board_sub.board_id')
-    //                     ->where('board_sub.institute_id', $institute_id)
-    //                     ->where('board_sub.user_id', $user_id)
-    //                     ->where('board_sub.institute_for_id', $inst_forsd->id);
-    //             })
-    //                 ->whereNull('board.deleted_at')
-    //                 ->select('board.*')
-    //                 ->get();
-
-    //             $boards = [];
-    //             foreach ($board as $boardsdt) {
-    //                 $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
-    //                     ->where('medium_sub.institute_id', $institute_id)
-    //                     ->where('medium_sub.user_id', $user_id)
-    //                     ->where('medium_sub.institute_for_id', $inst_forsd->id)
-    //                     ->where('medium_sub.board_id', $boardsdt->id)
-    //                     ->select('medium.*')
-    //                     ->distinct()->get();
-    //                 $mediums = [];
-    //                 foreach ($medium as $mediumdt) {
-    //                     $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
-    //                         ->where('class_sub.institute_id', $institute_id)
-    //                         ->where('class_sub.user_id', $user_id)
-    //                         ->where('class_sub.institute_for_id', $inst_forsd->id)
-    //                         ->where('class_sub.board_id', $boardsdt->id)
-    //                         ->where('class_sub.medium_id', $mediumdt->id)
-    //                         ->select('class.*')
-    //                         ->distinct()->get();
-    //                     $classs = [];
-    //                     foreach ($class as $classdt) {
-
-    //                         $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
-    //                             ->where('standard_sub.institute_id', $institute_id)
-    //                             ->where('standard_sub.user_id', $user_id)
-    //                             ->where('standard_sub.institute_for_id', $inst_forsd->id)
-    //                             ->where('standard_sub.board_id', $boardsdt->id)
-    //                             ->where('standard_sub.medium_id', $mediumdt->id)
-    //                             ->where('standard_sub.class_id', $classdt->id)
-    //                             ->select('standard.*')
-    //                             ->distinct()->get();
-
-    //                         $standards = [];
-    //                         foreach ($standard as $standarddt) {
-    //                             //stream 
-    //                             $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
-    //                                 ->where('stream_sub.institute_id', $institute_id)
-    //                                 ->where('stream_sub.user_id', $user_id)
-    //                                 ->where('stream_sub.institute_for_id', $inst_forsd->id)
-    //                                 ->where('stream_sub.board_id', $boardsdt->id)
-    //                                 ->where('stream_sub.medium_id', $mediumdt->id)
-    //                                 ->where('stream_sub.class_id', $classdt->id)
-    //                                 ->select('stream.*')
-    //                                 ->distinct()->get();
-    //                             $streams = [];
-    //                             foreach ($stream as $streamdt) {
-    //                                 $streams[] = array(
-    //                                     'id' => $streamdt->id,
-    //                                     'name' => $streamdt->name
-    //                                 );
-    //                             }
-
-    //                             $batableids = Base_table::where('institute_for', $inst_forsd->id)
-    //                                 ->where('board', $boardsdt->id)
-    //                                 ->where('medium', $mediumdt->id)
-    //                                 ->where('medium', $mediumdt->id)
-    //                                 ->where('institute_for_class', $classdt->id)
-    //                                 ->where('standard', $standarddt->id)->pluck('id')
-    //                                 ->toArray();
-
-    //                             $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
-    //                                 ->where('subject_sub.institute_id', $institute_id)
-    //                                 ->where('subject_sub.user_id', $user_id)
-    //                                 ->whereIN('subject.base_table_id', $batableids)
-    //                                 ->select('subject.*')
-    //                                 ->distinct()->get();
-    //                             $subjects = [];
-    //                             foreach ($subject as $subjectdt) {
-
-    //                                 $subjects[] = array(
-    //                                     'id' => $subjectdt->id,
-    //                                     'name' => $subjectdt->name
-    //                                 );
-    //                             }
-
-    //                             $standards[] = array(
-    //                                 'id' => $standarddt->id,
-    //                                 'name' => $standarddt->name,
-    //                                 'stream' => $streams,
-    //                                 'subject_id' => $subjects
-    //                             );
-    //                         }
+            $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')
+                ->where('institute_for_sub.institute_id', $institute_id)
+                ->where('institute_for_sub.user_id', $user_id)
+                ->select('institute_for.*')
+                ->distinct()->get();
+            $institute_fors = [];
+            foreach ($institute_for as $inst_forsd) {
+                $board = Board::join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
+                    $join->on('board.id', '=', 'board_sub.board_id')
+                        ->where('board_sub.institute_id', $institute_id)
+                        ->where('board_sub.user_id', $user_id)
+                        ->where('board_sub.institute_for_id', $inst_forsd->id);
+                })
+                    ->whereNull('board.deleted_at')
+                    ->select('board.*')
+                    ->get();
 
 
+                $boards = [];
+                foreach ($board as $boardsdt) {
+                    $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
+                        ->where('medium_sub.institute_id', $institute_id)
+                        ->where('medium_sub.user_id', $user_id)
+                        ->where('medium_sub.institute_for_id', $inst_forsd->id)
+                        ->where('medium_sub.board_id', $boardsdt->id)
+                        ->select('medium.*')
+                        ->distinct()->get();
+                    $mediums = [];
+                    foreach ($medium as $mediumdt) {
+                        $class = Class_model::join('class_sub', 'class.id', '=', 'class_sub.class_id')
+                            ->where('class_sub.institute_id', $institute_id)
+                            ->where('class_sub.user_id', $user_id)
+                            ->where('class_sub.institute_for_id', $inst_forsd->id)
+                            ->where('class_sub.board_id', $boardsdt->id)
+                            ->where('class_sub.medium_id', $mediumdt->id)
+                            ->select('class.*')
+                            ->distinct()->get();
+                        $classs = [];
+                        foreach ($class as $classdt) {
 
+                            $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')
+                                ->where('standard_sub.institute_id', $institute_id)
+                                ->where('standard_sub.user_id', $user_id)
+                                ->where('standard_sub.institute_for_id', $inst_forsd->id)
+                                ->where('standard_sub.board_id', $boardsdt->id)
+                                ->where('standard_sub.medium_id', $mediumdt->id)
+                                ->where('standard_sub.class_id', $classdt->id)
+                                ->select('standard.*')
+                                ->distinct()->get();
 
+                            $standards = [];
+                            foreach ($standard as $standarddt) {
+                                //stream 
+                                $stream = Stream_model::join('stream_sub', 'stream.id', '=', 'stream_sub.stream_id')
+                                    ->where('stream_sub.institute_id', $institute_id)
+                                    ->where('stream_sub.user_id', $user_id)
+                                    ->where('stream_sub.institute_for_id', $inst_forsd->id)
+                                    ->where('stream_sub.board_id', $boardsdt->id)
+                                    ->where('stream_sub.medium_id', $mediumdt->id)
+                                    ->where('stream_sub.class_id', $classdt->id)
+                                    ->select('stream.*')
+                                    ->distinct()->get();
+                                $streams = [];
+                                foreach ($stream as $streamdt) {
+                                    $streams[] = array(
+                                        'id' => $streamdt->id,
+                                        'name' => $streamdt->name
+                                    );
+                                }
 
-    //                         $classs[] = array(
-    //                             'id' => $classdt->id,
-    //                             'name' => $classdt->name,
-    //                             'standard' => $standards
-    //                         );
-    //                     }
+                                $batableids = Base_table::where('institute_for', $inst_forsd->id)
+                                    ->where('board', $boardsdt->id)
+                                    ->where('medium', $mediumdt->id)
+                                    ->where('medium', $mediumdt->id)
+                                    ->where('institute_for_class', $classdt->id)
+                                    ->where('standard', $standarddt->id)->pluck('id')
+                                    ->toArray();
 
-    //                     $mediums[] = array(
-    //                         'id' => $mediumdt->id,
-    //                         'name' => $mediumdt->name, 'class' => $classs
-    //                     );
-    //                 }
+                                $subject = Subject_model::join('subject_sub', 'subject.id', '=', 'subject_sub.subject_id')
+                                    ->where('subject_sub.institute_id', $institute_id)
+                                    ->where('subject_sub.user_id', $user_id)
+                                    ->whereIN('subject.base_table_id', $batableids)
+                                    ->select('subject.*')
+                                    ->distinct()->get();
+                                $subjects = [];
+                                
+                                foreach ($subject as $subjectdt) {
 
-    //                 $boards[] = array(
-    //                     'id' => $boardsdt->id,
-    //                     'name' => $boardsdt->name,
-    //                     'medium' => $mediums
-    //                 );
-    //             }
-    //             $institute_fors[] = array(
-    //                 'id' => $inst_forsd->id,
-    //                 'name' => $inst_forsd->name,
-    //                 'boards' => $boards
-    //             );
-    //         }
+                                    $subjects[] = array(
+                                        'id' => $subjectdt->id,
+                                        'name' => $subjectdt->name
+                                    );
+                                }
+                                  
+                                $standards[] = array(
+                                    'id' => $standarddt->id,
+                                    'name' => $standarddt->name,
+                                    'stream' => $streams,
+                                    'subject_id' => $subjects
+                                );
+                            }
 
+                           $classs[] = array(
+                                'id' => $classdt->id,
+                                'name' => $classdt->name,
+                                'standard' => $standards
+                            );
+                        }
 
+                        $mediums[] = array(
+                            'id' => $mediumdt->id,
+                            'name' => $mediumdt->name, 'class' => $classs
+                        );
+                    }
 
-    //         $alldata = array(
-    //             'institute_fors' => $institute_fors,
-    //             // 'boards' => $boards,
-    //             // 'mediums' => $mediums,
-    //             // 'classs' => $classs,
-    //             // 'streams' => $streams,
-    //             // 'subjects' => $subjects,
-    //             // 'standards' => $standards
-    //         );
+                    $boards[] = array(
+                        'id' => $boardsdt->id,
+                        'name' => $boardsdt->name,
+                        'medium' => $mediums
+                    );
+                }
+                $institute_fors[] = array(
+                    'id' => $inst_forsd->id,
+                    'name' => $inst_forsd->name,
+                    'boards' => $boards
+                );
+            }
+            $alldata = array(
+                'institute_fors' => $institute_fors,
+                // 'boards' => $boards,
+                // 'mediums' => $mediums,
+                // 'classs' => $classs,
+                // 'streams' => $streams,
+                // 'subjects' => $subjects,
+                // 'standards' => $standards
+            );
 
-    //         return response()->json([
-    //             'status' => 200,
-    //             'message' => 'Successfully fetch Data.',
-    //             'data' => $alldata
-    //         ], 200, [], JSON_NUMERIC_CHECK);
-    //     } else {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'Invalid token.',
-    //         ]);
-    //     }
-    // }
+             return $this->response($alldata, 'Successfully fetch Data.');
+        }  catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
     //student list for add exam marks
     // public function student_list_for_add_marks123(Request $request)
     // {

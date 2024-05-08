@@ -40,7 +40,7 @@ class VideoController extends Controller
         }
 
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
-
+        
         if (!$check || $check->category_id != $request->parent_category_id) {
             return $this->response([], 'Please Select Correct Category', false, 400);
         }
@@ -90,6 +90,53 @@ class VideoController extends Controller
             return $this->response($e, 'Something went Wrong!!', false, 400);
         }
     }
+
+    public function upload_youtube_video(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'base_table_id' => 'required',
+            'user_id' => 'required',
+            'institute_id' => 'required',
+            'standard_id' => 'required',
+            'subject_id' => 'required',
+            'chapter_id' => 'required',
+            'topic_no' => 'required',
+            'topic_name' => 'required',
+            'category_id' => 'required',
+            'parent_category_id' => 'required',
+            'youtube_url' => 'required|url'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
+        if (!$check || $check->category_id != $request->parent_category_id) {
+            return $this->response([], 'Please Select Correct Category', false, 400);
+        }
+
+        try {
+            $topic = Topic_model::create([
+                'user_id' => $request->input('user_id'),
+                'institute_id' => $request->input('institute_id'),
+                'base_table_id' => $request->input('base_table_id'),
+                'standard_id' => $request->input('standard_id'),
+                'subject_id' => $request->input('subject_id'),
+                'chapter_id' => $request->input('chapter_id'),
+                'topic_no' => $request->input('topic_no'),
+                'topic_description' => $request->input('topic_description'),
+                'topic_name' => $request->input('topic_name'),
+                'video_category_id' => $request->input('category_id'),
+                'topic_video' =>  $request->youtube_url,
+            ]);
+            return $this->response($topic, 'Topic and file uploaded successfully');
+        } catch (Exception $e) {
+            return $this->response($e, 'Something went Wrong!!', false, 400);
+        }
+    }
+
+
 
     // public function upload_video1(Request $request)
     // {
