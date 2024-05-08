@@ -21,7 +21,24 @@ class NewAnnouncementController extends Controller
     {
         $institute_list = Institute_detail::get()->toArray();
         $UserRoleBy = User::whereIn('role_type', [3, 4, 5, 6])->get();
-        return view('announcementnew/create', compact('institute_list', 'UserRoleBy'));
+        $announcement = Common_announcement::get()->toarray();
+        $response = [];
+        foreach ($announcement as $value) {
+            $institute_response = Institute_detail::whereIn('id', explode(',', $value['institute_id']))->get()->toarray();
+            $teacher_response = User::whereIn('id', explode(',', $value['teacher_id']))->where('role_type',4)->get()->toarray();
+            $parent_response = User::whereIn('id', explode(',', $value['teacher_id']))->where('role_type',5)->get()->toarray();
+            $student_response = User::whereIn('id', explode(',', $value['teacher_id']))->where('role_type',6)->get()->toarray();
+            $response[] = [
+                'id' => $value['id'],
+                'title' => $value['title'],
+                'announcement' => $value['announcement'],
+                'institute_show' => $institute_response,
+                'teacher_show' => $teacher_response,
+                'parent_show' =>$parent_response,
+                'student_show' =>$student_response
+            ];
+        }
+        return view('announcementnew/create', compact('institute_list', 'UserRoleBy','response'));
     }
 
     public function fetchUsers(Request $request)
@@ -186,7 +203,7 @@ class NewAnnouncementController extends Controller
             ->where('device_key', '!=', null)
             ->get();
 
-        $serverKey = "";
+        $serverKey = "BNqy6sAYr0VQ-ipMsUfJTX6yjw5quVeApFrVQ7XqmgH8Br9dejmaUOUEKfGNU8T52yQdA3jj8KJM0WzpIHSbTDQ";
 
         $url = "https://fcm.googleapis.com/fcm/send";
         $registrationIds = $users->pluck('device_key')->toArray();
