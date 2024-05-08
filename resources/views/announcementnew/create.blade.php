@@ -149,10 +149,10 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn text-white blue-button announcement_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
-                                                &nbsp;&nbsp;
+                                                <!-- <input type="submit" class="btn text-white blue-button announcement_new_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                &nbsp;&nbsp; -->
                                                 <input type="submit" class="btn btn-danger announcement_deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
-                                            </div>
+                                      </div>
                                         </td>
                                     </tr>
                                     @endforeach

@@ -105,9 +105,11 @@ class AnnouncementController extends Controller
 
     public function destroy(Request $request)
     {
-        $announcement_id = $request->input('announcement_id');
-        $announcement_list = Common_announcement::find($announcement_id);
-
+        
+        $announcement_id = $request->announcement_id;
+        
+        $announcement_list = Common_announcement::where('id',$announcement_id);
+        
         if (!$announcement_list) {
             return redirect('announcement-create')->with('error', 'announcement not found');
         }
