@@ -22,7 +22,7 @@ return new class extends Migration
             $table->unsignedBigInteger('chapter_id');
             $table->foreign('chapter_id')->references('id')->on('chapters');
             $table->unsignedBigInteger('video_category_id');
-            $table->foreign('video_category_id')->references('id')->on('video_categories');
+            $table->foreign('video_category_id')->references('id')->on('do_business_with');
             $table->string('topic_no');
             $table->string('topic_name');
             $table->string('topic_video');

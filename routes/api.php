@@ -39,6 +39,7 @@ Route::group(['middleware' => ['web']], function () {
 
 Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
+    Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/institute/videoAssign', [VideoController::class, 'videoassign']);
