@@ -2670,7 +2670,7 @@ class InstituteApiController extends Controller
                 'standards' => $standards
             );
 
-             return $this->response([], 'Successfully fetch Data.');
+             return $this->response($alldata, 'Successfully fetch Data.');
         }  catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
