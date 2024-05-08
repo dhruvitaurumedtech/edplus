@@ -2551,6 +2551,7 @@ class InstituteApiController extends Controller
                     ->select('board.*')
                     ->get();
 
+
                 $boards = [];
                 foreach ($board as $boardsdt) {
                     $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')
