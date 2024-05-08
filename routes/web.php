@@ -220,7 +220,7 @@ Route::middleware('auth')->group(function () {
     Route::post('announcement/save', [AnnouncementController::class, 'save']);
     Route::post('/announcement/edit', [AnnouncementController::class, 'edit']);
     Route::post('announcement/update', [AnnouncementController::class, 'update']);
-    Route::post('announcement/delete', [AnnouncementController::class, 'destroy']);
+    Route::post('/announcement/delete', [AnnouncementController::class, 'destroy']);
     Route::resource('banner-sizes', 'App\Http\Controllers\Admin\BannerSizeController');
     Route::post('/banner-sizes/edit', [BannerSizeController::class, 'edit']);
     Route::post('/banner-sizes/update', [BannerSizeController::class, 'update']);

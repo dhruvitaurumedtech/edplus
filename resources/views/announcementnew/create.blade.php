@@ -149,9 +149,9 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn text-white blue-button announcement_new_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
-                                                &nbsp;&nbsp;
-                                                <input type="submit" class="btn btn-danger announcement_new_deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
+                                                <!-- <input type="submit" class="btn text-white blue-button announcement_new_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                &nbsp;&nbsp; -->
+                                                <input type="submit" class="btn btn-danger announcement_new_deletebutton" data-del-id="{{ $values['id'] }}" value="Delete">
                                             </div>
                                         </td>
                                     </tr>
@@ -170,8 +170,8 @@
         @include('layouts/footer_new')
     </div>
   
-            <script>
-                document.querySelectorAll('.announcement_new_editButton').forEach(function (button) {
+    <script>
+    document.querySelectorAll('.announcement_new_editButton').forEach(function (button) {
     button.addEventListener('click', function () {
         var anouncement_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
@@ -311,6 +311,27 @@
 
 
                 });
+            </script>
+
+            <script>
+            document.querySelectorAll('.announcement_new_deletebutton').forEach(function (button) {
+            button.addEventListener('click', function () {
+            var anouncement_id = this.getAttribute('data-del-id');
+            var baseUrl = $('meta[name="base-url"]').attr('content');
+
+
+            axios.post(baseUrl + '/announcement/delete', {
+                anouncement_id: anouncement_id
+            })
+            .then(response => {
+                alert('hl');
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+});
+
             </script>
 
            

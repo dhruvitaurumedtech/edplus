@@ -105,6 +105,7 @@ class AnnouncementController extends Controller
 
     public function destroy(Request $request)
     {
+        
         $announcement_id = $request->input('announcement_id');
         $announcement_list = Common_announcement::find($announcement_id);
 
