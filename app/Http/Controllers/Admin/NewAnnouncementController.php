@@ -203,7 +203,7 @@ class NewAnnouncementController extends Controller
             ->where('device_key', '!=', null)
             ->get();
 
-        $serverKey = "BNqy6sAYr0VQ-ipMsUfJTX6yjw5quVeApFrVQ7XqmgH8Br9dejmaUOUEKfGNU8T52yQdA3jj8KJM0WzpIHSbTDQ";
+        $serverKey = "AAAAw2iOsiU:APA91bFvtJsovqQESQi_Tzf0rPxBxcCXHTASZBVScK_MZBrg-Tbx5sBFfTVu9ryq-bJx-mr3GdPqFfX-PNJhBuEea5sz9XT7ytSoHFwg45jX_oS60IxFiYxLXJCA38ZL2HSb3WBuBENa";
 
         $url = "https://fcm.googleapis.com/fcm/send";
         $registrationIds = $users->pluck('device_key')->toArray();

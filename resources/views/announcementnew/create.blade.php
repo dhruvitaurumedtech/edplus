@@ -26,7 +26,7 @@
                     <div class="col-md-6">
                         <div class="institute-form">
                             <h3 class="card-title">Create Announcement </h3>
-                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data">
+                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data" id="usereditModal">
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group">
@@ -41,7 +41,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" class="instituteCheckbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
+                                                            <input type="checkbox" class="instituteCheckbox" id="institute_id" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -169,82 +169,44 @@
         </div>
         @include('layouts/footer_new')
     </div>
-    <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="usereditModalLabel">Edit Announcement </h5>
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                <span aria-hidden="true">&times;</span>
-                            </button>
-                        </div>
-                        <div class="modal-body">
-                            <form method="post" action="{{ url('announcement/update') }}" enctype="multipart/form-data">
-                                <input type="hidden" name="id" id="anouncement_id">
-                                @csrf
-                                <div class="card-body">
-                                    <div class="form-group">
-                                        <div class="row">
-
-                                        <div class="col-md-12 checbox-dropdown">
-                                                <label for="exampleInputEmail1">Institute Name : </label>
-                                                <div class="dropdown" data-control="checkbox-dropdown">
-                                                    <label class="dropdown-label">Select</label>
-                                                    <div class="dropdown-list">
-                                                        <a href="#" data-toggle="check-all" class="dropdown-option">
-                                                            Check All
-                                                        </a>
-                                                        @foreach($institute_list as $value)
-                                                        <label class="dropdown-option">
-                                                            <input type="checkbox" class="instituteCheckbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
-                                                            {{$value['institute_name']}}
-                                                        </label>
-                                                        @endforeach
-                                                    </div>
-                                                    @error('institute_id')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12 checbox-dropdown">
-                                                <label for="userDropdown">User Select:</label>
-                                                <div id="userDropdown" class="dropdown" data-control="checkbox-dropdown">
-                                                    <label class="dropdown-label">Select</label>
-                                                    <div class="dropdown-list">
-                                                        <ul>
-                                                        </ul>
-                                                    </div>
-                                                    @error('selected_users')
-                                                    <div class="text-danger">{{ $message }}</div>
-                                                    @enderror
-                                                </div>
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label for="exampleInputtitle">Title : </label>
-                                                <input type="text" class="form-control" name="title" id="title">
-                                                @error('title')
-                                                <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                            <div class="col-md-12">
-                                                <label for="exampleInputEmail1">Announcement : </label>
-                                                <textarea class="form-control" name="announcement" id="announcement"></textarea>
-                                                @error('announcement')
-                                                <div class="text-danger">{{ $message }}</div>
-                                                @enderror
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="d-flex justify-content-end">
-                                    <button type="submit" class="btn text-white blue-button">Update</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-            </div>
+  
             <script>
+                document.querySelectorAll('.announcement_new_editButton').forEach(function (button) {
+    button.addEventListener('click', function () {
+        var anouncement_id = this.getAttribute('data-user-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
+
+
+        axios.post(baseUrl + '/announcement/edit', {
+            anouncement_id: anouncement_id
+        })
+            .then(response => {
+                var response_data = response.data.announcement;
+                for (let result of response_data) {
+
+                    var institute_id = result.institute_id;
+                    var teacher_id = result.teacher_id;
+                    $('#anouncement_id').val(result.id);
+                    $('#announcement').val(result.announcement);
+                    $('#title').val(result.title);
+
+                    const institute_id_result = institute_id.split(',');
+                    for (let institute of institute_id_result) {
+                        $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);
+                    }
+                    const teacher_id_result = teacher_id.split(',');
+                    for (let teacher of teacher_id_result) {
+                        $(`#teacher_id[value="${teacher.trim()}"]`).prop('checked', true);
+                    }
+                    // $('#institute_id').prop('checked', result.institute_id);
+                    // $('#teacher_id').prop('checked', result.teacher_id);
+                }
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+});
                 document.addEventListener("DOMContentLoaded", function() {
                     function fetchUsers(instituteIds) {
                         $.ajax({
@@ -327,22 +289,7 @@
                     });
 
                     //edit
-                    $('.instituteCheckbox_edit').change(function() {
-                        var selectedInstitutes = $('.instituteCheckbox_edit:checked').map(function() {
-                            return $(this).val();
-                        }).get();
-                        fetchUsers(selectedInstitutes);
-                    });
-
-                    // Event listener for Check All
-                    $('[data-toggle="check-all-new"]').click(function(e) {
-                        e.preventDefault();
-                        $('.instituteCheckbox_edit').prop('checked', true);
-                        var allInstitutes = $('.instituteCheckbox_edit:checked').map(function() {
-                            return $(this).val();
-                        }).get();
-                        fetchUsers(allInstitutes);
-                    });
+                   
 
                     $('form').submit(function(event) {
                         event.preventDefault();
