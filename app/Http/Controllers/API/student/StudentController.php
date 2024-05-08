@@ -2209,7 +2209,12 @@ class StudentController extends Controller
 
         try {
             $institute_id = $request->institute_id;
-            $student_id = Auth::id();
+            if($request->child_id){
+                $student_id = $request->child_id;
+            }else{
+                $student_id = Auth::id();
+            }
+            
             $stdetails = Student_detail::where('student_id', $student_id)
                 ->when($institute_id, function ($query, $institute_id) {
                     return $query->where('institute_id', $institute_id);
@@ -2430,7 +2435,7 @@ class StudentController extends Controller
     //     }
     // }
 
-
+    //exam result list for student and parents
     public function exam_result(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -2442,6 +2447,13 @@ class StudentController extends Controller
         }
 
         try {
+            if($request->child_id){
+                $student_id = $request->child_id;
+            }else{
+                $student_id = AUth::id();
+            }
+
+
             $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
                 ->where('exam.id', $request->exam_id)
                 ->where('institute_detail.end_academic_year', '>=', now())
@@ -2452,7 +2464,7 @@ class StudentController extends Controller
 
                 $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
                     ->join('subject', 'subject.id', '=', 'exam.subject_id')
-                    ->where('marks.student_id', AUth::id())
+                    ->where('marks.student_id', $student_id)
                     ->where('marks.exam_id', $request->exam_id)
                     ->select('marks.*', 'subject.name as subjectname', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
                     ->orderByDesc('marks.created_at')->limit(3)->first();
@@ -2718,7 +2730,7 @@ class StudentController extends Controller
         }
     }
 
-    //timetable list
+    //timetable list for student and parents
     public function timetable_list(Request $request)
     {
 
@@ -2732,7 +2744,13 @@ class StudentController extends Controller
         }
 
         try {
-            $stdntdata = Student_detail::where('student_id', auth::id())
+            if($request->child_id){
+                $studentID = $request->child_id;
+            }else{
+                $studentID = auth::id();
+            }
+
+            $stdntdata = Student_detail::where('student_id', $studentID)
                 ->where('institute_id', $request->institute_id)->first();
 
             $lectures = [];

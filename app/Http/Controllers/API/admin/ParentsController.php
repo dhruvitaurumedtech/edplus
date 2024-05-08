@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\admin;
 use App\Http\Controllers\Controller;
 use App\Models\announcements_model;
 use App\Models\Banner_model;
+use App\Models\Exam_Model;
 use App\Models\Marks_model;
 use App\Models\Parents;
 use App\Models\Student_detail;
@@ -23,9 +24,7 @@ class ParentsController extends Controller
 
     public function child_list(Request $request)
     {
-        try {
-            
-            
+        try {            
             $banner_list = Banner_model::where('status', 'active')
             ->Where('user_id', '1')
             ->get(['id', 'banner_image', 'url']);
@@ -147,26 +146,72 @@ class ParentsController extends Controller
     public function parents_child_homescreen(Request $request)
     {
         
-        $validator = \validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'child_id' => 'required',
-            'institute_id'=>'request'
+            'institute_id'=>'required'
         ]);
         
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+
             $user_id = Auth::id();
             
-            $child_detail = [];
-            $announcement = [];
-            $result = [];
+            
+            
+            
             $fees = [];
-            $todays_lecture = [];
+            
+            //banner
+            $bannerss = Banner_model::where('status', 'active')
+                ->Where('institute_id', $request->institute_id)
+                ->paginate(10);
+            if ($bannerss->isEmpty()) {
+                $banners = Banner_model::where('status', 'active')
+                    ->Where('user_id', '1')
+                    ->paginate(10);
+            } else {
+                $banners = $bannerss;
+            }
+            $banners_data = [];
+            foreach ($banners as $value) {
+                $imgpath = asset($value->banner_image);
+                $banners_data[] = array(
+                    'id' => $value->id,
+                    'banner_image' => $imgpath,
+                    'url' => $value->url ?? ''
+                );
+            }
 
-            $getstdntdata = Student_detail::where('student_id', $request->child_id)
-            ->where('institute_id', $request->institute_id)->first();
+            $getstdntdata = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+            ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+            ->select('users.firstname', 'users.lastname', 'institute_detail.institute_name','institute_detail.id as institute_id','students_details.student_id')
+            ->where('students_details.student_id', $request->child_id)
+            ->where('students_details.institute_id', $request->institute_id)->first();
 
+
+            //child detail
+            $child_detail = [];
+            
+           
+                $subids = explode(',', $getstdntdata->subject_id);
+                $subjectQY = Subject_model::whereIN('id', $subids);
+                $subjDTs = [];
+                foreach ($subjectQY as $subDT) {
+                    $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                }
+
+                $child_detail[] = array(
+                    'child_id' => $getstdntdata->student_id,
+                    'firstname' => $getstdntdata->firstname,
+                    'lastname' => $getstdntdata->lastname,
+                    'institute_id' => $getstdntdata->institute_id,
+                    'institute_name' => $getstdntdata->institute_name,
+                    'subjects' => $subjDTs
+                );
+
+            //today's lecture
             $today = date('Y-m-d');
             $todays_lecture = [];
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
@@ -196,40 +241,74 @@ class ParentsController extends Controller
                 );
             }
 
-        //     $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
-        //         ->whereRaw("FIND_IN_SET('5', role_type)")
-        //         ->get();
-        //     foreach ($announcQY as $announcDT) {
-        //         $announcement[] = array(
-        //             'title' => $announcDT->title,
-        //             'desc' => $announcDT->detail,
-        //             'time' => $announcDT->created_at
-        //         );
-        //     }
+            //announcement
+            $announcement = [];
+            $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
+                ->whereRaw("FIND_IN_SET('5', role_type)")
+                ->get();
+            foreach ($announcQY as $announcDT) {
+                $announcement[] = array(
+                    'title' => $announcDT->title,
+                    'desc' => $announcDT->detail,
+                    'time' => $announcDT->created_at
+                );
+            }
 
-        //     $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
-        //     ->join('subject', 'subject.id', '=', 'exam.subject_id')
-        //     ->where('marks.student_id', $request->child_id)
-        //     ->where('exam.institute_id', $getstdntdata->institute_id)
-        //     ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
-        //     ->orderByDesc('marks.created_at')->limit(3)->get();
-        // $highestMarks = $resultQY->max('marks');
-        // foreach ($resultQY as $resultDDt) {
-        //     $result[] = array(
-        //         'subject' => $resultDDt->subject,
-        //         'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-        //         'total_marks' => $resultDDt->total_marks,
-        //         'achiveddmarks_marks' => boolval($resultDDt->mark),
-        //         'date' => $resultDDt->exam_date,
-        //         'class_highest' => $highestMarks
-        //     );
-        // }
+            //upcoming exam
+            $examlist = [];
+            $subjectIds = explode(',', $getstdntdata->subject_id);
+            $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                    ->join('standard', 'standard.id', '=', 'exam.standard_id')
+                    ->where('institute_id', $getstdntdata->institute_id)
+                    ->where('batch_id', $getstdntdata->batch_id)
+                    ->where('exam.board_id', $getstdntdata->board_id)
+                    ->where('exam.medium_id', $getstdntdata->medium_id)
+                    ->where('exam.standard_id', $getstdntdata->standard_id)
+                    ->orWhere('exam.stream_id', $getstdntdata->stream_id)
+                    ->whereIN('exam.subject_id', $subjectIds)
+                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                    ->orderBy('exam.created_at', 'desc')
+                    ->limit(3)
+                    ->get();
+                foreach ($exams as $examsDT) {
+                    $examlist[] = array(
+                        'exam_title' => $examsDT->exam_title,
+                        'total_mark' => $examsDT->total_mark,
+                        'exam_type' => $examsDT->exam_type,
+                        'subject' => $examsDT->subject,
+                        'standard' => $examsDT->standard,
+                        'date' => $examsDT->exam_date,
+                        'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                    );
+                }
+
+            //RESULT 
+            $result = [];
+            $resultQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
+            ->join('subject', 'subject.id', '=', 'exam.subject_id')
+            ->where('marks.student_id', $request->child_id)
+            ->where('exam.institute_id', $getstdntdata->institute_id)
+            ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
+            ->orderByDesc('marks.created_at')->limit(3)->get();
+        $highestMarks = $resultQY->max('marks');
+        foreach ($resultQY as $resultDDt) {
+            $result[] = array(
+                'subject' => $resultDDt->subject,
+                'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
+                'total_marks' => $resultDDt->total_marks,
+                'achiveddmarks_marks' => boolval($resultDDt->mark),
+                'date' => $resultDDt->exam_date,
+                'class_highest' => $highestMarks
+            );
+        }
 
         $data = [
-            'todays_lecture'=>$todays_lecture
-            // 'child_detail' => $child_detail,
-            // 'announcement' => $announcement,
-            // 'result' => $result,
+            'banners_data'=>$banners_data,
+            'todays_lecture'=>$todays_lecture,
+            'child_detail' => $child_detail,
+            'announcement' => $announcement,
+            'examlist'=>$examlist,
+            'result' => $result,
             // 'fees' => $fees,
         ];
 
