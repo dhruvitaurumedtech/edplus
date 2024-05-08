@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\announcements_model;
+use App\Models\Banner_model;
 use App\Models\Marks_model;
 use App\Models\Parents;
 use App\Models\Student_detail;
@@ -23,6 +24,20 @@ class ParentsController extends Controller
     public function child_list(Request $request)
     {
         try {
+            
+            
+            $banner_list = Banner_model::where('status', 'active')
+            ->Where('user_id', '1')
+            ->get(['id', 'banner_image', 'url']);
+            
+            $banner_array = $banner_list->map(function ($banner) {
+                return [
+                    'id' => $banner->id,
+                    'banner_image' => asset($banner->banner_image),
+                    'url' => $banner->url ?? ''
+                ];
+            })->toArray();
+            
             $childs = [];
             $chilsdata = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
@@ -46,7 +61,8 @@ class ParentsController extends Controller
                     'subjects' => $subjDTs
                 );
             }
-            return $this->response($childs, "Child List");
+            $data = ['banner'=>$banner_array,'child_list'=>$childs];
+            return $this->response($data, "Child List");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
