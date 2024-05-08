@@ -182,7 +182,7 @@
                     </div>
                   </div>
                   <div class="d-flex justify-content-end">
-                    <button type="submit" class="btn btn-primary" style="float: right;">Update</button>
+                    <button type="submit" class="btn text-white btn-rmv2" style="float: right;">Update</button>
                   </div>
                 </form>
               </div>

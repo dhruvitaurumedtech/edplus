@@ -26,7 +26,7 @@
                     <div class="col-md-6">
                         <div class="institute-form">
                             <h3 class="card-title">Create Announcement </h3>
-                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data" id="usereditModal">
+                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group">
@@ -41,7 +41,7 @@
                                                         </a>
                                                         @foreach($institute_list as $value)
                                                         <label class="dropdown-option">
-                                                            <input type="checkbox" class="instituteCheckbox" id="institute_id" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
+                                                            <input type="checkbox" class="instituteCheckbox" name="institute_id[]" value="{{$value['id']}}" {{ in_array($value['id'], old('institute_id', [])) ? 'checked' : '' }} />
                                                             {{$value['institute_name']}}
                                                         </label>
                                                         @endforeach
@@ -51,13 +51,13 @@
                                                     @enderror
                                                 </div>
                                             </div>
-                                            
                                             <div class="col-md-12 checbox-dropdown">
                                                 <label for="userDropdown">User Select:</label>
                                                 <div id="userDropdown" class="dropdown" data-control="checkbox-dropdown">
                                                     <label class="dropdown-label">Select</label>
                                                     <div class="dropdown-list">
                                                         <ul>
+                                                            <!-- User data will be populated here dynamically -->
                                                         </ul>
                                                     </div>
                                                     @error('selected_users')
@@ -115,7 +115,7 @@
                                     <tr>
                                         <td>{{$values['title']}}</td>
                                         <td>{{$values['announcement']}}</td>
-                                        <td style="height: 100px; overflow-x: auto;">
+                                        <td style="height: 100px; overflow-y: auto;">
                                             @foreach($values['institute_show'] as $institute)
                                             {{$institute['institute_name']}}
                                             @if (!$loop->last)
@@ -149,9 +149,9 @@
                                         </td>
                                         <td>
                                             <div class="d-flex">
-                                                <input type="submit" class="btn text-white blue-button announcement_new_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
+                                                <input type="submit" class="btn text-white blue-button announcement_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;
                                                 &nbsp;&nbsp;
-                                                <input type="submit" class="btn btn-danger announcement_new_deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
+                                                <input type="submit" class="btn btn-danger announcement_deletebutton" data-user-id="{{ $values['id'] }}" value="Delete">
                                             </div>
                                         </td>
                                     </tr>
@@ -166,47 +166,7 @@
                     </div>
                 </div>
             </div>
-        </div>
-        @include('layouts/footer_new')
-    </div>
-  
             <script>
-                document.querySelectorAll('.announcement_new_editButton').forEach(function (button) {
-    button.addEventListener('click', function () {
-        var anouncement_id = this.getAttribute('data-user-id');
-        var baseUrl = $('meta[name="base-url"]').attr('content');
-
-
-        axios.post(baseUrl + '/announcement/edit', {
-            anouncement_id: anouncement_id
-        })
-            .then(response => {
-                var response_data = response.data.announcement;
-                for (let result of response_data) {
-
-                    var institute_id = result.institute_id;
-                    var teacher_id = result.teacher_id;
-                    $('#anouncement_id').val(result.id);
-                    $('#announcement').val(result.announcement);
-                    $('#title').val(result.title);
-
-                    const institute_id_result = institute_id.split(',');
-                    for (let institute of institute_id_result) {
-                        $(`#institute_id[value="${institute.trim()}"]`).prop('checked', true);
-                    }
-                    const teacher_id_result = teacher_id.split(',');
-                    for (let teacher of teacher_id_result) {
-                        $(`#teacher_id[value="${teacher.trim()}"]`).prop('checked', true);
-                    }
-                    // $('#institute_id').prop('checked', result.institute_id);
-                    // $('#teacher_id').prop('checked', result.teacher_id);
-                }
-            })
-            .catch(error => {
-                console.error(error);
-            });
-    });
-});
                 document.addEventListener("DOMContentLoaded", function() {
                     function fetchUsers(instituteIds) {
                         $.ajax({
@@ -288,9 +248,6 @@
                         fetchUsers(allInstitutes);
                     });
 
-                    //edit
-                   
-
                     $('form').submit(function(event) {
                         event.preventDefault();
                         var formData = $(this).serialize();
@@ -313,4 +270,4 @@
                 });
             </script>
 
-           
+            @include('layouts/footer_new')

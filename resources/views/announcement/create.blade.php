@@ -105,7 +105,6 @@
                                         <th style="width: 200px">Announcement </th>
                                         <th style="width: 200px">Institute</th>
                                         <th style="width: 500px">Teacher</th>
-                                     
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -131,7 +130,6 @@
                                             @endif
                                             @endforeach
                                         </td>
-                                       
                                         <td>
                                             <div class="d-flex">
                                                 <input type="submit" class="btn text-white blue-button announcement_editButton" data-user-id="{{ $values['id'] }}" value="Edit">&nbsp;&nbsp;

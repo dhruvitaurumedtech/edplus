@@ -135,6 +135,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/get-teacher-request-list', [TeacherController::class, 'get_teacher_request_list']);
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request']);
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
+    Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
+
 });
 
 
@@ -148,8 +150,7 @@ Route::middleware(['auth:api'])->group(function () {
 
 
 
-// Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
-
+  
 //parents API's
 
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
