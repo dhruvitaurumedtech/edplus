@@ -394,6 +394,7 @@ class TeacherController extends Controller
                 )
                 ->get()
                 ->toArray();
+                
                     
             $teacher_response = [];
             foreach ($teacher_data as $value) {
