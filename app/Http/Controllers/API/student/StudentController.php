@@ -1852,6 +1852,7 @@ class StudentController extends Controller
                     $query->select('institute_id')
                         ->where('student_id', $student_id)
                         ->where('status', '=', '1')
+                        ->whereNull('deleted_at')
                         ->from('students_details');
                 })
                 ->when($institute_id, function ($query, $institute_id) {
