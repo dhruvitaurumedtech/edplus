@@ -4,6 +4,7 @@ namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\announcements_model;
+use App\Models\Attendance_model;
 use App\Models\Banner_model;
 use App\Models\Exam_Model;
 use App\Models\Marks_model;
@@ -157,10 +158,6 @@ class ParentsController extends Controller
         try{
 
             $user_id = Auth::id();
-            
-            
-            
-            
             $fees = [];
             
             //banner
@@ -302,6 +299,22 @@ class ParentsController extends Controller
             );
         }
 
+        //attendance
+        $totalattendlec = [];
+            $cumnth = date('Y-m');
+            $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
+                ->where('student_id', $request->child_id)
+                ->where('created_at', 'like', '%' . $cumnth . '%')
+                ->where('attendance', 'P')->count();
+
+            $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
+                ->where('batch_id', $getstdntdata->batch_id)
+                ->count();
+            $totalattendlec = array(
+                'total_lectures' => $totllect,
+                'attend_lectures' => $totalattlec,
+                'miss_lectures' => $totllect - $totalattlec
+            );
         $data = [
             'banners_data'=>$banners_data,
             'todays_lecture'=>$todays_lecture,
@@ -309,6 +322,7 @@ class ParentsController extends Controller
             'announcement' => $announcement,
             'examlist'=>$examlist,
             'result' => $result,
+            'attendance'=>$totalattendlec
             // 'fees' => $fees,
         ];
 
