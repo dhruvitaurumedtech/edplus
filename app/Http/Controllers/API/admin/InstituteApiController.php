@@ -2043,7 +2043,7 @@ class InstituteApiController extends Controller
     public function fetch_student_detail(Request $request)
     {
         $validator = \Validator::make($request->all(), [
-            'user_id' => 'required|integer',
+            'student_id' => 'required|integer',
             'institute_id' => 'required|integer',
         ]);
 
@@ -2054,7 +2054,7 @@ class InstituteApiController extends Controller
                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                ->where('students_details.student_id', $request->user_id)
+                ->where('students_details.student_id', $request->student_id)
                 ->where('students_details.user_id', Auth::id())
                 ->where('students_details.institute_id', $request->institute_id)
                 ->select(
@@ -2083,7 +2083,7 @@ class InstituteApiController extends Controller
                     );
                 }
                 $response_data = [
-                    'user_id' => $user_list->user_id,
+                    'user_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
