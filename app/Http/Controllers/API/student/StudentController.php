@@ -955,11 +955,11 @@ class StudentController extends Controller
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->count();
-            $totalattendlec = array(
+            $totalattendlec = [
                 'total_lectures' => $totllect,
                 'attend_lectures' => $totalattlec,
                 'miss_lectures' => $totllect - $totalattlec
-            );
+            ];
             $studentdata = [
                 'banners_data' => $banners_data,
                 'todays_lecture' => $todays_lecture,
@@ -2453,13 +2453,13 @@ class StudentController extends Controller
                 $student_id = AUth::id();
             }
 
-
+            $result = [];
             $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
                 ->where('exam.id', $request->exam_id)
                 ->where('institute_detail.end_academic_year', '>=', now())
                 ->first();
 
-            $result = [];
+            
             if (!empty($stdetails)) {
 
                 $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
@@ -2752,8 +2752,9 @@ class StudentController extends Controller
 
             $stdntdata = Student_detail::where('student_id', $studentID)
                 ->where('institute_id', $request->institute_id)->first();
-
+            
             $lectures = [];
+            if($stdntdata){
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
@@ -2781,8 +2782,8 @@ class StudentController extends Controller
                     'end_time' => $todayslecDT->end_time,
                 );
             }
-
-            return $this->response($lectures, "Data Fetch Successfully");
+        }
+        return $this->response($lectures, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
