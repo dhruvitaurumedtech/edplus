@@ -1836,7 +1836,7 @@ class StudentController extends Controller
 
         try {
             if (Auth::user()->role_type == 6) {
-                $student_id = $request->user_id;
+                $student_id = Auth::id();
             } else {
                 $student_id = $request->student_id;
             }
