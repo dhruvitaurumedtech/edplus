@@ -2103,9 +2103,9 @@ class InstituteApiController extends Controller
                     'stream_id' => $user_list->stream_id,
                     'subject_list' => $subjectslist,
                 ];
-                return $this->response($response_data, "Successfully Reject Request.");
+                return $this->response($response_data, "Successfully Fetch data.");
             } else {
-                return $this->response([], "Successfully Reject Request.");
+                return $this->response([], "Successfully Fetch data.");
             }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);

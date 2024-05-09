@@ -212,7 +212,7 @@ class TeacherController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             'standard_id' => 'required',
-            'stream_id' => 'required',
+            // 'stream_id' => 'required',
             'subject_id' => 'required',
             'teacher_id' => 'required',
         ]);
@@ -583,6 +583,75 @@ class TeacherController extends Controller
                 return $this->response($response, "Fetch teacher Reject list.");
             }
             return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+     }
+     public function fetch_teacher_detail(Request $request){
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required|integer',
+            'institute_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $user_list = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
+                ->join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->leftjoin('stream', 'stream.id', '=', 'teacher_detail.stream_id')
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->where('teacher_detail.institute_id', $request->institute_id)
+                ->select(
+                    'students_details.*',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.dob',
+                    'users.address',
+                    'users.email',
+                    'users.mobile',
+                    'board.name as board',
+                    'medium.name as medium',
+                    'standard.name as standard',
+                    'stream.name as stream'
+                )
+                ->first();
+            if ($user_list) {
+                $subjids = explode(',', $user_list->subject_id);
+                $subjcts = Subject_model::whereIN('id', $subjids)->get();
+                $subjectslist = [];
+                foreach ($subjcts as $subDT) {
+                    $subjectslist[] = array(
+                        'id' => $subDT->id,
+                        'name' => $subDT->name,
+                        'image' => asset($subDT->image)
+                    );
+                }
+                $response_data = [
+                    'teacher_id' => $user_list->teacher_id,
+                    'institute_id' => $user_list->institute_id,
+                    'first_name' => $user_list->firstname,
+                    'last_name' => $user_list->lastname,
+                    'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
+                    'address' => $user_list->address,
+                    'email' => $user_list->email,
+                    'mobile_no' => $user_list->mobile,
+                    //'institute_for' => $institute_for_list,
+                    'board' => $user_list->board,
+                    'board_id' => $user_list->board_id,
+                    'medium' => $user_list->medium,
+                    'medium_id' => $user_list->medium_id,
+                    //'class_list' => $class_list,
+                    'standard' => $user_list->standard,
+                    'standard_id' => $user_list->standard_id,
+                    'stream' => $user_list->stream,
+                    'stream_id' => $user_list->stream_id,
+                    'subject_list' => $subjectslist,
+                ];
+                return $this->response($response_data, "Successfully Fetch data.");
+            } else {
+                return $this->response([], "Successfully Fetch data.");
+            }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }

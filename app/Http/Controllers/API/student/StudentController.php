@@ -1837,7 +1837,7 @@ class StudentController extends Controller
 
         try {
             if (Auth::user()->role_type == 6) {
-                $student_id = $request->user_id;
+                $student_id = Auth::id();
             } else {
                 $student_id = $request->student_id;
             }
@@ -1853,24 +1853,27 @@ class StudentController extends Controller
                     $query->select('institute_id')
                         ->where('student_id', $student_id)
                         ->where('status', '=', '1')
+                        ->whereNull('deleted_at')
                         ->from('students_details');
                 })
                 ->when($institute_id, function ($query, $institute_id) {
                     return $query->where('id', $institute_id);
                 })
                 ->get();
-
-
             foreach ($joininstitute as $value) {
                 $substdnt = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $value->id)->first();
-
-                $subids = explode(',', $substdnt->subject_id);
-                $subjectids = Subject_model::whereIN('id', $subids)->get();
-                $subs = [];
-                foreach ($subjectids as $subDT) {
-                    $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
+                if ($substdnt) {
+                    $subids = explode(',', $substdnt->subject_id);
+                    $subjectids = Subject_model::whereIn('id', $subids)->get();
+                    $subs = [];
+                    foreach ($subjectids as $subDT) {
+                        $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
+                    }
+                } else {
+                    $subs = [];
                 }
+
                 $institutes[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
@@ -2210,12 +2213,12 @@ class StudentController extends Controller
 
         try {
             $institute_id = $request->institute_id;
-            if($request->child_id){
+            if ($request->child_id) {
                 $student_id = $request->child_id;
-            }else{
+            } else {
                 $student_id = Auth::id();
             }
-            
+
             $stdetails = Student_detail::where('student_id', $student_id)
                 ->when($institute_id, function ($query, $institute_id) {
                     return $query->where('institute_id', $institute_id);
@@ -2448,9 +2451,9 @@ class StudentController extends Controller
         }
 
         try {
-            if($request->child_id){
+            if ($request->child_id) {
                 $student_id = $request->child_id;
-            }else{
+            } else {
                 $student_id = AUth::id();
             }
 
@@ -2460,7 +2463,7 @@ class StudentController extends Controller
                 ->where('institute_detail.end_academic_year', '>=', now())
                 ->first();
 
-            
+
             if (!empty($stdetails)) {
 
                 $resulttQY = Marks_model::join('exam', 'exam.id', '=', 'marks.exam_id')
@@ -2745,46 +2748,46 @@ class StudentController extends Controller
         }
 
         try {
-            if($request->child_id){
+            if ($request->child_id) {
                 $studentID = $request->child_id;
-            }else{
+            } else {
                 $studentID = auth::id();
             }
 
             $stdntdata = Student_detail::where('student_id', $studentID)
                 ->where('institute_id', $request->institute_id)->first();
-            
-            $lectures = [];
-            if($stdntdata){
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                ->where('time_table.batch_id', $stdntdata->batch_id)
-                ->where('time_table.lecture_date', $request->date)
-                ->select(
-                    'subject.name as subject',
-                    'users.firstname',
-                    'users.lastname',
-                    'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date'
-                )
-                ->get();
 
-            foreach ($todayslect as $todayslecDT) {
-                $lectures[] = array(
-                    'subject' => $todayslecDT->subject,
-                    'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                    'lecture_date' => $todayslecDT->lecture_date,
-                    'lecture_type' => $todayslecDT->lecture_type_name,
-                    'start_time' => $todayslecDT->start_time,
-                    'end_time' => $todayslecDT->end_time,
-                );
+            $lectures = [];
+            if ($stdntdata) {
+                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                    ->where('time_table.batch_id', $stdntdata->batch_id)
+                    ->where('time_table.lecture_date', $request->date)
+                    ->select(
+                        'subject.name as subject',
+                        'users.firstname',
+                        'users.lastname',
+                        'lecture_type.name as lecture_type_name',
+                        'time_table.start_time',
+                        'time_table.end_time',
+                        'time_table.lecture_date'
+                    )
+                    ->get();
+
+                foreach ($todayslect as $todayslecDT) {
+                    $lectures[] = array(
+                        'subject' => $todayslecDT->subject,
+                        'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'lecture_date' => $todayslecDT->lecture_date,
+                        'lecture_type' => $todayslecDT->lecture_type_name,
+                        'start_time' => $todayslecDT->start_time,
+                        'end_time' => $todayslecDT->end_time,
+                    );
+                }
             }
-        }
-        return $this->response($lectures, "Data Fetch Successfully");
+            return $this->response($lectures, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
