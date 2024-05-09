@@ -387,6 +387,7 @@ class TeacherController extends Controller
                 //->whereNull('teacher_detail.deleted_at')
                 ->select(
                     'board.name as board_name',
+                    'standard.id as standard_id',
                     'standard.name as standard_name',
                     'medium.name as medium_name',
                     'teacher_assign_batch.batch_id',
@@ -399,6 +400,7 @@ class TeacherController extends Controller
             foreach ($teacher_data as $value) {
                 $teacher_response[] = [
                     'board' => $value['board_name'],
+                    'standard_id' =>$value['standard_id'],
                     'standard' => $value['standard_name'],
                     'medium' => $value['medium_name'],
                     'batch' => $value['batch_name']
@@ -550,7 +552,7 @@ class TeacherController extends Controller
      public function teacher_reject_request(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'teacher_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
@@ -603,7 +605,7 @@ class TeacherController extends Controller
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->select(
-                    'students_details.*',
+                    'teacher_detail.*',
                     'users.firstname',
                     'users.lastname',
                     'users.dob',
