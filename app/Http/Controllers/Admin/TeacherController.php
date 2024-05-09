@@ -588,7 +588,7 @@ class TeacherController extends Controller
         }
      }
      public function fetch_teacher_detail(Request $request){
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
             'institute_id' => 'required|integer',
         ]);
