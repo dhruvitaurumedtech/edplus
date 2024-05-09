@@ -2663,12 +2663,12 @@ class InstituteApiController extends Controller
             }
             $alldata = array(
                 'institute_fors' => $institute_fors,
-                'boards' => $boards,
-                'mediums' => $mediums,
-                'classs' => $classs,
-                'streams' => $streams,
-                'subjects' => $subjects,
-                'standards' => $standards
+                // 'boards' => $boards,
+                // 'mediums' => $mediums,
+                // 'classs' => $classs,
+                // 'streams' => $streams,
+                // 'subjects' => $subjects,
+                // 'standards' => $standards
             );
 
              return $this->response($alldata, 'Successfully fetch Data.');
