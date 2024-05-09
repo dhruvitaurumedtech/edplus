@@ -14,11 +14,87 @@ use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use GuzzleHttp\Client;
+use Laravel\Socialite\Facades\Socialite;
 
 
 class AuthController extends Controller
 {
     use ApiTrait;
+
+    //    Google Login
+
+    public function handleGoogle(Request $request)
+    {
+        try {
+            $user = Socialite::with('google')->stateless()->userFromToken($request->token);
+            if (!$user) {
+                return $this->response([], "UnAuthorized User", false, 400);
+            }
+            return $this->handleUser($user, "google", $request);
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+
+
+    private function handleUser($ssoUser, $ssoPlatform, $request)
+    {
+        try {
+            $user = User::where('social_id', $request->social_id)->first();
+            $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
+            if (!empty($user)) {
+                if (!in_array($user->role_type, $validRoles)) {
+                    $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
+                    return $this->response([], $errorMessage, false, 400);
+                }
+            }
+            if (!$user) {
+                $user = new User();
+                $user->firstname = $request->firstname;
+                $user->lastname = $request->lastname;
+                $user->email = $request->email;
+                $user->mobile = $request->mobile;
+                $user->role_type = $request->role_type;
+                $user->device_key = $request->device_key;
+                $user->social_id = $request->social_id;
+                $user->save();
+            }
+            $user = User::find($user->id);
+            return $this->login_res($user);
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+
+    private function login_res(User $user)
+    {
+        $token = JWTAuth::fromUser($user);
+        $user->token = $token;
+        $user->save();
+        $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
+            ->where('users.email', $user->email)
+            ->select('institute_detail.id')
+            ->first();
+        if (!empty($userdata->id)) {
+            $institute_id = $userdata->id;
+        } else {
+            $institute_id = null;
+        }
+        $data = [
+            'user_id' => $user->id,
+            'user_name' => $user->firstname . ' ' . $user->lastname,
+            'mobile_no' => $user->mobile,
+            'user_email' => $user->email,
+            'user_image' => $user->image,
+            'role_type' => (int)$user->role_type,
+            'institute_id' => $institute_id,
+            'token' => $token,
+        ];
+        return $this->response($data, "Login SuccessFully!!");
+    }
+
+
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -78,6 +154,9 @@ class AuthController extends Controller
 
         $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
 
+        if (empty($user->password) && !empty($user->social_id)) {
+            return $this->response([], "Please use Social Login", false, 400);
+        }
         if (!in_array($user->role_type, $validRoles)) {
             $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
             return $this->response([], $errorMessage, false, 400);
