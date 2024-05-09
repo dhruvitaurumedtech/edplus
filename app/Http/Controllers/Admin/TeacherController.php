@@ -400,6 +400,7 @@ class TeacherController extends Controller
             foreach ($teacher_data as $value) {
                 $teacher_response[] = [
                     'board' => $value['board_name'],
+                    'standard_id' =>$value['standard_id'],
                     'standard' => $value['standard_name'],
                     'medium' => $value['medium_name'],
                     'batch' => $value['batch_name']
