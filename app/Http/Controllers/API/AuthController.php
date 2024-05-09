@@ -78,6 +78,9 @@ class AuthController extends Controller
 
         $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
 
+        if (empty($user->password) && !empty($user->social_id)) {
+            return $this->response([], "Please use Social Login", false, 400);
+        }
         if (!in_array($user->role_type, $validRoles)) {
             $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
             return $this->response([], $errorMessage, false, 400);
