@@ -383,7 +383,7 @@ class TeacherController extends Controller
                 ->Join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->Join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('teacher_assign_batch.teacher_id', $teacher_id)
-                // ->where('batches.institute_id', $institute_id)
+                ->where('batches.institute_id', $institute_id)
                 //->whereNull('teacher_detail.deleted_at')
                 ->select(
                     'board.name as board_name',
@@ -394,7 +394,6 @@ class TeacherController extends Controller
                 )
                 ->get()
                 ->toArray();
-                
                     
             $teacher_response = [];
             foreach ($teacher_data as $value) {
@@ -555,7 +554,7 @@ class TeacherController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->user_id)->update(['status' => '2']);
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
             return $this->response([], "Successfully Reject Request.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
