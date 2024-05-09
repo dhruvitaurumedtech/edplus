@@ -36,6 +36,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class StudentController extends Controller
@@ -870,7 +871,7 @@ class StudentController extends Controller
             $announcement = [];
             $examlist = [];
             $announcQY = announcements_model::where('institute_id', $institute_id)
-                ->where('batch_id', $existingUser->batch_id)
+                ->where('batch_id', $getstdntdata->batch_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
                 ->orderByDesc('created_at')
                 ->get();
@@ -1852,6 +1853,7 @@ class StudentController extends Controller
                     $query->select('institute_id')
                         ->where('student_id', $student_id)
                         ->where('status', '=', '1')
+                        ->whereNull('deleted_at')
                         ->from('students_details');
                 })
                 ->when($institute_id, function ($query, $institute_id) {
@@ -2834,4 +2836,49 @@ class StudentController extends Controller
     //         ], 400);
     //     }
     // }
+
+        //announcement list for student and parents
+
+    public function announcementlist(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            if($request->child_id){
+                $student_id = $request->child_id;
+            }else{
+                $student_id = Auth::id();
+            }
+            $announcement = [];
+            $getstdntdata = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $request->institute_id)->first();
+            if(!empty($getstdntdata)){
+            $announcQY = announcements_model::where('institute_id', $request->institute_id)
+                ->where('batch_id', $getstdntdata->batch_id)
+                ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->orderByDesc('created_at')
+                ->get();
+                
+                if(!empty($announcQY)){
+                    foreach ($announcQY as $announcDT) {
+                        $announcement[] = array(
+                            'title' => $announcDT->title,
+                            'desc' => $announcDT->detail,
+                            'time' => $announcDT->created_at
+                        );
+                    }
+                }
+        }
+
+            return $this->response($announcement, "Announcement List");
+        } catch (Exception $e) {
+            return $this->response($e, "Something want Wrong!!.", false, 400);
+        }
+
+    }
 }
