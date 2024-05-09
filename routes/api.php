@@ -124,7 +124,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/student/attendance-student', [StudentAttendance::class, 'attendance_data']);
     Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student']);
     Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail']);
-
+    Route::post('/student/announcement-list-student', [StudentController::class, 'announcementlist']);
+    
     //teacher Api
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);

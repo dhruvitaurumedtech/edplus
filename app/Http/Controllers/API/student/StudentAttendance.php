@@ -9,6 +9,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class StudentAttendance extends Controller
@@ -93,9 +94,15 @@ class StudentAttendance extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            if($request->child_id){
+                $student_id = $request->child_id;
+            }else{
+                $student_id = Auth::id();
+            }
+
             $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.student_id')
                 ->where('attendance.institute_id', $request->institute_id)
-                ->where('attendance.student_id', Auth::id())
+                ->where('attendance.student_id', $student_id)
                 ->where('attendance.created_at', 'like', '%' . $request->date . '%')
                 ->whereNull('attendance.deleted_at')
                 ->select('attendance.*', 'subject.name')
