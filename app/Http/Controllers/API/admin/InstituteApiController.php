@@ -2500,11 +2500,36 @@ class InstituteApiController extends Controller
                     ];
 
 
+
                     if ($request->stream_id == 'null' || $request->stream_id == '') {
                         $studentdetail['stream_id'] = null;
                     }
 
                     $studentdetailadd = Student_detail::create($studentdetail);
+                    
+                    //parents table add and update 
+                    $parets = Parents::where('student_id',$student_id)->where('verify',0)->get();
+                    if(!empty($parets)){
+                        foreach($parets as $prdtl){
+                            $parnsad = Parents::where('id',$prdtl->id)->update([
+                                'institute_id' => $request->institute_id                                
+                            ]);
+                        }
+                    }else{
+                        $pare = Parents::where('student_id',$student_id)->get();
+                        if(!empty($pare)){
+                            foreach($parets as $prdtl){
+                                $parnsad = Parents::create([
+                                    'student_id' =>  $student_id,
+                                    'parent_id' => $prdtl->parent_id,
+                                    'institute_id' => $request->institute_id,
+                                    'relation' => $prdtl->relation,
+                                    'verify' => '0',
+                                ]);
+                            }
+                        }
+                    }
+                    //
                     return $this->response([], 'Successfully Insert Student.');
                 } else {
                     return $this->response([], 'Not Inserted.', false, 400);

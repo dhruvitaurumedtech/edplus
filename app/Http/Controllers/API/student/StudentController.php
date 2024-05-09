@@ -529,7 +529,6 @@ class StudentController extends Controller
                         $parnsad = Parents::create([
                             'student_id' =>  auth()->id(),
                             'parent_id' => $parent_id,
-                            // 'institute_id' => $request->input('institute_id'),
                             'relation' => $parentData['relation'],
                             'verify' => '0',
                         ]);
