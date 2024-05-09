@@ -33,6 +33,7 @@ class VideoController extends Controller
             'topic_name' => 'required',
             'category_id' => 'required',
             'parent_category_id' => 'required',
+            'created_by' =>'required',
         ]);
 
         if ($validator->fails()) {
@@ -83,7 +84,8 @@ class VideoController extends Controller
                 'topic_description' => $request->input('topic_description'),
                 'topic_name' => $request->input('topic_name'),
                 'video_category_id' => $request->input('category_id'),
-                'topic_video' => isset($path) ? asset($path) : null
+                'topic_video' => isset($path) ? asset($path) : null,
+                'created_by' => ($request->created_by)? $request->created_by:'',
             ]);
             return $this->response($topic, 'Topic and file uploaded successfully');
         } catch (Exception $e) {

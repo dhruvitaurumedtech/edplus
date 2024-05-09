@@ -84,7 +84,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
     Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
-    
+    Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
     Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 
     //new API
@@ -136,8 +136,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/get-teacher-request-list', [TeacherController::class, 'get_teacher_request_list']);
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request']);
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
-    Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
-
+    Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
 });
 
 
