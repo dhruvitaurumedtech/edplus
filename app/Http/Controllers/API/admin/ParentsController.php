@@ -241,7 +241,7 @@ class ParentsController extends Controller
             //announcement
             $announcement = [];
             $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
-                ->whereRaw("FIND_IN_SET('5', role_type)")
+                ->whereRaw("FIND_IN_SET('6', role_type)")
                 ->get();
             foreach ($announcQY as $announcDT) {
                 $announcement[] = array(
@@ -329,7 +329,7 @@ class ParentsController extends Controller
         return $this->response($data, "Data Fetch Successfully");
 
         }catch(\Exception $e){
-                return $this->response($e, "Something want Wrong!!.", false, 400);
+            return $this->response($e, "Something want Wrong!!.", false, 400);
         }
             
     }

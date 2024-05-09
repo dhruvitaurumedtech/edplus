@@ -383,7 +383,7 @@ class TeacherController extends Controller
                 ->Join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->Join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('teacher_assign_batch.teacher_id', $teacher_id)
-                ->where('batches.institute_id', $institute_id)
+                // ->where('batches.institute_id', $institute_id)
                 //->whereNull('teacher_detail.deleted_at')
                 ->select(
                     'board.name as board_name',
@@ -550,11 +550,11 @@ class TeacherController extends Controller
      public function teacher_reject_request(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'teacher_id' => 'required|exists:users,id',
+            'user_id' => 'required|exists:users,id',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->user_id)->update(['status' => '2']);
             return $this->response([], "Successfully Reject Request.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
@@ -603,7 +603,7 @@ class TeacherController extends Controller
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->select(
-                    'students_details.*',
+                    'teacher_detail.*',
                     'users.firstname',
                     'users.lastname',
                     'users.dob',

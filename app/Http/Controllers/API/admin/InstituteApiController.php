@@ -42,6 +42,7 @@ use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\Parents;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 
 class InstituteApiController extends Controller
