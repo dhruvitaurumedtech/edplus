@@ -387,6 +387,7 @@ class TeacherController extends Controller
                 //->whereNull('teacher_detail.deleted_at')
                 ->select(
                     'board.name as board_name',
+                    'standard.id as standard_id',
                     'standard.name as standard_name',
                     'medium.name as medium_name',
                     'teacher_assign_batch.batch_id',
