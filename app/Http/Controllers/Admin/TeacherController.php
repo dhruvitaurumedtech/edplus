@@ -603,7 +603,7 @@ class TeacherController extends Controller
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->select(
-                    'students_details.*',
+                    'teacher_detail.*',
                     'users.firstname',
                     'users.lastname',
                     'users.dob',
