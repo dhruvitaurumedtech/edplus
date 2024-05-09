@@ -212,7 +212,7 @@ class TeacherController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             'standard_id' => 'required',
-            'stream_id' => 'required',
+            // 'stream_id' => 'required',
             'subject_id' => 'required',
             'teacher_id' => 'required',
         ]);
