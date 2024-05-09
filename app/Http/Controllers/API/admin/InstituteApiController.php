@@ -2083,7 +2083,7 @@ class InstituteApiController extends Controller
                     );
                 }
                 $response_data = [
-                    'user_id' => $user_list->student_id,
+                    'student_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
