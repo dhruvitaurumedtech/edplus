@@ -41,6 +41,11 @@ class AuthController extends Controller
     private function handleUser($ssoUser, $ssoPlatform, $request)
     {
         try {
+            $emaillogincheck = User::where('email', $request->email)->where('social_id', null)->first();
+            if ($emaillogincheck) {
+                $emaillogincheck->social_id = $request->social_id;
+                $emaillogincheck->save();
+            }
             $user = User::where('social_id', $request->social_id)->first();
             $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
             if (!empty($user)) {
