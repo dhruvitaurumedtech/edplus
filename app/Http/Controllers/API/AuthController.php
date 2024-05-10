@@ -14,6 +14,7 @@ use Illuminate\Validation\ValidationException;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Laravel\Socialite\Facades\Socialite;
 
@@ -41,12 +42,12 @@ class AuthController extends Controller
     private function handleUser($ssoUser, $ssoPlatform, $request)
     {
         try {
-            $emaillogincheck = User::where('email', $request->email)->where('social_id', null)->first();
+            $emaillogincheck = User::where('email', $ssoUser->email)->where('social_id', null)->first();
             if ($emaillogincheck) {
-                $emaillogincheck->social_id = $request->social_id;
+                $emaillogincheck->social_id = $ssoUser->id;
                 $emaillogincheck->save();
             }
-            $user = User::where('social_id', $request->social_id)->first();
+            $user = User::where('social_id', $ssoUser->id)->first();
             $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
             if (!empty($user)) {
                 if (!in_array($user->role_type, $validRoles)) {
@@ -56,13 +57,14 @@ class AuthController extends Controller
             }
             if (!$user) {
                 $user = new User();
-                $user->firstname = $request->firstname;
-                $user->lastname = $request->lastname;
-                $user->email = $request->email;
+                $user->firstname = $ssoUser->user['name'];
+                $user->lastname = $ssoUser->user['given_name'];
+                $user->email = $ssoUser->user['email'];
+                $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
                 $user->role_type = $request->role_type;
                 $user->device_key = $request->device_key;
-                $user->social_id = $request->social_id;
+                $user->social_id = $ssoUser->user['id'];
                 $user->save();
             }
             $user = User::find($user->id);
