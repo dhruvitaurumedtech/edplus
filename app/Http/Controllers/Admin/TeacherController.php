@@ -224,16 +224,16 @@ class TeacherController extends Controller
             $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
             foreach ($subject as $value) {
-                $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-                    ->select('*')->get()->toarray();
+                // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                //     ->select('*')->get()->toarray();
 
-                foreach ($batch_list as $values_batch) {
+                // foreach ($batch_list as $values_batch) {
                     
-                    Batch_assign_teacher_model::create([
-                        'teacher_id' => $request->teacher_id,
-                        'batch_id' => $values_batch['id'],
-                    ]);
-                }
+                //     Batch_assign_teacher_model::create([
+                //         'teacher_id' => $request->teacher_id,
+                //         'batch_id' => $values_batch['id'],
+                //     ]);
+                // }
                 $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
                     Teacher_model::create([
