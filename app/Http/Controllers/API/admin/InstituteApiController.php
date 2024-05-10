@@ -41,7 +41,9 @@ use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use App\Models\Batch_assign_teacher_model;
 use App\Models\Parents;
+use App\Models\Teacher_model;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 
@@ -4777,6 +4779,77 @@ class InstituteApiController extends Controller
                 return $this->response([], "No data found.");
             }
         } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function approve_teacher(Request $request){
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required',
+            'lastname' => 'required',
+            'mobile' => 'required',
+            'email' => 'required',
+            'qualification' => 'required',
+            'employee_type' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            'batch_id' =>'required',
+            // 'stream_id' => 'required',
+            'subject_id' => 'required',
+            'teacher_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
+
+            foreach ($subject as $value) {
+                $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                    ->select('*')->get()->toarray();
+                   foreach(explode(',',$request->batch_id) as $value_batch){
+
+                    // $Batch_assign_teacher_model = Batch_assign_teacher_model::where('teacher_id',$request->teacher_id);
+                    $data = Batch_assign_teacher_model::where('teacher_id',$request->teacher_id)->update([
+                        'teacher_id' => $request->teacher_id,
+                        'batch_id' =>$value_batch,
+                    ]);
+                 }
+                    $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
+                foreach ($base_table_response as $value2) {
+                    if(is_array($request->subject_id)){
+                        $subject = implode(',', $request->subject_id);
+                    } else {
+                        $subject = $request->subject_id;
+                    }
+                    
+                    $teacher_detail=Teacher_model::where('id',$request->id);
+                    $teacher_detail->update([
+                        'institute_id' => $request->institute_id,
+                        'teacher_id' => $request->teacher_id,
+                        'institute_for_id' => $value2['institute_for'],
+                        'board_id' => $value2['board'],
+                        'medium_id' => $value2['medium'],
+                        'class_id' => $value2['institute_for_class'],
+                        'standard_id' => $value2['standard'],
+                        'stream_id' => $value2['stream'],
+                        'subject_id' => $subject,
+                        'status' => '1',
+                    ]);
+                }
+            }
+            User::where('id', $request->teacher_id)->update([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                'address' => $request->address,
+                'email' => $request->email,
+                'mobile' => $request->mobile,
+                'employee_type' => $request->employee_type,
+                'qualification' => $request->qualification,
+            ]);
+            return $this->response([], "Teacher Assign successfully");
+        } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
