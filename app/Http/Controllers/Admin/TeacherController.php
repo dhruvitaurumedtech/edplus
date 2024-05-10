@@ -224,16 +224,16 @@ class TeacherController extends Controller
             $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
             foreach ($subject as $value) {
-                $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-                    ->select('*')->get()->toarray();
+                // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+                //     ->select('*')->get()->toarray();
 
-                foreach ($batch_list as $values_batch) {
+                // foreach ($batch_list as $values_batch) {
                     
-                    Batch_assign_teacher_model::create([
-                        'teacher_id' => $request->teacher_id,
-                        'batch_id' => $values_batch['id'],
-                    ]);
-                }
+                //     Batch_assign_teacher_model::create([
+                //         'teacher_id' => $request->teacher_id,
+                //         'batch_id' => $values_batch['id'],
+                //     ]);
+                // }
                 $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
                     Teacher_model::create([
@@ -554,7 +554,7 @@ class TeacherController extends Controller
      public function teacher_reject_request(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'user_id' => 'required|exists:users,id',
+            'teacher_id' => 'required|exists:users,id',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {

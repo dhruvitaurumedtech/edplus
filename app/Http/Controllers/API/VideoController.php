@@ -33,7 +33,6 @@ class VideoController extends Controller
             'topic_name' => 'required',
             'category_id' => 'required',
             'parent_category_id' => 'required',
-            'created_by' =>'required',
         ]);
 
         if ($validator->fails()) {
@@ -52,7 +51,7 @@ class VideoController extends Controller
             $extensions = ['pdf'];
         }
 
-        $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:5242880', function ($input) use ($request) {
+        $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:204800', function ($input) use ($request) {
             return $request->parent_category_id == '1' || $request->parent_category_id == '3';
         });
 
