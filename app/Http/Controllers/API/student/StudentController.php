@@ -36,8 +36,10 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
@@ -574,9 +576,22 @@ class StudentController extends Controller
                 $parent->verify = '1';
                 $parent->save();
 
-                return view('verification_success');
+                $passcheck = User::where('id',$parent->parent_id)->first();
+                if(empty($passcheck->password)){
+                    $password = Str::random(12);
+                    user::where('id',$parent->parent_id)->update(['password'=>Hash::make($password)]);
+                    $parDT = [
+                        'password' => $password,
+                        'email'=>    $passcheck->email,
+                        'institute' =>''
+                    ];
+                    
+                    Mail::to($passcheck->email)->send(new WelcomeMail($parDT));
+                }
+
+                echo 'Sccess';
             } else {
-                return view('already_verified');
+                echo 'already_verified';
             }
         } else {
             return view('verification_failure');

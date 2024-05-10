@@ -2453,14 +2453,16 @@ class InstituteApiController extends Controller
 
 
                     $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
+                        ->join('institute_detail', 'institute_detail.id', 'parents.institute_id')
                         ->where('parents.student_id', $student_id)
-                        ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id')
+                        ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id','institute_detail.institute_name')
                         ->get();
                     foreach ($prnts as $prdetail) {
                         $parDT = [
                             'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
                             'email' => $prdetail,
-                            'id' => $prdetail->id
+                            'id' => $prdetail->id,
+                            'institute'=>$prdetail->institute_name,
                         ];
                         Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                     }
@@ -2519,8 +2521,9 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     }else{
-                        $pare = Parents::where('student_id',$student_id)->get();
-                        if(!empty($pare)){
+                        $pare = Parents::where('student_id',$student_id)
+                        ->where('institute_id',$request->institute_id)->get();
+                        if(empty($pare)){
                             foreach($parets as $prdtl){
                                 $parnsad = Parents::create([
                                     'student_id' =>  $student_id,
@@ -2541,7 +2544,7 @@ class InstituteApiController extends Controller
             // DB::commit();
         } catch (\Exception $e) {
             // DB::rollback();
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
