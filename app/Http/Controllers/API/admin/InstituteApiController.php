@@ -2508,7 +2508,8 @@ class InstituteApiController extends Controller
                     $studentdetailadd = Student_detail::create($studentdetail);
                     
                     //parents table add and update 
-                    $parets = Parents::where('student_id',$student_id)->where('verify',0)->get();
+                    
+                    $parets = Parents::where('student_id',$student_id)->where('verify','0')->get();
                     if(!empty($parets)){
                         foreach($parets as $prdtl){
                             $parnsad = Parents::where('id',$prdtl->id)->update([
