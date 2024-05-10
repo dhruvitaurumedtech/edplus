@@ -228,6 +228,7 @@ class TeacherController extends Controller
                     ->select('*')->get()->toarray();
 
                 foreach ($batch_list as $values_batch) {
+                    
                     Batch_assign_teacher_model::create([
                         'teacher_id' => $request->teacher_id,
                         'batch_id' => $values_batch['id'],
@@ -245,7 +246,7 @@ class TeacherController extends Controller
                         'standard_id' => $value2['standard'],
                         'stream_id' => $value2['stream'],
                         'subject_id' => $value['id'],
-                        'status' => '1',
+                        'status' => '0',
                     ]);
                 }
             }
@@ -536,6 +537,7 @@ class TeacherController extends Controller
                 })->map(function ($value) {
                     $user_data = User::find($value->teacher_id);
                     return [
+                        // 'id'=>$value->id,
                         'teacher_id' => $user_data->id,
                         'name' => $user_data->firstname . ' ' . $user_data->lastname,
                         'photo' => $user_data->image,
@@ -607,6 +609,7 @@ class TeacherController extends Controller
                 ->select(
                     'teacher_detail.*',
                     'users.firstname',
+                    'users.qualification',
                     'users.lastname',
                     'users.dob',
                     'users.address',
@@ -630,6 +633,7 @@ class TeacherController extends Controller
                     );
                 }
                 $response_data = [
+                    'id'=> $user_list->id,
                     'teacher_id' => $user_list->teacher_id,
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
@@ -644,6 +648,7 @@ class TeacherController extends Controller
                     'medium' => $user_list->medium,
                     'medium_id' => $user_list->medium_id,
                     //'class_list' => $class_list,
+                    'qualification'=>$user_list->qualification,
                     'standard' => $user_list->standard,
                     'standard_id' => $user_list->standard_id,
                     'stream' => $user_list->stream,
