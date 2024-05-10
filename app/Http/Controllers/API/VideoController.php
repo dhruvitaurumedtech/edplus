@@ -33,7 +33,6 @@ class VideoController extends Controller
             'topic_name' => 'required',
             'category_id' => 'required',
             'parent_category_id' => 'required',
-            'created_by' =>'required',
         ]);
 
         if ($validator->fails()) {

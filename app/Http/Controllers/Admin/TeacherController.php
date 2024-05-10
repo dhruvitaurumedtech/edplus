@@ -554,7 +554,7 @@ class TeacherController extends Controller
      public function teacher_reject_request(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'user_id' => 'required|exists:users,id',
+            'teacher_id' => 'required|exists:users,id',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
