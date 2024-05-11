@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\API\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\announcements_model;
@@ -12,6 +12,7 @@ use App\Models\board;
 use App\Models\Common_announcement;
 use App\Models\Institute_detail;
 use App\Models\Search_history;
+use App\Models\Standard_model;
 use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
@@ -662,5 +663,71 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
+     }
+
+     public function teacher_profile(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            //'teacher_id' => 'required|integer',
+        ]);
+
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+
+        try{
+            $teacher_id = Auth::id();
+           $userdetl = user::where('id',$teacher_id)->first();
+
+            if ($userdetl->image) {
+            $img = $userdetl->image;
+            } else {
+                $img = asset('default.jpg');
+            }
+
+          $standardids = Teacher_model::where('teacher_id',$teacher_id)
+          ->whereNull('deleted_at')->pluck('standard_id'); 
+            
+          $standards = Standard_model::whereIN('id',$standardids)->get();
+          $stds = [];
+          foreach($standards as $stddata){
+            $stds[] = ['id'=>$stddata->id,'name'=>$stddata->name];
+          }
+          
+          $instrdids = Teacher_model::where('teacher_id',$teacher_id)
+          ->whereNull('deleted_at')->pluck('institute_id'); 
+
+          $institds = institute_detail::whereIN('id',$instrdids)->get();
+          $workwith = [];
+          foreach($institds as $instdata){
+            $workwith[] = ['id'=>$instdata->id,'institute_name'=>$instdata->institute_name];
+          }
+
+           $userdetail = array(
+            'id' => $userdetl->id,
+            'unique_id' => $userdetl->unique_id . '',
+            'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
+            'email' => $userdetl->email,
+            'mobile' => $userdetl->mobile . '',
+            'image' => $img . '',
+            'dob' => $userdetl->dob,
+            'address' => $userdetl->address,
+            'education' => $userdetl->area,
+            'country' => $userdetl ? $userdetl->country . '' : '',
+            'state' => $userdetl ? $userdetl->state . '' : '',
+            'city' => $userdetl ? $userdetl->city . '' : '',
+            'pincode' => $userdetl ? $userdetl->pincode . '' : '',
+            'about_us' => $userdetl->about_us,
+            'standard' => $stds,
+            'institutes' => $workwith, // work with
+            //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
+            //'experience'=>$experience
+            //emergency_contacts => $emergency_contacts
+        );
+
+        return $this->response($userdetail, "Successfully fetch data.");
+
+        }catch (Exception $e) {
+            return $this->response([], "Somthing went wrong!!", false, 400);
+        }
+
      }
 }
