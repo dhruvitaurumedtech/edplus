@@ -102,7 +102,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable_institute']);
     Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list']);
     Route::post('/institute/edit-timetable', [TimetableController::class, 'edit_timetable']);
-   
+    Route::post('/institute/fetch-teacher-list', [InstituteApiController::class, 'fetch_teacher_list']);
+  
 
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
@@ -140,7 +141,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request']);
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
-    
+   
 });
 
 
