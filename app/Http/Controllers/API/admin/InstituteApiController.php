@@ -4854,5 +4854,63 @@ class InstituteApiController extends Controller
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
+    
+    }
+    public function fetch_teacher_list(Request $request){
+    //     $institute_id=Institute_detail::where('user_id',auth::user()->id)->get()->toarray();
+    // foreach($institute_id as $value_intitute_id){
+    //       echo "<pre>";print_r($value_intitute_id);
+    // }
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $teacher_data = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
+        ->where('teacher_detail.institute_id', $request->institute_id)
+        ->where('teacher_detail.status', '1')
+        ->select('users.*', 'teacher_detail.teacher_id')
+        ->groupBy('users.firstname', 'users.lastname', 'teacher_detail.teacher_id');
+    
+                if (!empty($request->search)) {
+                    $teacher_data->where(function ($query) use ($request) {
+                        $query->where('users.firstname', 'like', "%{$request->search}%")
+                            ->orWhere('users.lastname', 'like', "%{$request->search}%");
+                    });
+                }
+                
+                $teacher_data = $teacher_data->get()->toArray();
+                $response = [];
+                if (!empty($teacher_data)) {
+                   
+                    foreach ($teacher_data as $value) {
+                        $standard_list = Teacher_model::join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                            ->where('teacher_detail.institute_id', $request->institute_id)
+                            ->where('teacher_detail.teacher_id', $value['teacher_id'])
+                            ->where('teacher_detail.status', '1')
+                            ->select('standard.name as standard_name')
+                            ->get()
+                            ->toArray();
+                
+                        $standard_array = [];
+                        foreach ($standard_list as $standard_value) {
+                            $standard_array[] = ['standard' => $standard_value['standard_name']];
+                        }
+                
+                        $response[] = [
+                            'name' => $value['firstname'] . ' ' . $value['lastname'],
+                            'qualification' => $value['qualification'],
+                            'standard' => $standard_array
+                        ];
+                    }
+                
+                
+             }
+             return $this->response($response, "Data Fetch Successfully");
+        }catch(\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 }
