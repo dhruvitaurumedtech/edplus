@@ -4857,10 +4857,6 @@ class InstituteApiController extends Controller
     
     }
     public function fetch_teacher_list(Request $request){
-    //     $institute_id=Institute_detail::where('user_id',auth::user()->id)->get()->toarray();
-    // foreach($institute_id as $value_intitute_id){
-    //       echo "<pre>";print_r($value_intitute_id);
-    // }
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -4871,8 +4867,8 @@ class InstituteApiController extends Controller
         $teacher_data = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
         ->where('teacher_detail.institute_id', $request->institute_id)
         ->where('teacher_detail.status', '1')
-        ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id')
-        ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id');
+        ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id','users.qualification')
+        ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id','users.qualification');
        
     
                 if (!empty($request->search)) {
@@ -4894,7 +4890,6 @@ class InstituteApiController extends Controller
                             ->select('standard.name as standard_name')
                             ->get()
                             ->toArray();
-                
                         $standard_array = [];
                         foreach ($standard_list as $standard_value) {
                             $standard_array[] = ['standard' => $standard_value['standard_name']];
@@ -4907,8 +4902,9 @@ class InstituteApiController extends Controller
                         ];
                     }
                 
-                
+                  
              }
+          
              return $this->response($response, "Data Fetch Successfully");
         }catch(\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
