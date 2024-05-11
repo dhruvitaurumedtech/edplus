@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BannerController;
-use App\Http\Controllers\Admin\TeacherController;
+use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
 use App\Http\Controllers\API\admin\BasetableControllerAPI;
 use Illuminate\Http\Request;
