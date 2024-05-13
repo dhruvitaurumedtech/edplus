@@ -62,15 +62,7 @@ class TimetableController extends Controller
 
         try{
             DB::beginTransaction();
-            // if ($request->id) {
-            //     $timetable = Timetable::find($request->id);
-            //     if (!$timetable) {
-            //         return $this->response([],'Record Not Found',404);
-            //     }
-            // } else {
-            //     $timetable = new Timetable();
-            // }
-
+            
             $timetablebase = new TimeTableBase();
             $timetablebase->subject_id = $request->subject_id;
             $timetablebase->batch_id = $request->batch_id;
