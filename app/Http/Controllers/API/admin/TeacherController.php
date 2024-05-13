@@ -19,6 +19,10 @@ use App\Models\Teacher_model;
 use App\Models\TeacherAssignBatch;
 use App\Models\Timetable;
 use App\Models\User;
+use App\Models\Users_sub_emergency;
+use App\Models\Users_sub_experience;
+use App\Models\Users_sub_model;
+use App\Models\Users_sub_qualification;
 use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
@@ -659,6 +663,150 @@ class TeacherController extends Controller
             } else {
                 return $this->response([], "Successfully Fetch data.");
             }
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+     }
+     public function edit_profile(Request $request){
+        $teacher_id = $request->teacher_id;
+       $validator = Validator::make($request->all(), [
+        'teacher_id'=> 'required',
+        'firstname' => 'required|string|max:255',
+        'lastname' => 'required|string|max:255',
+        'email' => 'required|string|email|max:255|unique:users,email,' . $teacher_id,
+        'phone_no' => 'required|string|max:255',
+        'dob' => 'required',
+        'address' => 'required|string|max:255',
+        'pincode' => 'required|string|max:10',
+        'area' => 'required|string|max:255',
+        'about_us' => 'nullable|string',
+        'qualification' => 'required|string|max:255',
+        'institute_name' => 'required|string|max:255',
+        'startdate' => 'required',
+        'enddate' => 'nullable',
+        'name' => 'required|string|max:255',
+        'relation_with' => 'required|string|max:255',
+        'mobile_no' => 'required|string|max:255',
+    ]);
+
+    if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+   
+       
+        $user = User::findOrFail($teacher_id);
+
+        $user->firstname = $request->input('firstname');
+        $user->lastname = $request->input('lastname');
+        $user->email = $request->input('email');
+        
+        $user->save();
+         try{
+        $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
+        if (!empty($userSub)) {
+           
+            $userSub->update([
+                'phone_no' => $request['phone_no'],
+                'dob' => date('Y-m-d', strtotime($request['dob'])),
+                'address' => $request['address'],
+                'pincode' => $request['pincode'],
+                'area' => $request['area'],
+                'about_us' => $request['about_us'],
+                
+            ]);
+        } else {
+          
+           
+            Users_sub_model::create([
+                'user_id' => $teacher_id,
+                'phone_no' => $request['phone_no'],
+                'dob' =>  date('Y-m-d', strtotime($request['dob'])),
+                'address' => $request['address'],
+                'pincode' => $request['pincode'],
+                'area' => $request['area'],
+                'about_us' => $request['about_us'],
+               ]);
+        
+        }
+        $userSub2 = Users_sub_qualification::where('user_id', $teacher_id)->first();
+        if (!empty($userSub2)) {
+            $delete_qualification = Users_sub_qualification::where('user_id',$request->teacher_id);
+            $delete_qualification->delete();
+            $qualification = explode(',',$request['qualification']);
+               for ($i = 0; $i < count($qualification); $i++) {
+                Users_sub_qualification::create([
+                       'user_id' => $teacher_id,
+                       'qualification' => $qualification[$i],
+                   ]);
+               }
+        } else {
+               $qualification = explode(',',$request['qualification']);
+               for ($i = 0; $i < count($qualification); $i++) {
+                Users_sub_qualification::create([
+                       'user_id' => $teacher_id,
+                       'qualification' => $qualification[$i],
+                   ]);
+               }
+        }
+        $userSub2 = Users_sub_experience::where('user_id', $teacher_id)->first();
+        if (!empty($userSub2)) {
+            $delete_experience = Users_sub_experience::where('user_id',$request->teacher_id);
+            $delete_experience->delete();
+            $experience = explode(',',$request['institute_name']);
+            $startdate = explode(',',$request['startdate']);
+            $enddate = explode(',',$request['enddate']);
+               for ($i = 0; $i < count($experience); $i++) {
+                $startdates = date('Y-m-d', strtotime($startdate[$i]));
+                $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                Users_sub_experience::create([
+                       'user_id' => $teacher_id,
+                       'institute_name' => $experience[$i],
+                       'startdate' => $startdates,
+                       'enddate' => $enddates,
+                   ]);
+               }
+        } else {
+            $experience = explode(',',$request['institute_name']);
+            $startdate = explode(',',$request['startdate']);
+            $enddate = explode(',',$request['enddate']);
+            for ($i = 0; $i < count($experience); $i++) {
+                $startdates = date('Y-m-d', strtotime($startdate[$i]));
+                $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                  Users_sub_experience::create([
+                    'user_id' => $teacher_id,
+                    'institute_name' => $experience[$i],
+                    'startdate' => $startdates,
+                       'enddate' => $enddates,
+                ]);
+            }
+        }
+        $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
+        if (!empty($userSub2)) {
+            $delete_qualification = Users_sub_emergency::where('user_id',$request->teacher_id);
+            $delete_qualification->delete();
+            $name = explode(',',$request['name']);
+            $relation_with = explode(',',$request['relation_with']);
+            $mobile_no = explode(',',$request['mobile_no']);
+               for ($i = 0; $i < count($qualification); $i++) {
+                Users_sub_emergency::create([
+                       'user_id' => $teacher_id,
+                       'name' => $name[$i],
+                       'relation_with'=>$relation_with[$i],
+                       'mobile_no'=>$mobile_no[$i]
+                   ]);
+               }
+        } else {
+            $name = explode(',',$request['name']);
+            $relation_with = explode(',',$request['relation_with']);
+            $mobile_no = explode(',',$request['mobile_no']);
+               for ($i = 0; $i < count($qualification); $i++) {
+                Users_sub_emergency::create([
+                       'user_id' => $teacher_id,
+                       'name' => $name[$i],
+                       'relation_with'=>$relation_with[$i],
+                       'mobile_no'=>$mobile_no[$i]
+                   ]);
+               }
+        }
+        return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
