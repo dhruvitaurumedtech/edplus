@@ -145,7 +145,7 @@ class AuthController extends Controller
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
-                'mobile_no' => $user->mobile,
+                'mobile_no' => (int)$user->mobile,
                 'user_email' => $user->email,
                 'user_image' => $user->image,
                 'role_type' => (int)$user->role_type,
