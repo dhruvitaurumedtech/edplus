@@ -141,6 +141,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request']);
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
+    Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
+   
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
 });
 
