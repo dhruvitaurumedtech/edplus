@@ -55,7 +55,7 @@ class TimetableController extends Controller
             'lecture_type'=>'required',
             'start_date'=>'required',
             'start_time'=>'required',
-            'end_time'=>'required',
+            'end_time'=>'required|after:start_time',
 
         ]);
 
@@ -89,6 +89,18 @@ class TimetableController extends Controller
                    if($current_date->format('l') === $repeat){
 
                     $lecture_date = $current_date->format('Y-m-d');
+
+                    $existing = Timetable::where([
+                        ['batch_id', $request->batch_id],
+                        ['teacher_id', $request->teacher_id],
+                        ['lecture_date', $lecture_date],
+                        ['start_time', $request->start_time],
+                        ['end_time', $request->end_time],
+                    ])->exists();
+        
+                    if ($existing) {
+                        return $this->response([], "Lecture  already Schedule  for this date and time!", false, 400);
+                    }
 
                     $timetable = new Timetable();
                     $timetable->time_table_base_id = $lastInsertedId;
@@ -132,7 +144,7 @@ class TimetableController extends Controller
             try{
                 $lastDateString = $request->end_date;
 
-                $lastDate = Carbon::createFromFormat('d-m-y', $lastDateString);
+                $lastDate = Carbon::createFromFormat('Y-m-d', $lastDateString);
                 $lastDate->setCentury(Carbon::now()->year - Carbon::now()->year % 100);
 
                 $nextWeekDate = $lastDate->copy()->addWeek();
@@ -141,16 +153,31 @@ class TimetableController extends Controller
 
                 $endOfWeek = $startOfWeek->copy()->addDays(6);
 
-                $start_date = $startOfWeek->format('d-m-Y');
-                $end_date = $endOfWeek->format('d-m-Y');
-                
+                $start_date = $startOfWeek->format('Y-m-d');
+                $end_date = $endOfWeek->format('Y-m-d');
+
+                $startDateTime = new DateTime($start_date);
+                $endDateTime = new DateTime($end_date);
+
                 $timetablee = Timetable::where('batch_id',$request->batch_id)
-                ->whereBetween('lecture_date', [$start_date, $end_date])->get();
+                ->whereBetween('lecture_date', [$request->start_date, $request->end_date])->get();
                 
                 foreach($timetablee as $tmidt){
-                    $current_date = clone $start_date;
-                    while ($current_date <= $end_date) {
-                       echo ' hello';exit;
+                    $current_date = clone $startDateTime;
+                    while ($current_date <= $endDateTime) {
+                       
+                        $existing = Timetable::where([
+                            ['batch_id', $request->batch_id],
+                            ['teacher_id', $request->teacher_id],
+                            ['lecture_date', $current_date],
+                            ['start_time', $request->start_time],
+                            ['end_time', $request->end_time],
+                        ])->exists();
+            
+                        if ($existing) {
+                            return $this->response([], "Lecture  already Schedule  for this date and time!", false, 400);
+                        }
+
                         $timetable = new Timetable();
                         $timetable->time_table_base_id = $tmidt->time_table_base_id;
                         $timetable->subject_id = $tmidt->subject_id;
@@ -169,10 +196,10 @@ class TimetableController extends Controller
                     }
                 }
 
-                DB::commit();
+                
                 return $this->response([],'data save');
             }catch(Exeption $e){
-                DB::rollback();
+               
                 return $this->response($e,"Something want Wrong!!", false, 400);
             }
     }
