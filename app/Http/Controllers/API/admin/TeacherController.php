@@ -975,7 +975,8 @@ class TeacherController extends Controller
            $userdetail = array(
             'id' => $userdetl->id,
             'unique_id' => $userdetl->unique_id . '',
-            'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
+            'firstname' => $userdetl->firstname . '',
+            'lastname' => $userdetl->lastname.'',
             'email' => $userdetl->email,
             'mobile' => $userdetl->mobile . '',
             'image' => $img . '',
