@@ -107,7 +107,7 @@ class BannerApiController extends Controller
                 $bannerad->banner_image = $imagePath;
             }
             $bannerad->url = $request->url;
-            $bannerad->status = 'active';
+            $bannerad->status = 'inactive';
             $bannerad->save();
             return $this->response([], "Banner create Successfully");
         } catch (Exception $e) {
@@ -132,10 +132,11 @@ class BannerApiController extends Controller
             $banner_count=Banner_model::where('user_id', Auth::id())
                  ->where('institute_id', $request->institute_id)
                  ->where('status', 'active')->count();
-            if($banner_count <= 5 ){
+                //  echo $banner_count;exit;
+            if($banner_count != 5 ){
                 Banner_model::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
-                ->where('id', $request->id)->update(['status' => $request->status]);
+                            ->where('institute_id', $request->institute_id)
+                            ->where('id', $request->id)->update(['status' => $request->status]);
             }else{
                 return $this->response([], "Maxium banner limit 5!");
             }  
