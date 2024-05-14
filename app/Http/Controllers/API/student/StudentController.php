@@ -1918,7 +1918,7 @@ class StudentController extends Controller
             if ($studentUser->image) {
                 $img = $studentUser->image;
             } else {
-                $img = asset('default.jpg');
+                $img = asset('no-image.png');
             }
             $userdetail = array(
                 'id' => $studentUser->id,
