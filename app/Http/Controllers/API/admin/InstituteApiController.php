@@ -2472,8 +2472,13 @@ class InstituteApiController extends Controller
                     return $this->response([], 'Not Inserted.', false, 400);
                 }
             } else {
-
-                if ($existingUser->role_type != 6 && empty($request->student_id)) {
+                $parets = Parents::where('student_id', $student_id)->get();
+                
+                if($parets->isEmpty()){
+                    return $this->response([], 'Please add parents detail first.', false, 400);
+                }  
+                else{
+                    if ($existingUser->role_type != 6 && empty($request->student_id)) {
                     $data = user::create([
                         'firstname' => $request->first_name,
                         'lastname' => $request->last_name,
@@ -2540,6 +2545,7 @@ class InstituteApiController extends Controller
                 } else {
                     return $this->response([], 'Not Inserted.', false, 400);
                 }
+            } 
             }
             // DB::commit();
         } catch (\Exception $e) {
