@@ -2008,6 +2008,52 @@ class InstituteApiController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
             $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '2']);
+            $serverKey = env('SERVER_KEY');
+
+            $url = "https://fcm.googleapis.com/fcm/send";
+            $users = User::where('id', $request->student_id)->pluck('device_key');
+
+            $notificationTitle = "Your Request Approved successfully!!";
+            $notificationBody = "Your Teacher Request Approved successfully!!";
+
+            $data = [
+                'registration_ids' => $users,
+                'notification' => [
+                    'title' => $notificationTitle,
+                    'body' => $notificationBody,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                ],
+            ];
+
+            if ($users->isNotEmpty()) {
+                $json = json_encode($data);
+
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: key=' . $serverKey
+                ];
+
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $json,
+                    CURLOPT_HTTPHEADER => $headers,
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                }
+
+                curl_close($ch);
+            }
             return $this->response([], "Successfully Reject Request.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
@@ -2473,79 +2519,78 @@ class InstituteApiController extends Controller
                 }
             } else {
                 $parets = Parents::where('student_id', $student_id)->get();
-                
-                if($parets->isEmpty()){
+
+                if ($parets->isEmpty()) {
                     return $this->response([], 'Please add parents detail first.', false, 400);
-                }  
-                else{
-                    if ($existingUser->role_type != 6 && empty($request->student_id)) {
-                    $data = user::create([
-                        'firstname' => $request->first_name,
-                        'lastname' => $request->last_name,
-                        'dob' => $request->date_of_birth,
-                        'address' => $request->address,
-                        'email' => $request->email_id,
-                        'mobile' => $request->mobile_no,
-                    ]);
-                    $student_id = $data->id;
                 } else {
-                    $student_id = $student_id;
-                }
-
-                if (!empty($student_id)) {
-                    $studentdetail = [
-                        'user_id' => $user_id,
-                        'institute_id' => $request->institute_id,
-                        'student_id' => $student_id,
-                        'institute_for_id' => $insdelQY->institute_for_id,
-                        'board_id' =>  $request->board_id,
-                        'medium_id' => $request->medium_id,
-                        'class_id' => $insdelQY->class_id,
-                        'standard_id' => $request->standard_id,
-                        'batch_id' => $batch_id,
-                        'stream_id' => $request->stream_id,
-                        'subject_id' => $request->subject_id,
-                        'status' => '0',
-                    ];
-
-
-
-                    if ($request->stream_id == 'null' || $request->stream_id == '') {
-                        $studentdetail['stream_id'] = null;
+                    if ($existingUser->role_type != 6 && empty($request->student_id)) {
+                        $data = user::create([
+                            'firstname' => $request->first_name,
+                            'lastname' => $request->last_name,
+                            'dob' => $request->date_of_birth,
+                            'address' => $request->address,
+                            'email' => $request->email_id,
+                            'mobile' => $request->mobile_no,
+                        ]);
+                        $student_id = $data->id;
+                    } else {
+                        $student_id = $student_id;
                     }
 
-                    $studentdetailadd = Student_detail::create($studentdetail);
+                    if (!empty($student_id)) {
+                        $studentdetail = [
+                            'user_id' => $user_id,
+                            'institute_id' => $request->institute_id,
+                            'student_id' => $student_id,
+                            'institute_for_id' => $insdelQY->institute_for_id,
+                            'board_id' =>  $request->board_id,
+                            'medium_id' => $request->medium_id,
+                            'class_id' => $insdelQY->class_id,
+                            'standard_id' => $request->standard_id,
+                            'batch_id' => $batch_id,
+                            'stream_id' => $request->stream_id,
+                            'subject_id' => $request->subject_id,
+                            'status' => '0',
+                        ];
 
-                    //parents table add and update 
 
-                    $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
-                    if (!empty($parets)) {
-                        foreach ($parets as $prdtl) {
-                            $parnsad = Parents::where('id', $prdtl->id)->update([
-                                'institute_id' => $request->institute_id
-                            ]);
+
+                        if ($request->stream_id == 'null' || $request->stream_id == '') {
+                            $studentdetail['stream_id'] = null;
                         }
-                    } else {
-                        $pare = Parents::where('student_id', $student_id)
-                            ->where('institute_id', $request->institute_id)->get();
-                        if (empty($pare)) {
+
+                        $studentdetailadd = Student_detail::create($studentdetail);
+
+                        //parents table add and update 
+
+                        $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
+                        if (!empty($parets)) {
                             foreach ($parets as $prdtl) {
-                                $parnsad = Parents::create([
-                                    'student_id' =>  $student_id,
-                                    'parent_id' => $prdtl->parent_id,
-                                    'institute_id' => $request->institute_id,
-                                    'relation' => $prdtl->relation,
-                                    'verify' => '0',
+                                $parnsad = Parents::where('id', $prdtl->id)->update([
+                                    'institute_id' => $request->institute_id
                                 ]);
                             }
+                        } else {
+                            $pare = Parents::where('student_id', $student_id)
+                                ->where('institute_id', $request->institute_id)->get();
+                            if (empty($pare)) {
+                                foreach ($parets as $prdtl) {
+                                    $parnsad = Parents::create([
+                                        'student_id' =>  $student_id,
+                                        'parent_id' => $prdtl->parent_id,
+                                        'institute_id' => $request->institute_id,
+                                        'relation' => $prdtl->relation,
+                                        'verify' => '0',
+                                    ]);
+                                }
+                            }
                         }
+                        //
+                        return $this->response([], 'Successfully Insert Student.');
+                    } else {
+                        return $this->response([], 'Not Inserted.', false, 400);
                     }
-                    //
-                    return $this->response([], 'Successfully Insert Student.');
-                } else {
-                    return $this->response([], 'Not Inserted.', false, 400);
                 }
-            } 
             }
             // DB::commit();
         } catch (\Exception $e) {
@@ -3114,8 +3159,86 @@ class InstituteApiController extends Controller
             $announcement->detail = $request->detail;
             $announcement->standard_id = $request->standard_id;
             $announcement->batch_id = $request->batch_id;
-            $announcement->save();
-            return $this->response([], "Announcement added successfully.");
+            if ($announcement->save()) {
+                $roleTypes = explode(',', $announcement['role_type']);
+                $combinedIds = [];
+                if (in_array('4', $roleTypes)) {
+                    $teachersId = Teacher_model::where('institute_id', $announcement->institute_id)
+                        ->where('board_id', $announcement->board_id)
+                        ->where('medium_id', $announcement->medium_id)
+                        ->where('subject_id', $announcement->subject_id)
+                        ->pluck('teacher_id');
+                    $combinedIds = array_merge($combinedIds, $teachersId->toArray());
+                }
+
+                // Check for role type 5
+                if (in_array('5', $roleTypes)) {
+                    $studentId = Student_detail::where('institute_id', $announcement->institute_id)
+                        ->where('board_id', $announcement->board_id)
+                        ->where('medium_id', $announcement->medium_id)
+                        ->where('subject_id', $announcement->subject_id)
+                        ->pluck('student_id');
+                    $parent = Parents::whereIn('student_id', $studentId)->pluck('parent_id');
+                    $combinedIds = array_merge($combinedIds, $parent->toArray());
+                }
+
+                // Check for role type 6
+                if (in_array('6', $roleTypes)) {
+                    $studentId = Student_detail::where('institute_id', $request->institute_id)
+                        ->where('board_id', $request->board_id)
+                        ->where('medium_id', $request->medium_id)
+                        ->where('subject_id', $request->subject_id)->pluck('student_id');
+                    $combinedIds = array_merge($combinedIds, $studentId->toArray());
+                }
+                $serverKey = env('SERVER_KEY');
+                $users = User::whereIn('id', $combinedIds)->where('device_key', '!=', null)->get();
+                $url = "https://fcm.googleapis.com/fcm/send";
+                $registrationIds = $users->pluck('device_key')->toArray();
+
+                $notificationTitle = $announcement->title;
+                $notificationBody = $announcement->detail;
+
+                $data = [
+                    'registration_ids' => $registrationIds,
+                    'notification' => [
+                        'title' => $notificationTitle,
+                        'body' => $notificationBody,
+                        'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                    ],
+                ];
+
+                if ($users->isNotEmpty()) {
+                    $json = json_encode($data);
+
+                    $headers = [
+                        'Content-Type: application/json',
+                        'Authorization: key=' . $serverKey
+                    ];
+
+                    $ch = curl_init();
+                    curl_setopt_array($ch, [
+                        CURLOPT_URL => $url,
+                        CURLOPT_RETURNTRANSFER => true,
+                        CURLOPT_ENCODING => '',
+                        CURLOPT_MAXREDIRS => 10,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_FOLLOWLOCATION => true,
+                        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                        CURLOPT_CUSTOMREQUEST => 'POST',
+                        CURLOPT_POSTFIELDS => $json,
+                        CURLOPT_HTTPHEADER => $headers,
+                    ]);
+
+                    $result = curl_exec($ch);
+
+                    if ($result === FALSE) {
+                        // Handle error if needed
+                    }
+
+                    curl_close($ch);
+                }
+                return $this->response([], "Announcement added successfully.");
+            }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
