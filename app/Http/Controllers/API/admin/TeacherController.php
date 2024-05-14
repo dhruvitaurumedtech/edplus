@@ -233,7 +233,7 @@ class TeacherController extends Controller
                 //     ->select('*')->get()->toarray();
 
                 // foreach ($batch_list as $values_batch) {
-                    
+
                 //     Batch_assign_teacher_model::create([
                 //         'teacher_id' => $request->teacher_id,
                 //         'batch_id' => $values_batch['id'],
@@ -264,6 +264,53 @@ class TeacherController extends Controller
                 'employee_type' => $request->employee_type,
                 'qualification' => $request->qualification,
             ]);
+            $serverKey = env('SERVER_KEY');
+
+            $url = "https://fcm.googleapis.com/fcm/send";
+            $inst_owner_id = Institute_detail::where('id', $request->institute_id)->first();
+            $users = User::where('id', $inst_owner_id->user_id)->pluck('device_key');
+
+            $notificationTitle = "Teacher Join Request";
+            $notificationBody = $request->firstname . " Requestd To Join Your Institute";
+
+            $data = [
+                'registration_ids' => $users,
+                'notification' => [
+                    'title' => $notificationTitle,
+                    'body' => $notificationBody,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                ],
+            ];
+
+            if ($users->isNotEmpty()) {
+                $json = json_encode($data);
+
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: key=' . $serverKey
+                ];
+
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $json,
+                    CURLOPT_HTTPHEADER => $headers,
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                }
+
+                curl_close($ch);
+            }
             return $this->response([], "Teacher added successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -401,12 +448,12 @@ class TeacherController extends Controller
                 )
                 ->get()
                 ->toArray();
-                    
+
             $teacher_response = [];
             foreach ($teacher_data as $value) {
                 $teacher_response[] = [
                     'board' => $value['board_name'],
-                    'standard_id' =>$value['standard_id'],
+                    'standard_id' => $value['standard_id'],
                     'standard' => $value['standard_name'],
                     'medium' => $value['medium_name'],
                     'batch' => $value['batch_name']
@@ -436,20 +483,20 @@ class TeacherController extends Controller
         }
         try {
             $teacher_data = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-            ->Join('board', 'board.id', '=', 'batches.board_id')
-            ->Join('medium', 'medium.id', '=', 'batches.medium_id')
-            ->Join('standard', 'standard.id', '=', 'batches.standard_id')
-            ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
-            ->where('batches.standard_id', $request->standard_id)
-            ->select(
-                'board.name as board_name',
-                'standard.name as standard_name',
-                'medium.name as medium_name',
-                'teacher_assign_batch.batch_id',
-                'batches.batch_name',
-                'batches.subjects'
-            )
-            ->get();
+                ->Join('board', 'board.id', '=', 'batches.board_id')
+                ->Join('medium', 'medium.id', '=', 'batches.medium_id')
+                ->Join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
+                ->where('batches.standard_id', $request->standard_id)
+                ->select(
+                    'board.name as board_name',
+                    'standard.name as standard_name',
+                    'medium.name as medium_name',
+                    'teacher_assign_batch.batch_id',
+                    'batches.batch_name',
+                    'batches.subjects'
+                )
+                ->get();
             $teacher_response = [];
 
             foreach ($teacher_data as $value) {
@@ -457,9 +504,10 @@ class TeacherController extends Controller
                 $subject_response = [];
                 foreach ($subject_data as $subject_value) {
                     $subject_response[] = array(
-                        'id' => $subject_value->id, 
+                        'id' => $subject_value->id,
                         'subject_name' => $subject_value->name,
-                        'image'=>!empty($subject_value->image)?url($subject_value->image):'');
+                        'image' => !empty($subject_value->image) ? url($subject_value->image) : ''
+                    );
                 }
 
                 $teacher_response[] = [
@@ -526,7 +574,8 @@ class TeacherController extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
-    public function get_teacher_request_list(Request $request){
+    public function get_teacher_request_list(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
         ]);
@@ -555,8 +604,9 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
-     }
-     public function teacher_reject_request(Request $request){
+    }
+    public function teacher_reject_request(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
             'teacher_id' => 'required|exists:users,id',
@@ -564,12 +614,60 @@ class TeacherController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
             $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
+            $serverKey = env('SERVER_KEY');
+
+
+            $url = "https://fcm.googleapis.com/fcm/send";
+            $users = User::where('id', $request->teacher_id)->pluck('device_key');
+
+            $notificationTitle = "Your Request Rejected";
+            $notificationBody = "Your Teacher Request Rejected successfully!!";
+
+            $data = [
+                'registration_ids' => $users,
+                'notification' => [
+                    'title' => $notificationTitle,
+                    'body' => $notificationBody,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
+                ],
+            ];
+
+            if ($users->isNotEmpty()) {
+                $json = json_encode($data);
+
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: key=' . $serverKey
+                ];
+
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $json,
+                    CURLOPT_HTTPHEADER => $headers,
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                }
+
+                curl_close($ch);
+            }
             return $this->response([], "Successfully Reject Request.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
-     }
-     public function get_teacher_reject_request_list(Request $request){
+    }
+    public function get_teacher_reject_request_list(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
         ]);
@@ -595,8 +693,9 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
-     }
-     public function fetch_teacher_detail(Request $request){
+    }
+    public function fetch_teacher_detail(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
             'institute_id' => 'required|integer',
@@ -638,7 +737,7 @@ class TeacherController extends Controller
                     );
                 }
                 $response_data = [
-                    'id'=> $user_list->id,
+                    'id' => $user_list->id,
                     'teacher_id' => $user_list->teacher_id,
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
@@ -653,7 +752,7 @@ class TeacherController extends Controller
                     'medium' => $user_list->medium,
                     'medium_id' => $user_list->medium_id,
                     //'class_list' => $class_list,
-                    'qualification'=>$user_list->qualification,
+                    'qualification' => $user_list->qualification,
                     'standard' => $user_list->standard,
                     'standard_id' => $user_list->standard_id,
                     'stream' => $user_list->stream,
@@ -667,152 +766,153 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
-     }
-     public function edit_profile(Request $request){
+    }
+    public function edit_profile(Request $request)
+    {
         $teacher_id = $request->teacher_id;
-       $validator = Validator::make($request->all(), [
-        'teacher_id'=> 'required',
-        'firstname' => 'required|string|max:255',
-        'lastname' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users,email,' . $teacher_id,
-        'phone_no' => 'required|string|max:255',
-        'dob' => 'required',
-        'address' => 'required|string|max:255',
-        'pincode' => 'required|string|max:10',
-        'area' => 'required|string|max:255',
-        'about_us' => 'nullable|string',
-        'qualification' => 'required|string|max:255',
-        'institute_name' => 'required|string|max:255',
-        'startdate' => 'required',
-        'enddate' => 'nullable',
-        'name' => 'required|string|max:255',
-        'relation_with' => 'required|string|max:255',
-        'mobile_no' => 'required|string|max:255',
-    ]);
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required',
+            'firstname' => 'required|string|max:255',
+            'lastname' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users,email,' . $teacher_id,
+            'phone_no' => 'required|string|max:255',
+            'dob' => 'required',
+            'address' => 'required|string|max:255',
+            'pincode' => 'required|string|max:10',
+            'area' => 'required|string|max:255',
+            'about_us' => 'nullable|string',
+            'qualification' => 'required|string|max:255',
+            'institute_name' => 'required|string|max:255',
+            'startdate' => 'required',
+            'enddate' => 'nullable',
+            'name' => 'required|string|max:255',
+            'relation_with' => 'required|string|max:255',
+            'mobile_no' => 'required|string|max:255',
+        ]);
 
-    if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-   
-       
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+
+
         $user = User::findOrFail($teacher_id);
 
         $user->firstname = $request->input('firstname');
         $user->lastname = $request->input('lastname');
         $user->email = $request->input('email');
-        
+
         $user->save();
-         try{
-        $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
-        if (!empty($userSub)) {
-           
-            $userSub->update([
-                'phone_no' => $request['phone_no'],
-                'dob' => date('Y-m-d', strtotime($request['dob'])),
-                'address' => $request['address'],
-                'pincode' => $request['pincode'],
-                'area' => $request['area'],
-                'about_us' => $request['about_us'],
-                
-            ]);
-        } else {
-          
-           
-            Users_sub_model::create([
-                'user_id' => $teacher_id,
-                'phone_no' => $request['phone_no'],
-                'dob' =>  date('Y-m-d', strtotime($request['dob'])),
-                'address' => $request['address'],
-                'pincode' => $request['pincode'],
-                'area' => $request['area'],
-                'about_us' => $request['about_us'],
-               ]);
-        
-        }
-        $userSub2 = Users_sub_qualification::where('user_id', $teacher_id)->first();
-        if (!empty($userSub2)) {
-            $delete_qualification = Users_sub_qualification::where('user_id',$request->teacher_id);
-            $delete_qualification->delete();
-            $qualification = explode(',',$request['qualification']);
-               for ($i = 0; $i < count($qualification); $i++) {
-                Users_sub_qualification::create([
-                       'user_id' => $teacher_id,
-                       'qualification' => $qualification[$i],
-                   ]);
-               }
-        } else {
-               $qualification = explode(',',$request['qualification']);
-               for ($i = 0; $i < count($qualification); $i++) {
-                Users_sub_qualification::create([
-                       'user_id' => $teacher_id,
-                       'qualification' => $qualification[$i],
-                   ]);
-               }
-        }
-        $userSub2 = Users_sub_experience::where('user_id', $teacher_id)->first();
-        if (!empty($userSub2)) {
-            $delete_experience = Users_sub_experience::where('user_id',$request->teacher_id);
-            $delete_experience->delete();
-            $experience = explode(',',$request['institute_name']);
-            $startdate = explode(',',$request['startdate']);
-            $enddate = explode(',',$request['enddate']);
-               for ($i = 0; $i < count($experience); $i++) {
-                $startdates = date('Y-m-d', strtotime($startdate[$i]));
-                $enddates = date('Y-m-d', strtotime($enddate[$i]));
-                Users_sub_experience::create([
-                       'user_id' => $teacher_id,
-                       'institute_name' => $experience[$i],
-                       'startdate' => $startdates,
-                       'enddate' => $enddates,
-                   ]);
-               }
-        } else {
-            $experience = explode(',',$request['institute_name']);
-            $startdate = explode(',',$request['startdate']);
-            $enddate = explode(',',$request['enddate']);
-            for ($i = 0; $i < count($experience); $i++) {
-                $startdates = date('Y-m-d', strtotime($startdate[$i]));
-                $enddates = date('Y-m-d', strtotime($enddate[$i]));
-                  Users_sub_experience::create([
+        try {
+            $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
+            if (!empty($userSub)) {
+
+                $userSub->update([
+                    'phone_no' => $request['phone_no'],
+                    'dob' => date('Y-m-d', strtotime($request['dob'])),
+                    'address' => $request['address'],
+                    'pincode' => $request['pincode'],
+                    'area' => $request['area'],
+                    'about_us' => $request['about_us'],
+
+                ]);
+            } else {
+
+
+                Users_sub_model::create([
                     'user_id' => $teacher_id,
-                    'institute_name' => $experience[$i],
-                    'startdate' => $startdates,
-                       'enddate' => $enddates,
+                    'phone_no' => $request['phone_no'],
+                    'dob' =>  date('Y-m-d', strtotime($request['dob'])),
+                    'address' => $request['address'],
+                    'pincode' => $request['pincode'],
+                    'area' => $request['area'],
+                    'about_us' => $request['about_us'],
                 ]);
             }
-        }
-        $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
-        if (!empty($userSub2)) {
-            $delete_qualification = Users_sub_emergency::where('user_id',$request->teacher_id);
-            $delete_qualification->delete();
-            $name = explode(',',$request['name']);
-            $relation_with = explode(',',$request['relation_with']);
-            $mobile_no = explode(',',$request['mobile_no']);
-               for ($i = 0; $i < count($qualification); $i++) {
-                Users_sub_emergency::create([
-                       'user_id' => $teacher_id,
-                       'name' => $name[$i],
-                       'relation_with'=>$relation_with[$i],
-                       'mobile_no'=>$mobile_no[$i]
-                   ]);
-               }
-        } else {
-            $name = explode(',',$request['name']);
-            $relation_with = explode(',',$request['relation_with']);
-            $mobile_no = explode(',',$request['mobile_no']);
-               for ($i = 0; $i < count($qualification); $i++) {
-                Users_sub_emergency::create([
-                       'user_id' => $teacher_id,
-                       'name' => $name[$i],
-                       'relation_with'=>$relation_with[$i],
-                       'mobile_no'=>$mobile_no[$i]
-                   ]);
-               }
-        }
-        return $this->response([], "Successfully Update data.");
+            $userSub2 = Users_sub_qualification::where('user_id', $teacher_id)->first();
+            if (!empty($userSub2)) {
+                $delete_qualification = Users_sub_qualification::where('user_id', $request->teacher_id);
+                $delete_qualification->delete();
+                $qualification = explode(',', $request['qualification']);
+                for ($i = 0; $i < count($qualification); $i++) {
+                    Users_sub_qualification::create([
+                        'user_id' => $teacher_id,
+                        'qualification' => $qualification[$i],
+                    ]);
+                }
+            } else {
+                $qualification = explode(',', $request['qualification']);
+                for ($i = 0; $i < count($qualification); $i++) {
+                    Users_sub_qualification::create([
+                        'user_id' => $teacher_id,
+                        'qualification' => $qualification[$i],
+                    ]);
+                }
+            }
+            $userSub2 = Users_sub_experience::where('user_id', $teacher_id)->first();
+            if (!empty($userSub2)) {
+                $delete_experience = Users_sub_experience::where('user_id', $request->teacher_id);
+                $delete_experience->delete();
+                $experience = explode(',', $request['institute_name']);
+                $startdate = explode(',', $request['startdate']);
+                $enddate = explode(',', $request['enddate']);
+                for ($i = 0; $i < count($experience); $i++) {
+                    $startdates = date('Y-m-d', strtotime($startdate[$i]));
+                    $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                    Users_sub_experience::create([
+                        'user_id' => $teacher_id,
+                        'institute_name' => $experience[$i],
+                        'startdate' => $startdates,
+                        'enddate' => $enddates,
+                    ]);
+                }
+            } else {
+                $experience = explode(',', $request['institute_name']);
+                $startdate = explode(',', $request['startdate']);
+                $enddate = explode(',', $request['enddate']);
+                for ($i = 0; $i < count($experience); $i++) {
+                    $startdates = date('Y-m-d', strtotime($startdate[$i]));
+                    $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                    Users_sub_experience::create([
+                        'user_id' => $teacher_id,
+                        'institute_name' => $experience[$i],
+                        'startdate' => $startdates,
+                        'enddate' => $enddates,
+                    ]);
+                }
+            }
+            $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
+            if (!empty($userSub2)) {
+                $delete_qualification = Users_sub_emergency::where('user_id', $request->teacher_id);
+                $delete_qualification->delete();
+                $name = explode(',', $request['name']);
+                $relation_with = explode(',', $request['relation_with']);
+                $mobile_no = explode(',', $request['mobile_no']);
+                for ($i = 0; $i < count($qualification); $i++) {
+                    Users_sub_emergency::create([
+                        'user_id' => $teacher_id,
+                        'name' => $name[$i],
+                        'relation_with' => $relation_with[$i],
+                        'mobile_no' => $mobile_no[$i]
+                    ]);
+                }
+            } else {
+                $name = explode(',', $request['name']);
+                $relation_with = explode(',', $request['relation_with']);
+                $mobile_no = explode(',', $request['mobile_no']);
+                for ($i = 0; $i < count($qualification); $i++) {
+                    Users_sub_emergency::create([
+                        'user_id' => $teacher_id,
+                        'name' => $name[$i],
+                        'relation_with' => $relation_with[$i],
+                        'mobile_no' => $mobile_no[$i]
+                    ]);
+                }
+            }
+            return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
     }
-     public function teacher_profile(Request $request){
+    public function teacher_profile(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             //'teacher_id' => 'required|integer',
@@ -820,61 +920,59 @@ class TeacherController extends Controller
 
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
 
-        try{
+        try {
             $teacher_id = Auth::id();
-           $userdetl = user::where('id',$teacher_id)->first();
+            $userdetl = user::where('id', $teacher_id)->first();
 
             if ($userdetl->image) {
-            $img = $userdetl->image;
+                $img = $userdetl->image;
             } else {
                 $img = asset('default.jpg');
             }
 
-          $standardids = Teacher_model::where('teacher_id',$teacher_id)
-          ->whereNull('deleted_at')->pluck('standard_id'); 
-            
-          $standards = Standard_model::whereIN('id',$standardids)->get();
-          $stds = [];
-          foreach($standards as $stddata){
-            $stds[] = ['id'=>$stddata->id,'name'=>$stddata->name];
-          }
-          
-          $instrdids = Teacher_model::where('teacher_id',$teacher_id)
-          ->whereNull('deleted_at')->pluck('institute_id'); 
+            $standardids = Teacher_model::where('teacher_id', $teacher_id)
+                ->whereNull('deleted_at')->pluck('standard_id');
 
-          $institds = institute_detail::whereIN('id',$instrdids)->get();
-          $workwith = [];
-          foreach($institds as $instdata){
-            $workwith[] = ['id'=>$instdata->id,'institute_name'=>$instdata->institute_name];
-          }
+            $standards = Standard_model::whereIN('id', $standardids)->get();
+            $stds = [];
+            foreach ($standards as $stddata) {
+                $stds[] = ['id' => $stddata->id, 'name' => $stddata->name];
+            }
 
-           $userdetail = array(
-            'id' => $userdetl->id,
-            'unique_id' => $userdetl->unique_id . '',
-            'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
-            'email' => $userdetl->email,
-            'mobile' => $userdetl->mobile . '',
-            'image' => $img . '',
-            'dob' => $userdetl->dob,
-            'address' => $userdetl->address,
-            'education' => $userdetl->area,
-            'country' => $userdetl ? $userdetl->country . '' : '',
-            'state' => $userdetl ? $userdetl->state . '' : '',
-            'city' => $userdetl ? $userdetl->city . '' : '',
-            'pincode' => $userdetl ? $userdetl->pincode . '' : '',
-            'about_us' => $userdetl->about_us,
-            'standard' => $stds,
-            'institutes' => $workwith, // work with
-            //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
-            //'experience'=>$experience
-            //emergency_contacts => $emergency_contacts
-        );
+            $instrdids = Teacher_model::where('teacher_id', $teacher_id)
+                ->whereNull('deleted_at')->pluck('institute_id');
 
-        return $this->response($userdetail, "Successfully fetch data.");
+            $institds = institute_detail::whereIN('id', $instrdids)->get();
+            $workwith = [];
+            foreach ($institds as $instdata) {
+                $workwith[] = ['id' => $instdata->id, 'institute_name' => $instdata->institute_name];
+            }
 
-        }catch (Exception $e) {
+            $userdetail = array(
+                'id' => $userdetl->id,
+                'unique_id' => $userdetl->unique_id . '',
+                'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
+                'email' => $userdetl->email,
+                'mobile' => $userdetl->mobile . '',
+                'image' => $img . '',
+                'dob' => $userdetl->dob,
+                'address' => $userdetl->address,
+                'education' => $userdetl->area,
+                'country' => $userdetl ? $userdetl->country . '' : '',
+                'state' => $userdetl ? $userdetl->state . '' : '',
+                'city' => $userdetl ? $userdetl->city . '' : '',
+                'pincode' => $userdetl ? $userdetl->pincode . '' : '',
+                'about_us' => $userdetl->about_us,
+                'standard' => $stds,
+                'institutes' => $workwith, // work with
+                //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
+                //'experience'=>$experience
+                //emergency_contacts => $emergency_contacts
+            );
+
+            return $this->response($userdetail, "Successfully fetch data.");
+        } catch (Exception $e) {
             return $this->response([], "Somthing went wrong!!", false, 400);
         }
-
-     }
+    }
 }
