@@ -138,7 +138,7 @@ class BannerApiController extends Controller
                             ->where('institute_id', $request->institute_id)
                             ->where('id', $request->id)->update(['status' => $request->status]);
             }else{
-                return $this->response([], "Maxium banner limit 5!");
+                return $this->response([], "Maxium banner active limit 5!");
             }  
              
             return $this->response([], "Status Update create Successfully");
