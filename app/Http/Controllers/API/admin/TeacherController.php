@@ -948,27 +948,51 @@ class TeacherController extends Controller
                 $workwith[] = ['id' => $instdata->id, 'institute_name' => $instdata->institute_name];
             }
 
-            $userdetail = array(
-                'id' => $userdetl->id,
-                'unique_id' => $userdetl->unique_id . '',
-                'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
-                'email' => $userdetl->email,
-                'mobile' => $userdetl->mobile . '',
-                'image' => $img . '',
-                'dob' => $userdetl->dob,
-                'address' => $userdetl->address,
-                'education' => $userdetl->area,
-                'country' => $userdetl ? $userdetl->country . '' : '',
-                'state' => $userdetl ? $userdetl->state . '' : '',
-                'city' => $userdetl ? $userdetl->city . '' : '',
-                'pincode' => $userdetl ? $userdetl->pincode . '' : '',
-                'about_us' => $userdetl->about_us,
-                'standard' => $stds,
-                'institutes' => $workwith, // work with
-                //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
-                //'experience'=>$experience
-                //emergency_contacts => $emergency_contacts
-            );
+          $educationds = Users_sub_qualification::where('user_id',$teacher_id)->get();
+          $education = [];
+          foreach($educationds as $edudata){
+            $education[] = ['id'=>$edudata->id,'qualification'=>$edudata->qualification];
+          }
+
+          $experiences = Users_sub_experience::where('user_id',$teacher_id)->get();
+          $experience = [];
+          foreach($experiences as $expdata){
+            $experience[] = ['id'=>$expdata->id,
+            'institute_name'=>$expdata->institute_name,
+            'startdate'=>$expdata->startdate,
+            'enddate'=>$expdata->enddate];
+          }
+
+          $emergency = Users_sub_emergency::where('user_id',$teacher_id)->get();
+          $emergency_contacts = [];
+          foreach($emergency as $emergencydata){
+            $emergency_contacts[] = ['id'=>$emergencydata->id,
+            'name'=>$emergencydata->name,
+            'relation_with'=>$emergencydata->relation_with,
+            'mobile_no'=>$emergencydata->mobile_no];
+          }
+
+           $userdetail = array(
+            'id' => $userdetl->id,
+            'unique_id' => $userdetl->unique_id . '',
+            'name' => $userdetl->firstname . ' ' . $userdetl->lastname,
+            'email' => $userdetl->email,
+            'mobile' => $userdetl->mobile . '',
+            'image' => $img . '',
+            'dob' => $userdetl->dob,
+            'address' => $userdetl->address,
+            'country' => $userdetl ? $userdetl->country . '' : '',
+            'state' => $userdetl ? $userdetl->state . '' : '',
+            'city' => $userdetl ? $userdetl->city . '' : '',
+            'pincode' => $userdetl ? $userdetl->pincode . '' : '',
+            'about_us' => $userdetl->about_us,
+            'standard' => $stds,
+            'institutes' => $workwith, // work with
+            'education' => $education,
+            'experience'=>$experience,
+            'emergency_contacts' => $emergency_contacts
+            //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
+        );
 
             return $this->response($userdetail, "Successfully fetch data.");
         } catch (Exception $e) {
