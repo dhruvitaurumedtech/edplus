@@ -848,6 +848,30 @@ class TeacherController extends Controller
             $workwith[] = ['id'=>$instdata->id,'institute_name'=>$instdata->institute_name];
           }
 
+          $educationds = Users_sub_qualification::where('user_id',$teacher_id)->get();
+          $education = [];
+          foreach($educationds as $edudata){
+            $education[] = ['id'=>$edudata->id,'qualification'=>$edudata->qualification];
+          }
+
+          $experiences = Users_sub_experience::where('user_id',$teacher_id)->get();
+          $experience = [];
+          foreach($experiences as $expdata){
+            $experience[] = ['id'=>$expdata->id,
+            'institute_name'=>$expdata->institute_name,
+            'startdate'=>$expdata->startdate,
+            'enddate'=>$expdata->enddate];
+          }
+
+          $emergency = Users_sub_emergency::where('user_id',$teacher_id)->get();
+          $emergency_contacts = [];
+          foreach($emergency as $emergencydata){
+            $emergency_contacts[] = ['id'=>$emergencydata->id,
+            'name'=>$emergencydata->name,
+            'relation_with'=>$emergencydata->relation_with,
+            'mobile_no'=>$emergencydata->mobile_no];
+          }
+
            $userdetail = array(
             'id' => $userdetl->id,
             'unique_id' => $userdetl->unique_id . '',
@@ -857,7 +881,6 @@ class TeacherController extends Controller
             'image' => $img . '',
             'dob' => $userdetl->dob,
             'address' => $userdetl->address,
-            'education' => $userdetl->area,
             'country' => $userdetl ? $userdetl->country . '' : '',
             'state' => $userdetl ? $userdetl->state . '' : '',
             'city' => $userdetl ? $userdetl->city . '' : '',
@@ -865,9 +888,10 @@ class TeacherController extends Controller
             'about_us' => $userdetl->about_us,
             'standard' => $stds,
             'institutes' => $workwith, // work with
+            'education' => $education,
+            'experience'=>$experience,
+            'emergency_contacts' => $emergency_contacts
             //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
-            //'experience'=>$experience
-            //emergency_contacts => $emergency_contacts
         );
 
         return $this->response($userdetail, "Successfully fetch data.");

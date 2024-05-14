@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Timetable;
 use App\Models\TimeTableBase;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -42,14 +43,15 @@ class TimetableController extends Controller
             return $this->response($e,"Something want Wrong!!", false, 400);
         }
     }
+
     //add
     public function add_timetable(Request $request){
         
         $validator = validator::make($request->all(),[
             
-            'subject_id'=>'required',
-            'batch_id'=>'required',
-            'teacher_id'=>'required',
+            'subject_id'=>'required|exists:subject,id',
+            'batch_id'=>'required|exists:batches,id',
+            'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
             'start_date'=>'required',
             'start_time'=>'required',
@@ -115,7 +117,65 @@ class TimetableController extends Controller
         }
     }
     
+    //repeat announcement 
+    public function repeat_timetable(Request $request){
+            $validator = validator::make($request->all(),[
+                'batch_id'=>'required|exists:batches,id',
+                'start_date'=>'required',
+                'end_date'=>'required',
+                'start_date'=>'required',
+            ]);
     
+            if($validator->fails()) 
+            return $this->response([],$validator->errors()->first(),false,400);
+    
+            try{
+                $lastDateString = $request->end_date;
+
+                $lastDate = Carbon::createFromFormat('d-m-y', $lastDateString);
+                $lastDate->setCentury(Carbon::now()->year - Carbon::now()->year % 100);
+
+                $nextWeekDate = $lastDate->copy()->addWeek();
+
+                $startOfWeek = $nextWeekDate->startOfWeek();
+
+                $endOfWeek = $startOfWeek->copy()->addDays(6);
+
+                $start_date = $startOfWeek->format('d-m-Y');
+                $end_date = $endOfWeek->format('d-m-Y');
+                
+                $timetablee = Timetable::where('batch_id',$request->batch_id)
+                ->whereBetween('lecture_date', [$start_date, $end_date])->get();
+                
+                foreach($timetablee as $tmidt){
+                    $current_date = clone $start_date;
+                    while ($current_date <= $end_date) {
+                       echo ' hello';exit;
+                        $timetable = new Timetable();
+                        $timetable->time_table_base_id = $tmidt->time_table_base_id;
+                        $timetable->subject_id = $tmidt->subject_id;
+                        $timetable->batch_id = $tmidt->batch_id;
+                        $timetable->teacher_id = $tmidt->teacher_id;
+                        $timetable->lecture_type = $tmidt->lecture_type;
+                        $timetable->start_date = $start_date;
+                        $timetable->end_date = $end_date;
+                        $timetable->lecture_date = $current_date;
+                        $timetable->start_time = $tmidt->start_time;
+                        $timetable->end_time = $tmidt->end_time;
+                        $timetable->repeat = $tmidt->repeat;
+                        $timetable->save();
+                       
+                        $current_date->modify('+1 day');
+                    }
+                }
+
+                DB::commit();
+                return $this->response([],'data save');
+            }catch(Exeption $e){
+                DB::rollback();
+                return $this->response($e,"Something want Wrong!!", false, 400);
+            }
+    }
 
     public function list_timetable_institute(Request $request){
         $validator = validator::make($request->all(),[
