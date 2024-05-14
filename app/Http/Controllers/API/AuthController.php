@@ -133,7 +133,26 @@ class AuthController extends Controller
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
             $user->save();
-            return $this->response($user->otp_num, "OTP Sent Successfully !");
+            $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
+                ->where('users.email', $user->email)
+                ->select('institute_detail.id')
+                ->first();
+            if (!empty($userdata->id)) {
+                $institute_id = $userdata->id;
+            } else {
+                $institute_id = null;
+            }
+            $data = [
+                'user_id' => $user->id,
+                'user_name' => $user->firstname . ' ' . $user->lastname,
+                'mobile_no' => (int)$user->mobile,
+                'user_email' => $user->email,
+                'user_image' => $user->image,
+                'role_type' => (int)$user->role_type,
+                'institute_id' => $institute_id,
+                'token' => $token,
+            ];
+            return $this->response($data, "Registration Successfully !");
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
