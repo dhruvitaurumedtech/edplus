@@ -2455,14 +2455,14 @@ class InstituteApiController extends Controller
                     $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
                         ->join('institute_detail', 'institute_detail.id', 'parents.institute_id')
                         ->where('parents.student_id', $student_id)
-                        ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id','institute_detail.institute_name')
+                        ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id', 'institute_detail.institute_name')
                         ->get();
                     foreach ($prnts as $prdetail) {
                         $parDT = [
                             'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
                             'email' => $prdetail,
                             'id' => $prdetail->id,
-                            'institute'=>$prdetail->institute_name,
+                            'institute' => $prdetail->institute_name,
                         ];
                         Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                     }
@@ -2510,21 +2510,21 @@ class InstituteApiController extends Controller
                     }
 
                     $studentdetailadd = Student_detail::create($studentdetail);
-                    
+
                     //parents table add and update 
-                    
-                    $parets = Parents::where('student_id',$student_id)->where('verify','0')->get();
-                    if(!empty($parets)){
-                        foreach($parets as $prdtl){
-                            $parnsad = Parents::where('id',$prdtl->id)->update([
-                                'institute_id' => $request->institute_id                                
+
+                    $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
+                    if (!empty($parets)) {
+                        foreach ($parets as $prdtl) {
+                            $parnsad = Parents::where('id', $prdtl->id)->update([
+                                'institute_id' => $request->institute_id
                             ]);
                         }
-                    }else{
-                        $pare = Parents::where('student_id',$student_id)
-                        ->where('institute_id',$request->institute_id)->get();
-                        if(empty($pare)){
-                            foreach($parets as $prdtl){
+                    } else {
+                        $pare = Parents::where('student_id', $student_id)
+                            ->where('institute_id', $request->institute_id)->get();
+                        if (empty($pare)) {
+                            foreach ($parets as $prdtl) {
                                 $parnsad = Parents::create([
                                     'student_id' =>  $student_id,
                                     'parent_id' => $prdtl->parent_id,
@@ -2560,7 +2560,7 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        try{
+        try {
             $institute_id = $request->institute_id;
 
             $instituteDTS = Institute_detail::where('id', $institute_id)->first();
@@ -2651,7 +2651,7 @@ class InstituteApiController extends Controller
                                     ->select('subject.*')
                                     ->distinct()->get();
                                 $subjects = [];
-                                
+
                                 foreach ($subject as $subjectdt) {
 
                                     $subjects[] = array(
@@ -2659,7 +2659,7 @@ class InstituteApiController extends Controller
                                         'name' => $subjectdt->name
                                     );
                                 }
-                                  
+
                                 $standards[] = array(
                                     'id' => $standarddt->id,
                                     'name' => $standarddt->name,
@@ -2668,7 +2668,7 @@ class InstituteApiController extends Controller
                                 );
                             }
 
-                           $classs[] = array(
+                            $classs[] = array(
                                 'id' => $classdt->id,
                                 'name' => $classdt->name,
                                 'standard' => $standards
@@ -2703,8 +2703,8 @@ class InstituteApiController extends Controller
                 // 'standards' => $standards
             );
 
-             return $this->response($alldata, 'Successfully fetch Data.');
-        }  catch (Exception $e) {
+            return $this->response($alldata, 'Successfully fetch Data.');
+        } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
     }
@@ -4786,7 +4786,8 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function approve_teacher(Request $request){
+    public function approve_teacher(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
@@ -4797,7 +4798,7 @@ class InstituteApiController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             'standard_id' => 'required',
-            'batch_id' =>'required',
+            'batch_id' => 'required',
             // 'stream_id' => 'required',
             'subject_id' => 'required',
             'teacher_id' => 'required',
@@ -4812,21 +4813,21 @@ class InstituteApiController extends Controller
             foreach ($subject as $value) {
                 $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
                     ->select('*')->get()->toarray();
-                   foreach(explode(',',$request->batch_id) as $batchId){
-                       Batch_assign_teacher_model::create([
-                            'teacher_id' => $request->teacher_id,
-                            'batch_id' => $batchId,
-                       ]);
-                     }
-                    $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
+                foreach (explode(',', $request->batch_id) as $batchId) {
+                    Batch_assign_teacher_model::create([
+                        'teacher_id' => $request->teacher_id,
+                        'batch_id' => $batchId,
+                    ]);
+                }
+                $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
-                    if(is_array($request->subject_id)){
+                    if (is_array($request->subject_id)) {
                         $subject = implode(',', $request->subject_id);
                     } else {
                         $subject = $request->subject_id;
                     }
-                    
-                    $teacher_detail=Teacher_model::where('teacher_id',$request->teacher_id);
+
+                    $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id);
                     $teacher_detail->update([
                         'institute_id' => $request->institute_id,
                         'teacher_id' => $request->teacher_id,
@@ -4850,63 +4851,107 @@ class InstituteApiController extends Controller
                 'employee_type' => $request->employee_type,
                 'qualification' => $request->qualification,
             ]);
+            $serverKey = env('SERVER_KEY');
+
+            $url = "https://fcm.googleapis.com/fcm/send";
+            $users = User::where('id', $request->teacher_id)->pluck('device_key');
+
+            $notificationTitle = "Your Request Approved successfully!!";
+            $notificationBody = "Your Teacher Request Approved successfully!!";
+
+            $data = [
+                'registration_ids' => $users,
+                'notification' => [
+                    'title' => $notificationTitle,
+                    'body' => $notificationBody,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                ],
+            ];
+
+            if ($users->isNotEmpty()) {
+                $json = json_encode($data);
+
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: key=' . $serverKey
+                ];
+
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $json,
+                    CURLOPT_HTTPHEADER => $headers,
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                }
+
+                curl_close($ch);
+            }
             return $this->response([], "Teacher Assign successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
-    
     }
-    public function fetch_teacher_list(Request $request){
+    public function fetch_teacher_list(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-        $teacher_data = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
-        ->where('teacher_detail.institute_id', $request->institute_id)
-        ->where('teacher_detail.status', '1')
-        ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id','users.qualification')
-        ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id','users.qualification');
-       
-    
-                if (!empty($request->search)) {
-                    $teacher_data->where(function ($query) use ($request) {
-                        $query->where('users.firstname', 'like', "%{$request->search}%")
-                            ->orWhere('users.lastname', 'like', "%{$request->search}%");
-                    });
-                }
-                
-                $teacher_data = $teacher_data->get()->toArray();
-                $response = [];
-                if (!empty($teacher_data)) {
-                   
-                    foreach ($teacher_data as $value) {
-                        $standard_list = Teacher_model::join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                            ->where('teacher_detail.institute_id', $request->institute_id)
-                            ->where('teacher_detail.teacher_id', $value['teacher_id'])
-                            ->where('teacher_detail.status', '1')
-                            ->select('standard.name as standard_name')
-                            ->get()
-                            ->toArray();
-                        $standard_array = [];
-                        foreach ($standard_list as $standard_value) {
-                            $standard_array[] = ['standard' => $standard_value['standard_name']];
-                        }
-                
-                        $response[] = [
-                            'name' => $value['firstname'] . ' ' . $value['lastname'],
-                            'qualification' => $value['qualification'],
-                            'standard' => $standard_array
-                        ];
+        try {
+            $teacher_data = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
+                ->where('teacher_detail.institute_id', $request->institute_id)
+                ->where('teacher_detail.status', '1')
+                ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification')
+                ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification');
+
+
+            if (!empty($request->search)) {
+                $teacher_data->where(function ($query) use ($request) {
+                    $query->where('users.firstname', 'like', "%{$request->search}%")
+                        ->orWhere('users.lastname', 'like', "%{$request->search}%");
+                });
+            }
+
+            $teacher_data = $teacher_data->get()->toArray();
+            $response = [];
+            if (!empty($teacher_data)) {
+
+                foreach ($teacher_data as $value) {
+                    $standard_list = Teacher_model::join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                        ->where('teacher_detail.institute_id', $request->institute_id)
+                        ->where('teacher_detail.teacher_id', $value['teacher_id'])
+                        ->where('teacher_detail.status', '1')
+                        ->select('standard.name as standard_name')
+                        ->get()
+                        ->toArray();
+                    $standard_array = [];
+                    foreach ($standard_list as $standard_value) {
+                        $standard_array[] = ['standard' => $standard_value['standard_name']];
                     }
-                
-                  
-             }
-          
-             return $this->response($response, "Data Fetch Successfully");
-        }catch(\Exception $e) {
+
+                    $response[] = [
+                        'name' => $value['firstname'] . ' ' . $value['lastname'],
+                        'qualification' => $value['qualification'],
+                        'standard' => $standard_array
+                    ];
+                }
+            }
+
+            return $this->response($response, "Data Fetch Successfully");
+        } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
