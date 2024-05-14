@@ -127,7 +127,7 @@ class StudentController extends Controller
             }
 
             //join with
-            $ctdmy = date('Y-m');
+            $ctdmy = date('d-m-Y');
             $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($user_id) {
                     $query->select('institute_id')
@@ -589,12 +589,12 @@ class StudentController extends Controller
                     Mail::to($passcheck->email)->send(new WelcomeMail($parDT));
                 }
 
-                echo 'Sccess';
+                return view('already_verify')->with('data', 1);
             } else {
-                echo 'already_verified';
+                return view('already_verify')->with('data', 2);
             }
         } else {
-            return view('verification_failure');
+            return view('already_verify')->with('data', 3);
         }
     }
 
