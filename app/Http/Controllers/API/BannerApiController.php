@@ -107,7 +107,7 @@ class BannerApiController extends Controller
                 $bannerad->banner_image = $imagePath;
             }
             $bannerad->url = $request->url;
-            $bannerad->status = 'active';
+            $bannerad->status = 'inactive';
             $bannerad->save();
             return $this->response([], "Banner create Successfully");
         } catch (Exception $e) {
@@ -129,11 +129,18 @@ class BannerApiController extends Controller
         }
 
         try {
-            $bannerad = Banner_model::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
-                ->where('id', $request->id)->update([
-                    'status' => $request->status
-                ]);
+            $banner_count=Banner_model::where('user_id', Auth::id())
+                 ->where('institute_id', $request->institute_id)
+                 ->where('status', 'active')->count();
+                //  echo $banner_count;exit;
+            if($banner_count != 5 ){
+                Banner_model::where('user_id', Auth::id())
+                            ->where('institute_id', $request->institute_id)
+                            ->where('id', $request->id)->update(['status' => $request->status]);
+            }else{
+                return $this->response([], "Maxium banner active limit 5!");
+            }  
+             
             return $this->response([], "Status Update create Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
