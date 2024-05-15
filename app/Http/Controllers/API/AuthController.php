@@ -125,6 +125,7 @@ class AuthController extends Controller
             $user->lastname = $request->lastname;
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
+            $user->country_code = $request->country_code;
             $user->mobile = $request->mobile;
             $user->role_type = $request->role_type;
             $user->otp_num = rand(100000, 999999);
@@ -145,6 +146,7 @@ class AuthController extends Controller
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
+                'country_code' => $user->country_code,
                 'mobile_no' => (int)$user->mobile,
                 'user_email' => $user->email,
                 'user_image' => $user->image,
@@ -208,6 +210,7 @@ class AuthController extends Controller
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
+                'country_code' => $user->country_code,
                 'mobile_no' => $user->mobile,
                 'user_email' => $user->email,
                 'user_image' => $user->image,
@@ -358,6 +361,7 @@ class AuthController extends Controller
                 $data = [
                     'user_id' => $user->id,
                     'user_name' => $user->firstname . ' ' . $user->lastname,
+                    'country_code' => $user->country_code,
                     'mobile_no' => $user->mobile,
                     'user_email' => $user->email,
                     'user_image' => $user->image,
