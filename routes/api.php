@@ -106,6 +106,12 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/repeat-timetable', [TimetableController::class, 'repeat_timetable']);
     Route::post('/institute/get-edit-institute-for', [BasetableControllerAPI::class, 'get_edit_institute_for']);
     Route::post('/institute/get-edit-board', [BasetableControllerAPI::class, 'get_edit_board']);
+    Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
+    Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
+    Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
+    Route::post('/institute/get-edit-stream', [BasetableControllerAPI::class, 'get_edit_stream']);
+    Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
+
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
     Route::post('/parents/child-homescreen-parents', [ParentsController::class, 'parents_child_homescreen'])->name('parents_child_homescreen');

@@ -32,6 +32,7 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 class TeacherController extends Controller
 {
@@ -774,7 +775,13 @@ class TeacherController extends Controller
             'teacher_id' => 'required',
             'firstname' => 'required|string|max:255',
             'lastname' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $teacher_id,
+            'email' => [
+                'required',
+                'string',
+                'email',
+                'max:255',
+                Rule::unique('users', 'email')->ignore($teacher_id),
+            ],
             'phone_no' => 'required|string|max:255',
             'dob' => 'required',
             'address' => 'required|string|max:255',
