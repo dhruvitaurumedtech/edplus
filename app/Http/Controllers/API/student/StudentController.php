@@ -519,13 +519,16 @@ class StudentController extends Controller
                 } elseif (!empty($emilfin)) {
                     return $this->response([], 'email is already exist', false, 400);
                 } else {
+                    
                     $user = User::create([
                         'firstname' => $parentData['firstname'],
                         'lastname' => $parentData['lastname'],
                         'email' => $parentData['email'],
+                        'country_code' => $parentData['country_code'],
                         'mobile' => $parentData['mobile'],
                         'role_type' => '5'
                     ]);
+                    
                     $parent_id = $user->id;
                     if (!empty($parent_id)) {
                         $parnsad = Parents::create([
@@ -1958,6 +1961,7 @@ class StudentController extends Controller
                 $parents_dt[] = array(
                     'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
                     'email' => $parentsDT->email,
+                    'country_code' => $parentsDT->country_code,
                     'mobile' => $parentsDT->mobile,
                     'relation' => $parentsDT->relation
                 );
@@ -1972,6 +1976,7 @@ class StudentController extends Controller
                 'unique_id' => $studentUser->unique_id . '',
                 'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
                 'email' => $studentUser->email,
+                'country_code' => $studentUser->country_code,
                 'mobile' => $studentUser->mobile . '',
                 'image' => $img . '',
                 'dob' => $studentUser->dob,
@@ -2082,6 +2087,7 @@ class StudentController extends Controller
             $user = Auth::user();
             $user->firstname = $request->firstname;
             $user->lastname = $request->lastname;
+            $user->country_code = $request->country_code;
             $user->mobile = $request->mobile;
             $user->address = $request->address;
             $user->dob = $request->dob;
@@ -2127,6 +2133,7 @@ class StudentController extends Controller
                                 'firstname' => $parentData['firstname'],
                                 'lastname' => $parentData['lastname'],
                                 'email' => $parentData['email'],
+                                'country_code' => $parentData['country_code'],
                                 'mobile' => $parentData['mobile'],
                                 'role_type' => '5'
                             ]);
@@ -2135,6 +2142,7 @@ class StudentController extends Controller
                                 'firstname' => $parentData['firstname'],
                                 'lastname' => $parentData['lastname'],
                                 'email' => $parentData['email'],
+                                'country_code' => $parentData['country_code'],
                                 'mobile' => $parentData['mobile'],
                                 'role_type' => '5'
                             ]);
