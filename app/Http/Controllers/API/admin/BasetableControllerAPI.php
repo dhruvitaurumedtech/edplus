@@ -132,84 +132,7 @@ class BasetableControllerAPI extends Controller
         }
     }
 
-    // public function standard(Request $request)
-    // {
-
-    //     $validator = \Validator::make($request->all(), [
-    //         'institute_for_id' => 'required',
-    //         'board_id' => 'required',
-    //         'medium_id' => 'required',
-    //         'class_id' => 'required',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return $this->response([], $validator->errors()->first(), false, 400);
-    //     }
-
-    //     try {
-    //         $institute_for_ids = explode(',', $request->institute_for_id);
-    //         $board_ids = explode(',', $request->board_id);
-    //         $medium_ids = explode(',', $request->medium_id);
-    //         $class_ids = explode(',', $request->class_id);
-
-    //         $base_standard = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
-    //             ->join('class', 'base_table.institute_for_class', '=', 'class.id')
-    //             ->join('medium', 'base_table.medium', '=', 'medium.id')
-    //             ->whereIN('base_table.institute_for', $institute_for_ids)
-    //             ->whereIN('base_table.board', $board_ids)
-    //             ->whereIN('base_table.medium', $medium_ids)
-    //             ->whereIN('base_table.institute_for_class', $class_ids)
-    //             ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name')
-    //             ->distinct()
-    //             ->get();
-    //         $data = [];
-    //         foreach ($base_standard as $basestandard) {
-    //             $data[] = array(
-    //                 'id' => $basestandard->id,
-    //                 'standard_name' => $basestandard->name,
-    //                 'class_name' => $basestandard->class_name,
-    //                 'medium_name' => $basestandard->medium_name
-    //             );
-    //         }
-    //         // $base_standard = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
-    //         //     ->join('medium', 'base_table.medium', '=', 'medium.id')
-    //         //     ->whereIN('base_table.institute_for', $institute_for_ids)
-    //         //     ->whereIN('base_table.board', $board_ids)
-    //         //     ->whereIN('base_table.medium', $medium_ids)
-    //         //     ->whereIN('base_table.institute_for_class', $class_ids)
-    //         //     ->select('base_table.id', 'class.id', 'class.name as class_name', 'medium.name as medium_name')
-    //         //     ->distinct()
-    //         //     ->get();
-    //         // $base_standard = [];
-    //         // foreach ($base_standard as $basestandard) {
-    //         //     $base_class = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
-    //         //         ->whereIN('base_table.id', $basestandard->id)
-    //         //         ->select('standard.id', 'standard.name')
-    //         //         ->distinct()
-    //         //         ->get();
-    //         //     $standard = [];
-    //         //     foreach ($base_class as $value2) {
-    //         //         $standard[] = array(
-    //         //             'id' => $value2->id,
-    //         //             'standard_name' => $value2->name,
-    //         //         );
-    //         //     }
-
-
-    //         $data[] = array(
-    //             'id' => $basestandard->id,
-    //             'class_name' => $basestandard->class_name,
-    //             'medium_name' => $basestandard->medium_name,
-    //             // 'standard' => $standard
-    //         );
-    //         // }
-
-    //         return $this->response($data, "Fetch Data Successfully");
-    //     } catch (Exeption $e) {
-    //         return $this->response($e, "Something want Wrong!!", false, 400);
-    //     }
-    // }
-
+   
     public function standard(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -356,6 +279,68 @@ class BasetableControllerAPI extends Controller
                     'stream_name' => $basesubject->stream_name
                 );
             }
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+    public function get_edit_institute_for(Request $request){
+        try {
+            $instituteId = $request->institute_id;
+
+            $baseInstitutfor1 = Institute_for_model::join('institute_for_sub', 'institute_for_sub.institute_for_id', '=', 'institute_for.id')
+                ->select('institute_for.id', 'institute_for.name', 'institute_for.icon')
+                ->where('institute_for_sub.institute_id', $instituteId)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'institute_for' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => true
+                    ];
+                });
+            
+            $baseInstitutfor2 = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
+                ->select('institute_for.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'institute_for' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseInstitutfor1->merge($baseInstitutfor2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+    public function get_edit_board(Request $request){
+        try {
+            $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+                ->select('board.*')
+                ->where('board_sub.institute_id',$request->institute_id)
+                ->get();
+            $data = [];
+            foreach ($baseBoard1 as $basedata) {
+                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon));
+            }
+            $baseBoard2 = board::join('base_table', 'base_table.board', '=', 'board.id')
+            ->select('institute_for.*')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'institute_for' => $item->name,
+                    'icon' => url($item->icon),
+                    'is_added' => false
+                ];
+            });
+            $data = $baseBoard1->merge($baseBoard2)->unique('id')->values();
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
