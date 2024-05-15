@@ -724,6 +724,7 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    
 
 
     // public function register_institute123(Request $request)
