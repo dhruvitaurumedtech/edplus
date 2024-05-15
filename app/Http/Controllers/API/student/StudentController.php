@@ -131,12 +131,12 @@ class StudentController extends Controller
             $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($user_id) {
                     $query->select('institute_id')
+                        ->from('students_details')
                         ->where('student_id', $user_id)
                         ->where('status', '=', '1')
-                        ->from('students_details')
                         ->whereNull('deleted_at');
                 })
-                ->where('end_academic_year', '>=', $ctdmy)
+                ->whereRaw("STR_TO_DATE(end_academic_year, '%d-%m-%Y') >= STR_TO_DATE(?, '%d-%m-%Y')", [$ctdmy]) 
                 ->paginate($perPage);
             $join_with = [];
             foreach ($joininstitute as $value) {
