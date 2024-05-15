@@ -295,7 +295,7 @@ class BasetableControllerAPI extends Controller
                 ->map(function($item) {
                     return [
                         'id' => $item->id,
-                        'institute_for' => $item->name,
+                        'name' => $item->name,
                         'icon' => url($item->icon),
                         'is_added' => true
                     ];
@@ -307,7 +307,7 @@ class BasetableControllerAPI extends Controller
                 ->map(function($item) {
                     return [
                         'id' => $item->id,
-                        'institute_for' => $item->name,
+                        'name' => $item->name,
                         'icon' => url($item->icon),
                         'is_added' => false
                     ];
@@ -321,29 +321,204 @@ class BasetableControllerAPI extends Controller
     }
     public function get_edit_board(Request $request){
         try {
-            $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                ->select('board.*')
-                ->where('board_sub.institute_id',$request->institute_id)
-                ->get();
-            $data = [];
-            foreach ($baseBoard1 as $basedata) {
-                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon));
-            }
-            $baseBoard2 = board::join('base_table', 'base_table.board', '=', 'board.id')
-            ->select('institute_for.*')
-            ->get()
-            ->map(function($item) {
-                return [
-                    'id' => $item->id,
-                    'institute_for' => $item->name,
-                    'icon' => url($item->icon),
-                    'is_added' => false
-                ];
-            });
-            $data = $baseBoard1->merge($baseBoard2)->unique('id')->values();
+                $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+                ->select('board.id', 'board.name', 'board.icon')
+                ->where('board_sub.institute_id', $request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => true
+                    ];
+                });
+
+                $baseBoard2 = board::join('base_table', 'base_table.board', '=', 'board.id')
+                ->select('board.id', 'board.name', 'board.icon')
+                ->distinct()
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => false
+                    ];
+                });
+
+             $data = $baseBoard1->merge($baseBoard2)->unique('id')->values();
+
+
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
+    }
+    public function get_edit_medium(Request $request){
+        try {
+            
+            $baseMedium1 = Medium_model::join('medium_sub', 'medium_sub.medium_id', '=', 'medium.id')
+                ->select('medium.*')
+                ->where('medium_sub.institute_id',$request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => true
+                    ];
+                });
+            
+            $baseMedium2 = Medium_model::join('base_table', 'base_table.medium', '=', 'medium.id')
+                ->select('medium.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseMedium1->merge($baseMedium2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        } 
+    }
+    public function get_edit_class(Request $request){
+        try {
+            
+            $baseClass1 = Class_model::join('class_sub', 'class_sub.class_id', '=', 'class.id')
+                ->select('class.*')
+                ->where('class_sub.institute_id',$request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => true
+                    ];
+                });
+                // echo "<pre>";print_r($baseClass1);exit;
+            
+            $baseClass2 = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
+                ->select('class.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'icon' => url($item->icon),
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseClass1->merge($baseClass2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        } 
+    }
+    public function get_edit_standard(Request $request){
+        try {
+            
+            $baseStandard1 = Standard_model::join('standard_sub', 'standard_sub.standard_id', '=', 'standard.id')
+                ->select('standard.*')
+                ->where('standard_sub.institute_id',$request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                      //  'icon' => url($item->icon),
+                        'is_added' => true
+                    ];
+                });
+            
+            $baseStandard2 = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                ->select('standard.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                    //    'icon' => url($item->icon),
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseStandard1->merge($baseStandard2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        } 
+    }
+    public function get_edit_stream(Request $request){
+        try {
+            
+            $baseStream1 = Stream_model::join('stream_sub', 'stream_sub.stream_id', '=', 'stream.id')
+                ->select('stream.*')
+                ->where('stream_sub.institute_id',$request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'is_added' => true
+                    ];
+                });
+            
+            $baseStream2 = Stream_model::join('base_table', 'base_table.stream', '=', 'stream.id')
+                ->select('stream.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseStream1->merge($baseStream2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        } 
+    }
+    public function get_edit_subject(Request $request){
+        try {
+            $baseSubject1=  Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+            ->leftjoin('subject_sub', 'subject_sub.subject_id', '=', 'subject.id')
+            ->where('subject_sub.institute_id',$request->institute_id)
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'is_added' => true
+                    ];
+                });
+            
+            $baseSubject2 = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->select('subject.*')
+                ->get()
+                ->map(function($item) {
+                    return [
+                        'id' => $item->id,
+                        'name' => $item->name,
+                        'is_added' => false
+                    ];
+                });
+            
+            $data = $baseSubject1->merge($baseSubject2)->unique('id')->values();
+             return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        } 
     }
 }
