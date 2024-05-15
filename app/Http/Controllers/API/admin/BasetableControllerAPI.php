@@ -6,7 +6,9 @@ use App\Http\Controllers\Controller;
 use App\Models\Base_table;
 use App\Models\board;
 use App\Models\Class_model;
+use App\Models\Institute_board_sub;
 use App\Models\Institute_for_model;
+use App\Models\Institute_for_sub;
 use App\Models\Medium_model;
 use App\Models\Standard_model;
 use App\Models\Stream_model;
@@ -133,7 +135,7 @@ class BasetableControllerAPI extends Controller
         }
     }
 
-   
+
     public function standard(Request $request)
     {
         $validator = \Validator::make($request->all(), [
@@ -285,8 +287,10 @@ class BasetableControllerAPI extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
-    public function get_edit_institute_for(Request $request){
 
+
+    public function get_edit_institute_for(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -294,82 +298,47 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $instituteId = $request->institute_id;
-
-            $baseInstitutfor1 = Institute_for_model::join('institute_for_sub', 'institute_for_sub.institute_for_id', '=', 'institute_for.id')
+            $base_institutfor = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
                 ->select('institute_for.id', 'institute_for.name', 'institute_for.icon')
-                ->where('institute_for_sub.institute_id', $instituteId)
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'icon' => url($item->icon),
-                        'is_added' => true
-                    ];
-                });
-            
-            $baseInstitutfor2 = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
-                ->select('institute_for.*')
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'icon' => url($item->icon),
-                        'is_added' => false
-                    ];
-                });
-            
-            $data = $baseInstitutfor1->merge($baseInstitutfor2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
-        }
-    }
-    public function get_edit_board(Request $request){
-        $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
-        try {
-                $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                ->select('board.id', 'board.name', 'board.icon')
-                ->where('board_sub.institute_id', $request->institute_id)
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'icon' => url($item->icon),
-                        'is_added' => true
-                    ];
-                });
-
-                $baseBoard2 = board::join('base_table', 'base_table.board', '=', 'board.id')
-                ->select('board.id', 'board.name', 'board.icon')
                 ->distinct()
-                ->get()
-                ->map(function($item) {
-                    return [
-                        'id' => $item->id,
-                        'name' => $item->name,
-                        'icon' => url($item->icon),
-                        'is_added' => false
-                    ];
-                });
-
-             $data = $baseBoard1->merge($baseBoard2)->unique('id')->values();
-
-
+                ->get();
+            $institute_base_for_ids = Institute_for_sub::where('institute_id', $request->institute_id)->pluck('institute_for_id')->toArray();;
+            $data = [];
+            foreach ($base_institutfor as $basedata) {
+                $isAdded = in_array($basedata->id, $institute_base_for_ids);
+                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon), 'is_added' => $isAdded);
+            }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
-    public function get_edit_medium(Request $request){
+
+    public function get_edit_board(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'institute_for_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->distinct()->pluck('board');
+            $base_board = board::whereIn('id', $getBoardsId)->get();
+            $institute_base_board_id = Institute_board_sub::where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
+            foreach ($base_board as $baseboard) {
+                $isAdded = in_array($baseboard->id, $institute_base_board_id);
+                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon), 'is_added' => $isAdded);
+            }
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exeption $e) {
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+    }
+    public function get_edit_medium(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -377,12 +346,12 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            
+
             $baseMedium1 = Medium_model::join('medium_sub', 'medium_sub.medium_id', '=', 'medium.id')
                 ->select('medium.*')
-                ->where('medium_sub.institute_id',$request->institute_id)
+                ->where('medium_sub.institute_id', $request->institute_id)
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
@@ -390,11 +359,11 @@ class BasetableControllerAPI extends Controller
                         'is_added' => true
                     ];
                 });
-            
+
             $baseMedium2 = Medium_model::join('base_table', 'base_table.medium', '=', 'medium.id')
                 ->select('medium.*')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
@@ -402,14 +371,15 @@ class BasetableControllerAPI extends Controller
                         'is_added' => false
                     ];
                 });
-            
+
             $data = $baseMedium1->merge($baseMedium2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
-        } 
+        }
     }
-    public function get_edit_class(Request $request){
+    public function get_edit_class(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -417,12 +387,12 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            
+
             $baseClass1 = Class_model::join('class_sub', 'class_sub.class_id', '=', 'class.id')
                 ->select('class.*')
-                ->where('class_sub.institute_id',$request->institute_id)
+                ->where('class_sub.institute_id', $request->institute_id)
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
@@ -430,12 +400,12 @@ class BasetableControllerAPI extends Controller
                         'is_added' => true
                     ];
                 });
-                // echo "<pre>";print_r($baseClass1);exit;
-            
+            // echo "<pre>";print_r($baseClass1);exit;
+
             $baseClass2 = Class_model::join('base_table', 'base_table.institute_for_class', '=', 'class.id')
                 ->select('class.*')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
@@ -443,14 +413,15 @@ class BasetableControllerAPI extends Controller
                         'is_added' => false
                     ];
                 });
-            
+
             $data = $baseClass1->merge($baseClass2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
-        } 
+        }
     }
-    public function get_edit_standard(Request $request){
+    public function get_edit_standard(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -458,39 +429,40 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            
+
             $baseStandard1 = Standard_model::join('standard_sub', 'standard_sub.standard_id', '=', 'standard.id')
                 ->select('standard.*')
-                ->where('standard_sub.institute_id',$request->institute_id)
+                ->where('standard_sub.institute_id', $request->institute_id)
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
-                      //  'icon' => url($item->icon),
+                        //  'icon' => url($item->icon),
                         'is_added' => true
                     ];
                 });
-            
+
             $baseStandard2 = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->select('standard.*')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
-                    //    'icon' => url($item->icon),
+                        //    'icon' => url($item->icon),
                         'is_added' => false
                     ];
                 });
-            
+
             $data = $baseStandard1->merge($baseStandard2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
-        } 
+        }
     }
-    public function get_edit_stream(Request $request){
+    public function get_edit_stream(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -498,37 +470,38 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            
+
             $baseStream1 = Stream_model::join('stream_sub', 'stream_sub.stream_id', '=', 'stream.id')
                 ->select('stream.*')
-                ->where('stream_sub.institute_id',$request->institute_id)
+                ->where('stream_sub.institute_id', $request->institute_id)
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
                         'is_added' => true
                     ];
                 });
-            
+
             $baseStream2 = Stream_model::join('base_table', 'base_table.stream', '=', 'stream.id')
                 ->select('stream.*')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
                         'is_added' => false
                     ];
                 });
-            
+
             $data = $baseStream1->merge($baseStream2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
-        } 
+        }
     }
-    public function get_edit_subject(Request $request){
+    public function get_edit_subject(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -536,33 +509,33 @@ class BasetableControllerAPI extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $baseSubject1=  Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
-            ->leftjoin('subject_sub', 'subject_sub.subject_id', '=', 'subject.id')
-            ->where('subject_sub.institute_id',$request->institute_id)
+            $baseSubject1 =  Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->leftjoin('subject_sub', 'subject_sub.subject_id', '=', 'subject.id')
+                ->where('subject_sub.institute_id', $request->institute_id)
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
                         'is_added' => true
                     ];
                 });
-            
+
             $baseSubject2 = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
                 ->select('subject.*')
                 ->get()
-                ->map(function($item) {
+                ->map(function ($item) {
                     return [
                         'id' => $item->id,
                         'name' => $item->name,
                         'is_added' => false
                     ];
                 });
-            
+
             $data = $baseSubject1->merge($baseSubject2)->unique('id')->values();
-             return $this->response($data, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
-        } 
+        }
     }
 }
