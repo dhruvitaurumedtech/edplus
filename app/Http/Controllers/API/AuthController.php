@@ -91,6 +91,7 @@ class AuthController extends Controller
         $data = [
             'user_id' => $user->id,
             'user_name' => $user->firstname . ' ' . $user->lastname,
+            'country_code' => $user->country_code,
             'mobile_no' => $user->mobile,
             'user_email' => $user->email,
             'user_image' => $user->image,
