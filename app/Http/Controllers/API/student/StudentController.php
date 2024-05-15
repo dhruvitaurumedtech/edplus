@@ -576,16 +576,16 @@ class StudentController extends Controller
                 $parent->verify = '1';
                 $parent->save();
 
-                $passcheck = User::where('id',$parent->parent_id)->first();
-                if(empty($passcheck->password)){
+                $passcheck = User::where('id', $parent->parent_id)->first();
+                if (empty($passcheck->password)) {
                     $password = Str::random(12);
-                    user::where('id',$parent->parent_id)->update(['password'=>Hash::make($password)]);
+                    user::where('id', $parent->parent_id)->update(['password' => Hash::make($password)]);
                     $parDT = [
                         'password' => $password,
-                        'email'=>    $passcheck->email,
-                        'institute' =>''
+                        'email' =>    $passcheck->email,
+                        'institute' => ''
                     ];
-                    
+
                     Mail::to($passcheck->email)->send(new WelcomeMail($parDT));
                 }
 
@@ -627,6 +627,53 @@ class StudentController extends Controller
                         'student_id' => $request->input('user_id'),
                         'status' => '0',
                     ]);
+                    $serverKey = env('SERVER_KEY');
+
+                    $url = "https://fcm.googleapis.com/fcm/send";
+                    $inst_owner_id = Institute_detail::where('id', $request->institute_id)->first();
+                    $users = User::where('id', $inst_owner_id->user_id)->pluck('device_key');
+
+                    $notificationTitle = "Student Join Request";
+                    $notificationBody = $request->firstname . " Student Join Request to  Your Institute";
+
+                    $data = [
+                        'registration_ids' => $users,
+                        'notification' => [
+                            'title' => $notificationTitle,
+                            'body' => $notificationBody,
+                            'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                        ],
+                    ];
+
+                    if ($users->isNotEmpty()) {
+                        $json = json_encode($data);
+
+                        $headers = [
+                            'Content-Type: application/json',
+                            'Authorization: key=' . $serverKey
+                        ];
+
+                        $ch = curl_init();
+                        curl_setopt_array($ch, [
+                            CURLOPT_URL => $url,
+                            CURLOPT_RETURNTRANSFER => true,
+                            CURLOPT_ENCODING => '',
+                            CURLOPT_MAXREDIRS => 10,
+                            CURLOPT_TIMEOUT => 0,
+                            CURLOPT_FOLLOWLOCATION => true,
+                            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                            CURLOPT_CUSTOMREQUEST => 'POST',
+                            CURLOPT_POSTFIELDS => $json,
+                            CURLOPT_HTTPHEADER => $headers,
+                        ]);
+
+                        $result = curl_exec($ch);
+
+                        if ($result === FALSE) {
+                        }
+
+                        curl_close($ch);
+                    }
                     return $this->response([], "Request added successfully");
                 } else {
                     return $this->response([], "Institute ID not found.", false, 404);
@@ -2851,9 +2898,10 @@ class StudentController extends Controller
     //     }
     // }
 
-        //announcement list for student and parents
+    //announcement list for student and parents
 
-    public function announcementlist(Request $request){
+    public function announcementlist(Request $request)
+    {
 
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
@@ -2863,22 +2911,22 @@ class StudentController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            if($request->child_id){
+            if ($request->child_id) {
                 $student_id = $request->child_id;
-            }else{
+            } else {
                 $student_id = Auth::id();
             }
             $announcement = [];
             $getstdntdata = Student_detail::where('student_id', $student_id)
                 ->where('institute_id', $request->institute_id)->first();
-            if(!empty($getstdntdata)){
-            $announcQY = announcements_model::where('institute_id', $request->institute_id)
-                ->where('batch_id', $getstdntdata->batch_id)
-                ->whereRaw("FIND_IN_SET('6', role_type)")
-                ->orderByDesc('created_at')
-                ->get();
-                
-                if(!empty($announcQY)){
+            if (!empty($getstdntdata)) {
+                $announcQY = announcements_model::where('institute_id', $request->institute_id)
+                    ->where('batch_id', $getstdntdata->batch_id)
+                    ->whereRaw("FIND_IN_SET('6', role_type)")
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                if (!empty($announcQY)) {
                     foreach ($announcQY as $announcDT) {
                         $announcement[] = array(
                             'title' => $announcDT->title,
@@ -2887,12 +2935,11 @@ class StudentController extends Controller
                         );
                     }
                 }
-        }
+            }
 
             return $this->response($announcement, "Announcement List");
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!.", false, 400);
         }
-
     }
 }
