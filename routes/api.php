@@ -109,7 +109,6 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
-    Route::post('/institute/get-edit-stream', [BasetableControllerAPI::class, 'get_edit_stream']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
 
     // parent api
