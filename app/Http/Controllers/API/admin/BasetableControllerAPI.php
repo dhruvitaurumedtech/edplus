@@ -302,8 +302,7 @@ class BasetableControllerAPI extends Controller
                 });
             
             $baseInstitutfor2 = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
-                ->select('institute_for.id', 'institute_for.name', 'institute_for.icon')
-                ->distinct()
+                ->select('institute_for.*')
                 ->get()
                 ->map(function($item) {
                     return [
@@ -322,15 +321,26 @@ class BasetableControllerAPI extends Controller
     }
     public function get_edit_board(Request $request){
         try {
-            $base_board = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+            $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
                 ->select('board.*')
                 ->where('board_sub.institute_id',$request->institute_id)
-                ->distinct()
                 ->get();
             $data = [];
-            foreach ($base_board as $basedata) {
+            foreach ($baseBoard1 as $basedata) {
                 $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon));
             }
+            $baseBoard2 = board::join('base_table', 'base_table.board', '=', 'board.id')
+            ->select('institute_for.*')
+            ->get()
+            ->map(function($item) {
+                return [
+                    'id' => $item->id,
+                    'institute_for' => $item->name,
+                    'icon' => url($item->icon),
+                    'is_added' => false
+                ];
+            });
+            $data = $baseBoard1->merge($baseBoard2)->unique('id')->values();
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exeption $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
