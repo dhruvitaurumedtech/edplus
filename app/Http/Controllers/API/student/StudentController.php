@@ -1012,13 +1012,16 @@ class StudentController extends Controller
             }
             $totalattendlec = [];
             $cumnth = date('Y-m');
+            $cmtoday = date('Y-m-d');
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
+                ->where('created_at', '<=', $cmtoday)
                 ->where('attendance', 'P')->count();
 
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
+                ->where('lecture_date', '<=', $cmtoday)
                 ->count();
             $totalattendlec = [
                 'total_lectures' => $totllect,

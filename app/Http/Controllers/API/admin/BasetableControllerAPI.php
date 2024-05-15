@@ -16,8 +16,10 @@ use App\Models\Standard_model;
 use App\Models\Standard_sub;
 use App\Models\Stream_model;
 use App\Models\Subject_model;
+use App\Models\Subject_sub;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
+use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,7 +38,7 @@ class BasetableControllerAPI extends Controller
                 $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon));
             }
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -44,7 +46,7 @@ class BasetableControllerAPI extends Controller
     public function board(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
         ]);
 
@@ -61,7 +63,7 @@ class BasetableControllerAPI extends Controller
             }
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -69,7 +71,7 @@ class BasetableControllerAPI extends Controller
     public function medium(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
         ]);
@@ -92,7 +94,7 @@ class BasetableControllerAPI extends Controller
             }
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -101,7 +103,7 @@ class BasetableControllerAPI extends Controller
     public function class(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -133,7 +135,7 @@ class BasetableControllerAPI extends Controller
             }
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -141,7 +143,7 @@ class BasetableControllerAPI extends Controller
 
     public function standard(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -197,7 +199,7 @@ class BasetableControllerAPI extends Controller
     public function stream(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -231,7 +233,7 @@ class BasetableControllerAPI extends Controller
             }
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -239,7 +241,7 @@ class BasetableControllerAPI extends Controller
     public function subject(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -286,7 +288,7 @@ class BasetableControllerAPI extends Controller
                 );
             }
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -312,7 +314,7 @@ class BasetableControllerAPI extends Controller
                 $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon), 'is_added' => $isAdded);
             }
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -336,7 +338,7 @@ class BasetableControllerAPI extends Controller
                 $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon), 'is_added' => $isAdded);
             }
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -366,7 +368,7 @@ class BasetableControllerAPI extends Controller
                 );
             }
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -374,7 +376,7 @@ class BasetableControllerAPI extends Controller
     public function get_edit_class(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -402,7 +404,7 @@ class BasetableControllerAPI extends Controller
             }
 
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -410,7 +412,7 @@ class BasetableControllerAPI extends Controller
 
     public function get_edit_standard(Request $request)
     {
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
@@ -469,12 +471,13 @@ class BasetableControllerAPI extends Controller
     public function get_edit_subject(Request $request)
     {
 
-        $validator = \Validator::make($request->all(), [
+        $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
             'medium_id' => 'required',
             'class_id' => 'required',
             'standard_id' => 'required',
+            'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -504,19 +507,21 @@ class BasetableControllerAPI extends Controller
                 ->select('subject.id', 'subject.name', 'subject.image', 'stream.name as stream_name', 'base_table.stream as stream_id')
                 ->distinct()
                 ->get();
-
+            $intitute_base_subject_id = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
             $data = [];
             foreach ($base_subject as $basesubject) {
+                $isAdded = in_array($basesubject->id, $intitute_base_subject_id);
                 $data[] = array(
                     'id' => $basesubject->id,
                     'name' => $basesubject->name,
                     'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
                     'stream_id' => $basesubject->stream_id,
-                    'stream_name' => $basesubject->stream_name
+                    'stream_name' => $basesubject->stream_name,
+                    'is_added' => $isAdded
                 );
-            }
+            }    
             return $this->response($data, "Fetch Data Successfully");
-        } catch (Exeption $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
