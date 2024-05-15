@@ -14,6 +14,7 @@ use App\Models\Subject_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class BasetableControllerAPI extends Controller
 {
@@ -285,6 +286,13 @@ class BasetableControllerAPI extends Controller
         }
     }
     public function get_edit_institute_for(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             $instituteId = $request->institute_id;
 
@@ -320,6 +328,12 @@ class BasetableControllerAPI extends Controller
         }
     }
     public function get_edit_board(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
                 $baseBoard1 = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
                 ->select('board.id', 'board.name', 'board.icon')
@@ -356,6 +370,12 @@ class BasetableControllerAPI extends Controller
         }
     }
     public function get_edit_medium(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             
             $baseMedium1 = Medium_model::join('medium_sub', 'medium_sub.medium_id', '=', 'medium.id')
@@ -390,6 +410,12 @@ class BasetableControllerAPI extends Controller
         } 
     }
     public function get_edit_class(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             
             $baseClass1 = Class_model::join('class_sub', 'class_sub.class_id', '=', 'class.id')
@@ -425,6 +451,12 @@ class BasetableControllerAPI extends Controller
         } 
     }
     public function get_edit_standard(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             
             $baseStandard1 = Standard_model::join('standard_sub', 'standard_sub.standard_id', '=', 'standard.id')
@@ -459,6 +491,12 @@ class BasetableControllerAPI extends Controller
         } 
     }
     public function get_edit_stream(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             
             $baseStream1 = Stream_model::join('stream_sub', 'stream_sub.stream_id', '=', 'stream.id')
@@ -491,6 +529,12 @@ class BasetableControllerAPI extends Controller
         } 
     }
     public function get_edit_subject(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             $baseSubject1=  Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
             ->leftjoin('subject_sub', 'subject_sub.subject_id', '=', 'subject.id')
