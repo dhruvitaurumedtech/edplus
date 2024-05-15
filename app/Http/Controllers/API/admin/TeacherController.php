@@ -798,6 +798,7 @@ class TeacherController extends Controller
         $user->firstname = $request->input('firstname');
         $user->lastname = $request->input('lastname');
         $user->email = $request->input('email');
+        $user->country_code = $request->input('country_code');
 
         $user->save();
         try {
@@ -978,6 +979,7 @@ class TeacherController extends Controller
             'firstname' => $userdetl->firstname . '',
             'lastname' => $userdetl->lastname.'',
             'email' => $userdetl->email,
+            'country_code' => $userdetl->country_code,
             'mobile' => $userdetl->mobile . '',
             'image' => $img . '',
             'dob' => $userdetl->dob,

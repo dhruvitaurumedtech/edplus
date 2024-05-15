@@ -2138,6 +2138,7 @@ class InstituteApiController extends Controller
                     'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
                     'address' => $user_list->address,
                     'email' => $user_list->email,
+                    'country_code' => $user_list->country_code,
                     'mobile_no' => $user_list->mobile,
                     //'institute_for' => $institute_for_list,
                     'board' => $user_list->board,
@@ -2488,6 +2489,7 @@ class InstituteApiController extends Controller
                         'dob' => $request->date_of_birth,
                         'address' => $request->address,
                         'email' => $request->email_id,
+                        'country_code' => $request->country_code,
                         'mobile' => $request->mobile_no,
                     ]);
 
@@ -2530,6 +2532,7 @@ class InstituteApiController extends Controller
                             'dob' => $request->date_of_birth,
                             'address' => $request->address,
                             'email' => $request->email_id,
+                            'country_code' => $request->country_code,
                             'mobile' => $request->mobile_no,
                         ]);
                         $student_id = $data->id;
