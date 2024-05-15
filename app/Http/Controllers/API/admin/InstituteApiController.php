@@ -2013,8 +2013,8 @@ class InstituteApiController extends Controller
             $url = "https://fcm.googleapis.com/fcm/send";
             $users = User::where('id', $request->student_id)->pluck('device_key');
 
-            $notificationTitle = "Your Request Approved successfully!!";
-            $notificationBody = "Your Teacher Request Approved successfully!!";
+            $notificationTitle = "Your Request Rejected successfully!!";
+            $notificationBody = "Your Teacher Request Rejected successfully!!";
 
             $data = [
                 'registration_ids' => $users,
