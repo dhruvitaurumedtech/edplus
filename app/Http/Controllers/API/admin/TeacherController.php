@@ -808,7 +808,11 @@ class TeacherController extends Controller
         $user->lastname = $request->input('lastname');
         $user->email = $request->input('email');
         $user->country_code = $request->input('country_code');
-
+        $user->dob = date('Y-m-d', strtotime($request['dob']));
+        $user->address = $request['address'];
+        $user->pincode = $request['pincode'];
+        $user->area = $request['area'];
+        
         $user->save();
         try {
             $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
@@ -816,10 +820,10 @@ class TeacherController extends Controller
 
                 $userSub->update([
                     'phone_no' => $request['phone_no'],
-                    'dob' => date('Y-m-d', strtotime($request['dob'])),
-                    'address' => $request['address'],
-                    'pincode' => $request['pincode'],
-                    'area' => $request['area'],
+                    // 'dob' => date('Y-m-d', strtotime($request['dob'])),
+                    // 'address' => $request['address'],
+                    // 'pincode' => $request['pincode'],
+                    // 'area' => $request['area'],
                     'about_us' => $request['about_us'],
 
                 ]);
@@ -829,10 +833,10 @@ class TeacherController extends Controller
                 Users_sub_model::create([
                     'user_id' => $teacher_id,
                     'phone_no' => $request['phone_no'],
-                    'dob' =>  date('Y-m-d', strtotime($request['dob'])),
-                    'address' => $request['address'],
-                    'pincode' => $request['pincode'],
-                    'area' => $request['area'],
+                    // 'dob' =>  date('Y-m-d', strtotime($request['dob'])),
+                    // 'address' => $request['address'],
+                    // 'pincode' => $request['pincode'],
+                    // 'area' => $request['area'],
                     'about_us' => $request['about_us'],
                 ]);
             }

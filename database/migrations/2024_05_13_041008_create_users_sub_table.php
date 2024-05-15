@@ -16,10 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->foreign('user_id')->references('id')->on('users');
             $table->string('phone_no');
-            $table->date('dob');
-            $table->string('address');
-            $table->string('pincode');
-            $table->string('area');
             $table->string('about_us');
             $table->timestamps();
             $table->softDeletes();
