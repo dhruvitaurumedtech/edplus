@@ -504,6 +504,7 @@ class InstituteApiController extends Controller
             $unique_id = $subadminPrefix . $paddedNumber;
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
+            // echo "<pre>";print_r($imagePath);exit;
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
             $nextYear = date("d-m-Y", strtotime($nextYearDate));
@@ -759,15 +760,12 @@ class InstituteApiController extends Controller
                         return $this->response([], "cannot remove institute_for Already exist student and teacher this institute_for.", false, 400);
                     }else{
                         
-                        return $delete_sub = Institute_for_sub::where('institute_for_id',$institute_for_check)->where('institute_id',$institute->id)->first();
+                        $delete_sub = Institute_for_sub::where('institute_for_id',$institute_for_check)->where('institute_id',$institute->id)->first();
                         $delete_sub->delete();
                        
                     }
                 }
             }
-
-            
-            
             // $lastInsertedId = $instituteDetail->id;
             // $institute_name = $instituteDetail->institute_name;
             $subjectid = explode(',', $request->input('subject_id'));
@@ -5319,6 +5317,7 @@ class InstituteApiController extends Controller
                     }
 
                     $response[] = [
+                        'teacher_id'=>$teacher_data[0]['teacher_id'],
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
                         'standard' => $standard_array
