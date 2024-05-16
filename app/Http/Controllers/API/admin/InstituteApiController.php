@@ -504,6 +504,7 @@ class InstituteApiController extends Controller
             $unique_id = $subadminPrefix . $paddedNumber;
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
+            // echo "<pre>";print_r($imagePath);exit;
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
             $nextYear = date("d-m-Y", strtotime($nextYearDate));
@@ -5353,6 +5354,7 @@ class InstituteApiController extends Controller
                     }
 
                     $response[] = [
+                        'teacher_id'=>$teacher_data[0]['teacher_id'],
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
                         'standard' => $standard_array
