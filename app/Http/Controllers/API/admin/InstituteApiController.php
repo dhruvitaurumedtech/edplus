@@ -783,7 +783,7 @@ class InstituteApiController extends Controller
                 if (!empty($institute_board_check)) {
                     $student_check = Student_detail::whereIn('board_id', $institute_board_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('board_id', $institute_board_check)->where('institute_id', $institute->id)->first();
-                    if (!empty($student_check) && !empty($teacher_check)) {
+                    if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
                     } else {
                         $delete_sub = Institute_board_sub::where('board_id', $institute_board_check)->where('institute_id', $institute->id)->first();
@@ -939,6 +939,57 @@ class InstituteApiController extends Controller
                     }
                 }
             }
+
+            $stream_medium = Stream_sub::where('institute_id', $institute->id)->pluck('stream_id')->toArray();
+            $stream_medium_ids = explode(',', $request->stream_id);
+            $differenceStreammediumArray = array_diff($stream_medium, $stream_medium_ids);
+
+            if (!empty($differenceStreammediumArray)) {
+                $stream_medium_check = Stream_sub::where('institute_id', $institute->id)->whereIn('stream_id', $differenceStreammediumArray)->pluck('stream_id');
+                if (!empty($stream_medium_check)) {
+                    $student_check = Student_detail::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
+                    if (!empty($student_check) || !empty($teacher_check)) {
+                        return $this->response([], "Cannot remove stream_medium. Already exist student or teacher in this stream_medium.", false, 400);
+                    } else {
+                        $delete_sub = Stream_sub::where('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
+                        if ($delete_sub) {
+                            $delete_sub->delete();
+                        }
+                    }
+                }
+            } else {
+                foreach ($stream_medium_ids as $stream_medium_id) {
+                    foreach ($institute_for_ids as $institute_for_id) {
+                        foreach ($institute_board_ids as $institute_board_id) {
+                            foreach ($institute_medium_ids as $institute_medium_id) {
+                                foreach ($class_medium_ids as $class_medium_id) {
+                                    $sub_streammedium_exists = Stream_sub::where('institute_id', $institute->id)
+                                        ->where('stream_id', $stream_medium_id)
+                                        ->where('institute_for_id', $institute_for_id)
+                                        ->where('board_id', $institute_board_id)
+                                        ->where('medium_id', $institute_medium_id)
+                                        ->where('class_id', $class_medium_id)
+                                        ->first();
+                                    if (!$sub_streammedium_exists) {
+                                        Stream_sub::create([
+                                            'user_id' => $institute->user_id,
+                                            'institute_id' => $institute->id,
+                                            'stream_id' => $stream_medium_id,
+                                            'institute_for_id' => $institute_for_id,
+                                            'board_id' => $institute_board_id,
+                                            'medium_id' => $institute_medium_id,
+                                            'class_id' => $class_medium_id
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
             return $this->response([], "institute create Successfully");
         } catch (Exception $e) {
             return $e->getMessage();
