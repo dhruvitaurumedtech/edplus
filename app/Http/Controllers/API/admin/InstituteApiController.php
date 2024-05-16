@@ -5354,7 +5354,7 @@ class InstituteApiController extends Controller
                     }
 
                     $response[] = [
-                        'teacher_id'=>$teacher_data[0]['teacher_id'],
+                        'teacher_id'=>$value['teacher_id'],
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
                         'standard' => $standard_array
