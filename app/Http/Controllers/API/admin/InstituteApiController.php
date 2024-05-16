@@ -734,7 +734,8 @@ class InstituteApiController extends Controller
             'institute_medium_id' => 'required',
             'standard_id' => 'required',
             'subject_id' => 'required',
-            'institute_id' => 'required',
+            'institute_id' => 'required|exists:institute_detail,id',
+
         ]);
 
         if ($validator->fails()) {
