@@ -129,7 +129,7 @@ class TimetableController extends Controller
         }
     }
     
-    //repeat announcement 
+    
     public function repeat_timetable(Request $request){
             $validator = validator::make($request->all(),[
                 'batch_id'=>'required|exists:batches,id',
@@ -177,21 +177,25 @@ class TimetableController extends Controller
                         if ($existing) {
                             return $this->response([], "Lecture  already Schedule  for this date and time!", false, 400);
                         }
-
+                        
+                        
+                        $today = $current_date->format('l');
+                        
+                        if($tmidt->repeat == $today){
                         $timetable = new Timetable();
                         $timetable->time_table_base_id = $tmidt->time_table_base_id;
                         $timetable->subject_id = $tmidt->subject_id;
                         $timetable->batch_id = $tmidt->batch_id;
                         $timetable->teacher_id = $tmidt->teacher_id;
                         $timetable->lecture_type = $tmidt->lecture_type;
-                        $timetable->start_date = $start_date;
-                        $timetable->end_date = $end_date;
+                        $timetable->start_date = $startDateTime;
+                        $timetable->end_date = $endDateTime;
                         $timetable->lecture_date = $current_date;
                         $timetable->start_time = $tmidt->start_time;
                         $timetable->end_time = $tmidt->end_time;
                         $timetable->repeat = $tmidt->repeat;
                         $timetable->save();
-                       
+                    }
                         $current_date->modify('+1 day');
                     }
                 }
