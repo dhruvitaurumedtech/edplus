@@ -995,6 +995,36 @@ class InstituteApiController extends Controller
                 }
             }
 
+            $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
+            $institute_subject_ids = explode(',', $request->subject_id);
+            $differenceInstituteSubjectArray = array_diff($institute_subjects, $institute_subject_ids);
+
+            if (!empty($differenceInstituteSubjectArray)) {
+                $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
+                if (!empty($institute_subject_check)) {
+                    $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+                    if (!empty($student_check) || !empty($teacher_check)) {
+                        return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
+                    } else {
+                        $delete_sub = Subject_sub::where('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+                        if ($delete_sub) {
+                            $delete_sub->delete();
+                        }
+                    }
+                }
+            } else {
+                foreach ($institute_subject_ids as $institute_subject_id) {
+                    $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
+                    if (!$sub_instboard_exists) {
+                        Subject_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'subject_id' => $institute_subject_id,
+                        ]);
+                    }
+                }
+            }
 
             return $this->response([], "institute create Successfully");
         } catch (Exception $e) {
@@ -5354,7 +5384,7 @@ class InstituteApiController extends Controller
                     }
 
                     $response[] = [
-                        'teacher_id'=>$value['teacher_id'],
+                        'teacher_id' => $value['teacher_id'],
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
                         'standard' => $standard_array
