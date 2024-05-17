@@ -55,7 +55,6 @@ class BannerSizeController extends Controller
 
     public function destroy(Request $request)
     {
-
         BannerSize::findOrFail($request->bannerId)->delete();
         return redirect('banner-sizes/create')->with('success', 'Banner size deleted successfully.');
     }
