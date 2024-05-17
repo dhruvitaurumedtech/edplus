@@ -26,7 +26,7 @@
                     <div class="col-md-6">
                         <div class="institute-form">
                             <h3 class="card-title">Create Announcement </h3>
-                            <form method="post" action="{{ url('announcement/save') }}" enctype="multipart/form-data">
+                            <form method="post" action="{{ url('announcement/publish') }}" enctype="multipart/form-data">
                                 @csrf
                                 <div class="card-body">
                                     <div class="form-group">
@@ -248,22 +248,22 @@
                         fetchUsers(allInstitutes);
                     });
 
-                    $('form').submit(function(event) {
-                        event.preventDefault();
-                        var formData = $(this).serialize();
-                        $.ajax({
-                            url: "{{ route('annoucement.publish') }}",
-                            type: "POST",
-                            data: formData,
-                            success: function(response) {
-                                console.log(response);
-                                window.location.href = "{{ route('announcement-create-new') }}";
-                            },
-                            error: function(xhr, status, error) {
-                                console.error('Error:', error);
-                            }
-                        });
-                    });
+                    // $('form').submit(function(event) {
+                    //     event.preventDefault();
+                    //     var formData = $(this).serialize();
+                    //     $.ajax({
+                    //         url: "{{ route('annoucement.publish') }}",
+                    //         type: "POST",
+                    //         data: formData,
+                    //         success: function(response) {
+                    //             console.log(response);
+                    //             window.location.href = "{{ route('announcement-create-new') }}";
+                    //         },
+                    //         error: function(xhr, status, error) {
+                    //             console.error('Error:', error);
+                    //         }
+                    //     });
+                    // });
 
 
 
