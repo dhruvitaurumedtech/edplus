@@ -717,6 +717,7 @@ class TeacherController extends Controller
                     'users.address',
                     'users.email',
                     'users.mobile',
+                    'users.employee_type'
                     
                 )
                 ->first();
@@ -752,7 +753,6 @@ class TeacherController extends Controller
                             'board_id' => $values->board_id,
                             'medium' => $values->medium,
                             'medium_id' => $values->medium_id,
-                            'qualification' => $values->qualification,
                             'standard' => $values->standard,
                             'standard_id' => $values->standard_id,
                             'stream' => $values->stream,
@@ -768,6 +768,8 @@ class TeacherController extends Controller
                     'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
                     'address' => $user_list->address,
                     'email' => $user_list->email,
+                    'employee_type'=> $user_list->employee_type,
+                    'qualification' => $user_list->qualification,
                     'country_code' => $user_list->country_code,
                     'mobile_no' => $user_list->mobile,
                     'education'=>$response_data_two,
