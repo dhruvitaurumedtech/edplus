@@ -732,7 +732,7 @@ document.querySelectorAll('.banner_size_deletebutton').forEach(function (button)
     button.addEventListener('click', function (event) {
         event.preventDefault();
         var bannerId = this.getAttribute('data-banner-id');
-
+        var baseUrl = $('meta[name="base-url"]').attr('content');
         Swal.fire({
             title: 'Are you sure want to delete?',
             icon: 'warning',
@@ -742,7 +742,7 @@ document.querySelectorAll('.banner_size_deletebutton').forEach(function (button)
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post("{{ url('banner-sizes/destroy') }}", {
+                axios.post(baseUrl + '/banner-sizes/destroy', {
                     bannerId: bannerId
                 })
                     .then(response => {
