@@ -84,7 +84,13 @@ class Users extends Controller
             ->update([
                 'token' => $token
             ]);
-        return Redirect::route('admin.create')->with('success', 'profile-created');
+        //return Redirect::route('admin.create')->with('success', 'profile-created');
+        if($request->role_type == 2){
+            return Redirect::route('admin.list')->with('success', 'Profile created successfully!');
+        }else{
+            return Redirect::route('institute.list')->with('success', 'Profile created successfully!');
+        }
+        
     }
 
     public function subadmin_edit(Request $request)
