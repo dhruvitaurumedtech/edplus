@@ -516,6 +516,7 @@ class InstituteApiController extends Controller
                 'user_id' => $request->input('user_id'),
                 'institute_name' => $request->input('institute_name'),
                 'address' => $request->input('address'),
+                'country_code' => $request->input('country_code'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
                 'country' => $request->input('country'),
@@ -4387,6 +4388,7 @@ class InstituteApiController extends Controller
                 $institute_response[] = [
                     'institute_name' => $value['institute_name'],
                     'address' => $value['address'] . '',
+                    'country_code' => $value['country_code'],
                     'contact_no' => $value['contact_no'] . '',
                     'email' => $value['email'] . '',
                     'about_us' => $value['about_us'] . '',
@@ -4633,6 +4635,7 @@ class InstituteApiController extends Controller
             $institutedt = Institute_detail::find($request->institute_id);
             $institutedt->institute_name = $request->institute_name;
             $institutedt->address = $request->address;
+            $institutedt->country_code = $request->country_code;
             $institutedt->contact_no = $request->contact_no;
             $institutedt->email = $request->email;
             $institutedt->about_us = $request->about_us;
