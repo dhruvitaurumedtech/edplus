@@ -706,38 +706,59 @@ class TeacherController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
             $user_list = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
-                ->join('board', 'board.id', '=', 'teacher_detail.board_id')
-                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->leftjoin('stream', 'stream.id', '=', 'teacher_detail.stream_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->select(
                     'teacher_detail.*',
-                    'users.firstname',
+                    'users.*',
                     'users.qualification',
                     'users.lastname',
                     'users.dob',
                     'users.address',
                     'users.email',
                     'users.mobile',
-                    'board.name as board',
-                    'medium.name as medium',
-                    'standard.name as standard',
-                    'stream.name as stream'
+                    
                 )
                 ->first();
             if ($user_list) {
-                $subjids = explode(',', $user_list->subject_id);
-                $subjcts = Subject_model::whereIN('id', $subjids)->get();
-                $subjectslist = [];
-                foreach ($subjcts as $subDT) {
-                    $subjectslist[] = array(
-                        'id' => $subDT->id,
-                        'name' => $subDT->name,
-                        'image' => asset($subDT->image)
-                    );
-                }
+                $teacher_detail=Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
+                ->join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->leftjoin('stream', 'stream.id', '=', 'teacher_detail.stream_id')
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->where('teacher_detail.institute_id', $request->institute_id)
+                ->select('teacher_detail.*',
+                         'users.qualification',
+                         'board.name as board',
+                         'medium.name as medium',
+                         'standard.name as standard',
+                         'stream.name as stream')
+               ->get();
+             
+               $response_data_two= [];
+                foreach($teacher_detail as $values){
+                    $subjids = explode(',', $values->subject_id);
+                    $subjcts = Subject_model::whereIN('id', $subjids)->get();
+                    $subjectslist = [];
+                    foreach ($subjcts as $subDT) {
+                        $subjectslist[] = array(
+                            'id' => $subDT->id,
+                            'name' => $subDT->name,
+                            'image' => asset($subDT->image)
+                        );
+                    }
+                    $response_data_two[]=[ 'board' => $values->board,
+                            'board_id' => $values->board_id,
+                            'medium' => $values->medium,
+                            'medium_id' => $values->medium_id,
+                            'qualification' => $values->qualification,
+                            'standard' => $values->standard,
+                            'standard_id' => $values->standard_id,
+                            'stream' => $values->stream,
+                            'stream_id' => $values->stream_id,
+                            'subject'=>$subjectslist ];
+                 }
                 $response_data = [
                     'id' => $user_list->id,
                     'teacher_id' => $user_list->teacher_id,
@@ -749,18 +770,7 @@ class TeacherController extends Controller
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
                     'mobile_no' => $user_list->mobile,
-                    //'institute_for' => $institute_for_list,
-                    'board' => $user_list->board,
-                    'board_id' => $user_list->board_id,
-                    'medium' => $user_list->medium,
-                    'medium_id' => $user_list->medium_id,
-                    //'class_list' => $class_list,
-                    'qualification' => $user_list->qualification,
-                    'standard' => $user_list->standard,
-                    'standard_id' => $user_list->standard_id,
-                    'stream' => $user_list->stream,
-                    'stream_id' => $user_list->stream_id,
-                    'subject_list' => $subjectslist,
+                    'education'=>$response_data_two,
                 ];
                 return $this->response($response_data, "Successfully Fetch data.");
             } else {
@@ -820,10 +830,6 @@ class TeacherController extends Controller
 
                 $userSub->update([
                     'phone_no' => $request['phone_no'],
-                    // 'dob' => date('Y-m-d', strtotime($request['dob'])),
-                    // 'address' => $request['address'],
-                    // 'pincode' => $request['pincode'],
-                    // 'area' => $request['area'],
                     'about_us' => $request['about_us'],
 
                 ]);
@@ -833,10 +839,6 @@ class TeacherController extends Controller
                 Users_sub_model::create([
                     'user_id' => $teacher_id,
                     'phone_no' => $request['phone_no'],
-                    // 'dob' =>  date('Y-m-d', strtotime($request['dob'])),
-                    // 'address' => $request['address'],
-                    // 'pincode' => $request['pincode'],
-                    // 'area' => $request['area'],
                     'about_us' => $request['about_us'],
                 ]);
             }
