@@ -224,6 +224,59 @@ class ExamController extends Controller
     }
 
 
+    public function exam_report(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $exam_list = Exam_Model::select(
+                'exam.id as exam_id',
+                'exam.exam_title',
+                'exam.exam_type',
+                'exam.exam_date',
+                'exam.total_mark',
+                DB::raw("TIME_FORMAT(exam.start_time, '%h:%i %p') as start_time"),
+                DB::raw("TIME_FORMAT(exam.end_time, '%h:%i %p') as end_time"),
+                'board.name as board',
+                'medium.name as medium',
+                'standard.name as standard',
+                'stream.name as stream',
+                'subject.name as subject',
+                'batches.id as batch_id',
+                'batches.batch_name'
+            )
+                ->leftJoin('board', 'board.id', '=', 'exam.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'exam.medium_id')
+                ->leftJoin('standard', 'standard.id', '=', 'exam.standard_id')
+                ->leftJoin('stream', 'stream.id', '=', 'exam.stream_id')
+                ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
+                ->where('exam.institute_id', $request->institute_id)
+                ->when($request->board, function ($query, $stream_id) {
+                return $query->where('students_details.stream_id', $stream_id);
+                })
+                ->where('exam.user_id', Auth::id())
+                ->whereNull('exam.deleted_at')
+                ->orderByDesc('exam.created_at')
+                ->get();
+
+            if (!empty($exam_list)) {
+                return $this->response($exam_list, "Successfully Fetch Exam List");
+            } else {
+                return $this->response([], "No Data Found.", false, 400);
+            }
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+
+    }
+
+
     // public function get_exam(Request $request)
     // {
     //     $token = $request->header('Authorization');
