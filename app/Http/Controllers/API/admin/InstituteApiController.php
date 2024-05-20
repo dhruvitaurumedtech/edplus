@@ -1005,31 +1005,34 @@ class InstituteApiController extends Controller
                     }
                 }
             } else {
-                foreach ($stream_medium_ids as $stream_medium_id) {
-                    foreach ($institute_for_ids as $institute_for_id) {
-                        foreach ($institute_board_ids as $institute_board_id) {
-                            foreach ($institute_medium_ids as $institute_medium_id) {
-                                foreach ($class_medium_ids as $class_medium_id) {
-                                    foreach ($stream_standards_ids as $standard_id) {
-                                        $sub_streammedium_exists = Stream_sub::where('institute_id', $institute->id)
-                                            ->where('stream_id', $stream_medium_id)
-                                            ->where('institute_for_id', $institute_for_id)
-                                            ->where('board_id', $institute_board_id)
-                                            ->where('medium_id', $institute_medium_id)
-                                            ->where('class_id', $class_medium_id)
-                                            ->where('standard_id', $standard_id)
-                                            ->first();
-                                        if (!$sub_streammedium_exists) {
-                                            Stream_sub::create([
-                                                'user_id' => $institute->user_id,
-                                                'institute_id' => $institute->id,
-                                                'stream_id' => $stream_medium_id,
-                                                'institute_for_id' => $institute_for_id,
-                                                'board_id' => $institute_board_id,
-                                                'medium_id' => $institute_medium_id,
-                                                'class_id' => $class_medium_id,
-                                                'standard_id' => $standard_id
-                                            ]);
+                 
+                if(!empty($stream_medium_ids[0])){
+                    foreach ($stream_medium_ids as $stream_medium_id) {
+                        foreach ($institute_for_ids as $institute_for_id) {
+                            foreach ($institute_board_ids as $institute_board_id) {
+                                foreach ($institute_medium_ids as $institute_medium_id) {
+                                    foreach ($class_medium_ids as $class_medium_id) {
+                                        foreach ($stream_standards_ids as $standard_id) {
+                                            $sub_streammedium_exists = Stream_sub::where('institute_id', $institute->id)
+                                                ->where('stream_id', $stream_medium_id)
+                                                ->where('institute_for_id', $institute_for_id)
+                                                ->where('board_id', $institute_board_id)
+                                                ->where('medium_id', $institute_medium_id)
+                                                ->where('class_id', $class_medium_id)
+                                                ->where('standard_id', $standard_id)
+                                                ->first();
+                                            if (!$sub_streammedium_exists) {
+                                                Stream_sub::create([
+                                                    'user_id' => $institute->user_id,
+                                                    'institute_id' => $institute->id,
+                                                    'stream_id' => $stream_medium_id,
+                                                    'institute_for_id' => $institute_for_id,
+                                                    'board_id' => $institute_board_id,
+                                                    'medium_id' => $institute_medium_id,
+                                                    'class_id' => $class_medium_id,
+                                                    'standard_id' => $standard_id
+                                                ]);
+                                            }
                                         }
                                     }
                                 }
@@ -1037,6 +1040,7 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
+                
             }
 
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
