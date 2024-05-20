@@ -593,6 +593,7 @@ class TeacherController extends Controller
                     return $user_data = User::find($value->teacher_id);
                 })->map(function ($value) {
                     $user_data = User::find($value->teacher_id);
+                    // print_r($user_data->image);exit;
                     return [
                         // 'id'=>$value->id,
                         'teacher_id' => $user_data->id,
