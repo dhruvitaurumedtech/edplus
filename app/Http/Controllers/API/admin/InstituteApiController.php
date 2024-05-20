@@ -730,12 +730,55 @@ class InstituteApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'institute_for_id' => 'required|in:institute_for,id',
-            'institute_board_id' => 'required|in:board,id',
-            'institute_for_class_id' => 'required|in:class,id',
-            'institute_medium_id' => 'required|in:medium,id',
-            'standard_id' => 'required|in:standard,id', 
-            'subject_id' => 'required|in:subject,id',
+            'institute_for_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!Institute_for_model::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            'institute_board_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!board::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            'institute_for_class_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!Class_model::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            'institute_medium_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!Medium_model::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            'standard_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!Standard_model::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            'subject_id' => ['required', function ($attribute, $value, $fail) {
+                $ids = explode(',', $value);
+                foreach ($ids as $id) {
+                    if (!Subject_model::where('id', $id)->exists()) {
+                        $fail("The selected $attribute is invalid.");
+                    }
+                }
+            }],
+            
             'institute_id' => 'required|exists:institute_detail,id', 
 
         ]);

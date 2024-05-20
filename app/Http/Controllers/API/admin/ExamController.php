@@ -260,6 +260,9 @@ class ExamController extends Controller
                 ->when($request->board, function ($query, $stream_id) {
                 return $query->where('students_details.stream_id', $stream_id);
                 })
+                ->when($request->board, function ($query, $stream_id) {
+                return $query->where('students_details.stream_id', $stream_id);
+                })
                 ->where('exam.user_id', Auth::id())
                 ->whereNull('exam.deleted_at')
                 ->orderByDesc('exam.created_at')
