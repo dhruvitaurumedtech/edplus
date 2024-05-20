@@ -221,6 +221,7 @@ class TeacherController extends Controller
             // 'stream_id' => 'required',
             'subject_id' => 'required',
             'teacher_id' => 'required',
+            'country_code' =>'required',
         ]);
 
         if ($validator->fails()) {
@@ -809,6 +810,7 @@ class TeacherController extends Controller
             'name' => 'required|string|max:255',
             'relation_with' => 'required|string|max:255',
             'mobile_no' => 'required|string|max:255',
+            'country_code' =>'required',
         ]);
 
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);

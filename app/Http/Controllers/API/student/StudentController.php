@@ -494,6 +494,7 @@ class StudentController extends Controller
             'parents.*.email' => 'required|email|unique:users,email',
             'parents.*.mobile' => 'required',
             'parents.*.relation' => 'required',
+            'country_code' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -2080,6 +2081,7 @@ class StudentController extends Controller
             'state' => 'required|string',
             'city' => 'required|string',
             'pincode' => 'required|string',
+            'country_code'=>'required',
         ]);
 
         if ($validator->fails()) {
