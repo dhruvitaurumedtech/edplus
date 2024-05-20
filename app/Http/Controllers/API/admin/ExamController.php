@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers\API\admin;
+use Maatwebsite\Excel\Facades\Excel;
+
 
 use App\Http\Controllers\Controller;
 use App\Models\Batches_model;
@@ -232,7 +234,7 @@ class ExamController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
+        $board = $request->board;
         try {
             $exam_list = Exam_Model::select(
                 'exam.id as exam_id',
@@ -257,16 +259,20 @@ class ExamController extends Controller
                 ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
                 ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
                 ->where('exam.institute_id', $request->institute_id)
-                ->when($request->board, function ($query, $stream_id) {
-                return $query->where('students_details.stream_id', $stream_id);
+                ->when($board, function ($query, $board) {
+                return $query->where('exam.board_id', $board);
                 })
-                ->when($request->board, function ($query, $stream_id) {
-                return $query->where('students_details.stream_id', $stream_id);
-                })
+                
                 ->where('exam.user_id', Auth::id())
                 ->whereNull('exam.deleted_at')
                 ->orderByDesc('exam.created_at')
                 ->get();
+
+                Excel::create('filename', function($excel) use ($exam_list) {
+                    $excel->sheet('Sheet1', function($sheet) use ($exam_list) {
+                        $sheet->fromArray($exam_list);
+                    });
+                })->store('xlsx', storage_path('app/excel'));
 
             if (!empty($exam_list)) {
                 return $this->response($exam_list, "Successfully Fetch Exam List");
