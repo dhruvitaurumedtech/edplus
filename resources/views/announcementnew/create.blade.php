@@ -241,7 +241,7 @@
                     // Event listener for Check All
                     $('[data-toggle="check-all"]').click(function(e) {
                         e.preventDefault();
-                        $('.instituteCheckbox').prop('checked', true);
+                        // $('.instituteCheckbox').prop('checked', true);
                         var allInstitutes = $('.instituteCheckbox:checked').map(function() {
                             return $(this).val();
                         }).get();
