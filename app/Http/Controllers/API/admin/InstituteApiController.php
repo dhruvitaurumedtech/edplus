@@ -1008,7 +1008,6 @@ class InstituteApiController extends Controller
                  
                 if(!empty($stream_medium_ids[0])){
                     foreach ($stream_medium_ids as $stream_medium_id) {
-                        echo 'helo';exit;
                         foreach ($institute_for_ids as $institute_for_id) {
                             foreach ($institute_board_ids as $institute_board_id) {
                                 foreach ($institute_medium_ids as $institute_medium_id) {
