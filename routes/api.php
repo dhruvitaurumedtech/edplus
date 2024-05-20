@@ -56,6 +56,7 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam');
     Route::post('/institute/delete-exam', [ExamController::class, 'delete_exam'])->name('delete_exam');
     Route::post('/institute/edit-exam', [ExamController::class, 'edit_exam'])->name('edit_exam');
+    Route::post('/institute/exam-report', [ExamController::class, 'exam_report'])->name('exam_report');
 
     Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
     Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
