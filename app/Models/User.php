@@ -77,7 +77,7 @@ class User extends Authenticatable implements JWTSubject
         if (!empty($value)) {
             return asset($value);
         } else {
-            return asset('profile/image.jpg');
+            return asset('profile/no-image.png');
         }
     }
 
