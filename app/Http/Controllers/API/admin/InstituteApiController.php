@@ -730,13 +730,13 @@ class InstituteApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|integer',
-            'institute_for_id' => 'required',
-            'institute_board_id' => 'required',
-            'institute_for_class_id' => 'required',
-            'institute_medium_id' => 'required',
-            'standard_id' => 'required',
-            'subject_id' => 'required',
-            'institute_id' => 'required|exists:institute_detail,id',
+            'institute_for_id' => 'required|in:institute_for,id',
+            'institute_board_id' => 'required|in:board,id',
+            'institute_for_class_id' => 'required|in:class,id',
+            'institute_medium_id' => 'required|in:medium,id',
+            'standard_id' => 'required|in:standard,id', 
+            'subject_id' => 'required|in:subject,id',
+            'institute_id' => 'required|exists:institute_detail,id', 
 
         ]);
 
@@ -1027,10 +1027,10 @@ class InstituteApiController extends Controller
                 }
             }
 
-            return $this->response([], "institute create Successfully");
+            return $this->response([], "institute Update Successfully");
         } catch (Exception $e) {
             return $e->getMessage();
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Data not update.", false, 400);
         }
     }
 
