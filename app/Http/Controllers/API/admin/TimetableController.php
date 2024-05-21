@@ -133,8 +133,8 @@ class TimetableController extends Controller
     public function repeat_timetable(Request $request){
             $validator = validator::make($request->all(),[
                 'batch_id'=>'required|exists:batches,id',
-                'start_date'=>'required',
-                'end_date'=>'required',
+                'start_date'=>'required|date_format:Y-m-d|date',
+                'end_date'=>'required|date_format:Y-m-d|date',
                 'start_date'=>'required',
             ]);
     
