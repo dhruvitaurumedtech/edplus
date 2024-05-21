@@ -296,14 +296,10 @@ class ExamController extends Controller
                 ->orderByDesc('exam.created_at')
                 ->get();
 
-                // Excel::create('filename', function($excel) use ($exam_list) {
-                //     $excel->sheet('Sheet1', function($sheet) use ($exam_list) {
-                //         $sheet->fromArray($exam_list);
-                //     });
-                // })->store('xlsx', storage_path('app/excel'));
+              
                 $export = new ExamsExport($exam_list);
-                
             if (!empty($exam_list)) {
+                
                 Excel::store($export, 'exam_report'.Str::random(10).'.csv', 'local');
                 return $this->response($exam_list, "Successfully Fetch Exam List");
             } else {
