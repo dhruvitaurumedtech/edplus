@@ -310,6 +310,7 @@ class ExamController extends Controller
             } else {
                 return $this->response([], "No Data Found.", false, 400);
             }
+            
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
