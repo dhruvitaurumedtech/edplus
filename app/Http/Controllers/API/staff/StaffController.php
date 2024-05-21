@@ -17,6 +17,7 @@ class StaffController extends Controller
     use ApiTrait;
     public function add_staff(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'institute_id'=>'required|integer',
             'firstname' => 'required',
