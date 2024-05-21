@@ -303,8 +303,7 @@ class ExamController extends Controller
                 // })->store('xlsx', storage_path('app/excel'));
                 $export = new ExamsExport($exam_list);
 
-    // Store the file as CSV
-              Excel::store($export, 'exam_report'.Str::random(10).'.csv', 'local');
+                Excel::store($export, 'exam_report'.Str::random(10).'.csv', 'local');
 
             if (!empty($exam_list)) {
                 return $this->response($exam_list, "Successfully Fetch Exam List");

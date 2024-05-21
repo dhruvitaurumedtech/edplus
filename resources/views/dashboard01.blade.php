@@ -36,9 +36,9 @@
           <div class="col-xl-3 col-lg-6">
             <div class="card l-bg-blue-dark">
               <div class="card-statistic-3 p-4">
-                <div class="card-icon card-icon-large"><i class="fas fa-shopping-bag"></i></div>
+                <div class="card-icon card-icon-large"><i class="fas fa-user-plus"></i></div>
                 <div class="mb-4">
-                  <h5 class="card-title mb-0">New Orders</h5>
+                  <h5 class="card-title mb-0">Total Admin</h5>
                 </div>
                 <div class="row align-items-center mb-3 d-flex">
                   <div class="col-8">
