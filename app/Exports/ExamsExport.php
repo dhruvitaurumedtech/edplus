@@ -18,4 +18,14 @@ class ExamsExport implements FromCollection
     {
         return new Collection($this->exam_list);
     }
+
+    public function headings(): array
+    {
+        if (!empty($this->exam_list)) {
+            return array_keys($this->exam_list[0]);
+        }
+        
+        // Return an empty array if exam list is empty
+        return [];
+    }
 }

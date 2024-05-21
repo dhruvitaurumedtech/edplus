@@ -302,10 +302,9 @@ class ExamController extends Controller
                 //     });
                 // })->store('xlsx', storage_path('app/excel'));
                 $export = new ExamsExport($exam_list);
-
-                Excel::store($export, 'exam_report'.Str::random(10).'.csv', 'local');
-
+                
             if (!empty($exam_list)) {
+                Excel::store($export, 'exam_report'.Str::random(10).'.csv', 'local');
                 return $this->response($exam_list, "Successfully Fetch Exam List");
             } else {
                 return $this->response([], "No Data Found.", false, 400);
