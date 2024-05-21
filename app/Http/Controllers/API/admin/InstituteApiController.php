@@ -1076,8 +1076,8 @@ class InstituteApiController extends Controller
 
             return $this->response([], "institute Update Successfully");
         } catch (Exception $e) {
-            return $e->getMessage();
-            return $this->response($e, "Data not update.", false, 400);
+            //return $e->getMessage();
+            return $this->response([], $e->getMessage(), false, 400);
         }
     }
 
