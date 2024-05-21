@@ -240,8 +240,16 @@ class ExamController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $board = $request->board;
+        
         try {
+            $board = $request->board;
+            $medium = $request->medium;
+            $standard = $request->standard;
+            $stream = $request->stream;
+            $subject = $request->subject;
+            $batch = $request->batch;
+
+
             $exam_list = Exam_Model::select(
                 'exam.id as exam_id',
                 'exam.exam_title',
@@ -268,7 +276,21 @@ class ExamController extends Controller
                 ->when($board, function ($query, $board) {
                 return $query->where('exam.board_id', $board);
                 })
-                
+                ->when($medium, function ($query, $medium) {
+                return $query->where('exam.medium_id', $medium);
+                })
+                ->when($standard, function ($query, $standard) {
+                return $query->where('exam.standard_id', $standard);
+                })
+                ->when($stream, function ($query, $stream) {
+                    return $query->where('exam.stream_id', $stream);
+                    })
+                ->when($subject, function ($query, $subject) {
+                return $query->where('exam.subject_id', $subject);
+                })
+                ->when($batch, function ($query, $batch) {
+                return $query->where('exam.batch_id', $batch);
+                })    
                 ->where('exam.user_id', Auth::id())
                 ->whereNull('exam.deleted_at')
                 ->orderByDesc('exam.created_at')
