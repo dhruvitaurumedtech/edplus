@@ -803,7 +803,9 @@ class InstituteApiController extends Controller
                     } else {
                         $delete_sub = Institute_for_sub::whereIn('institute_for_id', $institute_for_check)->where('institute_id', $institute->id)->get();
                         if (!empty($delete_sub)) {
-                            $delete_sub->delete();
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
                         }
                     }
                 }
@@ -833,7 +835,9 @@ class InstituteApiController extends Controller
                     } else {
                         $delete_sub = Institute_board_sub::whereIn('board_id', $institute_board_check)->where('institute_id', $institute->id)->get();
                         if (!empty($delete_sub)) {
-                            $delete_sub->delete();
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
                         }
                     }
                 }
@@ -867,7 +871,9 @@ class InstituteApiController extends Controller
                     } else {
                         $delete_sub = Medium_sub::whereIn('medium_id', $institute_medium_check)->where('institute_id', $institute->id)->get();
                         if (!empty($delete_sub)) {
-                            $delete_sub->delete();
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
                         }
                     }
                 }
@@ -904,7 +910,9 @@ class InstituteApiController extends Controller
                     } else {
                         $delete_sub = Class_sub::whereIn('class_id', $class_medium_check)->where('institute_id', $institute->id)->get();
                         if (!empty($delete_sub)) {
-                            $delete_sub->delete();
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
                         }
                     }
                 }
@@ -953,7 +961,6 @@ class InstituteApiController extends Controller
                             foreach ($delete_sub as $did) {
                                 $did->delete();
                             }
-                            
                         }
                     }
                 }
