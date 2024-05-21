@@ -20,6 +20,7 @@ use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
+use App\Http\Controllers\API\staff\StaffController;
 use App\Http\Controllers\API\student\StudentAttendance;
 use App\Http\Controllers\PdfController;
 use App\Models\Student_detail;
@@ -152,6 +153,9 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
    
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
+
+    Route::post('/staff/add-staff', [StaffController::class, 'add_staff']);
+
     
 });
 
