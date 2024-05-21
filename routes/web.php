@@ -23,6 +23,7 @@ use App\Http\Controllers\Users;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\student\StudentController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\Videotimelimitcontroller;
 use App\Http\Controllers\WebNotificationController;
 
@@ -43,27 +44,7 @@ Route::get('/', function () {
 Route::get('/create-role', [ProfileController::class, 'create_role'])->name('role.create');
 
 
-Route::get('/dashboard', function () {
-
-    switch (Auth::user()->role_type) {
-        case '1':
-            return view('dashboard01');
-            break;
-
-        case '2':
-            return view('dashboard01');
-            break;
-
-        case '3':
-            return view('dashboard01');
-            break;
-
-
-        default:
-            return view('dashboard');
-            break;
-    }
-})->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('profile-edit', [ProfileController::class, 'edit'])->name('profile.edit');
