@@ -4,8 +4,8 @@ namespace App\Exports;
 
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\FromCollection;
-
-class ExamsExport implements FromCollection
+use Maatwebsite\Excel\Concerns\WithHeadings;
+class ExamsExport implements FromCollection, WithHeadings
 {
     protected $exam_list;
 
@@ -21,11 +21,17 @@ class ExamsExport implements FromCollection
 
     public function headings(): array
     {
-        if (!empty($this->exam_list)) {
-            return array_keys($this->exam_list[0]);
+        $uniqueKeys = [];
+        $data = [];
+        foreach ($this->exam_list as $exam) {
+            $attributes = $exam->getAttributes();
+            foreach ($attributes as $key => $value) {
+                if (!isset($uniqueKeys[$key])) {
+                    $data[]=$key;
+                    $uniqueKeys[$key] = true;
+                }
+            }
         }
-        
-        // Return an empty array if exam list is empty
-        return [];
+        return $data;
     }
 }

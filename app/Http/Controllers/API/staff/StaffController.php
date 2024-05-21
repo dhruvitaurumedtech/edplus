@@ -83,4 +83,28 @@ class StaffController extends Controller
         }
  
     }
+    public function view_staff(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+        ]);
+        $userdata = user::join('staff_detail', 'staff_detail.user_id', '=', 'users.id')
+                            ->where('staff_detail.institute_id', $request->institute_id)
+                            ->select('users.*')
+                            ->get();
+        try{
+            $data=[];
+            foreach($userdata as $value){
+                 $data[]=['user_id'=>$value->id,
+                          'firstname'=>$value->firstname,
+                          'lastname'=>$value->lastname];
+
+            }
+            return $this->response($data, "Staff Fetch Successfully !");
+
+        }catch(Exception $e){
+
+            return $this->response($e, "Something want Wrong!!", false, 400);
+        }
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+    }
 }
