@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('feedback', function (Blueprint $table) {
+        Schema::create('feedbacks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('feedback_to_id');
             $table->foreign('feedback_to_id')->references('id')->on('users');
             $table->unsignedBigInteger('institute_id');
             $table->foreign('institute_id')->references('id')->on('institute_detail');
             $table->string('feedback');
+            $table->enum('role_type', ['1', '2']); 
             $table->softDeletes();
             $table->timestamps();
         });
