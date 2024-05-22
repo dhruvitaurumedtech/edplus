@@ -99,6 +99,7 @@ class StaffController extends Controller
                  $data[]=['user_id'=>$value->id,
                           'fullname'=>$value->firstname.' '.$value->lastname,
                           'role_name'=>$value->role_name,
+                          'photo' => asset('profile/no-image.png')
                          ];
             }
             return $this->response($data, "Staff Fetch Successfully !");
