@@ -57,7 +57,6 @@ class TimetableController extends Controller
             'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
-
         ]);
 
         if($validator->fails()) 
