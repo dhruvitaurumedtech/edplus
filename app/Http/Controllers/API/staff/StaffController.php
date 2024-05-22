@@ -129,7 +129,7 @@ class StaffController extends Controller
             $roles = Roles::whereNull('created_by')->get();
             $data=[];
             foreach($roles as $value){
-               $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name];
+               $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name,'photo' => asset('profile/no-image.png')];
             }
             return $this->response($data, "Successfully Display Roles.");
         } catch (Exception $e) {
