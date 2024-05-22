@@ -54,6 +54,7 @@ class TimetableController extends Controller
             'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
             'start_date'=>'required',
+            'end_date'=>'required',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
 
@@ -122,7 +123,7 @@ class TimetableController extends Controller
                 }
             }
             DB::commit();
-            return $this->response([],'data save');
+            return $this->response([],'Successfully created Timetable');
         }catch(Exeption $e){
             DB::rollback();
             return $this->response($e,"Something want Wrong!!", false, 400);
