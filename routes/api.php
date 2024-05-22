@@ -17,6 +17,7 @@ use App\Http\Controllers\API\institude\SubjectDetailController;
 use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
+use App\Http\Controllers\API\admin\FeedbackController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -113,6 +114,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
+    Route::post('/institute/add-feedback-forstudent', [FeedbackController::class, 'addfeedbackforstudent']);
+    Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
 
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');

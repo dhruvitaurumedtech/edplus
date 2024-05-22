@@ -283,8 +283,8 @@ class ExamController extends Controller
                 return $query->where('exam.standard_id', $standard);
                 })
                 ->when($stream, function ($query, $stream) {
-                    return $query->where('exam.stream_id', $stream);
-                    })
+                return $query->where('exam.stream_id', $stream);
+                })
                 ->when($subject, function ($query, $subject) {
                 return $query->where('exam.subject_id', $subject);
                 })
