@@ -598,7 +598,7 @@ class TeacherController extends Controller
                         // 'id'=>$value->id,
                         'teacher_id' => $user_data->id,
                         'name' => $user_data->firstname . ' ' . $user_data->lastname,
-                        'photo' => $user_data->image,
+                        'photo' => asset('profile/no-image.png'),
                     ];
                 })->toArray();
                 return $this->response($response, "Fetch teacher request list.");
