@@ -177,7 +177,6 @@ class TimetableController extends Controller
                             return $this->response([], "Lecture  already Schedule  for this date and time!", false, 400);
                         }
                         
-                        
                         $today = $current_date->format('l');
                         
                         if($tmidt->repeat == $today){
@@ -200,9 +199,8 @@ class TimetableController extends Controller
                 }
 
                 
-                return $this->response([],'data save');
+                return $this->response([],'Data Repeat Successfully');
             }catch(Exeption $e){
-               
                 return $this->response($e,"Something want Wrong!!", false, 400);
             }
     }
