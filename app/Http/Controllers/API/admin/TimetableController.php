@@ -45,49 +45,53 @@ class TimetableController extends Controller
     }
 
     //add
-    public function add_timetable(Request $request){
-        
-        $validator = validator::make($request->all(),[
-            
-            'subject_id'=>'required|exists:subject,id',
-            'batch_id'=>'required|exists:batches,id',
-            'teacher_id'=>'required|exists:users,id',
-            'lecture_type'=>'required',
-            'start_date'=>'required',
-            'end_date'=>'required',
-            'start_time'=>'required',
-            'end_time'=>'required|after:start_time',
-        ]);
+   
+    public function add_timetable(Request $request)
+    {
+    $validator = Validator::make($request->all(), [
+        'subject_id' => 'required|exists:subject,id',
+        'batch_id' => 'required|exists:batches,id',
+        'teacher_id' => 'required|exists:users,id',
+        'lecture_type' => 'required',
+        'start_date' => 'required|date',
+        'end_date' => 'required|date|after_or_equal:start_date',
+        'start_time' => 'required|date_format:H:i:s',
+        'end_time' => 'required|date_format:H:i:s|after:start_time',
+        'repeat' => 'required|string'
+    ]);
 
-        if($validator->fails()) 
-        return $this->response([],$validator->errors()->first(),false,400);
+    if ($validator->fails()) {
+        return $this->response([], $validator->errors()->first(), false, 400);
+    }
 
-        try{
-            DB::beginTransaction();
-            
-            $timetablebase = new TimeTableBase();
-            $timetablebase->subject_id = $request->subject_id;
-            $timetablebase->batch_id = $request->batch_id;
-            $timetablebase->teacher_id = $request->teacher_id;
-            $timetablebase->lecture_type = $request->lecture_type;
-            $timetablebase->start_date = $request->start_date;
-            $timetablebase->end_date = $request->end_date;
-            $timetablebase->start_time = $request->start_time;
-            $timetablebase->end_time = $request->end_time;
-            $timetablebase->repeat = $request->repeat;
-            $timetablebase->save();
-            
-                $lastInsertedId = $timetablebase->id;
+    try {
+        //DB::beginTransaction();
 
-                $start_date = new DateTime($request->start_date);
-                $end_date = new DateTime($request->end_date);
+        $timetablebase = new TimeTableBase();
+        $timetablebase->subject_id = $request->subject_id;
+        $timetablebase->batch_id = $request->batch_id;
+        $timetablebase->teacher_id = $request->teacher_id;
+        $timetablebase->lecture_type = $request->lecture_type;
+        $timetablebase->start_date = $request->start_date;
+        $timetablebase->end_date = $request->end_date;
+        $timetablebase->start_time = $request->start_time;
+        $timetablebase->end_time = $request->end_time;
+        $timetablebase->repeat = $request->repeat;
+        $timetablebase->save();
 
-                foreach(explode(',',$request->repeat) as $repeat){
-                
-                $current_date = clone $start_date;
-                while ($current_date <= $end_date) {
-                   if($current_date->format('l') === $repeat){
+        $lastInsertedId = $timetablebase->id;
 
+        $start_date = new DateTime($request->start_date);
+        $end_date = new DateTime($request->end_date);
+        $days = explode(',', $request->repeat);
+
+        foreach ($days as $repeat) {
+            $repeat = trim(strtolower($repeat)); // Normalize the day name
+
+            $current_date = clone $start_date;
+
+            while ($current_date <= $end_date) {
+                if (strtolower($current_date->format('l')) == $repeat) {
                     $lecture_date = $current_date->format('Y-m-d');
 
                     $existing = Timetable::where([
@@ -97,9 +101,9 @@ class TimetableController extends Controller
                         ['start_time', $request->start_time],
                         ['end_time', $request->end_time],
                     ])->exists();
-        
+
                     if ($existing) {
-                        return $this->response([], "Lecture  already Schedule  for this date and time!", false, 400);
+                        return $this->response([], "Lecture already scheduled for this date and time!", false, 400);
                     }
 
                     $timetable = new Timetable();
@@ -115,19 +119,20 @@ class TimetableController extends Controller
                     $timetable->end_time = $request->end_time;
                     $timetable->repeat = $repeat;
                     $timetable->save();
-
-                   }
-
-                    $current_date->modify('+1 day'); 
                 }
+
+                $current_date->modify('+1 day');
             }
-            DB::commit();
-            return $this->response([],'Successfully created Timetable');
-        }catch(Exeption $e){
-            DB::rollback();
-            return $this->response($e,"Something want Wrong!!", false, 400);
         }
+
+        //DB::commit();
+        return $this->response([], 'Successfully created Timetable');
+    } catch (Exception $e) {
+        //DB::rollback();
+        return $this->response($e, "Something went wrong!!", false, 400);
     }
+}
+
     
     
     public function repeat_timetable(Request $request){
