@@ -159,7 +159,8 @@ Route::middleware(['auth:api'])->group(function () {
 
     Route::post('/staff/add-staff', [StaffController::class, 'add_staff']);
     Route::post('/staff/view-staff', [StaffController::class, 'view_staff']);
-
+    Route::post('/staff/delete-staff', [StaffController::class, 'delete_staff']);
+    Route::post('/staff/view-roles', [StaffController::class, 'view_roles']);
     
 });
 
