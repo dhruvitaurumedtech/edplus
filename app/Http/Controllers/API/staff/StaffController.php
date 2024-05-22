@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\Roles;
 use App\Models\Staff_detail_Model;
 use App\Models\User;
 use App\Traits\ApiTrait;
@@ -88,16 +89,17 @@ class StaffController extends Controller
             'institute_id'=>'required|integer',
         ]);
         $userdata = user::join('staff_detail', 'staff_detail.user_id', '=', 'users.id')
+                            ->join('roles', 'roles.id', '=', 'users.role_type')
                             ->where('staff_detail.institute_id', $request->institute_id)
-                            ->select('users.*')
+                            ->select('users.*','roles.role_name')
                             ->get();
         try{
             $data=[];
             foreach($userdata as $value){
                  $data[]=['user_id'=>$value->id,
-                          'firstname'=>$value->firstname,
-                          'lastname'=>$value->lastname];
-
+                          'fullname'=>$value->firstname.' '.$value->lastname,
+                          'role_name'=>$value->role_name,
+                         ];
             }
             return $this->response($data, "Staff Fetch Successfully !");
 
@@ -106,5 +108,32 @@ class StaffController extends Controller
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+    }
+    public function delete_staff(Request $request){
+        $validator = Validator::make($request->all(), [
+            'staff_id' => 'required|exists:users,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            user::where('id', $request->staff_id)->delete();
+            return $this->response([], "Successfully Deleted Staff.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
+    public function view_roles(Request $request){
+        try {
+            $roles = Roles::whereNull('created_by')->get();
+            $data=[];
+            foreach($roles as $value){
+               $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name];
+            }
+            return $this->response($data, "Successfully Display Roles.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
     }
 }

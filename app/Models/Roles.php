@@ -11,6 +11,6 @@ class Roles extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'roles';
     protected $fillable = [
-        'role_name'
+        'role_name', 'created_by'
     ];
 }
