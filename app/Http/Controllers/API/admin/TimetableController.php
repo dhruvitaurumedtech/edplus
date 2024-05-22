@@ -145,26 +145,25 @@ class TimetableController extends Controller
             return $this->response([],$validator->errors()->first(),false,400);
     
             try{
-                $lastDateString = $request->end_date;
+                $lastDateString = date('Y-m-d');
 
                 $lastDate = Carbon::createFromFormat('Y-m-d', $lastDateString);
                 $lastDate->setCentury(Carbon::now()->year - Carbon::now()->year % 100);
 
-                $nextWeekDate = $lastDate->copy()->addWeek();
-
-                $startOfWeek = $nextWeekDate->startOfWeek();
+                
+                $startOfWeek = $lastDate->startOfWeek();
 
                 $endOfWeek = $startOfWeek->copy()->addDays(6);
 
                 $start_date = $startOfWeek->format('Y-m-d');
                 $end_date = $endOfWeek->format('Y-m-d');
 
-                $startDateTime = new DateTime($start_date);
-                $endDateTime = new DateTime($end_date);
-
                 $timetablee = Timetable::where('batch_id',$request->batch_id)
-                ->whereBetween('lecture_date', [$request->start_date, $request->end_date])->get();
+                ->whereBetween('lecture_date', [$start_date, $end_date])->get();
                 
+                $startDateTime = new DateTime($request->start_date);
+                $endDateTime = new DateTime($request->end_date);
+
                 foreach($timetablee as $tmidt){
                     $current_date = clone $startDateTime;
                     while ($current_date <= $endDateTime) {
