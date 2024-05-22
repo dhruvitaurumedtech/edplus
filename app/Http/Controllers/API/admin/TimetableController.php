@@ -135,7 +135,6 @@ class TimetableController extends Controller
                 'batch_id'=>'required|exists:batches,id',
                 'start_date'=>'required|date_format:Y-m-d|date',
                 'end_date'=>'required|date_format:Y-m-d|date',
-                'start_date'=>'required',
             ]);
     
             if($validator->fails()) 
