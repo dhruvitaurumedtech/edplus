@@ -18,7 +18,6 @@ class StaffController extends Controller
     use ApiTrait;
     public function add_staff(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'institute_id'=>'required|integer',
             'firstname' => 'required',
@@ -127,7 +126,7 @@ class StaffController extends Controller
     }
     public function view_roles(Request $request){
         try {
-            $roles = Roles::whereNull('created_by')->get();
+            $roles = Roles::where('created_by','3')->get();
             $data=[];
             foreach($roles as $value){
                $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name];
