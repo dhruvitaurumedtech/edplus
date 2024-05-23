@@ -37,7 +37,8 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-        $existingFee = Fees_model::where('board_id', $request->board_id)
+        $existingFee = Fees_model::where('institute_id', $request->institute_id)
+        ->where('board_id', $request->board_id)
         ->where('medium_id', $request->medium_id)
         ->where('standard_id', $request->standard_id)
         ->where('stream_id', $request->stream_id)
