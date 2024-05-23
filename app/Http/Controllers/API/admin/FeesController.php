@@ -3,17 +3,16 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Batches_model;
 use App\Models\Fees_colletion_model;
 use App\Models\Fees_model;
 use App\Models\Payment_type_model;
 use App\Models\Student_detail;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
 
 class FeesController extends Controller
 {
@@ -170,8 +169,10 @@ class FeesController extends Controller
                 $invoice = 1;
             }
 
-           $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
-           $data_final = ['payment_type'=>$data,'invoice_number'=>$invoiceNumber,'date'=>date('Y-m-d')];
+            $student = User::where('id',$request->student_id)->first();
+            $student_name = $student->firstname .' '.$student->lastname;
+            $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
+            $data_final = ['payment_type'=>$data,'invoice_number'=>$invoiceNumber,'date'=>date('Y-m-d'),'student_name'=>$student_name];
            return $this->response($data_final, "Successfully Display PaymentType.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
