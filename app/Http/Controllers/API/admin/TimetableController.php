@@ -45,20 +45,19 @@ class TimetableController extends Controller
     }
 
     //add
-   
-    public function add_timetable(Request $request)
-    {
-    $validator = Validator::make($request->all(), [
-        'subject_id' => 'required|exists:subject,id',
-        'batch_id' => 'required|exists:batches,id',
-        'teacher_id' => 'required|exists:users,id',
-        'lecture_type' => 'required',
-        'start_date' => 'required|date',
-        'end_date' => 'required|date|after_or_equal:start_date',
-        'start_time' => 'required|date_format:H:i:s',
-        'end_time' => 'required|date_format:H:i:s|after:start_time',
-        'repeat' => 'required|string'
-    ]);
+    public function add_timetable(Request $request){
+        
+        $validator = validator::make($request->all(),[
+            
+            'subject_id'=>'required|exists:subject,id',
+            'batch_id'=>'required|exists:batches,id',
+            'teacher_id'=>'required|exists:users,id',
+            'lecture_type'=>'required',
+            'start_date'=>'required|date_format:Y-m-d|date',
+            'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
+            'start_time'=>'required',
+            'end_time'=>'required|after:start_time',
+        ]);
 
     if ($validator->fails()) {
         return $this->response([], $validator->errors()->first(), false, 400);
