@@ -165,6 +165,8 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/staff/view-roles', [StaffController::class, 'view_roles']);
     Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
     Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
+    Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
+    Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
     
 });
 

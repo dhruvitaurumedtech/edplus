@@ -3,10 +3,13 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batches_model;
 use App\Models\Fees_model;
+use App\Models\Student_detail;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Exception;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 class FeesController extends Controller
 {
@@ -95,5 +98,48 @@ class FeesController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
      
+    }
+    public function paid_fees_student(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            // 'due_date'=>'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $student_response = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                                            ->join('medium', 'medium.id', '=', 'students_details.medium_id')
+                                            ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+                                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                                            ->join('users', 'users.id', '=', 'students_details.student_id')
+                                            ->select(
+                                                DB::raw("CONCAT(users.firstname, ' ', users.lastname) as student_name"),
+                                                        'users.id as student_id',
+                                                        'users.image'
+                                            )
+                                            ->where('students_details.institute_id', $request->institute_id)
+                                            ->where('students_details.batch_id', $request->batch_id)
+                                            ->where('students_details.board_id', $request->board_id)
+                                            ->where('students_details.medium_id', $request->medium_id)
+                                            ->where('students_details.standard_id', $request->standard_id)
+                                            ->get()
+                                            ->toArray();
+        $student = [];
+        foreach($student_response as $value){
+            $student[]=  ['student_id'=>$value['student_id'],
+                          'student_name'=>$value['student_name'],
+                          'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png')];
+        }
+        return $this->response($student, "Data Fetch Successfully");
+    } catch (Exception $e) {
+        return $this->response($e, "Invalid token.", false, 400);
+    }
+    }
+    public function fees_collection(Request $request){
+        
     }
 }
