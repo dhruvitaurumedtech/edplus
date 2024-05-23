@@ -4,13 +4,17 @@ namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Batches_model;
+use App\Models\Fees_colletion_model;
 use App\Models\Fees_model;
+use App\Models\Payment_type_model;
 use App\Models\Student_detail;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 class FeesController extends Controller
 {
     /**
@@ -83,6 +87,8 @@ class FeesController extends Controller
         ->where('fees.institute_id', $request->institute_id)
         ->get()->toarray();
         $data=[];
+        if(!empty($fees)){
+
         foreach($fees as $value){
              $data[] = [
                   'board_name'=>$value['board_name'],
@@ -93,7 +99,10 @@ class FeesController extends Controller
                   'amount'=>$value['amount'],
              ];
              return $this->response($data, "Data Fetch Successfully");
-              } 
+              }
+            }else{
+                return $this->response([],"No record found", false, 400);
+            } 
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
@@ -138,6 +147,33 @@ class FeesController extends Controller
     } catch (Exception $e) {
         return $this->response($e, "Invalid token.", false, 400);
     }
+    }
+    
+    //invoice number mate student_id pass karvu padse
+    public function payment_type(Request $request){
+        try {
+            $payment_mode = Payment_type_model::whereNull('deleted_at')->get();
+            $data=[];
+            foreach($payment_mode as $value){
+               $data[] = ['id'=>$value->id,'name'=>$value->name];
+            }
+            $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->first();
+            if (!empty($fees_colletion)) {
+                $parts = explode('-', $fees_colletion->invoice_no);
+                if (count($parts) === 2) {
+                    $number = $parts[1];
+                }        
+                $invoice = $number + 1 ;
+            } else {
+                $invoice = 1;
+            }
+
+           $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
+           $data_final = ['payment_type'=>$data,'invoice_number'=>$invoiceNumber,'date'=>date('Y-m-d')];
+           return $this->response($data_final, "Successfully Display PaymentType.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
     }
     public function fees_collection(Request $request){
         
