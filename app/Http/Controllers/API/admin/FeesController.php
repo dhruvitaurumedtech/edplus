@@ -99,11 +99,12 @@ class FeesController extends Controller
                   'subject_name'=>$value['subject_name'],
                   'amount'=>$value['amount'],
              ];
-             return $this->response($data, "Data Fetch Successfully");
+           
               }
             }else{
                 return $this->response([],"No record found", false, 400);
             } 
+            return $this->response($data, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
