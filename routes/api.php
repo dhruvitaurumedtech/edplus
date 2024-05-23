@@ -18,6 +18,7 @@ use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
+use App\Http\Controllers\API\admin\FeesController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -156,11 +157,14 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
    
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
-
+    
+    //staff api
     Route::post('/staff/add-staff', [StaffController::class, 'add_staff']);
     Route::post('/staff/view-staff', [StaffController::class, 'view_staff']);
     Route::post('/staff/delete-staff', [StaffController::class, 'delete_staff']);
     Route::post('/staff/view-roles', [StaffController::class, 'view_roles']);
+    Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
+    Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
     
 });
 
