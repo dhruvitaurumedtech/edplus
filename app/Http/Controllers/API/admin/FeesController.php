@@ -212,7 +212,7 @@ class FeesController extends Controller
             $histroy = [];
             foreach($student_histroy as $value){
                 $histroy[] =[
-                    'paid_amount'=>$value->paid_amount,
+                    'paid_amount'=>$value->remaining_amount,
                     'date'=>$value->created_at,
                     'payment_mode'=>$value->payment_type,
                     'invoice_no'=>$value->invoice_no,
@@ -227,7 +227,7 @@ class FeesController extends Controller
                            'total_amount'=>$total_amount,
                            'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
                            'histroy'=>$histroy
-                        ];
+                          ];
             return $this->response($data_final, "Successfully Display PaymentType.");
         }catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
@@ -264,15 +264,19 @@ class FeesController extends Controller
         $fee->remaining_amount = $request->remaining_amount;
         $fee->payment_type = $request->payment_type;
         $fee->transaction_id = (!empty($request->transaction_id)) ? $request->transaction_id : '';
-        $fee->status = 'paid';
+        // $fee->status = ($request->total_amount==$request->paid_amount)?'paid':'pending';
         $fee->save();
         $paid_amount = 0;
         $fees_detail=Fees_colletion_model::where('student_id',$request->student_id)->get();
         foreach($fees_detail as $value){
             $paid_amount += $value->remaining_amount; 
-        }
-        Fees_colletion_model::where('id', $fee->id)->update(['paid_amount' => $paid_amount]);
 
+        }
+        
+        Fees_colletion_model::where('id', $fee->id)->update(['paid_amount' => $paid_amount]);
+        $paid_status=Fees_colletion_model::where('id',$fee->id)->latest()->first();
+       
+        Fees_colletion_model::where('id', $fee->id)->update(['status'=>($paid_status->total_amount==$paid_status->paid_amount)?'paid':'pending']);
 
         return $this->response([], "Fees Paid successfully.");
         } catch (Exception $e) {
