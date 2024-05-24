@@ -11,6 +11,6 @@ class Fees_model extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'fees';
     protected $fillable = [
-        'institute_id', 'board_id', 'medium_id', 'standard_id', 'stream_id', 'subject_id', 'amount', 'due_date',
+        'user_id','institute_id', 'board_id', 'medium_id', 'standard_id', 'stream_id', 'subject_id', 'amount', 'due_date',
     ];
 }
