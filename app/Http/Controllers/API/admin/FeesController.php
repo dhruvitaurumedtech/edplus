@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Exception;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -36,7 +37,8 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-        $existingFee = Fees_model::where('institute_id', $request->institute_id)
+        $existingFee = Fees_model::where('user_id',Auth::user()->id)
+        ->where('institute_id', $request->institute_id)
         ->where('board_id', $request->board_id)
         ->where('medium_id', $request->medium_id)
         ->where('standard_id', $request->standard_id)
@@ -47,8 +49,8 @@ class FeesController extends Controller
         if ($existingFee) {
             return $this->response([], "Fees for the given criteria already exist.", false, 400);
         }
-
         $fee = new Fees_model;
+        $fee->user_id = Auth::user()->id;
         $fee->institute_id = $request->institute_id;
         $fee->board_id = $request->board_id;
         $fee->medium_id = $request->medium_id;
@@ -136,6 +138,7 @@ class FeesController extends Controller
                                             ->where('students_details.board_id', $request->board_id)
                                             ->where('students_details.medium_id', $request->medium_id)
                                             ->where('students_details.standard_id', $request->standard_id)
+                                            ->where('students_details.subject_id', $request->subject_id)
                                             ->get()
                                             ->toArray();
         $student = [];
