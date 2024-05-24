@@ -11,6 +11,5 @@ class Fees_colletion_model extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'fees_colletion';
     protected $fillable = [
-        'user_id','institute_id', 'student_id', 'invoice_no', 'date', 'total_amount', 'paid_amount', 'due_amount', 'remaining_amount', 'payment_type', 'transaction_id', 'status'
-    ];
+        'user_id', 'institute_id', 'student_id', 'student_name', 'invoice_no', 'date', 'total_amount', 'paid_amount', 'remaining_amount', 'payment_type', 'transaction_id', 'status' ];
 }

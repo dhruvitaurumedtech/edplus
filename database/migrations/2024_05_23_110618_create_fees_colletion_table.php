@@ -19,11 +19,11 @@ return new class extends Migration
             $table->foreign('institute_id')->references('id')->on('institute_detail');
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign('student_id')->references('id')->on('students_details');
+            $table->string('student_name');
             $table->string('invoice_no');
             $table->date('date')->nullable();
             $table->string('total_amount')->nullable();
             $table->string('paid_amount')->nullable();
-            $table->string('due_amount')->nullable();
             $table->string('remaining_amount')->nullable();
             $table->string('payment_type')->nullable();
             $table->string('transaction_id')->nullable();
