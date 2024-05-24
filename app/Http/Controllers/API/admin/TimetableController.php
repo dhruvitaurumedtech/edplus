@@ -150,7 +150,6 @@ class TimetableController extends Controller
 
                 $lastDate = Carbon::createFromFormat('Y-m-d', $lastDateString);
                 $lastDate->setCentury(Carbon::now()->year - Carbon::now()->year % 100);
-
                 
                 $startOfWeek = $lastDate->startOfWeek();
 
