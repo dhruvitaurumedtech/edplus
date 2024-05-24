@@ -15,6 +15,7 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
+use Exception;
 use GuzzleHttp\Client;
 use Laravel\Socialite\Facades\Socialite;
 

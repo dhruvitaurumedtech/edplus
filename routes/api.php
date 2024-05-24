@@ -18,6 +18,7 @@ use App\Http\Controllers\API\VideoController;
 use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
+use App\Http\Controllers\API\admin\FeesController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -40,7 +41,7 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
@@ -156,11 +157,17 @@ Route::middleware(['auth:api'])->group(function () {
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
    
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
-
+    
+    //staff api
     Route::post('/staff/add-staff', [StaffController::class, 'add_staff']);
     Route::post('/staff/view-staff', [StaffController::class, 'view_staff']);
     Route::post('/staff/delete-staff', [StaffController::class, 'delete_staff']);
     Route::post('/staff/view-roles', [StaffController::class, 'view_roles']);
+    Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
+    Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
+    Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
+    Route::post('/institute/payment-type', [FeesController::class, 'payment_type']);
+    Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
     
 });
 

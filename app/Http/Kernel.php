@@ -67,6 +67,7 @@ class Kernel extends HttpKernel
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'permission' => \App\Http\Middleware\CheckPermission::class,
         'superadmin_permission' => \App\Http\Middleware\Permission::class,
+        'apilogs' => \App\Http\Middleware\LogRoute::class,
        
 
     ];
