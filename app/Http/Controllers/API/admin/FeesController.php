@@ -28,10 +28,8 @@ class FeesController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             'standard_id' => 'required',
-            // 'stream_id' => 'required',
             'subject_id' => 'required',
             'amount' => 'required',
-            // 'due_date'=>'required',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -49,6 +47,7 @@ class FeesController extends Controller
         if ($existingFee) {
             return $this->response([], "Fees for the given criteria already exist.", false, 400);
         }
+
         $fee = new Fees_model;
         $fee->user_id = Auth::user()->id;
         $fee->institute_id = $request->institute_id;
@@ -58,7 +57,6 @@ class FeesController extends Controller
         $fee->stream_id = $request->stream_id;
         $fee->subject_id = $request->subject_id;
         $fee->amount = $request->amount;
-        // $fee->due_date = $request->due_date;
         $fee->save();
         return $this->response([], "Fees inserted successfully.");
         } catch (Exception $e) {
@@ -123,7 +121,7 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-        $student_response = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+        $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
                                             ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                                             ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                                             ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
@@ -137,20 +135,24 @@ class FeesController extends Controller
                                             ->where('students_details.batch_id', $request->batch_id)
                                             ->where('students_details.board_id', $request->board_id)
                                             ->where('students_details.medium_id', $request->medium_id)
-                                            ->where('students_details.standard_id', $request->standard_id)
-                                            ->where('students_details.subject_id', $request->subject_id)
-                                            ->get()
-                                            ->toArray();
-        $student = [];
-        foreach($student_response as $value){
-            $student[]=  ['student_id'=>$value['student_id'],
-                          'student_name'=>$value['student_name'],
-                          'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png')];
+                                            ->where('students_details.standard_id', $request->standard_id);
+                                            if (!empty($request->subject_id)) {
+                                                $subjectIds = explode(',', $request->subject_id);
+                                                $query->whereIn('students_details.subject_id', $subjectIds);
+                                            }
+                                            $student_response=$query->get()->toArray();
+                                           
+                                          
+            $student = [];
+            foreach($student_response as $value){
+                $student[]=  ['student_id'=>$value['student_id'],
+                              'student_name'=>$value['student_name'],
+                              'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png')];
+            }
+            return $this->response($student, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
-        return $this->response($student, "Data Fetch Successfully");
-    } catch (Exception $e) {
-        return $this->response($e, "Invalid token.", false, 400);
-    }
     }
     
     //invoice number mate student_id pass karvu padse
