@@ -359,7 +359,7 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $subject=Institute_detail::join('subject_sub','subject_sub.institute_id','=','institute_detail.id')
+            $query=Institute_detail::join('subject_sub','subject_sub.institute_id','=','institute_detail.id')
                             ->leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
                             ->leftjoin('board','board.id','=','base_table.board')
@@ -367,17 +367,45 @@ if (!empty($request->subject_id)) {
                             ->leftjoin('standard','standard.id','=','base_table.standard')
                             ->leftjoin('stream','stream.id','=','base_table.stream')
                             ->where('institute_detail.id',$request->institute_id)
-                            ->select('subject.id','subject_sub.amount','subject.name as subject_name','board.name as board_name','medium.name as medium_name','standard.name as standard_name','stream.name as stream_name')
-                            ->get()->toarray();
+                            ->select('subject.id','subject_sub.amount','subject.name as subject_name',
+                               'board.id as board_id','board.name as board_name','medium.id as medium_id',
+                               'medium.name as medium_name','standard.id as standard_id',
+                               'standard.name as standard_name','stream.id as stream_id','stream.name as stream_name');
+                          
+                            if (!empty($request->board_id)) {
+                                $query->where('base_table.board', $request->board_id);
+                            }
+                            
+                            if (!empty($request->standard_id)) {
+                                $query->where('base_table.standard', $request->standard_id);
+                            }
+                            
+                            if (!empty($request->medium_id)) {
+                                $query->where('base_table.medium', $request->medium_id);
+                            }
+                            
+                            if (!empty($request->stream_id)) {
+                                $query->where('base_table.stream', $request->stream_id);
+                            }
+                            if (!empty($request->subject_id)) {
+                                $query->where('subject_sub.subject_id', $request->subject_id);
+                            }
+                            
+                            $subject = $query->get()->toarray();
+
         //    print_r($subject);exit;
                             
         $student = [];
         foreach($subject as $value){
                       $student[]=  ['subject_id'=>$value['id'],
                                     'subject_name'=>$value['subject_name'],
+                                    'board_id'=>$value['board_id'],
                                     'board_name'=>$value['board_name'],
+                                    'standard_id'=>$value['standard_id'],
                                     'standard_name'=>$value['standard_name'],
+                                    'medium_id'=>$value['medium_id'],
                                     'medium_name'=>$value['medium_name'],
+                                    'stream_id'=>$value['stream_id'],
                                     'stream_name'=>$value['stream_name'],
                                     'amount'=>(!empty($value['amount']))? $value['amount'] : '00.00',
                                 ];
