@@ -110,7 +110,7 @@ class FeesController extends Controller
     }
     public function paid_fees_student(Request $request){
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|exists:institute_for,id',
+            'institute_id' => 'required|integer',
             'board_id' => 'required|exists:board,id',
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
@@ -157,7 +157,7 @@ class FeesController extends Controller
     //invoice number mate student_id pass karvu padse
     public function payment_type(Request $request){
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|exists:institute_for,id',
+            'institute_id' => 'required|integer',
             'board_id' => 'required|exists:board,id',
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
