@@ -4246,7 +4246,8 @@ class InstituteApiController extends Controller
                         ->where('standard_sub.user_id', $request->user_id)
                         ->where('standard_sub.institute_id', $request->institute_id)
                         ->where('standard_sub.board_id', $board_value->id)
-                        ->where('standard_sub.medium_id', $medium_value->id)->select('standard.id as std_id', 'standard.name as std_name')->get();
+                        ->where('standard_sub.medium_id', $medium_value->id)
+                        ->select('standard.id as std_id', 'standard.name as std_name')->distinct()->get();
                     $stddata = [];
                     foreach ($stndQY as $stndDT) {
                         $forcounstd = Student_detail::whereNull('deleted_at')
