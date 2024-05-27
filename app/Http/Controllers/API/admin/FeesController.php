@@ -141,7 +141,7 @@ class FeesController extends Controller
             $student_response=$query->get()->toArray();
             $student = [];
             foreach($student_response as $value){
-                if($value['status'] == $request->status){
+                if($value['status'] == 'paid'){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
