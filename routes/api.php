@@ -169,6 +169,11 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
+
+
+
+    Route::post('/institute/display-subject-fees', [FeesController::class, 'display_subject_fees']);
+    
     
 });
 
