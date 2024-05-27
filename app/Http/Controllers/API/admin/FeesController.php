@@ -156,6 +156,7 @@ class FeesController extends Controller
     public function pending_fees_student(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
+            'batch_id' =>'required|exists:batches,id',
             'board_id' => 'required|exists:board,id',
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
@@ -164,33 +165,41 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+            $subjectIds = [];
+if (!empty($request->subject_id)) {
+    $subjectIds = explode(',', $request->subject_id);
+
+}
         $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
                                             ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
                                             ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
                                             ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
                                             ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                                            // ->leftJoin('fees_colletion', function ($join) {
-                                            //     $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
-                                            //         ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
-                                            // })
-                                            ->select('users.*')
+                                            ->leftJoin('fees_colletion', function ($join) {
+                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
+                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
+                                            })
+                                            ->select('users.*','fees_colletion.status','fees_colletion.student_id')
                                             ->where('students_details.institute_id', $request->institute_id)
                                             ->where('students_details.batch_id', $request->batch_id)
                                             ->where('students_details.board_id', $request->board_id)
                                             ->where('students_details.medium_id', $request->medium_id)
-                                            ->where('students_details.standard_id', $request->standard_id);
-            if (!empty($request->subject_id)) {
-            $subjectIds = explode(',', $request->subject_id);
-            $query->whereIn('students_details.subject_id', $subjectIds);
-            }
+                                            ->where('students_details.standard_id', $request->standard_id)
+                                            ->where('students_details.status', '1');
+                                            foreach ($subjectIds as $subjectId) {
+                                                $query->whereRaw("FIND_IN_SET($subjectId, students_details.subject_id)");
+                                            }
             $student_response=$query->get()->toArray();
             $student = [];
             foreach($student_response as $value){
-                    $student[]=  ['student_id'=>$value['id'],
-                    'student_name'=>$value['firstname'].' '.$value['lastname'],
-                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                    'status'=>'pending'];
-            }
+                    if($value['student_id'] != $value['id']){
+                          $student[]=  ['student_id'=>$value['id'],
+                                        'student_name'=>$value['firstname'].' '.$value['lastname'],
+                                        'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                                        'status'=>'pending'];
+                            
+                    }
+                  }
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -201,9 +210,9 @@ class FeesController extends Controller
     public function payment_type(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
-            'board_id' => 'required|exists:board,id',
-            'medium_id' => 'required|exists:medium,id',
-            'standard_id' => 'required|exists:standard,id',
+            'board_id' => 'required|integer|exists:board,id',
+            'medium_id' => 'required|integer|exists:medium,id',
+            'standard_id' => 'required|integer|exists:standard,id',
             'subject_id' => 'required|exists:subject,id',
             'stream_id' =>'nullable',
             'student_id' => 'required',
@@ -217,7 +226,7 @@ class FeesController extends Controller
             foreach($payment_mode as $value){
                $data[] = ['id'=>$value->id,'name'=>$value->name];
             }
-            $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
+           $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
             
             if (!empty($fees_colletion)) {
                 $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
@@ -245,23 +254,24 @@ class FeesController extends Controller
                                      ->where('subject_id', $request->subject_id)
                                      ->select('amount')
                                      ->first();
-            //   echo "<pre>";print_r($Fee_amount);exit;      
-            $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
-            if(!empty($fees_colletion)){
-                $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
+              
+             $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->get();
+             $paid_amount = 0 ;
+             foreach($fees_colletion as $value){
+                  $paid_amount +=$value->paid_amount;
+                $amount=$value->total_amount - $paid_amount; 
                 if($amount==0 || !empty($amount)){
                     $total_amount = $amount;
                 }else{
                     $total_amount =$Fee_amount->amount;
                 }
-            }else{
-                $total_amount =$Fee_amount->amount;
-            }
+             }
             $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
+             
             $histroy = [];
             foreach($student_histroy as $value){
                 $histroy[] =[
-                    'paid_amount'=>$value->remaining_amount,
+                    'paid_amount'=>$value->paid_amount,
                     'date'=>$value->created_at,
                     'payment_mode'=>$value->payment_type,
                     'invoice_no'=>$value->invoice_no,
@@ -272,9 +282,10 @@ class FeesController extends Controller
             $data_final = ['payment_type'=>$data,
                            'invoice_number'=>$invoiceNumber,
                            'date'=>date('Y-m-d'),
+                           'student_id'=>$request->student_id,
                            'student_name'=>$student_name,
                            'total_amount'=>$total_amount,
-                           'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
+                        //    'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
                            'histroy'=>$histroy
                           ];
             return $this->response($data_final, "Successfully Display PaymentType.");
@@ -300,7 +311,6 @@ class FeesController extends Controller
         }
         try{
        
-        
         $fee = new Fees_colletion_model;
         $fee->user_id = Auth::user()->id;
         $fee->institute_id = $request->institute_id;
@@ -322,7 +332,7 @@ class FeesController extends Controller
 
         }
         
-        Fees_colletion_model::where('id', $fee->id)->update(['paid_amount' => $paid_amount]);
+        // Fees_colletion_model::where('id', $fee->id)->update(['paid_amount' => $paid_amount]);
         $paid_status=Fees_colletion_model::where('id',$fee->id)->latest()->first();
        
         Fees_colletion_model::where('id', $fee->id)->update(['status'=>($paid_status->remaining_amount=='0')?'paid':'pending']);
