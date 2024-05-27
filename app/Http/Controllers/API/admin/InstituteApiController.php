@@ -778,8 +778,8 @@ class InstituteApiController extends Controller
                     }
                 }
             }],
-            
-            'institute_id' => 'required|exists:institute_detail,id', 
+
+            'institute_id' => 'required|exists:institute_detail,id',
 
         ]);
 
@@ -808,7 +808,7 @@ class InstituteApiController extends Controller
                             }
                         }
                     }
-                }else{
+                } else {
                     foreach ($differenceInstituteforArray as $difinstitute_for_ids) {
                         $sub_instfor_exists = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $difinstitute_for_ids)->first();
                         if (!$sub_instfor_exists) {
@@ -871,7 +871,7 @@ class InstituteApiController extends Controller
             $institute_medium = Medium_sub::where('institute_id', $institute->id)->pluck('medium_id')->toArray();
             $institute_medium_ids = explode(',', $request->institute_medium_id);
             $differenceInstitutemediumArray = array_diff($institute_medium, $institute_medium_ids);
-            
+
             if (!empty($differenceInstitutemediumArray)) {
                 $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->whereIn('medium_id', $differenceInstitutemediumArray)->pluck('medium_id');
                 if (!empty($institute_medium_check)) {
@@ -1028,8 +1028,8 @@ class InstituteApiController extends Controller
                     }
                 }
             } else {
-                 
-                if(!empty($stream_medium_ids[0])){
+
+                if (!empty($stream_medium_ids[0])) {
                     foreach ($stream_medium_ids as $stream_medium_id) {
                         foreach ($institute_for_ids as $institute_for_id) {
                             foreach ($institute_board_ids as $institute_board_id) {
@@ -1063,7 +1063,6 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
-                
             }
 
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
@@ -2145,7 +2144,7 @@ class InstituteApiController extends Controller
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
-                
+
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
 
@@ -2494,6 +2493,7 @@ class InstituteApiController extends Controller
                     'users.dob',
                     'users.address',
                     'users.email',
+                    'users.country_code',
                     'users.mobile',
                     'board.name as board',
                     'medium.name as medium',
