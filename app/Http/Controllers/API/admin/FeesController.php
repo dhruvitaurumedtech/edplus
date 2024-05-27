@@ -153,6 +153,51 @@ class FeesController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function pending_fees_student(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|integer',
+            'board_id' => 'required|exists:board,id',
+            'medium_id' => 'required|exists:medium,id',
+            'standard_id' => 'required|exists:standard,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                                            ->leftJoin('fees_colletion', function ($join) {
+                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
+                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
+                                            })
+                                            ->select('users.*','fees_colletion.status')
+                                            ->where('students_details.institute_id', $request->institute_id)
+                                            ->where('students_details.batch_id', $request->batch_id)
+                                            ->where('students_details.board_id', $request->board_id)
+                                            ->where('students_details.medium_id', $request->medium_id)
+                                            ->where('students_details.standard_id', $request->standard_id);
+            if (!empty($request->subject_id)) {
+            $subjectIds = explode(',', $request->subject_id);
+            $query->whereIn('students_details.subject_id', $subjectIds);
+            }
+            $student_response=$query->get()->toArray();
+            $student = [];
+            foreach($student_response as $value){
+                if($value['status'] == 'pending' || !empty($value['id'])){
+                    $student[]=  ['student_id'=>$value['id'],
+                    'student_name'=>$value['firstname'].' '.$value['lastname'],
+                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                    'status'=>'pending'];
+                }
+            }
+            return $this->response($student, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
     
     //invoice number mate student_id pass karvu padse
     public function payment_type(Request $request){
