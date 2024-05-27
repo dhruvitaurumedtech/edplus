@@ -147,6 +147,12 @@ class FeesController extends Controller
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>$value['status']];
                 }
+                if('pending' == $request->status){
+                    $student[]=  ['student_id'=>$value['id'],
+                    'student_name'=>$value['firstname'].' '.$value['lastname'],
+                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                    'status'=>$value['status']];
+                }
             }
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
