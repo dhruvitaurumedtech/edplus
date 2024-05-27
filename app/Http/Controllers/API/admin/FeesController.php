@@ -119,15 +119,32 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-        $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+            if($request->status == 'paid'){
+                $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                ->leftJoin('fees_colletion', function ($join) {
+                    $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
+                        ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
+                })
+                ->select('users.*','fees_colletion.status')
+                ->where('students_details.institute_id', $request->institute_id)
+                ->where('students_details.batch_id', $request->batch_id)
+                ->where('students_details.board_id', $request->board_id)
+                ->where('students_details.medium_id', $request->medium_id)
+                ->where('students_details.standard_id', $request->standard_id);
+                    if (!empty($request->subject_id)) {
+                    $subjectIds = explode(',', $request->subject_id);
+                    $query->whereIn('students_details.subject_id', $subjectIds);
+                    }
+            }else{
+                $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
                                             ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
                                             ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
                                             ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
                                             ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                                            ->leftJoin('fees_colletion', function ($join) {
-                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
-                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
-                                            })
                                             ->select('users.*','fees_colletion.status')
                                             ->where('students_details.institute_id', $request->institute_id)
                                             ->where('students_details.batch_id', $request->batch_id)
@@ -137,6 +154,8 @@ class FeesController extends Controller
             if (!empty($request->subject_id)) {
             $subjectIds = explode(',', $request->subject_id);
             $query->whereIn('students_details.subject_id', $subjectIds);
+            }
+        
             }
             $student_response=$query->get()->toArray();
             $student = [];
