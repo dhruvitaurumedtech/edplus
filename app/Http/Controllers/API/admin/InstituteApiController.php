@@ -783,8 +783,8 @@ class InstituteApiController extends Controller
                     }
                 }
             }],
-            
-            'institute_id' => 'required|exists:institute_detail,id', 
+
+            'institute_id' => 'required|exists:institute_detail,id',
 
         ]);
 
@@ -2136,7 +2136,7 @@ class InstituteApiController extends Controller
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
-                
+
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
 
@@ -2485,6 +2485,7 @@ class InstituteApiController extends Controller
                     'users.dob',
                     'users.address',
                     'users.email',
+                    'users.country_code',
                     'users.mobile',
                     'board.name as board',
                     'medium.name as medium',
