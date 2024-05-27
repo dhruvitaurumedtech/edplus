@@ -22,7 +22,7 @@ class FeesController extends Controller
     public function add_fees(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|exists:institute_for,id',
+            'institute_id' => 'required',
             'board_id' => 'required|exists:board,id',
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
@@ -124,7 +124,11 @@ class FeesController extends Controller
                                             ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
                                             ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
                                             ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                                            ->select('users.*')
+                                            ->leftJoin('fees_colletion', function ($join) {
+                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
+                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
+                                            })
+                                            ->select('users.*','fees_colletion.status')
                                             ->where('students_details.institute_id', $request->institute_id)
                                             ->where('students_details.batch_id', $request->batch_id)
                                             ->where('students_details.board_id', $request->board_id)
@@ -137,10 +141,12 @@ class FeesController extends Controller
             $student_response=$query->get()->toArray();
             $student = [];
             foreach($student_response as $value){
-                $student[]=  ['student_id'=>$value['id'],
-                              'student_name'=>$value['firstname'].' '.$value['lastname'],
-                              'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                              'status'=>'paid'];
+                if($value['status'] == $request->status){
+                    $student[]=  ['student_id'=>$value['id'],
+                    'student_name'=>$value['firstname'].' '.$value['lastname'],
+                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                    'status'=>$value['status']];
+                }
             }
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
@@ -276,7 +282,7 @@ class FeesController extends Controller
         Fees_colletion_model::where('id', $fee->id)->update(['paid_amount' => $paid_amount]);
         $paid_status=Fees_colletion_model::where('id',$fee->id)->latest()->first();
        
-        Fees_colletion_model::where('id', $fee->id)->update(['status'=>($paid_status->total_amount==$paid_status->paid_amount)?'paid':'pending']);
+        Fees_colletion_model::where('id', $fee->id)->update(['status'=>($paid_status->remaining_amount=='0')?'paid':'pending']);
 
         return $this->response([], "Fees Paid successfully.");
         } catch (Exception $e) {
