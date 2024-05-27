@@ -16,8 +16,10 @@ class FeedbackController extends Controller
         
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'student_id' => 'required|exists:users,id',
-            'feedback'=>'required'
+            'feedback_to_id' => 'required|exists:users,id', 
+            'feedback'=>'required',
+            'role_type'=>'required|in:1,2', //if 1 then feedback is for institute if 2 then feedback is for student and teacher
+            'rating'=>'required'
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -25,7 +27,6 @@ class FeedbackController extends Controller
         try {
             $feedback = new FeedbackModel();
             $feedback->fill($request->all());
-            $feedback->feedback_to_id = $request->student_id;
             $feedback->save();
             
             if (!empty($feedback->id)) {
@@ -49,11 +50,13 @@ class FeedbackController extends Controller
         // }
 
         try {
+            
             $feedback_list = FeedbackModel::select(
                 'feedback.id as feedback_id',
                 'feedback.feedback',
                 'feedback.feedback_to_id',
                 'feedback.institute_id',
+                'feedback.rating',
                 'institute_detail.institute_name',
             )
             ->Join('users', 'users.id', '=', 'feedback.feedback_to_id')

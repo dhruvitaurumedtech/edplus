@@ -52,6 +52,11 @@ class InstituteApiController extends Controller
 
     use ApiTrait;
 
+    private function array_symmetric_diff(array $array1, array $array2) {
+        $diff1 = array_diff($array1, $array2);
+        $diff2 = array_diff($array2, $array1);
+        return array_merge($diff1, $diff2);
+    }
     // function get_institute_reponse(Request $request)
     // {
     //     $token = $request->header('Authorization');
@@ -778,8 +783,8 @@ class InstituteApiController extends Controller
                     }
                 }
             }],
-            
-            'institute_id' => 'required|exists:institute_detail,id', 
+
+            'institute_id' => 'required|exists:institute_detail,id',
 
         ]);
 
@@ -795,7 +800,18 @@ class InstituteApiController extends Controller
             $differenceInstituteforArray = array_diff($institute_for, $institute_for_ids);
             if (!empty($differenceInstituteforArray)) {
                 $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)->whereIn('institute_for_id', $differenceInstituteforArray)->pluck('institute_for_id');
-                if (!empty($institute_for_check)) {
+                if ($institute_for_check->isEmpty()) {
+                    foreach ($differenceInstituteforArray as $difinstitute_for_ids) {
+                        $sub_instfor_exists = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $difinstitute_for_ids)->first();
+                        if (!$sub_instfor_exists) {
+                            Institute_for_sub::create([
+                                'user_id' => $institute->user_id,
+                                'institute_id' => $institute->id,
+                                'institute_for_id' => $difinstitute_for_ids
+                            ]);
+                        }
+                    }
+                }else{
                     $student_check = Student_detail::whereIn('institute_for_id', $institute_for_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('institute_for_id', $institute_for_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) && !empty($teacher_check)) {
@@ -808,37 +824,29 @@ class InstituteApiController extends Controller
                             }
                         }
                     }
-                }else{
-                    foreach ($differenceInstituteforArray as $difinstitute_for_ids) {
-                        $sub_instfor_exists = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $difinstitute_for_ids)->first();
-                        if (!$sub_instfor_exists) {
-                            Institute_for_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'institute_for_id' => $difinstitute_for_ids
-                            ]);
-                        }
-                    }
-                }
-            } else {
-                foreach ($institute_for_ids as $institute_for_id) {
-                    $sub_instfor_exists = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $institute_for_id)->first();
-                    if (!$sub_instfor_exists) {
-                        Institute_for_sub::create([
-                            'user_id' => $institute->user_id,
-                            'institute_id' => $institute->id,
-                            'institute_for_id' => $institute_for_id
-                        ]);
-                    }
                 }
             }
 
             $institute_board = Institute_board_sub::where('institute_id', $institute->id)->pluck('board_id')->toArray();
             $institute_board_ids = explode(',', $request->institute_board_id);
-            $differenceInstituteboardArray = array_diff($institute_board, $institute_board_ids);
+            $differenceInstituteboardArray = $this->array_symmetric_diff($institute_board,$institute_board_ids);
             if (!empty($differenceInstituteboardArray)) {
                 $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)->whereIn('board_id', $differenceInstituteboardArray)->pluck('board_id');
-                if (!empty($institute_board_check)) {
+                if ($institute_board_check->isEmpty()) {
+                    foreach ($institute_board_ids as $institute_board_id) {
+                        foreach ($institute_for_ids as $institute_for_id) {
+                            $sub_instboard_exists = Institute_board_sub::where('institute_id', $institute->id)->where('board_id', $institute_board_id)->where('institute_for_id', $institute_for_id)->first();
+                            if (!$sub_instboard_exists) {
+                                Institute_board_sub::create([
+                                    'user_id' => $institute->user_id,
+                                    'institute_id' => $institute->id,
+                                    'board_id' => $institute_board_id,
+                                    'institute_for_id' => $institute_for_id
+                                ]);
+                            }
+                        }
+                    }
+                } else {
                     $student_check = Student_detail::whereIn('board_id', $institute_board_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('board_id', $institute_board_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
@@ -852,29 +860,31 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
-            } else {
-                foreach ($institute_board_ids as $institute_board_id) {
-                    foreach ($institute_for_ids as $institute_for_id) {
-                        $sub_instboard_exists = Institute_board_sub::where('institute_id', $institute->id)->where('board_id', $institute_board_id)->where('institute_for_id', $institute_for_id)->first();
-                        if (!$sub_instboard_exists) {
-                            Institute_board_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'board_id' => $institute_board_id,
-                                'institute_for_id' => $institute_for_id
-                            ]);
-                        }
-                    }
-                }
-            }
+            } 
 
             $institute_medium = Medium_sub::where('institute_id', $institute->id)->pluck('medium_id')->toArray();
             $institute_medium_ids = explode(',', $request->institute_medium_id);
-            $differenceInstitutemediumArray = array_diff($institute_medium, $institute_medium_ids);
-            
+            $differenceInstitutemediumArray = $this->array_symmetric_diff($institute_medium, $institute_medium_ids);
             if (!empty($differenceInstitutemediumArray)) {
                 $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->whereIn('medium_id', $differenceInstitutemediumArray)->pluck('medium_id');
-                if (!empty($institute_medium_check)) {
+                if ($institute_medium_check->isEmpty()) {
+                    foreach ($institute_medium_ids as $institute_medium_id) {
+                        foreach ($institute_for_ids as $institute_for_id) {
+                            foreach ($institute_board_ids as $institute_board_id) {
+                                $sub_instmedium_exists = Medium_sub::where('institute_id', $institute->id)->where('medium_id', $institute_medium_id)->where('institute_for_id', $institute_for_id)->where('board_id', $institute_board_id)->tosql();
+                                if (!$sub_instmedium_exists) {
+                                    Medium_sub::create([
+                                        'user_id' => $institute->user_id,
+                                        'institute_id' => $institute->id,
+                                        'medium_id' => $institute_medium_id,
+                                        'institute_for_id' => $institute_for_id,
+                                        'board_id' => $institute_board_id
+                                    ]);
+                                }
+                            }
+                        }
+                    }
+                }else{
                     $student_check = Student_detail::whereIn('medium_id', $institute_medium_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('medium_id', $institute_medium_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
@@ -888,32 +898,40 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
-            } else {
-                foreach ($institute_medium_ids as $institute_medium_id) {
-                    foreach ($institute_for_ids as $institute_for_id) {
-                        foreach ($institute_board_ids as $institute_board_id) {
-                            $sub_instmedium_exists = Medium_sub::where('institute_id', $institute->id)->where('medium_id', $institute_medium_id)->where('institute_for_id', $institute_for_id)->where('board_id', $institute_board_id)->tosql();
-                            if (!$sub_instmedium_exists) {
-                                Medium_sub::create([
-                                    'user_id' => $institute->user_id,
-                                    'institute_id' => $institute->id,
-                                    'medium_id' => $institute_medium_id,
-                                    'institute_for_id' => $institute_for_id,
-                                    'board_id' => $institute_board_id
-                                ]);
-                            }
-                        }
-                    }
-                }
             }
 
             $class_medium = Class_sub::where('institute_id', $institute->id)->pluck('class_id')->toArray();
             $class_medium_ids = explode(',', $request->institute_for_class_id);
-            $differenceClassmediumArray = array_diff($class_medium, $class_medium_ids);
+            $differenceClassmediumArray = $this->array_symmetric_diff($class_medium, $class_medium_ids);
 
             if (!empty($differenceClassmediumArray)) {
                 $class_medium_check = Class_sub::where('institute_id', $institute->id)->whereIn('class_id', $differenceClassmediumArray)->pluck('class_id');
-                if (!empty($class_medium_check)) {
+                if ($class_medium_check->isEmpty()) {
+                    foreach ($class_medium_ids as $class_medium_id) {
+                        foreach ($institute_for_ids as $institute_for_id) {
+                            foreach ($institute_board_ids as $institute_board_id) {
+                                foreach ($institute_medium_ids as $institute_medium_id) {
+                                    $sub_classmedium_exists = Class_sub::where('institute_id', $institute->id)
+                                        ->where('class_id', $class_medium_id)
+                                        ->where('institute_for_id', $institute_for_id)
+                                        ->where('board_id', $institute_board_id)
+                                        ->where('medium_id', $institute_medium_id)
+                                        ->first();
+                                    if (!$sub_classmedium_exists) {
+                                        Class_sub::create([
+                                            'user_id' => $institute->user_id,
+                                            'institute_id' => $institute->id,
+                                            'class_id' => $class_medium_id,
+                                            'institute_for_id' => $institute_for_id,
+                                            'board_id' => $institute_board_id,
+                                            'medium_id' => $institute_medium_id
+                                        ]);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else{
                     $student_check = Student_detail::whereIn('class_id', $class_medium_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('class_id', $class_medium_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
@@ -927,41 +945,46 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
-            } else {
-                foreach ($class_medium_ids as $class_medium_id) {
-                    foreach ($institute_for_ids as $institute_for_id) {
-                        foreach ($institute_board_ids as $institute_board_id) {
-                            foreach ($institute_medium_ids as $institute_medium_id) {
-                                $sub_classmedium_exists = Class_sub::where('institute_id', $institute->id)
-                                    ->where('class_id', $class_medium_id)
-                                    ->where('institute_for_id', $institute_for_id)
-                                    ->where('board_id', $institute_board_id)
-                                    ->where('medium_id', $institute_medium_id)
-                                    ->first();
-                                if (!$sub_classmedium_exists) {
-                                    Class_sub::create([
-                                        'user_id' => $institute->user_id,
-                                        'institute_id' => $institute->id,
-                                        'class_id' => $class_medium_id,
-                                        'institute_for_id' => $institute_for_id,
-                                        'board_id' => $institute_board_id,
-                                        'medium_id' => $institute_medium_id
-                                    ]);
-                                }
-                            }
-                        }
-                    }
-                }
             }
 
 
             $standard_medium = Standard_sub::where('institute_id', $institute->id)->pluck('standard_id')->toArray();
             $standard_medium_ids = explode(',', $request->standard_id);
-            $differenceStandardmediumArray = array_diff($standard_medium, $standard_medium_ids);
-
+            
+            $differenceStandardmediumArray = $this->array_symmetric_diff($standard_medium, $standard_medium_ids);
+            	
             if (!empty($differenceStandardmediumArray)) {
                 $standard_medium_check = Standard_sub::where('institute_id', $institute->id)->whereIn('standard_id', $differenceStandardmediumArray)->pluck('standard_id');
-                if (!empty($standard_medium_check)) {
+                if ($standard_medium_check->isEmpty()) {
+                    foreach ($differenceStandardmediumArray as $standard_medium_id) {
+                        foreach ($institute_for_ids as $institute_for_id) {
+                            foreach ($institute_board_ids as $institute_board_id) {
+                                foreach ($institute_medium_ids as $institute_medium_id) {
+                                    foreach ($class_medium_ids as $class_medium_id) {
+                                        $sub_standardmedium_exists = Standard_sub::where('institute_id', $institute->id)
+                                            ->where('standard_id', $standard_medium_id)
+                                            ->where('institute_for_id', $institute_for_id)
+                                            ->where('board_id', $institute_board_id)
+                                            ->where('medium_id', $institute_medium_id)
+                                            ->where('class_id', $class_medium_id)
+                                            ->first();
+                                        if (!$sub_standardmedium_exists) {
+                                            Standard_sub::create([
+                                                'user_id' => $institute->user_id,
+                                                'institute_id' => $institute->id,
+                                                'standard_id' => $standard_medium_id,
+                                                'institute_for_id' => $institute_for_id,
+                                                'board_id' => $institute_board_id,
+                                                'medium_id' => $institute_medium_id,
+                                                'class_id' => $class_medium_id
+                                            ]);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }else{
                     $student_check = Student_detail::whereIn('standard_id', $standard_medium_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('standard_id', $standard_medium_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
@@ -971,36 +994,7 @@ class InstituteApiController extends Controller
                         if (!empty($delete_sub)) {
                             foreach ($delete_sub as $did) {
                                 $did->delete();
-                            }
-                        }
-                    }
-                }
-            } else {
-                foreach ($standard_medium_ids as $standard_medium_id) {
-                    foreach ($institute_for_ids as $institute_for_id) {
-                        foreach ($institute_board_ids as $institute_board_id) {
-                            foreach ($institute_medium_ids as $institute_medium_id) {
-                                foreach ($class_medium_ids as $class_medium_id) {
-                                    $sub_standardmedium_exists = Standard_sub::where('institute_id', $institute->id)
-                                        ->where('standard_id', $standard_medium_id)
-                                        ->where('institute_for_id', $institute_for_id)
-                                        ->where('board_id', $institute_board_id)
-                                        ->where('medium_id', $institute_medium_id)
-                                        ->where('class_id', $class_medium_id)
-                                        ->first();
-                                    if (!$sub_standardmedium_exists) {
-                                        Standard_sub::create([
-                                            'user_id' => $institute->user_id,
-                                            'institute_id' => $institute->id,
-                                            'standard_id' => $standard_medium_id,
-                                            'institute_for_id' => $institute_for_id,
-                                            'board_id' => $institute_board_id,
-                                            'medium_id' => $institute_medium_id,
-                                            'class_id' => $class_medium_id
-                                        ]);
-                                    }
-                                }
-                            }
+                            }    
                         }
                     }
                 }
@@ -1009,27 +1003,11 @@ class InstituteApiController extends Controller
             $stream_medium = Stream_sub::where('institute_id', $institute->id)->pluck('stream_id')->toArray();
             $stream_medium_ids = explode(',', $request->stream_id);
             $stream_standards_ids = explode(',', $request->standard_id);
-            $differenceStreammediumArray = array_diff($stream_medium, $stream_medium_ids);
-
-            if (!empty($differenceStreammediumArray)) {
+            $differenceStreammediumArray = $this->array_symmetric_diff($stream_medium, $stream_medium_ids);
+            
+            if (!empty($differenceStreammediumArray[0])) {
                 $stream_medium_check = Stream_sub::where('institute_id', $institute->id)->whereIn('stream_id', $differenceStreammediumArray)->pluck('stream_id');
-                if (!empty($stream_medium_check)) {
-                    $student_check = Student_detail::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
-                    $teacher_check = Teacher_model::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
-                    if (!empty($student_check) || !empty($teacher_check)) {
-                        return $this->response([], "Cannot remove stream_medium. Already exist student or teacher in this stream_medium.", false, 400);
-                    } else {
-                        $delete_sub = Stream_sub::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->get();
-                        if (!empty($delete_sub)) {
-                            foreach ($delete_sub as $did) {
-                                $did->delete();
-                            }
-                        }
-                    }
-                }
-            } else {
-                 
-                if(!empty($stream_medium_ids[0])){
+                if ($stream_medium_check->isEmpty()) {
                     foreach ($stream_medium_ids as $stream_medium_id) {
                         foreach ($institute_for_ids as $institute_for_id) {
                             foreach ($institute_board_ids as $institute_board_id) {
@@ -1062,16 +1040,40 @@ class InstituteApiController extends Controller
                             }
                         }
                     }
+                }else{
+                    
+                    $student_check = Student_detail::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->first();
+                    if (!empty($student_check) || !empty($teacher_check)) {
+                        return $this->response([], "Cannot remove stream_medium. Already exist student or teacher in this stream_medium.", false, 400);
+                    } else {
+                        $delete_sub = Stream_sub::whereIn('stream_id', $stream_medium_check)->where('institute_id', $institute->id)->get();
+                        if (!empty($delete_sub)) {
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
+                        }
+                    }
                 }
-                
-            }
+            } 
 
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
             $institute_subject_ids = explode(',', $request->subject_id);
-            $differenceInstituteSubjectArray = array_diff($institute_subjects, $institute_subject_ids);
+            $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
             if (!empty($differenceInstituteSubjectArray)) {
                 $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
-                if (!empty($institute_subject_check)) {
+                if ($institute_subject_check->isEmpty()) {
+                    foreach ($institute_subject_ids as $institute_subject_id) {
+                        $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
+                        if (!$sub_instboard_exists) {
+                            Subject_sub::create([
+                                'user_id' => $institute->user_id,
+                                'institute_id' => $institute->id,
+                                'subject_id' => $institute_subject_id,
+                            ]);
+                        }
+                    }
+                }else{
                     $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                     $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
@@ -1083,17 +1085,6 @@ class InstituteApiController extends Controller
                                 $did->delete();
                             }
                         }
-                    }
-                }
-            } else {
-                foreach ($institute_subject_ids as $institute_subject_id) {
-                    $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
-                    if (!$sub_instboard_exists) {
-                        Subject_sub::create([
-                            'user_id' => $institute->user_id,
-                            'institute_id' => $institute->id,
-                            'subject_id' => $institute_subject_id,
-                        ]);
                     }
                 }
             }
@@ -2145,7 +2136,7 @@ class InstituteApiController extends Controller
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
-                
+
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
 
@@ -2494,6 +2485,7 @@ class InstituteApiController extends Controller
                     'users.dob',
                     'users.address',
                     'users.email',
+                    'users.country_code',
                     'users.mobile',
                     'board.name as board',
                     'medium.name as medium',
