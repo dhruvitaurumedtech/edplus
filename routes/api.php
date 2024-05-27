@@ -72,7 +72,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
     Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete');
     Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
-    Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
+    
     Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
     Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
     Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
@@ -173,7 +173,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
 
 
     Route::post('/institute/display-subject-fees', [FeesController::class, 'display_subject_fees']);
-    
+    Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
     
 });
 

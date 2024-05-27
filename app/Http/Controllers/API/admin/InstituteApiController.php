@@ -4454,64 +4454,55 @@ class InstituteApiController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
             $boarids = Institute_board_sub::where('user_id', $request->user_id)
-                ->where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
-            $uniqueBoardIds = array_unique($boarids);
-
-            $board_list = DB::table('board')
-                ->whereIN('id', $uniqueBoardIds)
-                ->get();
-
-            $board_array = [];
-            foreach ($board_list as $board_value) {
-
-                $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $request->user_id)
-                    ->where('board_id', $board_value->id)
-                    ->where('institute_id', $request->institute_id)
-                    ->pluck('medium_id')->toArray();
-                $uniquemediumds = array_unique($medium_sublist);
-
-                $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-
-                $medium_array = [];
-                foreach ($medium_list as $medium_value) {
-
-                    $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
-                        ->where('standard_sub.user_id', $request->user_id)
-                        ->where('standard_sub.institute_id', $request->institute_id)
-                        ->where('standard_sub.board_id', $board_value->id)
-                        ->where('standard_sub.medium_id', $medium_value->id)
-                        ->select('standard.id as std_id', 'standard.name as std_name')->distinct()->get();
-                    $stddata = [];
-                    foreach ($stndQY as $stndDT) {
-                        $forcounstd = Student_detail::whereNull('deleted_at')
-                            ->where('user_id', $request->user_id)
-                            ->where('institute_id', $request->institute_id)
-                            ->where('board_id', $board_value->id)
-                            ->where('medium_id', $medium_value->id)
-                            ->get();
-                        $stdCount = $forcounstd->count();
-
-                        $stddata[] = array(
-                            'id' => $stndDT->std_id,
-                            'name' => $stndDT->std_name,
-                            'no_of_std' => $stdCount
-                        );
-                    }
-
-                    $medium_array[] = [
-                        'id' => $medium_value->id,
-                        'medium_name' => $medium_value->name,
-                        'standard' => $stddata
-                    ];
+            ->where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
+        $uniqueBoardIds = array_unique($boarids);
+        
+        $board_list = DB::table('board')
+            ->whereIn('id', $uniqueBoardIds)
+            ->get();
+        
+        $board_array = [];
+        foreach ($board_list as $board_value) {
+        
+            $medium_sublist = DB::table('medium_sub')
+                ->where('user_id', $request->user_id)
+                ->where('board_id', $board_value->id)
+                ->where('institute_id', $request->institute_id)
+                ->pluck('medium_id')->toArray();
+            $uniquemediumds = array_unique($medium_sublist);
+        
+            $medium_list = Medium_model::whereIn('id', $uniquemediumds)->get();
+        
+            $medium_array = [];
+            foreach ($medium_list as $medium_value) {
+        
+                $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
+                    ->where('standard_sub.user_id', $request->user_id)
+                    ->where('standard_sub.institute_id', $request->institute_id)
+                    ->where('standard_sub.board_id', $board_value->id)
+                    ->where('standard_sub.medium_id', $medium_value->id)
+                    ->select('standard.id as std_id', 'standard.name as std_name')->distinct()->get();
+                $stddata = [];
+                foreach ($stndQY as $stndDT) {
+                    $forcounstd = Student_detail::whereNull('deleted_at')
+                        ->where('user_id', $request->user_id)
+                        ->where('institute_id', $request->institute_id)
+                        ->where('board_id', $board_value->id)
+                        ->where('medium_id', $medium_value->id)
+                        ->get();
+                    $stdCount = $forcounstd->count();
+        
+                    $stddata[$stndDT->std_name] = ($stdCount > 0);
                 }
-
-                $board_array[] = [
-                    'id' => $board_value->id,
-                    'board_name' => $board_value->name,
-                    'medium' => $medium_array,
-                ];
+        
+                $medium_array[$medium_value->name] = $stddata;
             }
+        
+            $board_array[$board_value->name] = $medium_array;
+        }
+        
+        // Now $board_array holds the data in the desired format
+        
             return $this->response($board_array, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
