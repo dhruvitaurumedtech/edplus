@@ -4492,20 +4492,20 @@ class InstituteApiController extends Controller
                             ->get();
                         $stdCount = $forcounstd->count();
 
-                        $stddata[] = array(
+                        $stddata[] = [
                             'id' => $stndDT->std_id,
                             'name' => $stndDT->std_name,
-                            'no_of_std' => $stdCount
-                        );
+                            'no_of_std' => $stdCount,
+                        ];
                     }
-
+            
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
                         'standard' => $stddata
                     ];
                 }
-
+            
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
