@@ -28,7 +28,7 @@ class FeesController extends Controller
             'standard_id' => 'required|exists:standard,id',
             'subject_id' => 'required|exists:subject,id',
             'amount' => 'required',
-            'stream_id' =>'integer|exists:stream,id',
+            'stream_id' =>'nullable|integer|exists:stream,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -147,12 +147,10 @@ class FeesController extends Controller
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>$value['status']];
                 }
-                if('pending' == $request->status){
-                    $student[]=  ['student_id'=>$value['id'],
-                    'student_name'=>$value['firstname'].' '.$value['lastname'],
-                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                    'status'=>$value['status']];
-                }
+                $student[]=  ['student_id'=>$value['id'],
+                'student_name'=>$value['firstname'].' '.$value['lastname'],
+                'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                'status'=>'pending'];
             }
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
