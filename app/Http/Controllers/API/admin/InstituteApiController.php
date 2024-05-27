@@ -808,6 +808,17 @@ class InstituteApiController extends Controller
                             }
                         }
                     }
+                }else{
+                    foreach ($differenceInstituteforArray as $difinstitute_for_ids) {
+                        $sub_instfor_exists = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $difinstitute_for_ids)->first();
+                        if (!$sub_instfor_exists) {
+                            Institute_for_sub::create([
+                                'user_id' => $institute->user_id,
+                                'institute_id' => $institute->id,
+                                'institute_for_id' => $difinstitute_for_ids
+                            ]);
+                        }
+                    }
                 }
             } else {
                 foreach ($institute_for_ids as $institute_for_id) {
@@ -2134,6 +2145,7 @@ class InstituteApiController extends Controller
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
+                
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
 
