@@ -440,11 +440,26 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-                $student_list=Student_detail::join('users','users.id','=','students_details.student_id')
+                $query=Student_detail::join('users','users.id','=','students_details.student_id')
                       ->join('standard','standard.id','=','students_details.standard_id')
                       ->where('students_details.institute_id',$request->institute_id)
-                      ->select('users.*','standard.name as standard_name')
-                      ->get();
+                      ->select('users.*','standard.name as standard_name');
+                      if (!empty($request->board_id)) {
+                        $query->whereIn('students_details.board_id',explode(',', $request->board_id));
+                    }
+                    if (!empty($request->standard_id)) {
+                        $query->whereIn('students_details.standard_id',explode(',', $request->standard_id));
+                    }
+                    if (!empty($request->medium_id)) {
+                        $query->whereIn('students_details.medium_id', explode(',',$request->medium_id));
+                    }
+                    if (!empty($request->stream_id)) {
+                        $query->whereIn('students_details.stream_id', explode(',', $request->stream_id));
+                    }
+                    if (!empty($request->subject_id)) {
+                     $query->whereIn('students_details.subject_id',explode(',', $request->subject_id));
+                    }
+                    $student_list=$query->get();
                       $data = [];
                       foreach($student_list as $value){
                         $data[] =[
