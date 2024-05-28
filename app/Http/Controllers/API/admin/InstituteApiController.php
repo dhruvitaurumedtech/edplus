@@ -799,9 +799,9 @@ class InstituteApiController extends Controller
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
             $institute_subject_ids = explode(',', $request->subject_id);
             $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
-            // print_r($institute_subjects);
-            // print_r($institute_subject_ids);
-            // print_r($differenceInstituteSubjectArray);exit;
+                // print_r($institute_subjects);
+                // print_r($institute_subject_ids);
+                // print_r($differenceInstituteSubjectArray);exit;
             if(!empty($differenceInstituteSubjectArray)){
 
                 $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
@@ -830,8 +830,8 @@ class InstituteApiController extends Controller
                     }else{
                         $instiyutewArray = explode(',', $request->institute_for_id);
                         if(!in_array($institute_for,$instiyutewArray)){
-                            $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->first();
-                            $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->first();
+                            $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
+                            $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
                             if (!empty($student_check) && !empty($teacher_check)) {
                                 return $this->response([], "Cannot remove institute_for. Already exist student and teacher this institute_for.", false, 400);
                             } else {
@@ -859,8 +859,8 @@ class InstituteApiController extends Controller
                     } else {
                         $boardtewArray = explode(',', $request->institute_board_id);
                         if(!in_array($board,$boardtewArray)){
-                        $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->first();
-                        $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->first();
+                        $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->get();
+                        $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->get();
                         if (!empty($student_check) || !empty($teacher_check)) {
                             return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
                         } else {
@@ -888,8 +888,8 @@ class InstituteApiController extends Controller
                     }else{
                         $mediumtewArray = explode(',', $request->institute_medium_id);
                         if(!in_array($medium,$mediumtewArray)){
-                        $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
-                        $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
+                        $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
+                        $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
                         if (!empty($student_check) || !empty($teacher_check)) {
                             return $this->response([], "Cannot remove institute_medium. Already exist student or teacher in this institute_medium.", false, 400);
                         } else {
@@ -904,7 +904,8 @@ class InstituteApiController extends Controller
                     }
 
                     //class
-                $class_medium_check = Class_sub::where('institute_id', $institute->id)->where('class_id', $institute_for_class)->get();
+                $class_medium_check = Class_sub::where('institute_id', $institute->id)
+                ->where('class_id', $institute_for_class)->get();
                 if ($class_medium_check->isEmpty()) {
                     Class_sub::create([
                         'user_id' => $institute->user_id,
@@ -917,8 +918,8 @@ class InstituteApiController extends Controller
                 }else{
                     $classtewArray = explode(',', $request->institute_for_class_id);
                     if(!in_array($institute_for_class,$classtewArray)){
-                    $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
-                    $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
+                    $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
+                    $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
                     if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
                     } else {
@@ -951,11 +952,11 @@ class InstituteApiController extends Controller
                                     
                 }else{
                     $standardewArray = explode(',', $request->standard_id);
-                    //if(!in_array($standard,$standardewArray)){
-                    $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
-                    $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
+                    if(!in_array($standard,$standardewArray)){
+                    $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->get();
+                    $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->get();
                     if (!empty($student_check) || !empty($teacher_check)) {
-                        return $this->response([], "Cannot remove standard_medium. Already exist student or teacher in this standard_medium.", false, 400);
+                        return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
                     } else {
                         $delete_sub = Standard_sub::where('standard_id', $standard)
                         ->where('institute_id', $institute->id)
@@ -967,7 +968,7 @@ class InstituteApiController extends Controller
                             }    
                         }
                     }
-                   // }
+                    }
                 }
                 
                 //stream
@@ -1007,36 +1008,36 @@ class InstituteApiController extends Controller
                 
             }
 
-            //subject
-            $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
-            if ($institute_subject_check->isEmpty()) {
-                foreach ($institute_subject_ids as $institute_subject_id) {
-                    $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
-                    if (!$sub_instboard_exists) {
-                        Subject_sub::create([
-                            'user_id' => $institute->user_id,
-                            'institute_id' => $institute->id,
-                            'subject_id' => $institute_subject_id,
-                        ]);
+                //subject
+                $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
+                if ($institute_subject_check->isEmpty()) {
+                    foreach ($institute_subject_ids as $institute_subject_id) {
+                        $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
+                        if (!$sub_instboard_exists) {
+                            Subject_sub::create([
+                                'user_id' => $institute->user_id,
+                                'institute_id' => $institute->id,
+                                'subject_id' => $institute_subject_id,
+                            ]);
+                        }
                     }
-                }
-            }else{
-                $subjewArray = explode(',', $request->subject_id);
-                if(!in_array($institute_subject_check,$subjewArray)){
-                $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
-                $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
-                if (!empty($student_check) || !empty($teacher_check)) {
-                    return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
-                } else {
-                    $delete_sub = Subject_sub::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->get();
-                    if (!empty($delete_sub)) {
-                        foreach ($delete_sub as $did) {
-                            $did->delete();
+                }else{
+                    $subjewArray = explode(',', $request->subject_id);
+                    if(!in_array($institute_subject_check,$subjewArray)){
+                    $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+                    if (!empty($student_check) || !empty($teacher_check)) {
+                        return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
+                    } else {
+                        $delete_sub = Subject_sub::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->get();
+                        if (!empty($delete_sub)) {
+                            foreach ($delete_sub as $did) {
+                                $did->delete();
+                            }
                         }
                     }
                 }
-            }
-            }
+                }
 
         }
             
