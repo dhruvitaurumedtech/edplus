@@ -961,6 +961,7 @@ class InstituteApiController extends Controller
                         ->where('institute_id', $institute->id)
                         ->where('board_id', $board)
                         ->where('medium_id', $medium)->get();
+                        
                         if (!empty($delete_sub)) {
                             foreach ($delete_sub as $did) {
                                 $did->delete();
