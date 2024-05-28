@@ -44,35 +44,40 @@ class FeedbackController extends Controller
             $role_type = auth()->user()->role_type;
             $institute_id = $request->institute_id;
             $feedback_list = FeedbackModel::select(
-                'feedback.id as feedback_id',
-                'feedback.feedback',
-                'feedback.feedback_to_id',
-                'feedback.institute_id',
-                'feedback.rating',
+                'feedbacks.id as feedback_id',
+                'feedbacks.feedback',
+                'feedbacks.feedback_to_id',
+                'feedbacks.institute_id',
+                'feedbacks.rating',
+                'feedbacks.role_type',
                 'institute_detail.institute_name',
                 'users.firstname',
                 'users.lastname',
                 'users.image',
                 'institute_detail.logo'
             )
-            ->Join('users', 'users.id', '=', 'feedback.feedback_to_id')
-            ->Join('institute_detail', 'institute_detail.id', '=', 'feedback.institute_id')
-            ->whereNull('feedback.deleted_at')
-            ->orderByDesc('feedback.created_at');
+            ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
+            ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
+            ->whereNull('feedbacks.deleted_at')
+            ->orderByDesc('feedbacks.created_at');
             if (!empty($institute_id)) {
-                $feedback_list = $feedback_list->where('feedback.institute_id', $institute_id);
+                $feedback_list = $feedback_list->where('feedbacks.institute_id', $institute_id);
+                $feedback_list = $feedback_list->where('feedbacks.role_type', '1');
             } else {
-                // Otherwise, filter by feedback_to_id with Auth::id()
-                $feedback_list = $feedback_list->where('feedback.feedback_to_id', Auth::id());
+                
+                $feedback_list = $feedback_list->where('feedbacks.feedback_to_id', Auth::id());
+                $feedback_list = $feedback_list->where('feedbacks.role_type', '2');
             }
             
             $feedback_list = $feedback_list->get();
             $feedback_data = [];
             foreach($feedback_list as $feedbackdata){
-                if($role_type == 3){
+                if($feedbackdata->role_type == 2){ 
+                    // 2 role type feedback is  for users so which institute give a feedback to user
                     $dedsf = array('name'=>$feedbackdata->institute_name,
                                     'image'=>$feedbackdata->logo);
                 }else{
+                    //is for which user give a feedback to institute
                     $dedsf = array('name'=>$feedbackdata->firstname .' '.$feedbackdata->lastname,
                                     'image'=>$feedbackdata->image);
                 }

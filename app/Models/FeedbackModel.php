@@ -11,8 +11,8 @@ class FeedbackModel extends Model
     use HasFactory, SoftDeletes;
     protected $dates = ['deleted_at'];
 
-    protected $table = 'feedback';
+    protected $table = 'feedbacks';
     protected $fillable = [
-        'id', 'feedback_to_id', 'institute_id', 'feedback'
+        'id', 'feedback_to_id', 'institute_id', 'feedback','role_type','rating'
     ];
 }
