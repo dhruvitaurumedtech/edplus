@@ -476,7 +476,6 @@ if (!empty($request->subject_id)) {
      }
      public function fetch_discount_for_student(Request $request){
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
             'student_id'=>'required|integer',
           ]);
         if ($validator->fails()) {
@@ -487,7 +486,6 @@ if (!empty($request->subject_id)) {
                       ->join('standard','standard.id','=','students_details.standard_id')
                       ->join('subject_sub','subject_sub.subject_id','=','students_details.subject_id')
                       ->where('students_details.student_id',$request->student_id)
-                      ->where('students_details.institute_id',$request->institute_id)
                       ->select('users.*','standard.name as standard_name','subject_sub.amount')
                       ->get();
                       $data =[];
