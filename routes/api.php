@@ -115,7 +115,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
-    Route::post('/institute/add-feedback-forstudent', [FeedbackController::class, 'addfeedbackforstudent']);
+    Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);
     Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
 
     // parent api
