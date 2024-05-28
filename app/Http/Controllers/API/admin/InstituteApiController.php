@@ -4466,9 +4466,10 @@ class InstituteApiController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $boarids = Institute_board_sub::where('user_id', $request->user_id)
+            $boarids = Institute_board_sub::where('user_id', auth()->user()->id)
                 ->where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
             $uniqueBoardIds = array_unique($boarids);
+            // echo "<pre>";print_r($uniqueBoardIds);exit;
 
             $board_list = DB::table('board')
                 ->whereIN('id', $uniqueBoardIds)
@@ -4477,20 +4478,21 @@ class InstituteApiController extends Controller
             $board_array = [];
             foreach ($board_list as $board_value) {
 
-                $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $request->user_id)
+                 $medium_sublist = DB::table('medium_sub')
+                    ->where('user_id', auth()->user()->id)
                     ->where('board_id', $board_value->id)
                     ->where('institute_id', $request->institute_id)
                     ->pluck('medium_id')->toArray();
+                    
                 $uniquemediumds = array_unique($medium_sublist);
-
+                  
                 $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-
+                 
                 $medium_array = [];
                 foreach ($medium_list as $medium_value) {
 
                     $stndQY = Standard_sub::join('standard', 'standard.id', 'standard_sub.standard_id')
-                        ->where('standard_sub.user_id', $request->user_id)
+                        ->where('standard_sub.user_id', auth()->user()->id)
                         ->where('standard_sub.institute_id', $request->institute_id)
                         ->where('standard_sub.board_id', $board_value->id)
                         ->where('standard_sub.medium_id', $medium_value->id)
@@ -4498,7 +4500,7 @@ class InstituteApiController extends Controller
                     $stddata = [];
                     foreach ($stndQY as $stndDT) {
                         $forcounstd = Student_detail::whereNull('deleted_at')
-                            ->where('user_id', $request->user_id)
+                            ->where('user_id', auth()->user()->id)
                             ->where('institute_id', $request->institute_id)
                             ->where('board_id', $board_value->id)
                             ->where('medium_id', $medium_value->id)
