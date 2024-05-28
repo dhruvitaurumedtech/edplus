@@ -962,7 +962,6 @@ class InstituteApiController extends Controller
                         ->where('institute_id', $institute->id)
                         ->where('board_id', $board)
                         ->where('medium_id', $medium)->get();
-                        
                         if (!empty($delete_sub)) {
                             foreach ($delete_sub as $did) {
                                 $did->delete();
@@ -3080,7 +3079,6 @@ class InstituteApiController extends Controller
             }
 
             if (!empty($studentdtls)) {
-
                 $studentupdetail = [
                     'user_id' => $user_id,
                     'institute_id' => $request->institute_id,
@@ -4515,18 +4513,21 @@ class InstituteApiController extends Controller
                             'no_of_std' => $stdCount,
                         ];
                     }
-            
+                    
+
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
+                       
                         'standard' => $stddata
                     ];
                 }
-            
+                $concatenated_name = $board_value->name . ' - ' . $medium_value->name;
                 $board_array[] = [
-                    'id' => $board_value->id,
-                    'board_name' => $board_value->name,
-                    'medium' => $medium_array,
+                    'board_id' => $board_value->id,
+                    'medium_id' => $medium_value->id,
+                    'board_medium_name'=>$concatenated_name,
+                    'standard' => $stddata
                 ];
             }
             return $this->response($board_array, "Data Fetch Successfully");
