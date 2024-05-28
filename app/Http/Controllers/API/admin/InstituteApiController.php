@@ -3078,7 +3078,6 @@ class InstituteApiController extends Controller
             }
 
             if (!empty($studentdtls)) {
-
                 $studentupdetail = [
                     'user_id' => $user_id,
                     'institute_id' => $request->institute_id,
@@ -4513,17 +4512,21 @@ class InstituteApiController extends Controller
                             'no_of_std' => $stdCount,
                         ];
                     }
-            
+                    
+
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
+                       
                         'standard' => $stddata
                     ];
                 }
-            
+                $board_medium_name = $board_value->name . ' - ' . $medium_value->name;
+                $board_medium_name = $board_value->name . ' - ' . $medium_value->name;
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
+                    'concatenated_name'=>$concatenated_name,
                     'medium' => $medium_array,
                 ];
             }

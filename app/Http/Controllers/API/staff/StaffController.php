@@ -126,7 +126,7 @@ class StaffController extends Controller
     }
     public function view_roles(Request $request){
         try {
-            $roles = Roles::where('created_by','3')->get();
+            $roles = Roles::where('created_by',auth()->user()->id)->get();
             $data=[];
             foreach($roles as $value){
                $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name];
