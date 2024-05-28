@@ -8,6 +8,7 @@ use App\Models\Fees_model;
 use App\Models\Institute_detail;
 use App\Models\Payment_type_model;
 use App\Models\Student_detail;
+use App\Models\Subject_sub;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
@@ -359,42 +360,36 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $query=Institute_detail::join('subject_sub','subject_sub.institute_id','=','institute_detail.id')
-                            ->leftjoin('subject','subject.id','=','subject_sub.subject_id')
+         
+                            
+            $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
                             ->leftjoin('board','board.id','=','base_table.board')
                             ->leftjoin('medium','medium.id','=','base_table.medium')
                             ->leftjoin('standard','standard.id','=','base_table.standard')
                             ->leftjoin('stream','stream.id','=','base_table.stream')
-                            ->where('institute_detail.id',$request->institute_id)
+                            ->where('subject_sub.institute_id',$request->institute_id)
                             ->select('subject.id','subject_sub.amount','subject.name as subject_name',
-                               'board.id as board_id','board.name as board_name','medium.id as medium_id',
-                               'medium.name as medium_name','standard.id as standard_id',
-                               'standard.name as standard_name','stream.id as stream_id','stream.name as stream_name');
-                          
+                            'board.id as board_id','board.name as board_name','medium.id as medium_id',
+                            'medium.name as medium_name','standard.id as standard_id',
+                            'standard.name as standard_name','stream.id as stream_id','stream.name as stream_name');
                             if (!empty($request->board_id)) {
-                                $query->where('base_table.board', $request->board_id);
+                                $query->whereIn('base_table.board',explode(',', $request->board_id));
                             }
-                            
                             if (!empty($request->standard_id)) {
-                                $query->where('base_table.standard', $request->standard_id);
+                                $query->whereIn('base_table.standard',explode(',', $request->standard_id));
                             }
-                            
                             if (!empty($request->medium_id)) {
-                                $query->where('base_table.medium', $request->medium_id);
+                                $query->whereIn('base_table.medium', explode(',',$request->medium_id));
                             }
-                            
                             if (!empty($request->stream_id)) {
-                                $query->where('base_table.stream', $request->stream_id);
+                                $query->whereIn('base_table.stream', explode(',', $request->stream_id));
                             }
                             if (!empty($request->subject_id)) {
-                                $query->where('subject_sub.subject_id', $request->subject_id);
+                             $query->whereIn('subject_sub.subject_id',explode(',', $request->subject_id));
                             }
-                            
                             $subject = $query->get()->toarray();
-
-        //    print_r($subject);exit;
-                            
+                            // print_r($subject);exit;
         $student = [];
         foreach($subject as $value){
                       $student[]=  ['subject_id'=>$value['id'],
@@ -407,7 +402,7 @@ if (!empty($request->subject_id)) {
                                     'medium_name'=>$value['medium_name'],
                                     'stream_id'=>$value['stream_id'],
                                     'stream_name'=>$value['stream_name'],
-                                    'amount'=>(!empty($value['amount']))? $value['amount'] : '00.00',
+                                    'amount'=>(!empty($value['amount']))? $value['amount'].'.00' : '00.00',
                                 ];
                         
               }
@@ -417,6 +412,27 @@ if (!empty($request->subject_id)) {
         }
 
 
+    }
+    function subject_amount(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+            'subject_id'=>'required|integer',
+            'amount'=>'required|integer',
+
+            
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $subject_sub = Subject_sub::where('institute_id', $request->institute_id)->where('subject_id', $request->subject_id);
+            $subject_sub->update([
+            'amount'=>$request->amount
+            ]);
+            return $this->response([], "Fees Update Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
     
 }

@@ -174,6 +174,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
 
     Route::post('/institute/display-subject-fees', [FeesController::class, 'display_subject_fees']);
     Route::post('/institute/filters-data', [InstituteApiController::class, 'filters_data']);
+    Route::post('/institute/subject-amount', [FeesController::class, 'subject_amount']);
     
 });
 
