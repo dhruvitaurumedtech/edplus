@@ -158,17 +158,17 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
    
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
     
-    //staff api
-    Route::post('/staff/add-staff', [StaffController::class, 'add_staff']);
-    Route::post('/staff/view-staff', [StaffController::class, 'view_staff']);
-    Route::post('/staff/delete-staff', [StaffController::class, 'delete_staff']);
-    Route::post('/staff/view-roles', [StaffController::class, 'view_roles']);
-    Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
-    Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
-    Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
-    Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
-    Route::post('/institute/payment-type', [FeesController::class, 'payment_type']);
-    Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
+    Route::post('/institute/institute-add-staff', [StaffController::class, 'add_staff']);
+    Route::post('/institute/institute-view-staff', [StaffController::class, 'view_staff']);
+    Route::post('/institute/institute-delete-staff', [StaffController::class, 'delete_staff']);
+    Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
+   
+    // Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
+    // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
+    // Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
+    // Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
+    // Route::post('/institute/payment-type', [FeesController::class, 'payment_type']);
+    // Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
 
 
 
