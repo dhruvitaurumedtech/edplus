@@ -40,17 +40,9 @@ class FeedbackController extends Controller
     }
 
     public function get_feedback(Request $request){
-        
-        // $validator = Validator::make($request->all(), [
-        //     'institute_id' => 'required',
-        // ]);
-
-        // if ($validator->fails()) {
-        //     return $this->response([], $validator->errors()->first(), false, 400);
-        // }
-
         try {
-            
+            $role_type = auth()->user()->role_type;
+            $institute_id = $request->institute_id;
             $feedback_list = FeedbackModel::select(
                 'feedback.id as feedback_id',
                 'feedback.feedback',
@@ -58,16 +50,45 @@ class FeedbackController extends Controller
                 'feedback.institute_id',
                 'feedback.rating',
                 'institute_detail.institute_name',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'institute_detail.logo'
             )
             ->Join('users', 'users.id', '=', 'feedback.feedback_to_id')
             ->Join('institute_detail', 'institute_detail.id', '=', 'feedback.institute_id')
-            ->where('feedback.feedback_to_id', Auth::id())
             ->whereNull('feedback.deleted_at')
-            ->orderByDesc('feedback.created_at')
-            ->get()->toArray();
+            ->orderByDesc('feedback.created_at');
+            if (!empty($institute_id)) {
+                $feedback_list = $feedback_list->where('feedback.institute_id', $institute_id);
+            } else {
+                // Otherwise, filter by feedback_to_id with Auth::id()
+                $feedback_list = $feedback_list->where('feedback.feedback_to_id', Auth::id());
+            }
+            
+            $feedback_list = $feedback_list->get();
+            $feedback_data = [];
+            foreach($feedback_list as $feedbackdata){
+                if($role_type == 3){
+                    $dedsf = array('name'=>$feedbackdata->institute_name,
+                                    'image'=>$feedbackdata->logo);
+                }else{
+                    $dedsf = array('name'=>$feedbackdata->firstname .' '.$feedbackdata->lastname,
+                                    'image'=>$feedbackdata->image);
+                }
+                $feedback_item=array('feedback_id'=>$feedbackdata->feedback_id,
+                'feedback'=>$feedbackdata->feedback,
+                'rating'=>$feedbackdata->rating);
 
-            if (!empty($feedback_list)) {
-                return $this->response($feedback_list, "Successfully Fetch Exam List");
+                $merged_data = array_merge($dedsf, $feedback_item);
+                $feedback_data[] = $merged_data;                     
+
+
+            }
+
+
+            if (!empty($feedback_data)) {
+                return $this->response($feedback_data, "Successfully Fetch Exam List");
             } else {
                 return $this->response([], "No Data Found.", false, 400);
             }
