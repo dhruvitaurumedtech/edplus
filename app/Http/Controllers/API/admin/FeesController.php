@@ -473,9 +473,36 @@ if (!empty($request->subject_id)) {
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
-
-                        
-
-    }
+     }
+     public function fetch_discount_for_student(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+            'student_id'=>'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $query=Student_detail::join('users','users.id','=','students_details.student_id')
+                      ->join('standard','standard.id','=','students_details.standard_id')
+                      ->join('subject_sub','subject_sub.subject_id','=','students_details.subject_id')
+                      ->where('students_details.student_id',$request->student_id)
+                      ->where('students_details.institute_id',$request->institute_id)
+                      ->select('users.*','standard.name as standard_name','subject_sub.amount')
+                      ->get();
+                      $data =[];
+                      foreach($query as $value){
+                        $data[] = [ 'student_id'=>$value->id,
+                                    'student_name'=>$value->firstname.' '.$value->lastname,
+                                    'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
+                                    'standard_name'=>$value->standard_name,
+                                    'amount'=>$value->amount]; 
+                      }
+                      return $this->response($data, "fetch Student list Successfully");
+        }
+        catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400 );
+        }
+     }
     
 }
