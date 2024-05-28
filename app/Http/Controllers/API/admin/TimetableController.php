@@ -349,7 +349,7 @@ class TimetableController extends Controller
             
                
             DB::commit();
-            return $this->response([],'data save');
+            return $this->response([],'Timetable Update Successfully');
         }catch(Exeption $e){
             DB::rollback();
             return $this->response($e,"Something want Wrong!!", false, 400);
