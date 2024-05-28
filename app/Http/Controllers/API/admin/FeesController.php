@@ -360,6 +360,15 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+            $board_id=explode(',',$request->board_id);
+            $standard_id=explode(',',$request->standard_id);
+            $medium_id=explode(',',$request->medium_id);
+            $stream_id=explode(',',$request->stream_id);
+            if (!empty($request->subject_id)) {
+                $subjectIds = explode(',', $request->subject_id);
+            
+            }
+                            
             $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
                             ->leftjoin('board','board.id','=','base_table.board')
@@ -371,30 +380,23 @@ if (!empty($request->subject_id)) {
                             'board.id as board_id','board.name as board_name','medium.id as medium_id',
                             'medium.name as medium_name','standard.id as standard_id',
                             'standard.name as standard_name','stream.id as stream_id','stream.name as stream_name');
-                          
                             if (!empty($request->board_id)) {
-                                $query->where('base_table.board', $request->board_id);
+                                $query->whereIn('base_table.board',explode(',', $request->board_id));
                             }
-                            
                             if (!empty($request->standard_id)) {
-                                $query->where('base_table.standard', $request->standard_id);
+                                $query->whereIn('base_table.standard',explode(',', $request->standard_id));
                             }
-                            
                             if (!empty($request->medium_id)) {
-                                $query->where('base_table.medium', $request->medium_id);
+                                $query->whereIn('base_table.medium', explode(',',$request->medium_id));
                             }
-                            
                             if (!empty($request->stream_id)) {
-                                $query->where('base_table.stream', $request->stream_id);
+                                $query->whereIn('base_table.stream', explode(',', $request->stream_id));
                             }
                             if (!empty($request->subject_id)) {
-                                $query->where('subject_sub.subject_id', $request->subject_id);
+                             $query->whereIn('subject_sub.subject_id',explode(',', $request->subject_id));
                             }
-                            
                             $subject = $query->get()->toarray();
-
-        //    print_r($subject);exit;
-                            
+                            // print_r($subject);exit;
         $student = [];
         foreach($subject as $value){
                       $student[]=  ['subject_id'=>$value['id'],
@@ -407,7 +409,7 @@ if (!empty($request->subject_id)) {
                                     'medium_name'=>$value['medium_name'],
                                     'stream_id'=>$value['stream_id'],
                                     'stream_name'=>$value['stream_name'],
-                                    'amount'=>(!empty($value['amount']))? $value['amount'] : '00.00',
+                                    'amount'=>(!empty($value['amount']))? $value['amount'].'.00' : '00.00',
                                 ];
                         
               }
