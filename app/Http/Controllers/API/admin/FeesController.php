@@ -360,14 +360,7 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $board_id=explode(',',$request->board_id);
-            $standard_id=explode(',',$request->standard_id);
-            $medium_id=explode(',',$request->medium_id);
-            $stream_id=explode(',',$request->stream_id);
-            if (!empty($request->subject_id)) {
-                $subjectIds = explode(',', $request->subject_id);
-            
-            }
+         
                             
             $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
