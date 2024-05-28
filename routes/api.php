@@ -41,7 +41,7 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 
-Route::middleware(['auth:api' , 'apilogs'])->group(function () {
+Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
@@ -72,7 +72,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update');
     Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete');
     Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
-    
+
     Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students']);
     Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch']);
     Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign']);
@@ -141,7 +141,7 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/student/homescreen-student', [StudentController::class, 'homescreen_student']);
     Route::post('/student/institute-homescreen-student', [StudentController::class, 'student_added_detail']);
     Route::post('/student/announcement-list-student', [StudentController::class, 'announcementlist']);
-    
+
     //teacher Api
     Route::post('/teacher/institute-homescreen-teacher', [TeacherController::class, 'teacher_added_detail']);
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
@@ -155,14 +155,15 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list']);
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
-   
+
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
-    
+
+    Route::post('/institute/create-role', [StaffController::class, 'create_role']);
     Route::post('/institute/institute-add-staff', [StaffController::class, 'add_staff']);
     Route::post('/institute/institute-view-staff', [StaffController::class, 'view_staff']);
     Route::post('/institute/institute-delete-staff', [StaffController::class, 'delete_staff']);
     Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
-   
+
     // Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
     // Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
@@ -177,7 +178,6 @@ Route::middleware(['auth:api' , 'apilogs'])->group(function () {
     Route::post('/institute/subject-amount', [FeesController::class, 'subject_amount']);
     Route::post('/institute/student-list-for-discount', [FeesController::class, 'student_list_for_discount']);
     Route::post('/institute/fetch-discount-for-student', [FeesController::class, 'fetch_discount_for_student']);
-    
 });
 
 
