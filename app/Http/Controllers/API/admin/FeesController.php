@@ -360,8 +360,6 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-         
-                            
             $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
                             ->leftjoin('board','board.id','=','base_table.board')
@@ -434,5 +432,77 @@ if (!empty($request->subject_id)) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function student_list_for_discount(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+                $query=Student_detail::join('users','users.id','=','students_details.student_id')
+                      ->join('standard','standard.id','=','students_details.standard_id')
+                      ->where('students_details.institute_id',$request->institute_id)
+                      ->select('users.*','standard.name as standard_name');
+                      if (!empty($request->board_id)) {
+                        $query->whereIn('students_details.board_id',explode(',', $request->board_id));
+                    }
+                    if (!empty($request->standard_id)) {
+                        $query->whereIn('students_details.standard_id',explode(',', $request->standard_id));
+                    }
+                    if (!empty($request->medium_id)) {
+                        $query->whereIn('students_details.medium_id', explode(',',$request->medium_id));
+                    }
+                    if (!empty($request->stream_id)) {
+                        $query->whereIn('students_details.stream_id', explode(',', $request->stream_id));
+                    }
+                    if (!empty($request->subject_id)) {
+                     $query->whereIn('students_details.subject_id',explode(',', $request->subject_id));
+                    }
+                    $student_list=$query->get();
+                      $data = [];
+                      foreach($student_list as $value){
+                        $data[] =[
+                            'student_id'=>$value->id,
+                            'student_name'=>$value->firstname.' '.$value->lastname,
+                            'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
+                            'standard_name'=>$value->standard_name,
+                          ];
+                      }
+                      return $this->response($data, "fetch Student list Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+     }
+     public function fetch_discount_for_student(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+            'student_id'=>'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $query=Student_detail::join('users','users.id','=','students_details.student_id')
+                      ->join('standard','standard.id','=','students_details.standard_id')
+                      ->join('subject_sub','subject_sub.subject_id','=','students_details.subject_id')
+                      ->where('students_details.student_id',$request->student_id)
+                      ->where('students_details.institute_id',$request->institute_id)
+                      ->select('users.*','standard.name as standard_name','subject_sub.amount')
+                      ->get();
+                      $data =[];
+                      foreach($query as $value){
+                        $data[] = [ 'student_id'=>$value->id,
+                                    'student_name'=>$value->firstname.' '.$value->lastname,
+                                    'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
+                                    'standard_name'=>$value->standard_name,
+                                    'amount'=>$value->amount]; 
+                      }
+                      return $this->response($data, "fetch Student list Successfully");
+        }
+        catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400 );
+        }
+     }
     
 }
