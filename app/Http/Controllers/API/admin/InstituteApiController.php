@@ -798,15 +798,15 @@ class InstituteApiController extends Controller
             //start by priyanka
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
             $institute_subject_ids = explode(',', $request->subject_id);
-
             $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
-        if(!empty($differenceInstituteSubjectArray)){
+            
+            if(!empty($differenceInstituteSubjectArray)){
 
                 $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
                 $uniqueArray = array_unique($sectsbbsiqy);
                 $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
-            
-            foreach ($basedtqy as $svaluee) {
+                
+                foreach ($basedtqy as $svaluee) {
                 $institute_for = $svaluee->institute_for;
                 $board = $svaluee->board;
                 $medium = $svaluee->medium;
@@ -814,7 +814,7 @@ class InstituteApiController extends Controller
                 $standard = $svaluee->standard;
                 $stream = $svaluee->stream;
                 
-                
+               
                 //institute
                 
                 $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $institute_for)->get();
