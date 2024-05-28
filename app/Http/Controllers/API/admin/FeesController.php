@@ -360,8 +360,6 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-         
-                            
             $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
                             ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
                             ->leftjoin('board','board.id','=','base_table.board')
@@ -433,6 +431,36 @@ if (!empty($request->subject_id)) {
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
+    }
+    public function student_list_for_discount(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+                $student_list=Student_detail::join('users','users.id','=','students_details.student_id')
+                      ->join('standard','standard.id','=','students_details.standard_id')
+                      ->where('students_details.institute_id',$request->institute_id)
+                      ->select('users.*','standard.name as standard_name')
+                      ->get();
+                      $data = [];
+                      foreach($student_list as $value){
+                        $data[] =[
+                            'student_id'=>$value->id,
+                            'student_name'=>$value->firstname.' '.$value->lastname,
+                            'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
+                            'standard_name'=>$value->standard_name,
+                          ];
+                      }
+                      return $this->response($data, "fetch Student list Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+
+                        
+
     }
     
 }
