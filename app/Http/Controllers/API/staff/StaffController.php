@@ -16,10 +16,31 @@ use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 class StaffController extends Controller
 {
     use ApiTrait;
+
+    public function create_role(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $role = new Roles();
+            $role->role_name = $request->role_name;
+            $role->created_by = Auth::id();
+            $role->save();
+            return $this->response([], "Role Created");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
     public function add_staff(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
+            'institute_id' => 'required|integer',
             'firstname' => 'required',
             'lastname' => 'required',
             'email' => 'required|email|unique:users,email',
@@ -28,7 +49,7 @@ class StaffController extends Controller
             'role_type' => 'required|integer',
             'confirm_password' => 'required|string|same:password',
             'device_key' => 'nullable',
-            'country_code'=>'required',
+            'country_code' => 'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
@@ -57,10 +78,10 @@ class StaffController extends Controller
             $user->token = $token;
             $user->save();
             $userdata = user::join('staff_detail', 'staff_detail.user_id', '=', 'users.id')
-                            ->join('institute_detail', 'institute_detail.id', '=', 'staff_detail.institute_id')
-                            ->where('users.email', $user->email)
-                            ->select('institute_detail.id')
-                            ->first();
+                ->join('institute_detail', 'institute_detail.id', '=', 'staff_detail.institute_id')
+                ->where('users.email', $user->email)
+                ->select('institute_detail.id')
+                ->first();
             if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
             } else {
@@ -81,35 +102,36 @@ class StaffController extends Controller
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
- 
     }
-    public function view_staff(Request $request){
+    public function view_staff(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
+            'institute_id' => 'required|integer',
         ]);
         $userdata = user::join('staff_detail', 'staff_detail.user_id', '=', 'users.id')
-                            ->join('roles', 'roles.id', '=', 'users.role_type')
-                            ->where('staff_detail.institute_id', $request->institute_id)
-                            ->select('users.*','roles.role_name')
-                            ->get();
-        try{
-            $data=[];
-            foreach($userdata as $value){
-                 $data[]=['user_id'=>$value->id,
-                          'fullname'=>$value->firstname.' '.$value->lastname,
-                          'role_name'=>$value->role_name,
-                          'photo' => asset('profile/no-image.png')
-                         ];
+            ->join('roles', 'roles.id', '=', 'users.role_type')
+            ->where('staff_detail.institute_id', $request->institute_id)
+            ->select('users.*', 'roles.role_name')
+            ->get();
+        try {
+            $data = [];
+            foreach ($userdata as $value) {
+                $data[] = [
+                    'user_id' => $value->id,
+                    'fullname' => $value->firstname . ' ' . $value->lastname,
+                    'role_name' => $value->role_name,
+                    'photo' => asset('profile/no-image.png')
+                ];
             }
             return $this->response($data, "Staff Fetch Successfully !");
-
-        }catch(Exception $e){
+        } catch (Exception $e) {
 
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
     }
-    public function delete_staff(Request $request){
+    public function delete_staff(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'staff_id' => 'required|exists:users,id',
         ]);
@@ -124,12 +146,13 @@ class StaffController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
-    public function view_roles(Request $request){
+    public function view_roles(Request $request)
+    {
         try {
-            $roles = Roles::where('created_by',auth()->user()->id)->get();
-            $data=[];
-            foreach($roles as $value){
-               $data[] = ['role_id'=>$value->id,'role_name'=>$value->role_name];
+            $roles = Roles::where('created_by', auth()->user()->id)->get();
+            $data = [];
+            foreach ($roles as $value) {
+                $data[] = ['role_id' => $value->id, 'role_name' => $value->role_name];
             }
             return $this->response($data, "Successfully Display Roles.");
         } catch (Exception $e) {
