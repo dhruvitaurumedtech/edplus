@@ -17,6 +17,8 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class FeesController extends Controller
 {
@@ -526,7 +528,10 @@ if (!empty($request->subject_id)) {
             'student_id'=>'required|integer',
             'institute_id'=>'required|integer',
             'discount_amount'=>'required',
-            'discount_by'=>'required',
+            'discount_by' => [
+                'required',
+                Rule::in(['Rupee', 'Percentage']),
+            ],
           ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
