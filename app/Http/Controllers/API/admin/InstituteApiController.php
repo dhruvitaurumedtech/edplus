@@ -918,8 +918,8 @@ class InstituteApiController extends Controller
                 }else{
                     $classtewArray = explode(',', $request->institute_for_class_id);
                     if(!in_array($institute_for_class,$classtewArray)){
-                    $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
-                    $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
+                    $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
                     } else {
@@ -938,8 +938,8 @@ class InstituteApiController extends Controller
                 where('institute_id', $institute->id)
                 ->where('standard_id', $standard)
                 ->where('board_id', $board)
-                ->where('medium_id', $medium)->get();
-                if ($standard_medium_check->isEmpty()) {
+                ->where('medium_id', $medium)->first();
+                if (!$standard_medium_check) {
                         Standard_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
@@ -951,6 +951,7 @@ class InstituteApiController extends Controller
                         ]);
                                     
                 }else{
+                    
                     $standardewArray = explode(',', $request->standard_id);
                     if(!in_array($standard,$standardewArray)){
                     $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
@@ -958,10 +959,11 @@ class InstituteApiController extends Controller
                     if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
                     } else {
-                        $delete_sub = Standard_sub::where('standard_id', $standard)
+                        $delete_sub = Standard_sub::whereNotIn('standard_id', $standardewArray)
                         ->where('institute_id', $institute->id)
                         ->where('board_id', $board)
-                        ->where('medium_id', $medium)->get();
+                        ->where('medium_id', $medium)
+                        ->get();
                         if (!empty($delete_sub)) {
                             foreach ($delete_sub as $did) {
                                 $did->delete();
