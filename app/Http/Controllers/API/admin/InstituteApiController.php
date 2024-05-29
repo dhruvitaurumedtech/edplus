@@ -864,7 +864,8 @@ class InstituteApiController extends Controller
                         if (!empty($student_check) || !empty($teacher_check)) {
                             return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
                         } else {
-                            $delete_sub = Institute_board_sub::where('board_id', $board)->where('institute_id', $institute->id)->get();
+                            $delete_sub = Institute_board_sub::where('board_id', $board)
+                            ->where('institute_id', $institute->id)->get();
                             if (!empty($delete_sub)) {
                                 foreach ($delete_sub as $did) {
                                     $did->delete();
@@ -948,8 +949,7 @@ class InstituteApiController extends Controller
                             'board_id' => $board,
                             'medium_id' => $medium,
                             'class_id' => $institute_for_class
-                        ]);
-                                    
+                        ]);     
                 }else{
                     
                     $standardewArray = explode(',', $request->standard_id);
@@ -959,7 +959,7 @@ class InstituteApiController extends Controller
                     if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
                     } else {
-                        $delete_sub = Standard_sub::whereNotIn('standard_id', $standardewArray)
+                        $delete_sub = Standard_sub::where('standard_id', $standard)
                         ->where('institute_id', $institute->id)
                         ->where('board_id', $board)
                         ->where('medium_id', $medium)
