@@ -481,6 +481,17 @@ if (!empty($request->subject_id)) {
                     $student_list=$query->get();
                       $data = [];
                       foreach($student_list as $value){
+                        $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
+                        ->leftjoin('standard','standard.id','=','students_details.standard_id')
+                        ->leftJoin('subject_sub', function($join) {
+                          $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
+                                ->on('subject_sub.institute_id', '=', 'students_details.institute_id');
+                         })
+                        ->where('students_details.student_id',$value->id)
+                        ->where('students_details.institute_id',$request->institute_id)
+                        ->select('users.*','standard.name as standard_name','subject_sub.amount')
+                        ->first();
+                        // echo "<pre>";print_r($query);exit;
                         $data[] =[
                             'student_id'=>$value->id,
                             'student_name'=>$value->firstname.' '.$value->lastname,
@@ -489,6 +500,7 @@ if (!empty($request->subject_id)) {
                             'standard_name'=>$value->standard_name,
                             'stream_id'=>$value->stream_id,
                             'streamname'=>$value->streamname,
+                            'amount'=>$query->amount
                           ];
                       }
                       return $this->response($data, "fetch Student list Successfully");
