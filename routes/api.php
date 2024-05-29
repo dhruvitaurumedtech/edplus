@@ -159,10 +159,12 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role']);
+    Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
+    Route::get('/institute/institute-get-permission', [StaffController::class, 'Get_Permission']);
+    Route::post('/institute/assign-update-permissions', [StaffController::class, 'updateRolePermissions']);
     Route::post('/institute/institute-add-staff', [StaffController::class, 'add_staff']);
     Route::post('/institute/institute-view-staff', [StaffController::class, 'view_staff']);
     Route::post('/institute/institute-delete-staff', [StaffController::class, 'delete_staff']);
-    Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
 
     // Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);

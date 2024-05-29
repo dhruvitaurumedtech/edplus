@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API\staff;
 
 use App\Http\Controllers\Controller;
+use App\Models\Action;
+use App\Models\Module;
 use App\Models\Roles;
 use App\Models\Staff_detail_Model;
 use App\Models\User;
@@ -12,6 +14,8 @@ use Exception;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class StaffController extends Controller
 {
@@ -37,6 +41,115 @@ class StaffController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+
+    public function view_roles(Request $request)
+    {
+        try {
+            $roles = Roles::where('created_by', auth()->user()->id)->get();
+            $data = [];
+            foreach ($roles as $value) {
+                $data[] = ['role_id' => $value->id, 'role_name' => $value->role_name];
+            }
+            return $this->response($data, "Successfully Display Roles.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
+
+    public function Get_Permission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'nullable',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            // Fetch all actions from the Action table
+            $actions = Action::select('id', 'name')->get();
+
+            $modules = Module::with(['Features' => function ($query) {
+                $query->select('id', 'module_id', 'feature_name');
+            }])->select('id', 'module_name')->where('status', 1)->get();
+
+            foreach ($modules as $module) {
+                foreach ($module->Features as $feature) {
+                    $featureActions = [];
+
+                    foreach ($actions as $action) {
+                        if (empty($request->role_id)) {
+                            $hasPermission = false; // Default to false when no role_id is provided
+                        } else {
+                            $hasPermission = DB::table('role_has_permissions')
+                                ->where('role_id', $request->role_id)
+                                ->where('feature_id', $feature->id)
+                                ->where('action_id', $action->id)
+                                ->exists();
+                        }
+
+                        $featureActions[] = [
+                            'id' => $action->id,
+                            'name' => $action->name,
+                            'has_permission' => $hasPermission
+                        ];
+                    }
+
+                    $feature->actions = $featureActions;
+                }
+            }
+
+            return $this->response($modules, "Permissions retrieved successfully.", true, 200);
+        } catch (Exception $e) {
+            return $this->response([], "An error occurred.", false, 400);
+        }
+    }
+
+
+    public function updateRolePermissions(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'required|exists:roles,id',
+            'permissions' => 'required|array',
+            'permissions.*.feature_id' => 'required|exists:features,id',
+            'permissions.*.actions' => 'required|array',
+            'permissions.*.actions.*' => 'exists:actions,id',
+        ]); 
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $roleId = $request->role_id;
+            DB::beginTransaction();
+            DB::table('role_has_permissions')->where('role_id', $roleId)->delete();
+            $permissions = [];
+            foreach ($request->permissions as $permission) {
+                foreach ($permission['actions'] as $actionId) {
+                    $permissions[] = [
+                        'role_id' => $roleId,
+                        'feature_id' => $permission['feature_id'],
+                        'action_id' => $actionId,
+                    ];
+                }
+            }
+
+            DB::table('role_has_permissions')->insert($permissions);
+            DB::commit();
+            return $this->response([], "Permissions updated successfully.", true, 200);
+        } catch (Exception $e) {
+            DB::rollBack();
+            return $this->response([], "An error occurred while updating permissions.", false, 400);
+        }
+    }
+
+
+
+
+
     public function add_staff(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -142,19 +255,6 @@ class StaffController extends Controller
         try {
             user::where('id', $request->staff_id)->delete();
             return $this->response([], "Successfully Deleted Staff.");
-        } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
-        }
-    }
-    public function view_roles(Request $request)
-    {
-        try {
-            $roles = Roles::where('created_by', auth()->user()->id)->get();
-            $data = [];
-            foreach ($roles as $value) {
-                $data[] = ['role_id' => $value->id, 'role_name' => $value->role_name];
-            }
-            return $this->response($data, "Successfully Display Roles.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
