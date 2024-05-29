@@ -10,4 +10,9 @@ class Module extends Model
     use HasFactory;
 
     protected $fillable = ['module_name'];
+
+    public function Features()
+    {
+        return $this->hasMany(Feature::class, 'module_id', 'id')->select('id', 'module_id', 'feature_name');
+    }
 }
