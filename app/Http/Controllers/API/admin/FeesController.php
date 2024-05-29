@@ -386,8 +386,15 @@ if (!empty($request->subject_id)) {
                             if (!empty($request->subject_id)) {
                              $query->whereIn('subject_sub.subject_id',explode(',', $request->subject_id));
                             }
+                            if (!empty($request->sort_by)) {
+                                if ($request->sort_by == 'added') {
+                                    $query->whereNotNull('subject_sub.amount')->orderBy('subject_sub.amount', 'asc')->get()->toArray();
+                                } elseif ($request->sort_by == 'none') {
+                                    $query->whereNull('subject_sub.amount')->get()->toArray();
+                                }
+                            }
                             $subject = $query->get()->toarray();
-                            // print_r($subject);exit;
+                          
         $student = [];
         foreach($subject as $value){
                       $student[]=  ['subject_id'=>$value['id'],
