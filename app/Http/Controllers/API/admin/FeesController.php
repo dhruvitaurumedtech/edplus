@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Discount_model;
 use App\Models\Fees_colletion_model;
 use App\Models\Fees_model;
 use App\Models\Institute_detail;
@@ -16,6 +17,8 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
+
 
 class FeesController extends Controller
 {
@@ -512,12 +515,56 @@ if (!empty($request->subject_id)) {
                                   'student_name'=>$query->firstname.' '.$query->lastname,
                                   'profile'=>(!empty($query->image))?asset($query->image):asset('no-image.png'),
                                   'standard_name'=>$query->standard_name,
-                                  'total_fees'=>$query->amount]; 
+                                  'total_fees'=>$query->amount.'.00']; 
                       return $this->response($data, "Fetch Student list Successfully");
         }
         catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400 );
         }
+     }
+     function add_discount(Request $request){
+        // dd($request->All());
+        $validator = Validator::make($request->all(), [
+            'student_id'=>'required|integer',
+            'institute_id'=>'required|integer',
+            'discount_amount'=>'required',
+            'discount_by' => [
+                'required',
+                Rule::in(['Rupee', 'Percentage']),
+            ],
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $existingDiscount = Discount_model::where('institute_id', $request->institute_id)
+                                                ->where('student_id', $request->student_id)
+                                                ->where('financial_year', date('Y'))
+                                                ->exists();
+            $studentExists = DB::table('students_details')
+            ->where('student_id', $request->student_id)
+            ->exists();
+            if (!$studentExists) {
+                return $this->response([], 'Student does not exist', false, 400 );
+                
+            }
+
+       if (!$existingDiscount) {
+            Discount_model::create([
+                'institute_id' => $request->institute_id,
+                'student_id' => $request->student_id,
+                'financial_year' => date('Y'),
+                'discount_amount' => $request->discount_amount,
+                'discount_by' => $request->discount_by,
+            ]);
+
+     return $this->response([], "Discount Added successfully");
+        }else {
+            return $this->response([], "Discount already exists for the current financial year", false, 400 );
+        }
+        }catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400 );
+        }  
      }
     
 }

@@ -180,6 +180,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/subject-amount', [FeesController::class, 'subject_amount']);
     Route::post('/institute/student-list-for-discount', [FeesController::class, 'student_list_for_discount']);
     Route::post('/institute/fetch-discount-for-student', [FeesController::class, 'fetch_discount_for_student']);
+    Route::post('/institute/add-discount', [FeesController::class, 'add_discount']);
+
 });
 
 
