@@ -453,8 +453,9 @@ if (!empty($request->subject_id)) {
         try{
                 $query=Student_detail::join('users','users.id','=','students_details.student_id')
                       ->join('standard','standard.id','=','students_details.standard_id')
+                      ->leftjoin('stream','stream.id','=','students_details.stream_id')
                       ->where('students_details.institute_id',$request->institute_id)
-                      ->select('users.*','standard.name as standard_name');
+                      ->select('users.*','standard.name as standard_name','students_details.standard_id','students_details.stream_id','stream.name as streamname');
                       if (!empty($request->board_id)) {
                         $query->whereIn('students_details.board_id',explode(',', $request->board_id));
                     }
@@ -484,7 +485,10 @@ if (!empty($request->subject_id)) {
                             'student_id'=>$value->id,
                             'student_name'=>$value->firstname.' '.$value->lastname,
                             'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
+                            'standard_id'=>$value->standard_id,
                             'standard_name'=>$value->standard_name,
+                            'stream_id'=>$value->stream_id,
+                            'streamname'=>$value->streamname,
                           ];
                       }
                       return $this->response($data, "fetch Student list Successfully");
