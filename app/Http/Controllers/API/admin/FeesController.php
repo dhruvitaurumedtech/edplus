@@ -393,6 +393,7 @@ if (!empty($request->subject_id)) {
                                     $query->whereNull('subject_sub.amount')->get()->toArray();
                                 }
                             }
+                           
                             $subject = $query->get()->toarray();
                           
         $student = [];
@@ -465,6 +466,13 @@ if (!empty($request->subject_id)) {
                     }
                     if (!empty($request->subject_id)) {
                      $query->whereIn('students_details.subject_id',explode(',', $request->subject_id));
+                    }
+                    // echo $request->search;exit;
+                    if(!empty($request->search)){
+                        $searchTerm = '%' . $request->search . '%';
+                                            $query->where(function ($query) use ($searchTerm) {
+                                                $query->where(DB::raw("CONCAT(users.firstname, ' ', users.lastname)"), 'like', $searchTerm);
+                                            });
                     }
                     $student_list=$query->get();
                       $data = [];
