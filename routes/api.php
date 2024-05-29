@@ -119,6 +119,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);
     Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
     Route::post('/institute/add-deadstock', [DeadstockController::class, 'add_deadstock']);
+    Route::post('/institute/list-deadstock', [DeadstockController::class, 'list_deadstock']);
+    
 
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');

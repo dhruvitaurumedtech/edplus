@@ -45,7 +45,9 @@ class DeadstockController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $deadStocklist = new DeadStock();
+            $deadStocklist = DeadStock::where('institute_id',$request->institute_id)
+            ->select('id','institute_id','item_name','no_of_item')
+            ->get()->toArray();
             return $this->response($deadStocklist, "Fees inserted successfully.");
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
