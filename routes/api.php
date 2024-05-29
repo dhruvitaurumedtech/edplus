@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
 use App\Http\Controllers\API\admin\BasetableControllerAPI;
+use App\Http\Controllers\API\admin\DeadstockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -117,6 +118,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
     Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);
     Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
+    Route::post('/institute/add-deadstock', [DeadstockController::class, 'add_deadstock']);
 
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
