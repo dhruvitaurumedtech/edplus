@@ -942,7 +942,12 @@ class TeacherController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
 
         try {
-            $teacher_id = Auth::id();
+            if($request->teacher_id){
+                $teacher_id = $request->teacher_id;
+            }else{
+                $teacher_id = Auth::id();
+            }
+            
             $userdetl = user::where('id', $teacher_id)->first();
 
             if ($userdetl->image) {

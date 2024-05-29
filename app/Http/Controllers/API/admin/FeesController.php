@@ -515,7 +515,7 @@ if (!empty($request->subject_id)) {
                                   'student_name'=>$query->firstname.' '.$query->lastname,
                                   'profile'=>(!empty($query->image))?asset($query->image):asset('no-image.png'),
                                   'standard_name'=>$query->standard_name,
-                                  'total_fees'=>$query->amount]; 
+                                  'total_fees'=>$query->amount.'.00']; 
                       return $this->response($data, "Fetch Student list Successfully");
         }
         catch (Exception $e) {

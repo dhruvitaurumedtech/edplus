@@ -67,7 +67,6 @@ class FeedbackController extends Controller
                 $feedback_list = $feedback_list->where('feedbacks.institute_id', $institute_id);
                 $feedback_list = $feedback_list->where('feedbacks.role_type', '1');
             } else {
-                
                 $feedback_list = $feedback_list->where('feedbacks.feedback_to_id', Auth::id());
                 $feedback_list = $feedback_list->where('feedbacks.role_type', '2');
             }
