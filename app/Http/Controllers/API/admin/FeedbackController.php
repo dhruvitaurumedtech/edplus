@@ -50,13 +50,16 @@ class FeedbackController extends Controller
                 'feedbacks.institute_id',
                 'feedbacks.rating',
                 'feedbacks.role_type',
+                'feedbacks.created_at',
                 'institute_detail.institute_name',
                 'users.firstname',
                 'users.lastname',
                 'users.image',
+                'roles.role_name',
                 'institute_detail.logo'
             )
             ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
+            ->Join('roles', 'roles.id', '=', 'users.role_type')
             ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
             ->whereNull('feedbacks.deleted_at')
             ->orderByDesc('feedbacks.created_at');
@@ -75,7 +78,8 @@ class FeedbackController extends Controller
                 if($feedbackdata->role_type == 2){ 
                     // 2 role type feedback is  for users so which institute give a feedback to user
                     $dedsf = array('name'=>$feedbackdata->institute_name,
-                                    'image'=>$feedbackdata->logo);
+                                    'image'=>$feedbackdata->logo,
+                                    'role_name'=>$feedbackdata->role_name);
                 }else{
                     //is for which user give a feedback to institute
                     $dedsf = array('name'=>$feedbackdata->firstname .' '.$feedbackdata->lastname,
