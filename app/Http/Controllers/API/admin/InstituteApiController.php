@@ -953,8 +953,8 @@ class InstituteApiController extends Controller
                 }else{
                     $standardewArray = explode(',', $request->standard_id);
                     if(!in_array($standard,$standardewArray)){
-                    $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->get();
-                    $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->get();
+                    $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
+                    $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
                     if (!empty($student_check) || !empty($teacher_check)) {
                         return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
                     } else {
