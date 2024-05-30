@@ -81,7 +81,7 @@ class FeedbackController extends Controller
                     if ($feedbackdata->logo) {
                         $insimg = $feedbackdata->logo;
                     } else {
-                        $insimg = asset('no-image.PNG');
+                        $insimg = asset('no-image.png');
                     }
 
                     // 2 role type feedback is  for users so which institute give a feedback to user
