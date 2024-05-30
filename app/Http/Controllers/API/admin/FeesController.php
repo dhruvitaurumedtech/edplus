@@ -331,7 +331,7 @@ if (!empty($request->subject_id)) {
         $fee->payment_amount = $request->payment_amount;
         $fee->payment_type = $request->payment_type;
         $fee->transaction_id = (!empty($request->transaction_id)) ? $request->transaction_id : '';
-        // $fee->save();
+        $fee->save();
         $amount = 0;
         $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
         $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->get();
@@ -499,6 +499,7 @@ if (!empty($request->subject_id)) {
                         $revise_fee='';
                         if($query->discount_by =='Rupee'){
                             $revise_fee=$amounts - $query->discount_amount;
+                            
                         }
                         if($query->discount_by =='Percentage'){
                             $discountAmount =  $amounts * ($query->discount_amount / 100);
@@ -629,10 +630,12 @@ if (!empty($request->subject_id)) {
                 $revise_fee=0;
                 if($discount->discount_by =='Rupee'){
                     $revise_fee= $discount->discount_amount;
+                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
                 }
                 if($discount->discount_by =='Percentage'){
                     $revise_fee =  $student_fees->total_fees * ($discount->discount_amount / 100);
                     // $revise_fee = $value->payment_amount - $revise_fee;
+                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
                      
                 } 
                 
@@ -650,10 +653,8 @@ if (!empty($request->subject_id)) {
                            'student_name'=>$student_name,
                            'payment_type'=>$data,
                            'student_fees'=>(!empty($student_fees->total_fees)) ? $student_fees->total_fees .'.00' : '00.00',
-                           'discount'=>(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ,
+                           'discount'=>$discount_data,
                            'paid_amount'=>(!empty($amount_data))?$amount_data.'00':'00.00',
-                        //    'total_amount'=>$total_amount,
-                        //    'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
                            'histroy'=>$histroy
                           ];
             return $this->response($data_final, "Fetch data successfully");
