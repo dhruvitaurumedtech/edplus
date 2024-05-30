@@ -101,7 +101,7 @@ class StudentAttendance extends Controller
             // }
             // echo $student_id;exit;
 
-            $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.student_id')
+            $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.subject_id')
                 ->where('attendance.institute_id', $request->institute_id)
                 ->where('attendance.student_id', Auth::id())
                 ->where('attendance.date', $request->date)
