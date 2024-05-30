@@ -174,9 +174,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
     // Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
     // Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
-    // Route::post('/institute/payment-type', [FeesController::class, 'payment_type']);
-    // Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
-
+    
 
 
     Route::post('/institute/display-subject-fees', [FeesController::class, 'display_subject_fees']);
@@ -185,6 +183,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/student-list-for-discount', [FeesController::class, 'student_list_for_discount']);
     Route::post('/institute/fetch-discount-for-student', [FeesController::class, 'fetch_discount_for_student']);
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount']);
+    Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
+    Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
 
 });
 
