@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\NewAnnouncementController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\VideoCategoryController;
@@ -213,6 +214,17 @@ Route::middleware('auth')->group(function () {
     Route::get('announcement-create-new', [NewAnnouncementController::class, 'announcement_create'])->name('announcement-create-new');
     Route::post('fetch-users', [NewAnnouncementController::class, 'fetchUsers'])->name('fetch.users');
     Route::post('announcement/publish', [NewAnnouncementController::class, 'saveAnnouncement'])->name('annoucement.publish');
+
+
+
+
+    // ACL Management Module Start
+    Route::get('module_list', [ModuleController::class, 'module_list'])->name('module.list');
+    Route::post('module/create', [ModuleController::class, 'module_create'])->name('module.create');
+    Route::post('module/edit', [ModuleController::class, 'module_edit'])->name('module.edit');
+    Route::post('module/update', [ModuleController::class, 'module_update'])->name('module.update');
+    Route::post('module/delete', [ModuleController::class, 'module_delete'])->name('module.delete');
+    // ACL Management Module End
 });
 
 Route::get('/update-value/{token}', [StudentController::class, 'verifyEmail'])->name('verifyEmail.get');

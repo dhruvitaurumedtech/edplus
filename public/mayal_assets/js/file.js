@@ -249,7 +249,7 @@ document.querySelectorAll('.student_editButton').forEach(function (button) {
                 var reponse_studentdetail = response.data.studentsdetailsDT;
                 if (reponse_student !== null) {
                     // var imgsrc = 'http://127.0.0.1:8000/' + reponse_student.image;
-                   var imgsrc = baseUrl + reponse_student.image;
+                    var imgsrc = baseUrl + reponse_student.image;
 
 
                     $('#student_id').val(reponse_student.id);
@@ -978,6 +978,56 @@ document.querySelectorAll('.video_limit_deletebutton').forEach(function (button)
             if (result.isConfirmed) {
                 axios.post('video-timelimit-delete', {
                     id: id
+                })
+                    .then(response => {
+                        location.reload(true);
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+    });
+});
+
+document.querySelectorAll('.module_editButton').forEach(function (button) {
+    button.addEventListener('click', function () {
+        var module_id = this.getAttribute('data-module-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
+        axios.post(baseUrl + '/module/edit', {
+            module_id: module_id
+        })
+            .then(response => {
+                var reponse_data = response.data.modules;
+                $('#module_id').val(reponse_data.id);
+                $('#module_name').val(reponse_data.module_name);
+                $('#exampleModal').modal('show');
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+});
+
+document.querySelectorAll('.module_deletebutton').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var module_id = this.getAttribute('data-module-id');
+
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('/module/delete', {
+                    module_id: module_id
                 })
                     .then(response => {
                         location.reload(true);
