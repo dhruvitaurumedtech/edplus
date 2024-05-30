@@ -94,21 +94,17 @@ class StudentAttendance extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            // if($request->child_id){
-            //     $student_id = $request->child_id;
-            // }else{
-            //     $student_id = Auth::id();
-            // }
-            // echo $student_id;exit;
-
-            $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.subject_id')
+            if($request->child_id){
+                $student_id = $request->child_id;
+            }else{
+                $student_id = Auth::id();
+            }
+             $stdetails = Attendance_model::join('subject', 'subject.id','=','attendance.subject_id')
                 ->where('attendance.institute_id', $request->institute_id)
-                ->where('attendance.student_id', Auth::id())
+                ->where('attendance.student_id', $student_id)
                 ->where('attendance.date', $request->date)
-                ->whereNull('attendance.deleted_at')
                 ->select('attendance.*', 'subject.name')
                 ->get();
-
             $attenlist = [];
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
