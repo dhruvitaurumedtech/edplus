@@ -77,12 +77,12 @@ class FeedbackController extends Controller
                 if($feedbackdata->role_type == 2){ 
                     // 2 role type feedback is  for users so which institute give a feedback to user
                     $dedsf = array('name'=>$feedbackdata->institute_name,
-                                    'image'=>$feedbackdata->logo,
-                                    'role_name'=>$feedbackdata->role_name);
+                                    'image'=>$feedbackdata->logo);
                 }else{
                     //is for which user give a feedback to institute
                     $dedsf = array('name'=>$feedbackdata->firstname .' '.$feedbackdata->lastname,
-                                    'image'=>$feedbackdata->image);
+                                    'image'=>$feedbackdata->image,
+                                    'role_name'=>$feedbackdata->role_name);
                 }
                 $feedback_item=array('feedback_id'=>$feedbackdata->feedback_id,
                 'feedback'=>$feedbackdata->feedback,
