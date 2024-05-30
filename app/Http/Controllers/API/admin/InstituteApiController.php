@@ -859,8 +859,8 @@ class InstituteApiController extends Controller
                     } else {
                         $boardtewArray = explode(',', $request->institute_board_id);
                         if(!in_array($board,$boardtewArray)){
-                        $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->get();
-                        $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->get();
+                        $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->first();
+                        $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->first();
                         if (!empty($student_check) || !empty($teacher_check)) {
                             return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
                         } else {
@@ -889,8 +889,8 @@ class InstituteApiController extends Controller
                     }else{
                         $mediumtewArray = explode(',', $request->institute_medium_id);
                         if(!in_array($medium,$mediumtewArray)){
-                        $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
-                        $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
+                        $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
+                        $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
                         if (!empty($student_check) || !empty($teacher_check)) {
                             return $this->response([], "Cannot remove institute_medium. Already exist student or teacher in this institute_medium.", false, 400);
                         } else {
