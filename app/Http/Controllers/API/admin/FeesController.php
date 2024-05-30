@@ -499,6 +499,7 @@ if (!empty($request->subject_id)) {
                         $revise_fee='';
                         if($query->discount_by =='Rupee'){
                             $revise_fee=$amounts - $query->discount_amount;
+                            
                         }
                         if($query->discount_by =='Percentage'){
                             $discountAmount =  $amounts * ($query->discount_amount / 100);
@@ -629,12 +630,13 @@ if (!empty($request->subject_id)) {
                 $revise_fee=0;
                 if($discount->discount_by =='Rupee'){
                     $revise_fee= $discount->discount_amount;
-                    $discount_Final=$discount->discount_amount.'.00';
+                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
                 }
                 if($discount->discount_by =='Percentage'){
                     $revise_fee =  $student_fees->total_fees * ($discount->discount_amount / 100);
                     // $revise_fee = $value->payment_amount - $revise_fee;
-                    $discount_Final=$discount->discount_amount.'%';
+                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
+                     
                 } 
                 
                 if(!empty($value->payment_amount)){
@@ -651,7 +653,7 @@ if (!empty($request->subject_id)) {
                            'student_name'=>$student_name,
                            'payment_type'=>$data,
                            'student_fees'=>(!empty($student_fees->total_fees)) ? $student_fees->total_fees .'.00' : '00.00',
-                           'discount'=>(!empty($discount_Final)) ? $discount_Final: '00.00' ,
+                           'discount'=>$discount_data,
                            'paid_amount'=>(!empty($amount_data))?$amount_data.'00':'00.00',
                            'histroy'=>$histroy
                           ];
