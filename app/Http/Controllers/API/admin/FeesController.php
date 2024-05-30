@@ -512,7 +512,7 @@ if (!empty($request->subject_id)) {
                             'total_fees_amount' => !empty($query->amount) ? $query->amount . '.00' : '00.00',
                             'discount' =>!empty($query->discount_amount) ? $query->discount_amount: '00.00',
                             'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
-
+                            'discount_by'=>$query->discount_by
                           ];
                       }
                       return $this->response($data, "fetch Student list Successfully");
