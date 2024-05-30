@@ -953,7 +953,7 @@ class TeacherController extends Controller
             if ($userdetl->image) {
                 $img = $userdetl->image;
             } else {
-                $img = asset('default.jpg');
+                $img = asset('no-image.PNG');
             }
 
             $standardids = Teacher_model::where('teacher_id', $teacher_id)
