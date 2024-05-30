@@ -958,16 +958,16 @@ class StudentController extends Controller
                     'exam.total_mark',
                     'exam.exam_type',
                     'exam.exam_date',
-                    'exam.exam_title'
+                    'exam.exam_title',
                 )
                 ->orderByDesc('marks.created_at')->limit(3)->get();
-            $highestMarks = $resultQY->max('marks');
+            $highestMarks = $resultQY->max('mark');
             foreach ($resultQY as $resultDDt) {
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                    'total_marks' => $resultDDt->total_marks,
-                    'achiveddmarks_marks' => boolval($resultDDt->mark),
+                    'total_marks' => $resultDDt->total_mark,
+                    'achiveddmarks_marks' => floatval($resultDDt->mark),
                     'date' => $resultDDt->exam_date,
                     'class_highest' => $highestMarks
                 );
@@ -984,21 +984,25 @@ class StudentController extends Controller
                     }
                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
                 }
+                
                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
-                    ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                    ->where('institute_id', $stdetail->institute_id)
-                    ->where('batch_id', $stdetail->batch_id)
-                    ->where('exam.board_id', $stdetail->board_id)
-                    ->where('exam.medium_id', $stdetail->medium_id)
-                    ->where('exam.standard_id', $stdetail->standard_id)
-                    ->orWhere('exam.stream_id', $stdetail->stream_id)
-                    ->whereIN('exam.subject_id', $subjectIds)
-                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                    ->orderBy('exam.created_at', 'desc')
-                    ->limit(3)
-                    ->get();
+                ->join('standard', 'standard.id', '=', 'exam.standard_id')
+                ->where('exam.institute_id', $stdetail->institute_id)
+                ->where('exam.batch_id', $stdetail->batch_id)
+                ->where('exam.board_id', $stdetail->board_id)
+                ->where('exam.medium_id', $stdetail->medium_id)
+                ->where(function($query) use ($stdetail) {
+                    $query->where('exam.standard_id', $stdetail->standard_id)
+                          ->orWhere('exam.stream_id', $stdetail->stream_id);
+                })
+                ->whereIn('exam.subject_id', $subjectIds)
+                ->orderBy('exam.created_at', 'desc')
+                ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                ->limit(3)
+                ->get();
+                
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
@@ -1040,7 +1044,7 @@ class StudentController extends Controller
             ];
             return $this->response($studentdata, "Successfully fetch data.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
