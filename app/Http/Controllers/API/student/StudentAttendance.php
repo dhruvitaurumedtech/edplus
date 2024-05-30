@@ -103,7 +103,7 @@ class StudentAttendance extends Controller
             $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.student_id')
                 ->where('attendance.institute_id', $request->institute_id)
                 ->where('attendance.student_id', $student_id)
-                ->where('attendance.created_at', strtotime('d-m-Y', $request->exam_date))
+                ->where('attendance.created_at', '2024-05-30 09:53:18.903070')
                 ->whereNull('attendance.deleted_at')
                 ->select('attendance.*', 'subject.name')
                 ->get();
