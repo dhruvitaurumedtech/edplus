@@ -73,12 +73,27 @@ class FeedbackController extends Controller
             
             $feedback_list = $feedback_list->get();
             $feedback_data = [];
+
+            
+
             foreach($feedback_list as $feedbackdata){
                 if($feedbackdata->role_type == 2){ 
+                    if ($feedbackdata->logo) {
+                        $insimg = $feedbackdata->logo;
+                    } else {
+                        $insimg = asset('no-image.PNG');
+                    }
+
                     // 2 role type feedback is  for users so which institute give a feedback to user
                     $dedsf = array('name'=>$feedbackdata->institute_name,
-                                    'image'=>$feedbackdata->logo);
+                                    'image'=>$insimg);
                 }else{
+                    if ($feedbackdata->image) {
+                        $insimg = $feedbackdata->image;
+                    } else {
+                        $insimg = asset('no-image.PNG');
+                    }
+
                     //is for which user give a feedback to institute
                     $dedsf = array('name'=>$feedbackdata->firstname .' '.$feedbackdata->lastname,
                                     'image'=>$feedbackdata->image,
