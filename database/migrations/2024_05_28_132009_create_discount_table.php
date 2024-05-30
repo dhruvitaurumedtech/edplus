@@ -18,7 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger('student_id')->nullable();
             $table->foreign('student_id')->references('id')->on('users');
             $table->string('financial_year');
-            $table->string('discount_amount');
+            $table->double('discount_amount');
             $table->enum('discount_by', ['Rupee', 'Percentage']);
             $table->timestamps();
         });
