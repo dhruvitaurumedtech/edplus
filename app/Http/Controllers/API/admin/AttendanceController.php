@@ -95,7 +95,7 @@ class AttendanceController extends Controller
                     'student_id' => $request->student_id,
                     'batch_id' => $request->batch_id,
                     'subject_id' => $request->subject_id,
-                    'date' => $request->date,
+                    'date' => date('Y-m-d',strtotime($request->date)),
                 ],
                 [
                     'attendance' => $request->status,

@@ -2757,6 +2757,7 @@ class StudentController extends Controller
             }
 
             $student_data = $query->get()->toArray();
+            // echo "<pre>";print_r($student_data);exit;
 
             if (!empty($student_data)) {
                 $student_response = [];
@@ -2776,7 +2777,7 @@ class StudentController extends Controller
                             ->get()
                             ->toArray();
                     }
-
+                    
                     $attendances = [];
 
                     foreach ($attendance_records as $attendance_record) {

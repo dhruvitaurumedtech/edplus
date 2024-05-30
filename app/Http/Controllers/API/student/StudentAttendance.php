@@ -99,12 +99,10 @@ class StudentAttendance extends Controller
             }else{
                 $student_id = Auth::id();
             }
-
-            $stdetails = Attendance_model::join('subject', 'subject.id', 'attendance', 'attendance.student_id')
+             $stdetails = Attendance_model::join('subject', 'subject.id','=','attendance.subject_id')
                 ->where('attendance.institute_id', $request->institute_id)
                 ->where('attendance.student_id', $student_id)
-                ->where('attendance.created_at', 'like', '%' . $request->date . '%')
-                ->whereNull('attendance.deleted_at')
+                ->where('attendance.date', $request->date)
                 ->select('attendance.*', 'subject.name')
                 ->get();
             $attenlist = [];
