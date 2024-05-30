@@ -482,6 +482,7 @@ if (!empty($request->subject_id)) {
                       $data = [];
                       foreach($student_list as $value){
                         $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
+                        ->leftjoin('discount','discount.student_id','=','students_details.student_id')
                         ->leftjoin('standard','standard.id','=','students_details.standard_id')
                         ->leftJoin('subject_sub', function($join) {
                           $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
@@ -489,8 +490,12 @@ if (!empty($request->subject_id)) {
                          })
                         ->where('students_details.student_id',$value->id)
                         ->where('students_details.institute_id',$request->institute_id)
-                        ->select('users.*','standard.name as standard_name','subject_sub.amount')
+                        ->select('users.*','standard.name as standard_name','subject_sub.amount','discount.discount_amount','discount.discount_by')
                         ->first();
+                        $revise_fee='';
+                        if($query->discount_by =='Rupee'){
+                            $revise_fee=$query->amount - $query->discount_amount;
+                        }
                         // echo "<pre>";print_r($query);exit;
                         $data[] =[
                             'student_id'=>$value->id,
@@ -500,7 +505,9 @@ if (!empty($request->subject_id)) {
                             'standard_name'=>$value->standard_name,
                             'stream_id'=>$value->stream_id,
                             'streamname'=>$value->streamname,
-                            'amount' => !empty($query->amount) ? $query->amount . '.00' : '00.00',
+                            'total_fees_amount' => !empty($query->amount) ? $query->amount . '.00' : '00.00',
+                            'discount' =>!empty($query->discount_amount) ? $query->discount_amount . '.00' : '00.00',
+                            'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
 
                           ];
                       }
@@ -540,7 +547,6 @@ if (!empty($request->subject_id)) {
         }
      }
      function add_discount(Request $request){
-        // dd($request->All());
         $validator = Validator::make($request->all(), [
             'student_id'=>'required|integer',
             'institute_id'=>'required|integer',
@@ -554,31 +560,20 @@ if (!empty($request->subject_id)) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $existingDiscount = Discount_model::where('institute_id', $request->institute_id)
-                                                ->where('student_id', $request->student_id)
-                                                ->where('financial_year', date('Y'))
-                                                ->exists();
-            $studentExists = DB::table('students_details')
-            ->where('student_id', $request->student_id)
-            ->exists();
-            if (!$studentExists) {
-                return $this->response([], 'Student does not exist', false, 400 );
-                
-            }
-
-       if (!$existingDiscount) {
-            Discount_model::create([
-                'institute_id' => $request->institute_id,
-                'student_id' => $request->student_id,
-                'financial_year' => date('Y'),
-                'discount_amount' => $request->discount_amount,
-                'discount_by' => $request->discount_by,
-            ]);
-
-     return $this->response([], "Discount Added successfully");
-        }else {
-            return $this->response([], "Discount already exists for the current financial year", false, 400 );
-        }
+         
+            Discount_model::updateOrCreate(
+                [
+                    'institute_id' => $request->institute_id,
+                    'student_id' => $request->student_id,
+                    'financial_year' => date('Y'),
+                ],
+                [
+                    'discount_amount' => $request->discount_amount,
+                    'discount_by' => $request->discount_by,
+                ]
+            );
+          return $this->response([], "Discount added or updated successfully");
+        
         }catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400 );
         }  
