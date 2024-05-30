@@ -496,7 +496,11 @@ if (!empty($request->subject_id)) {
                         if($query->discount_by =='Rupee'){
                             $revise_fee=$query->amount - $query->discount_amount;
                         }
-                        // echo "<pre>";print_r($query);exit;
+                        if($query->discount_by =='Percentage'){
+                            $discountAmount =  $query->amount * ($query->discount_amount / 100);
+                             $revise_fee = $query->amount - $discountAmount;
+                             
+                        }
                         $data[] =[
                             'student_id'=>$value->id,
                             'student_name'=>$value->firstname.' '.$value->lastname,
@@ -506,7 +510,7 @@ if (!empty($request->subject_id)) {
                             'stream_id'=>$value->stream_id,
                             'streamname'=>$value->streamname,
                             'total_fees_amount' => !empty($query->amount) ? $query->amount . '.00' : '00.00',
-                            'discount' =>!empty($query->discount_amount) ? $query->discount_amount . '.00' : '00.00',
+                            'discount' =>!empty($query->discount_amount) ? $query->discount_amount: '00.00',
                             'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
 
                           ];
