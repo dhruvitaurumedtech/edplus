@@ -500,7 +500,7 @@ if (!empty($request->subject_id)) {
                             'standard_name'=>$value->standard_name,
                             'stream_id'=>$value->stream_id,
                             'streamname'=>$value->streamname,
-                            'amount'=>$query->amount
+                            'amount'=>$query->amount.'.00'
                           ];
                       }
                       return $this->response($data, "fetch Student list Successfully");
