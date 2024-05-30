@@ -966,10 +966,10 @@ class StudentController extends Controller
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                    'total_marks' => $resultDDt->total_mark,
+                    'total_marks' => floatval($resultDDt->total_mark),
                     'achiveddmarks_marks' => floatval($resultDDt->mark),
                     'date' => $resultDDt->exam_date,
-                    'class_highest' => $highestMarks
+                    'class_highest' => floatval($highestMarks)
                 );
             }
             $subdta = Student_detail::where('student_id', $user_id)
