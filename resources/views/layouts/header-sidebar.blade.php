@@ -4,8 +4,7 @@
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
 <style>
-    / Add styles for open/close states /
-    .dashboard-nav-dropdown-menu {
+    / Add styles for open/close states / .dashboard-nav-dropdown-menu {
         display: none;
     }
 
@@ -17,148 +16,45 @@
     <nav class="dashboard-nav-list">
 
         <!-- <a href="index.php" class="dashboard-nav-item border-t"><i class="fas fa-tachometer-alt"></i> dashboard </a> -->
-        
-        <div class="dashboard-nav-dropdown" >
-            <a href="dashboard" class="dashboard-nav-item dashboard-nav-dropdown-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Dashboard
+        @php
+        $menu = getDynamicMenu();
+        @endphp
+        @php
+        function isActiveMenu($menu) {
+        return request()->routeIs($menu['url']) || collect($menu['submenus'])->pluck('url')->contains(request()->path());
+        }
+
+        function isActiveLink($url) {
+        return request()->routeIs($url) ? 'active' : '';
+        }
+        @endphp
+
+        @foreach ($menu as $value)
+        <div class="dashboard-nav-dropdown {{ isActiveMenu($value) }}">
+            <a href="{{ isset($value['url']) && Route::has($value['url']) ? url($value['url']) : '#' }}" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ isActiveLink($value['url']) }}">
+                <i class="fas fa-graduation-cap"></i>&nbsp;{{ $value['menu_name'] }}
             </a>
+            @if (!empty($value['submenus']))
+            <div class="dashboard-nav-dropdown-menu " style="{{ isActiveMenu($value) ? 'display: block;' : '' }}">
+                @foreach ($value['submenus'] as $submenu)
+                <a href="{{ url($submenu['url']) }}" class="dashboard-nav-dropdown-item {{ ($submenu['url']==request()->segment(1)) ? 'active': '' }}">
+                    <i class="fas fa-angle-right"></i>&nbsp; {{ $submenu['menu_name'] }}
+                </a>
+                @endforeach
+            </div>
+            @endif
         </div>
-        <div class="dashboard-nav-dropdown" >
+        @endforeach
+
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Setting
+                <i class="fas fa-graduation-cap"></i>&nbsp; Access Control
             </a>
             <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="role_list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Roles
+                <a href="{{ route('module.list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Module
                 </a>
             </div>
-        </div>
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Admin
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="admin" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Admin
-                </a>
-            </div>
-        </div>
-        
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Institute
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="institute-admin" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Institutes Admins
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="institute-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; List institute
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="institute-for-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Institute_for
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="board-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Board
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="class-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Class
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="medium-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Medium
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="standard-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Standard
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="stream-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Stream
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="subject-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Subject
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="do-business-with-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Do_business_with
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="add-lists" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Chapter
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="topic-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Topic
-                </a>
-            </div>
-        </div>
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Banner
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="banner-sizes" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Banner-size
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="banner-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; banner
-                </a>
-            </div>
-        </div>
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Category
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="video-category-list" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Video Category
-                </a>
-            </div>
-        </div>
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Announcement
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="announcement-create" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Create
-                </a>
-            </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="announcement-create-new" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; announcement
-                </a>
-            </div>
-        </div>
-        <div class="dashboard-nav-dropdown" >
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Video Time Limit
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="video-time-limit" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Video Time Limit
-                </a>
-            </div>
-          
         </div>
 
 
