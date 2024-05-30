@@ -994,8 +994,8 @@ document.querySelectorAll('.video_limit_deletebutton').forEach(function (button)
 document.querySelectorAll('.module_editButton').forEach(function (button) {
     button.addEventListener('click', function () {
         var module_id = this.getAttribute('data-module-id');
-
-        axios.post('/module/edit', {
+        var baseUrl = $('meta[name="base-url"]').attr('content');
+        axios.post(baseUrl + '/module/edit', {
             module_id: module_id
         })
             .then(response => {
