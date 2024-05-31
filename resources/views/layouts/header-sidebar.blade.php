@@ -4,7 +4,7 @@
 <link rel="stylesheet" href="{{asset('mayal_assets/css/style.css')}}" />
 <link rel="stylesheet" href="{{asset('mayal_assets/css/responsive.css')}}" />
 <style>
-    / Add styles for open/close states / .dashboard-nav-dropdown-menu {
+    .dashboard-nav-dropdown-menu {
         display: none;
     }
 
@@ -53,6 +53,9 @@
             <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
                 <a href="{{ route('module.list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Module
+                </a>
+                <a href="{{ route('feature.list') }}" class="dashboard-nav-dropdown-item" id="submenu2-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Feature
                 </a>
             </div>
         </div>

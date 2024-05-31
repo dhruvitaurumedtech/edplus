@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\NewAnnouncementController;
 use App\Http\Controllers\Admin\TopicController;
@@ -224,6 +225,13 @@ Route::middleware('auth')->group(function () {
     Route::post('module/edit', [ModuleController::class, 'module_edit'])->name('module.edit');
     Route::post('module/update', [ModuleController::class, 'module_update'])->name('module.update');
     Route::post('module/delete', [ModuleController::class, 'module_delete'])->name('module.delete');
+
+    Route::get('feature_list', [FeatureController::class, 'feature_list'])->name('feature.list');
+    Route::post('feature/create', [FeatureController::class, 'feature_create'])->name('feature.create');
+    Route::post('feature/edit', [FeatureController::class, 'feature_edit'])->name('feature.edit');
+    Route::post('feature/update', [FeatureController::class, 'feature_update'])->name('feature.update');
+    Route::post('feature/delete', [FeatureController::class, 'feature_delete'])->name('feature.delete');
+
     // ACL Management Module End
 });
 
