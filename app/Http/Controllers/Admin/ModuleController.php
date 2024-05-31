@@ -18,10 +18,12 @@ class ModuleController extends Controller
     {
         $request->validate([
             'module_name' => 'required|string|max:255',
+            'type' => 'required',
         ]);
 
         Module::create([
             'module_name' => $request->module_name,
+            'type' => $request->type,
         ]);
 
         return response()->json(['success' => 'Module created successfully']);
@@ -38,13 +40,13 @@ class ModuleController extends Controller
     {
         $request->validate([
             'module_name' => 'required|string|max:255',
+            'type' => 'required',
         ]);
 
         $module = Module::find($request->id);
-        $module->update([
-            'module_name' => $request->module_name,
-        ]);
-
+        $module->module_name = $request->module_name;
+        $module->type = $request->type;
+        $module->save();
         return response()->json(['success' => 'Module updated successfully']);
     }
 

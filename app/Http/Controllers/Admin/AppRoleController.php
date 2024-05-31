@@ -8,6 +8,7 @@ use App\Models\Module;
 use Illuminate\Http\Request;
 use App\Models\Roles;
 use App\Models\UserHasRole;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class AppRoleController extends Controller
@@ -24,10 +25,15 @@ class AppRoleController extends Controller
             'role_name' => 'required|string|max:255',
         ]);
 
-        Roles::create([
-            'role_name' => $request->role_name,
-            'created_by' => auth()->id(),  // Assuming you're using authentication
-        ]);
+        $roles = new Roles();
+        $roles->role_name = $request->role_name;
+        $roles->created_by = auth()->id();
+        if ($roles->save()) {
+            $user_has_role = new UserHasRole();
+            $user_has_role->role_id = $roles->id;
+            $user_has_role->user_id = auth()->id();
+            $user_has_role->save();
+        }
 
         return response()->json(['success' => 'Role created successfully']);
     }
