@@ -260,8 +260,10 @@ class ParentsController extends Controller
                     ->where('batch_id', $getstdntdata->batch_id)
                     ->where('exam.board_id', $getstdntdata->board_id)
                     ->where('exam.medium_id', $getstdntdata->medium_id)
-                    ->where('exam.standard_id', $getstdntdata->standard_id)
-                    ->orWhere('exam.stream_id', $getstdntdata->stream_id)
+                    ->where(function($query) use ($getstdntdata) {
+                        $query->where('exam.standard_id', $getstdntdata->standard_id)
+                              ->orWhere('exam.stream_id', $getstdntdata->stream_id);
+                    })
                     ->whereIN('exam.subject_id', $subjectIds)
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     ->orderBy('exam.created_at', 'desc')
