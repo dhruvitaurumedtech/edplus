@@ -40,7 +40,7 @@
                                             <label>Role Name</label>
                                         </div>
                                         <div class="col-md-9">
-                                            <input type="text" name="role_name" class="form-control" placeholder="Enter Role Name" value="{{old('role_name')}}">
+                                            <input type="text" name="role_name" class="form-control" placeholder="Enter Role Name" value="{{ old('role_name') }}">
                                             <div class="invalid-feedback" id="role_name_error"></div>
                                         </div>
                                     </div>
@@ -51,7 +51,7 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-lg-6  mt-3">
+                    <div class="col-lg-6 mt-3">
                         <div class="institute-form">
                             <div class="create-title-btn ">
                                 <h4 class="mb-0">List of Roles</h4>
@@ -71,12 +71,13 @@
                                     @php $i=1 @endphp
                                     @foreach($roles as $value)
                                     <tr>
-                                        <td>{{$i}}</td>
-                                        <td>{{$value->role_name}}</td>
+                                        <td>{{ $i }}</td>
+                                        <td>{{ $value->role_name }}</td>
                                         <td>
                                             <div class="d-flex">
                                                 <button class="btn text-white btn-rmv2 role_editButton" data-role-id="{{ $value->id }}">Edit</button>&nbsp;&nbsp;
-                                                <button class="btn btn-danger role_deleteButton" data-role-id="{{ $value->id }}">Delete</button>
+                                                <button class="btn btn-danger role_deleteButton" data-role-id="{{ $value->id }}">Delete</button>&nbsp;&nbsp;
+                                                <a href="{{ route('app_role.permissions', $value->id) }}" class="btn btn-secondary">Permissions</a>
                                             </div>
                                         </td>
                                     </tr>

@@ -238,7 +238,8 @@ Route::middleware('auth')->group(function () {
     Route::post('app_role/edit', [AppRoleController::class, 'role_edit'])->name('app_role.edit');
     Route::post('app_role/update', [AppRoleController::class, 'role_update'])->name('app_role.update');
     Route::post('app_role/delete', [AppRoleController::class, 'role_delete'])->name('app_role.delete');
-
+    Route::get('app_role/{id}/permissions', [AppRoleController::class, 'permissions'])->name('app_role.permissions');
+    Route::post('app_role/{id}/permissions/update', [AppRoleController::class, 'update_permissions'])->name('app_role.update_permissions');
 
     // ACL Management Module End
 });

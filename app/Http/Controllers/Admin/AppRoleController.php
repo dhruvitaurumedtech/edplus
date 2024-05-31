@@ -10,7 +10,7 @@ class AppRoleController extends Controller
 {
     public function role_list()
     {
-        $roles = Roles::orderBy('id', 'ASC')->paginate(10);
+        $roles = Roles::where('created_by', 1)->orderBy('id', 'ASC')->paginate(10);
         return view('approle.list', compact('roles'));
     }
 
@@ -61,5 +61,20 @@ class AppRoleController extends Controller
         $role->delete();
 
         return response()->json(['success' => 'Role deleted successfully']);
+    }
+
+    public function permissions($id)
+    {
+        $role = Roles::findOrFail($id);
+
+        return view('approle.permissions', compact('role'));
+    }
+
+    public function update_permissions(Request $request, $id)
+    {
+        $role = Roles::findOrFail($id);
+        $role->permissions()->sync($request->permissions);
+
+        return redirect()->route('app_role.permissions', $id)->with('success', 'Permissions updated successfully');
     }
 }
