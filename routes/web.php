@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\AppRoleController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BannerSizeController;
 use App\Http\Controllers\Admin\RoleController;
@@ -231,6 +232,13 @@ Route::middleware('auth')->group(function () {
     Route::post('feature/edit', [FeatureController::class, 'feature_edit'])->name('feature.edit');
     Route::post('feature/update', [FeatureController::class, 'feature_update'])->name('feature.update');
     Route::post('feature/delete', [FeatureController::class, 'feature_delete'])->name('feature.delete');
+
+    Route::get('app_role_list', [AppRoleController::class, 'role_list'])->name('app_role.list');
+    Route::post('app_role/create', [AppRoleController::class, 'role_create'])->name('app_role.create');
+    Route::post('app_role/edit', [AppRoleController::class, 'role_edit'])->name('app_role.edit');
+    Route::post('app_role/update', [AppRoleController::class, 'role_update'])->name('app_role.update');
+    Route::post('app_role/delete', [AppRoleController::class, 'role_delete'])->name('app_role.delete');
+
 
     // ACL Management Module End
 });
