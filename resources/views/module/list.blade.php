@@ -44,6 +44,18 @@
                       <div class="invalid-feedback" id="module_name_error"></div>
                     </div>
                   </div>
+                  <div class="form-group row">
+                    <div class="col-md-3">
+                      <label>Type</label>
+                    </div>
+                    <div class="col-md-9">
+                      <select name="type" class="form-control">
+                        <option value="1">Admin</option>
+                        <option value="2">Application</option>
+                      </select>
+                      <div class="invalid-feedback" id="type_error"></div>
+                    </div>
+                  </div>
                 </div>
                 <div class="submit-btn">
                   <button type="button" id="createModuleButton" class="btn bg-primary-btn text-white">Submit</button>
@@ -51,10 +63,10 @@
               </form>
             </div>
           </div>
-          <div class="col-lg-6  mt-3">
+          <div class="col-lg-6 mt-3">
             <div class="institute-form">
               <div class="create-title-btn ">
-                <h4 class="mb-0">List of Module</h4>
+                <h4 class="mb-0">List of Modules</h4>
                 <div class="inner-list-search">
                   <input type="search" class="form-control myInput" name="search" placeholder="Search">
                 </div>
@@ -64,6 +76,7 @@
                   <tr>
                     <th scope="col">No</th>
                     <th scope="col">Module Name</th>
+                    <th scope="col">Type</th>
                     <th scope="col">Action</th>
                   </tr>
                 </thead>
@@ -73,6 +86,7 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->module_name}}</td>
+                    <td>{{$value->type == 1 ? 'Admin' : 'Application'}}</td>
                     <td>
                       <div class="d-flex">
                         <button class="btn text-white btn-rmv2 module_editButton" data-module-id="{{ $value->id }}">Edit</button>&nbsp;&nbsp;
@@ -111,8 +125,16 @@
                 <div class="form-group">
                   <label for="editModuleName">Module Name:</label>
                   <input type="hidden" id="editModuleId" name="id">
-                  <input type="text" name="module_name" class="form-control" id="editModuleName" placeholder="Edit Module">
+                  <input type="text" name="module_name" class="form-control" id="editModuleName" placeholder="Edit Module Name">
                   <div class="invalid-feedback" id="edit_module_name_error"></div>
+                </div>
+                <div class="form-group">
+                  <label for="editType">Type:</label>
+                  <select name="type" class="form-control" id="editType">
+                    <option value="1">Admin</option>
+                    <option value="2">Application</option>
+                  </select>
+                  <div class="invalid-feedback" id="edit_type_error"></div>
                 </div>
               </div>
               <hr>
@@ -149,6 +171,13 @@
                 $('#module_name_error').text('');
                 $('input[name="module_name"]').removeClass('is-invalid');
               }
+              if (errors.type) {
+                $('#type_error').text(errors.type[0]);
+                $('select[name="type"]').addClass('is-invalid');
+              } else {
+                $('#type_error').text('');
+                $('select[name="type"]').removeClass('is-invalid');
+              }
             }
           }
         });
@@ -168,6 +197,7 @@
             console.log(response);
             $('#editModuleId').val(response.module.id);
             $('#editModuleName').val(response.module.module_name);
+            $('#editType').val(response.module.type);
             $('#editModuleModal').modal('show');
           },
           error: function(response) {
@@ -197,6 +227,13 @@
               } else {
                 $('#edit_module_name_error').text('');
                 $('input[name="module_name"]').removeClass('is-invalid');
+              }
+              if (errors.type) {
+                $('#edit_type_error').text(errors.type[0]);
+                $('select[name="type"]').addClass('is-invalid');
+              } else {
+                $('#edit_type_error').text('');
+                $('select[name="type"]').removeClass('is-invalid');
               }
             }
           }
