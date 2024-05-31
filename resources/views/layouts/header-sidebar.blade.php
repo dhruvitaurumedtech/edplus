@@ -57,6 +57,9 @@
                 <a href="{{ route('feature.list') }}" class="dashboard-nav-dropdown-item" id="submenu2-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Feature
                 </a>
+                <a href="{{ route('app_role.list') }}" class="dashboard-nav-dropdown-item" id="submenu2-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; App Role
+                </a>
             </div>
         </div>
 
