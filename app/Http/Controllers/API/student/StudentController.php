@@ -2389,9 +2389,9 @@ class StudentController extends Controller
                         //->where('exam.class_id', $stdetail->class_id)
                         ->where('exam.institute_id', $stdetail->institute_id)
                         ->where('exam.batch_id', $stdetail->batch_id)
+                        ->where('exam.standard_id', $stdetail->standard_id)
                         ->where(function($query) use ($stdetail) {
-                            $query->where('exam.standard_id', $stdetail->standard_id)
-                                  ->orWhere('exam.stream_id', $stdetail->stream_id);
+                           $query->orWhere('exam.stream_id', $stdetail->stream_id);
                         })
                         ->whereIN('exam.subject_id', $subjectIds)
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
