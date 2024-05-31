@@ -1033,14 +1033,13 @@ class StudentController extends Controller
                 ->orderByDesc('marks.created_at')->limit(3)->get();
             $highestMarks = $resultQY->max('mark');
             foreach ($resultQY as $resultDDt) {
-                $formatted_float = floatval($highestMarks);
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
                     'total_marks' => intval($resultDDt->total_mark),
-                    'achiveddmarks_marks' => number_format($resultDDt->mark,2),
+                    'achiveddmarks_marks' => $resultDDt->mark,
                     'date' => $resultDDt->exam_date,
-                    'class_highest' => sprintf("%.2f", $formatted_float) //number_format($highestMarks,2),
+                    'class_highest' => $highestMarks
                 );
             }
             $subdta = Student_detail::where('student_id', $user_id)
