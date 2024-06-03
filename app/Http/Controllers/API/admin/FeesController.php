@@ -162,9 +162,11 @@ class FeesController extends Controller
                             $query->where('students_details.batch_id', $request->batch_id);
                             }
 
-                            foreach ($subjectIds as $subjectId) {
-                            $query->whereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
-                            }
+                            $query->where(function($query) use ($subjectIds) {
+                                foreach ($subjectIds as $subjectId) {
+                                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                                }
+                            });
 
                             $student_response = $query->get()->toArray();
 
@@ -234,9 +236,11 @@ class FeesController extends Controller
                             $query->where('students_details.batch_id', $request->batch_id);
                             }
 
-                            foreach ($subjectIds as $subjectId) {
-                            $query->whereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
-                            }
+                            $query->where(function($query) use ($subjectIds) {
+                                foreach ($subjectIds as $subjectId) {
+                                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                                }
+                            });
 
                             $student_response = $query->get()->toArray();
 
