@@ -39,6 +39,7 @@ use Illuminate\Auth\Events\Verified;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -2380,16 +2381,21 @@ class StudentController extends Controller
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
                     $stream_id =$stdetail->stream_id;
+                    $batch_id =$stdetail->batch_id;
                     $subjectIds = explode(',', $stdetail->subject_id);
-                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                    
+                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
                         ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
-                        ->where('institute_detail.end_academic_year', '>=', now())
+                        ->where('institute_detail.end_academic_year', '>=', Carbon::now())
                         ->where('exam.board_id', $stdetail->board_id)
                         ->where('exam.medium_id', $stdetail->medium_id)
                         //->where('exam.class_id', $stdetail->class_id)
                         ->where('exam.institute_id', $stdetail->institute_id)
-                        ->where('exam.batch_id', $stdetail->batch_id)
+                        //->where('exam.batch_id', $stdetail->batch_id)
+                        ->when($stdetail->batch_id, function ($query, $batch_id) {
+                            return $query->where('exam.batch_id', $batch_id);
+                        })
                         ->where('exam.standard_id', $stdetail->standard_id)
                         ->when($stdetail->stream_id, function ($query, $stream_id) {
                             return $query->where('exam.stream_id', $stream_id);
@@ -2398,7 +2404,7 @@ class StudentController extends Controller
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
                         ->orderByDesc('exam.created_at')
                         ->get();
-
+                       
                     foreach ($exams as $examsDT) {
                         $examlist[] = array(
                             'institute_id' => $examsDT->institute_id,
