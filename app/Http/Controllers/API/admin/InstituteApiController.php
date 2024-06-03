@@ -3082,6 +3082,7 @@ class InstituteApiController extends Controller
             }
 
             if (!empty($studentdtls)) {
+                if ($existingUser->role_type != 6) {
                 $studentupdetail = [
                     'user_id' => $user_id,
                     'institute_id' => $request->institute_id,
@@ -3144,6 +3145,7 @@ class InstituteApiController extends Controller
                 } else {
                     return $this->response([], 'Not Inserted.', false, 400);
                 }
+            } 
             } else {
                 $parets = Parents::where('student_id', $student_id)->get();
 
