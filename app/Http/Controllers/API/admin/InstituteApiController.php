@@ -2200,20 +2200,15 @@ class InstituteApiController extends Controller
                         ->where('user_id', $user_id)
                         ->where('board_id', $board->id)
                         ->where('institute_id', $institute_id);
+                })->get(['id', 'name', 'icon']);
+                $medium_array = $medium_list->map(function ($medium) {
+                    return [
+                        'id' => $medium->id,
+                        'medium_name' => $medium->name,
+                        'medium_icon' => asset($medium->icon)
+                    ];
                 })
-                // ->get(['id', 'name', 'icon']);
-                // $medium_array = $medium_list->map(function ($medium) {
-                //     return [
-                //         'id' => $medium->id,
-                //         'medium_name' => $medium->name,
-                //         'medium_icon' => asset($medium->icon)
-                //     ];
-                // })
-                ->select('id', 'name', 'icon')->get();
-                foreach($medium_list as $medium){
-                    $medium_array = array('id' => $medium->id,
-                             'medium_name' => $medium->name,
-                             'medium_icon' => asset($medium->icon));
+                ->toArray();
                     $board_array[] = [
                         'id' => $board->id,
                         'board_name' => $board->name,
@@ -2221,7 +2216,7 @@ class InstituteApiController extends Controller
                         'medium' => $medium_array,
                         // Include banner_array inside board_array
                     ];
-                }
+                
                 
             }
 
