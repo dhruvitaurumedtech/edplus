@@ -2211,7 +2211,7 @@ class InstituteApiController extends Controller
                 //     ];
                 // })
                 //->toArray();
-                foreach($medium_list as $mediumDT){
+                foreach($medium_list as $medium){
                     $medium_array = array('id' => $medium->id,
                             'medium_name' => $medium->name,
                              'medium_icon' => asset($medium->icon));
