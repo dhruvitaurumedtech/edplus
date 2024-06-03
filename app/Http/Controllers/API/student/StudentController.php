@@ -2379,6 +2379,7 @@ class StudentController extends Controller
             $examlist = [];
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
+                    $stream_id =$stdetail->stream_id;
                     $subjectIds = explode(',', $stdetail->subject_id);
                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
@@ -2390,8 +2391,8 @@ class StudentController extends Controller
                         ->where('exam.institute_id', $stdetail->institute_id)
                         ->where('exam.batch_id', $stdetail->batch_id)
                         ->where('exam.standard_id', $stdetail->standard_id)
-                        ->where(function($query) use ($stdetail) {
-                           $query->orWhere('exam.stream_id', $stdetail->stream_id);
+                        ->when($stdetail->stream_id, function ($query, $stream_id) {
+                            return $query->where('exam.stream_id', $stream_id);
                         })
                         ->whereIN('exam.subject_id', $subjectIds)
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
