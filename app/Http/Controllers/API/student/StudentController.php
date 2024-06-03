@@ -2887,7 +2887,7 @@ class StudentController extends Controller
                 ];
                 return $this->response($base, "Student Fetch Successfully");
             } else {
-                return $this->response(null, "Data Not Found");
+                return $this->response([], "Data Not Found");
             }
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
