@@ -174,7 +174,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     // Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
      Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
-    // Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
+    Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
     
 
 
