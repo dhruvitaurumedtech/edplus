@@ -476,7 +476,9 @@ if (!empty($request->subject_id)) {
 
                     
                       $data = [];
-                  
+                  $revise_fee='';
+                  $revise_fee ='';
+                  $discount_data='';
                       foreach($student_list as $value){
 
                         $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
@@ -496,7 +498,8 @@ if (!empty($request->subject_id)) {
                             }
                             
                         }
-                        $revise_fee='';
+                        
+                        
                         if($query->discount_by =='Rupee'){
                             $revise_fee=$amounts - $query->discount_amount;
                             $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'.00' : '00.00' ;
@@ -621,6 +624,16 @@ if (!empty($request->subject_id)) {
             
             $histroy = [];
             $paid_amount = 0;
+            if($discount->discount_by =='Rupee'){
+                $revise_fee= $discount->discount_amount;
+                $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
+            }
+            if($discount->discount_by =='Percentage'){
+                $revise_fee =  $student_fees->total_fees * ($discount->discount_amount / 100);
+                // $revise_fee = $value->payment_amount - $revise_fee;
+                $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
+                 
+            } 
             foreach($student_histroy as $value){
                 $histroy[] =[
                     'paid_amount'=>$value->payment_amount,
@@ -630,16 +643,7 @@ if (!empty($request->subject_id)) {
                     'transaction_id'=>$value->transaction_id,
                 ];
                 $revise_fee=0;
-                if($discount->discount_by =='Rupee'){
-                    $revise_fee= $discount->discount_amount;
-                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
-                }
-                if($discount->discount_by =='Percentage'){
-                    $revise_fee =  $student_fees->total_fees * ($discount->discount_amount / 100);
-                    // $revise_fee = $value->payment_amount - $revise_fee;
-                    $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
-                     
-                } 
+                
                 
                 if(!empty($value->payment_amount)){
                         $paid_amount += $value->payment_amount;
