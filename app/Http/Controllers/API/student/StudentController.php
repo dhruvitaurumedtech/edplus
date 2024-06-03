@@ -869,29 +869,23 @@ class StudentController extends Controller
                         ->from('medium_sub')
                         ->where('board_id', $board->id)
                         ->where('institute_id', $institute_id);
-                })
-                // ->get(['id', 'name', 'icon']);
-                // $medium_array = $medium_list->map(function ($medium) {
-                //     return [
-                //         'id' => $medium->id,
-                //         'medium_name' => $medium->name,
-                //         'medium_icon' => asset($medium->icon)
-                //     ];
-                // })->toArray();
-                ->select('id', 'name', 'icon')->get();
+                })->get(['id', 'name', 'icon']);
 
-                foreach($medium_list as $medium){
-                    $medium_array = array('id' => $medium->id,
-                             'medium_name' => $medium->name,
-                             'medium_icon' => asset($medium->icon));
-                    $boards[] = [
-                        'id' => $board->id,
-                        'board_name' => $board->name,
-                        'board_icon' => asset($board->icon),
-                        'medium' => $medium_array,
-                        // Include banner_array inside board_array
+                $medium_array = $medium_list->map(function ($medium) {
+                    return [
+                        'id' => $medium->id,
+                        'medium_name' => $medium->name,
+                        'medium_icon' => asset($medium->icon)
                     ];
-                }
+                })->toArray();
+
+                $boards[] = [
+                    'id' => $board->id,
+                    'board_name' => $board->name,
+                    'board_icon' => asset($board->icon),
+                    'medium' => $medium_array,
+                    // Include banner_array inside board_array
+                ];
             }
 
             //feedbacks
