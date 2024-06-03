@@ -2199,24 +2199,31 @@ class InstituteApiController extends Controller
                         ->from('medium_sub')
                         ->where('user_id', $user_id)
                         ->where('board_id', $board->id)
-                        ->where('institute_id', $institute_id);
-                })->get(['id', 'name', 'icon']);
+                        ->where('institute_id', $institute_id)
+                        ->select('id', 'name', 'icon');
+                })->get();
 
-                $medium_array = $medium_list->map(function ($medium) {
-                    return [
-                        'id' => $medium->id,
-                        'medium_name' => $medium->name,
-                        'medium_icon' => asset($medium->icon)
+                // $medium_array = $medium_list->map(function ($medium) {
+                //     return [
+                //         'id' => $medium->id,
+                //         'medium_name' => $medium->name,
+                //         'medium_icon' => asset($medium->icon)
+                //     ];
+                // })
+                //->toArray();
+                foreach($medium_list as $mediumDT){
+                    $medium_array = array('id' => $medium->id,
+                            'medium_name' => $medium->name,
+                             'medium_icon' => asset($medium->icon));
+                    $board_array[] = [
+                        'id' => $board->id,
+                        'board_name' => $board->name,
+                        'board_icon' => asset($board->icon),
+                        'medium' => $medium_array,
+                        // Include banner_array inside board_array
                     ];
-                })->toArray();
-
-                $board_array[] = [
-                    'id' => $board->id,
-                    'board_name' => $board->name,
-                    'board_icon' => asset($board->icon),
-                    'medium' => $medium_array,
-                    // Include banner_array inside board_array
-                ];
+                }    
+                
             }
 
             // Fetch banners
