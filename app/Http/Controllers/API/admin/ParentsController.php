@@ -335,4 +335,53 @@ class ParentsController extends Controller
         }
             
     }
+    public function view_profile(Request $request){
+        $validator = Validator::make($request->all(), [
+            'parent_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $parent = Parents::join('users', 'users.id', '=', 'parents.parent_id')
+            ->where('parents.parent_id', $request->parent_id)
+            ->get();
+              $data1 = [];
+            foreach($parent as $value_parent){
+                $data1[] = ['first_name'=>$value_parent->firstname,
+                           'last_name'=>$value_parent->lastname,
+                           'email'=>$value_parent->email,
+                           'phone'=>$value_parent->mobile,
+                           'profile'=>(!empty($value_parent->image))?asset($value_parent->image):asset('no-image.png'),
+                           'address'=>$value_parent->address];
+            }
+            $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
+            ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
+            ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+              ->where('parents.parent_id', $request->parent_id)
+              ->select('users.*','institute_detail.institute_name')
+              ->get();
+              $data2 = [];
+            foreach($student as $value_student){
+                $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
+                ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
+                ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+                ->where('parents.parent_id', $request->parent_id)
+                ->select('users.*','institute_detail.institute_name')
+                ->get();
+
+                $data2[] = ['first_name'=>$value_student->firstname,
+                            'last_name'=>$value_student->lastname,
+                            'email'=>$value_student->email,
+                            'phone'=>$value_student->mobile,
+                            'institute_name'=>$value_student->institute_name];
+            }
+                $response = ['parent'=>$data1,'student'=>$data2];
+                // echo "<pre>";print_r($parent);exit;
+                return $this->response($response, "Data Fetch Successfully");
+            }catch(\Exception $e){
+                return $this->response($e, "Something want Wrong!!.", false, 400);
+            }
+
+    }
 }
