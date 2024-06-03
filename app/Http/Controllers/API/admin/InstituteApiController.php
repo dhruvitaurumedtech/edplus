@@ -3145,6 +3145,8 @@ class InstituteApiController extends Controller
                 } else {
                     return $this->response([], 'Not Inserted.', false, 400);
                 }
+            }else{
+                return $this->response([], "Something went wrong.", false, 400);
             } 
             } else {
                 $parets = Parents::where('student_id', $student_id)->get();

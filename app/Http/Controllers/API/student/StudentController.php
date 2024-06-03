@@ -889,25 +889,25 @@ class StudentController extends Controller
             }
 
             //feedbacks
-            $feedback_list = FeedbackModel::select(
-                'feedbacks.id as feedback_id',
-                'feedbacks.feedback',
-                'feedbacks.feedback_to_id',
-                'feedbacks.institute_id',
-                'feedbacks.rating',
-                'feedbacks.role_type',
-                'feedbacks.created_at',
-                'users.firstname',
-                'users.lastname',
-                'users.image',
-                'roles.role_name',
-            )
-            ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
-            ->Join('roles', 'roles.id', '=', 'users.role_type')
-            ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
-            ->where('feedbacks.institute_id', $institute_id)
-            ->where('feedbacks.role_type', '1')
-            ->orderByDesc('feedbacks.created_at')->get()->toArray();
+            // $feedback_list = FeedbackModel::select(
+            //     'feedbacks.id as feedback_id',
+            //     'feedbacks.feedback',
+            //     'feedbacks.feedback_to_id',
+            //     'feedbacks.institute_id',
+            //     'feedbacks.rating',
+            //     'feedbacks.role_type',
+            //     'feedbacks.created_at',
+            //     'users.firstname',
+            //     'users.lastname',
+            //     'users.image',
+            //     'roles.role_name',
+            // )
+            // ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
+            // ->Join('roles', 'roles.id', '=', 'users.role_type')
+            // ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
+            // ->where('feedbacks.institute_id', $institute_id)
+            // ->where('feedbacks.role_type', '1')
+            // ->orderByDesc('feedbacks.created_at')->get()->toArray();
             
 
             $stdcount = Student_detail::where('institute_id', $request->institute_id)->count();
@@ -931,7 +931,7 @@ class StudentController extends Controller
                 'students' => $stdcount,
                 'subject' => $subcount,
                 'teacher' => $teacherdt,
-                'feedback'=>$feedback_list
+                //'feedback'=>$feedback_list
             );
             return $this->response($institutedetaa, "Successfully fetch data.");
         } catch (Exception $e) {
