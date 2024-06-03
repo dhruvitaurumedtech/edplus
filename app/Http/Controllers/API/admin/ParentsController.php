@@ -363,7 +363,7 @@ class ParentsController extends Controller
               ->get();
               $data2 = [];
             foreach($student as $value_student){
-                $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
+                $student2 = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                 ->where('parents.parent_id', $request->parent_id)
