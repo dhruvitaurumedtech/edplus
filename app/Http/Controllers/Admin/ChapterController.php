@@ -89,6 +89,8 @@ class ChapterController extends Controller
 
         $exists = Chapter::where('subject_id', $request->input('subject'))
             ->where('base_table_id', $request->input('standard_id'))
+            ->where('chapter_name', $request->input('chapter_name'))
+            ->where('chapter_no', $request->input('chapter_no'))
             ->exists();
         if ($exists) {
             return redirect()->route('chapter.list')->with('success', 'Already Exists!');
