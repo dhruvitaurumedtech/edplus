@@ -117,44 +117,72 @@ class FeesController extends Controller
     public function paid_fees_student(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
+            'batch_id' =>'required|exists:batches,id',
             'board_id' => 'required|exists:board,id',
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
-            'batch_id' => 'required|exists:batches,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-        $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
-                                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
-                                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                                            ->leftJoin('fees_colletion', function ($join) {
-                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
-                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
-                                            })
-                                            ->select('users.*','fees_colletion.status')
-                                            ->where('students_details.institute_id', $request->institute_id)
-                                            ->where('students_details.batch_id', $request->batch_id)
-                                            ->where('students_details.board_id', $request->board_id)
-                                            ->where('students_details.medium_id', $request->medium_id)
-                                            ->where('students_details.standard_id', $request->standard_id);
-            if (!empty($request->subject_id)) {
-            $subjectIds = explode(',', $request->subject_id);
-            $query->whereIn('students_details.subject_id', $subjectIds);
-            }
-            $student_response=$query->get()->toArray();
+            $subjectIds = [];
+                if (!empty($request->subject_id)) {
+                    $subjectIds = explode(',', $request->subject_id);
+
+                }
+                            $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                            ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
+                            ->select(
+                                'users.id',
+                                'users.firstname',
+                                'users.lastname',
+                                'users.image',
+                                'students_details.student_id', // make sure this is included if it's not part of 'users'
+                                DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+                            )
+                            ->where('students_details.institute_id', $request->institute_id)
+                            ->where('students_details.board_id', $request->board_id)
+                            ->where('students_details.medium_id', $request->medium_id)
+                            ->where('students_details.standard_id', $request->standard_id)
+                            ->where('students_details.status', '1')
+                            ->groupBy(
+                                'users.id',
+                                'users.firstname',
+                                'users.lastname',
+                                'users.image',
+                                'students_details.student_id' // include this in the group by as well
+                            );
+
+                            if (!empty($request->batch_id)) {
+                            $query->where('students_details.batch_id', $request->batch_id);
+                            }
+
+                            $query->where(function($query) use ($subjectIds) {
+                                foreach ($subjectIds as $subjectId) {
+                                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                                }
+                            });
+
+                            $student_response = $query->get()->toArray();
+
+            // echo "<pre>";print_r($student_response);exit;
             $student = [];
+            
+           
             foreach($student_response as $value){
-                if($value['status'] == 'paid'){
+                $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
+                if($student_fees->total_fees == $value['total_payment_amount']){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                    'status'=>$value['status']];
+                    'status'=>'paid'];
                 }
-            }
+             }                    
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -173,40 +201,70 @@ class FeesController extends Controller
         }
         try{
             $subjectIds = [];
-if (!empty($request->subject_id)) {
-    $subjectIds = explode(',', $request->subject_id);
+                if (!empty($request->subject_id)) {
+                    $subjectIds = explode(',', $request->subject_id);
 
-}
-        $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
-                                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
-                                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                                            ->leftJoin('fees_colletion', function ($join) {
-                                                $join->on('fees_colletion.student_id', '=', 'students_details.student_id')
-                                                    ->whereRaw('fees_colletion.id = (SELECT MAX(id) FROM fees_colletion WHERE student_id = students_details.student_id)');
-                                            })
-                                            ->select('users.*','fees_colletion.status','fees_colletion.student_id')
-                                            ->where('students_details.institute_id', $request->institute_id)
-                                            ->where('students_details.batch_id', $request->batch_id)
-                                            ->where('students_details.board_id', $request->board_id)
-                                            ->where('students_details.medium_id', $request->medium_id)
-                                            ->where('students_details.standard_id', $request->standard_id)
-                                            ->where('students_details.status', '1');
-                                            foreach ($subjectIds as $subjectId) {
-                                                $query->whereRaw("FIND_IN_SET($subjectId, students_details.subject_id)");
-                                            }
-            $student_response=$query->get()->toArray();
-            $student = [];
+                }
+                            $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                            ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
+                            ->select(
+                                'users.id',
+                                'users.firstname',
+                                'users.lastname',
+                                'users.image',
+                                'students_details.student_id', // make sure this is included if it's not part of 'users'
+                                DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+                            )
+                            ->where('students_details.institute_id', $request->institute_id)
+                            ->where('students_details.board_id', $request->board_id)
+                            ->where('students_details.medium_id', $request->medium_id)
+                            ->where('students_details.standard_id', $request->standard_id)
+                            ->where('students_details.status', '1')
+                            ->groupBy(
+                                'users.id',
+                                'users.firstname',
+                                'users.lastname',
+                                'users.image',
+                                'students_details.student_id' // include this in the group by as well
+                            );
+
+                            if (!empty($request->batch_id)) {
+                            $query->where('students_details.batch_id', $request->batch_id);
+                            }
+
+                            $query->where(function($query) use ($subjectIds) {
+                                foreach ($subjectIds as $subjectId) {
+                                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                                }
+                            });
+
+                            $student_response = $query->get()->toArray();
+
+             $student = [];
+            
+           
             foreach($student_response as $value){
-                    if($value['student_id'] != $value['id']){
-                          $student[]=  ['student_id'=>$value['id'],
-                                        'student_name'=>$value['firstname'].' '.$value['lastname'],
-                                        'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                                        'status'=>'pending'];
-                            
+                $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
+                if($student_fees->total_fees != $value['total_payment_amount']){
+                    if(!empty($value['total_payment_amount']))
+                    {
+                        $due_Amount = $student_fees->total_fees - $value['total_payment_amount'];
+                   
+                    }else{
+                        $due_Amount = $student_fees->total_fees;
+
                     }
-                  }
+                    $student[]=  ['student_id'=>$value['id'],
+                    'student_name'=>$value['firstname'].' '.$value['lastname'],
+                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
+                    'status'=>'pending',
+                    'due_amount'=>$due_Amount];
+                }
+             }                    
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
