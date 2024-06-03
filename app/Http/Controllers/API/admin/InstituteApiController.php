@@ -3197,7 +3197,7 @@ class InstituteApiController extends Controller
                     //                ->whereIn('subject_id',explode(',',$request->subject_id))
                     //                ->select('amount')
                     //                ->get();
-                    //      $amount =0;
+                    //      $amount = 0;
                     //     foreach($subject_amount as $value){
                     //        $amount += $value->amount;
 
@@ -3209,6 +3209,22 @@ class InstituteApiController extends Controller
                     //         'subject_id' => $request->subject_id,
                     //         'total_fees' => (!empty($amount)) ? $amount : '',
                     //     ]);
+                    $subject_amounts = Subject_sub::where('institute_id', $institute_id)
+                                ->whereIn('subject_id', explode(',', $request->subject_id))
+                                ->pluck('amount');
+
+                            $amount = 0.0;
+                            foreach ($subject_amounts as $value) {
+                                $amount += (double) $value;
+                            }
+
+                            Student_fees_model::create([
+                                'user_id' => $user_id,
+                                'institute_id' => $request->institute_id,
+                                'student_id' => $student_id,
+                                'subject_id' => $request->subject_id,
+                                'total_fees' => $amount,
+                            ]);
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
                         if (!empty($parets)) {
                             foreach ($parets as $prdtl) {
