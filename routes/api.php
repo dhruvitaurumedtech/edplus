@@ -28,6 +28,7 @@ use App\Http\Controllers\API\student\StudentAttendance;
 use App\Http\Controllers\PdfController;
 use App\Models\Student_detail;
 
+
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/google', [AuthController::class, 'handleGoogle']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');

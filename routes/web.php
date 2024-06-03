@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AnnouncementController;
+use App\Http\Controllers\Admin\AppRoleController;
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\Admin\BannerSizeController;
 use App\Http\Controllers\Admin\RoleController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\Admin\StreamController;
 use App\Http\Controllers\Admin\StudentsController;
 use App\Http\Controllers\Admin\SubjectController;
 use App\Http\Controllers\Admin\ChapterController;
+use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\NewAnnouncementController;
 use App\Http\Controllers\Admin\TopicController;
@@ -224,6 +226,21 @@ Route::middleware('auth')->group(function () {
     Route::post('module/edit', [ModuleController::class, 'module_edit'])->name('module.edit');
     Route::post('module/update', [ModuleController::class, 'module_update'])->name('module.update');
     Route::post('module/delete', [ModuleController::class, 'module_delete'])->name('module.delete');
+
+    Route::get('feature_list', [FeatureController::class, 'feature_list'])->name('feature.list');
+    Route::post('feature/create', [FeatureController::class, 'feature_create'])->name('feature.create');
+    Route::post('feature/edit', [FeatureController::class, 'feature_edit'])->name('feature.edit');
+    Route::post('feature/update', [FeatureController::class, 'feature_update'])->name('feature.update');
+    Route::post('feature/delete', [FeatureController::class, 'feature_delete'])->name('feature.delete');
+
+    Route::get('app_role_list', [AppRoleController::class, 'role_list'])->name('app_role.list');
+    Route::post('app_role/create', [AppRoleController::class, 'role_create'])->name('app_role.create');
+    Route::post('app_role/edit', [AppRoleController::class, 'role_edit'])->name('app_role.edit');
+    Route::post('app_role/update', [AppRoleController::class, 'role_update'])->name('app_role.update');
+    Route::post('app_role/delete', [AppRoleController::class, 'role_delete'])->name('app_role.delete');
+    Route::get('app_role/{id}/permissions', [AppRoleController::class, 'permissions'])->name('app_role.permissions');
+    Route::post('app_role/{id}/permissions/update', [AppRoleController::class, 'update_permissions'])->name('app_role.update_permissions');
+
     // ACL Management Module End
 });
 

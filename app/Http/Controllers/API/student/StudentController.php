@@ -17,6 +17,8 @@ use App\Models\Dobusinesswith_Model;
 use App\Models\Subject_sub;
 use App\Models\Class_model;
 use App\Models\Exam_Model;
+use App\Models\FeedbackModel;
+use App\Models\Institute_board_sub;
 use App\Models\Stream_model;
 use App\Models\Standard_model;
 use App\Models\Institute_detail;
@@ -30,6 +32,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\VideoCategory;
 use App\Models\Medium_model;
+use App\Models\Teacher_model;
 use App\Models\Timetable;
 use App\Models\VideoAssignToBatch;
 use Illuminate\Auth\Events\Verified;
@@ -842,25 +845,92 @@ class StudentController extends Controller
             $boards = [];
 
             $institutedeta = Institute_detail::where('id', $request->institute_id)
-                ->select('id', 'institute_name', 'address', 'about_us')->first();
+                ->select('id', 'institute_name', 'address', 'about_us','contact_no','email',
+                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link')
+                ->first();
 
-            $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                ->where('board_sub.institute_id', $request->institute_id)->select('board.name')->get();
+            // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+            //     ->where('board_sub.institute_id', $request->institute_id)
+            //     ->select('board.name')->get();
+            $institute_id = $request->institute_id;
+            $uniqueBoardIds = Institute_board_sub::where('institute_id', $institute_id)
+                ->distinct()
+                ->pluck('board_id')
+                ->toArray();
+
+            // Fetch board details
+            $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name', 'icon']);
+
+            $board_array = [];
+            foreach ($board_list as $board) {
+                $medium_list = Medium_model::whereIn('id', function ($query) use ($institute_id, $board) {
+                    $query->select('medium_id')
+                        ->from('medium_sub')
+                        ->where('board_id', $board->id)
+                        ->where('institute_id', $institute_id);
+                })->get(['id', 'name', 'icon']);
+
+                $medium_array = $medium_list->map(function ($medium) {
+                    return [
+                        'id' => $medium->id,
+                        'medium_name' => $medium->name,
+                        'medium_icon' => asset($medium->icon)
+                    ];
+                })->toArray();
+
+                $boards[] = [
+                    'id' => $board->id,
+                    'board_name' => $board->name,
+                    'board_icon' => asset($board->icon),
+                    'medium' => $medium_array,
+                    // Include banner_array inside board_array
+                ];
+            }
+
+            //feedbacks
+            $feedback_list = FeedbackModel::select(
+                'feedbacks.id as feedback_id',
+                'feedbacks.feedback',
+                'feedbacks.feedback_to_id',
+                'feedbacks.institute_id',
+                'feedbacks.rating',
+                'feedbacks.role_type',
+                'feedbacks.created_at',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'roles.role_name',
+            )
+            ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
+            ->Join('roles', 'roles.id', '=', 'users.role_type')
+            ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
+            ->where('feedbacks.institute_id', $institute_id)
+            ->where('feedbacks.role_type', '1')
+            ->orderByDesc('feedbacks.created_at')->get()->toArray();
+            
 
             $stdcount = Student_detail::where('institute_id', $request->institute_id)->count();
             $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
+            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->distinct('teacher_id')->count(); //by priyanka
 
             $institutedetaa = array(
                 'id' => $institutedeta->id,
                 'institute_name' => $institutedeta->institute_name,
                 'address' => $institutedeta->address,
+                'contact_no' => $institutedeta->contact_no,
+                'email' => $institutedeta->email,
                 'about_us' => $institutedeta->about_us,
+                'website_link'=>$institutedeta->website_link,
+                'instagram_link'=>$institutedeta->instagram_link,
+                'facebook_link'=>$institutedeta->facebook_link,
+                'whatsaap_link'=>$institutedeta->whatsaap_link,
+                'youtube_link'=>$institutedeta->youtube_link,
                 'logo' => asset($institutedeta->logo),
                 'boards' => $boards,
                 'students' => $stdcount,
                 'subject' => $subcount,
-                'total_board' => count($boards),
-                'teacher' => 0
+                'teacher' => $teacherdt,
+                'feedback'=>$feedback_list
             );
             return $this->response($institutedetaa, "Successfully fetch data.");
         } catch (Exception $e) {
@@ -966,10 +1036,10 @@ class StudentController extends Controller
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                    'total_marks' => floatval($resultDDt->total_mark),
-                    'achiveddmarks_marks' => floatval($resultDDt->mark),
+                    'total_marks' => intval($resultDDt->total_mark),
+                    'achiveddmarks_marks' => $resultDDt->mark,
                     'date' => $resultDDt->exam_date,
-                    'class_highest' => floatval($highestMarks)
+                    'class_highest' => $highestMarks
                 );
             }
             $subdta = Student_detail::where('student_id', $user_id)
@@ -1006,7 +1076,7 @@ class StudentController extends Controller
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
-                        'total_mark' => $examsDT->total_mark,
+                        'total_mark' => intval($examsDT->total_mark),
                         'exam_type' => $examsDT->exam_type,
                         'subject' => $examsDT->subject,
                         'standard' => $examsDT->standard,
@@ -2317,10 +2387,12 @@ class StudentController extends Controller
                         ->where('exam.board_id', $stdetail->board_id)
                         ->where('exam.medium_id', $stdetail->medium_id)
                         //->where('exam.class_id', $stdetail->class_id)
-                        ->where('exam.standard_id', $stdetail->standard_id)
                         ->where('exam.institute_id', $stdetail->institute_id)
                         ->where('exam.batch_id', $stdetail->batch_id)
-                        ->orWhere('exam.stream_id', $stdetail->stream_id)
+                        ->where('exam.standard_id', $stdetail->standard_id)
+                        ->where(function($query) use ($stdetail) {
+                           $query->orWhere('exam.stream_id', $stdetail->stream_id);
+                        })
                         ->whereIN('exam.subject_id', $subjectIds)
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
                         ->orderByDesc('exam.created_at')
@@ -2332,7 +2404,7 @@ class StudentController extends Controller
                             'institute_name' => $examsDT->institute_name,
                             'exam_id' => $examsDT->id,
                             'exam_title' => $examsDT->exam_title,
-                            'total_mark' => $examsDT->total_mark,
+                            'total_mark' => intval($examsDT->total_mark),
                             'exam_type' => $examsDT->exam_type,
                             'subject' => $examsDT->subject,
                             'standard' => $examsDT->standard,

@@ -105,8 +105,7 @@ class FeedbackController extends Controller
                 'date'=>$feedbackdata->created_at);
 
                 $merged_data = array_merge($dedsf, $feedback_item);
-                $feedback_data[] = $merged_data;                     
-
+                $feedback_data[] = $merged_data;
 
             }
 

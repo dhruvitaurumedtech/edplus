@@ -613,12 +613,12 @@ if (!empty($request->subject_id)) {
             $student_name = $student->firstname .' '.$student->lastname;
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
             $userId = Auth::user()->id;
-
+            
             $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
            
             $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
             $discount=Discount_model::where('student_id',$request->student_id)->first();
-             
+            
             $histroy = [];
             $paid_amount = 0;
             if($discount->discount_by =='Rupee'){
@@ -660,6 +660,7 @@ if (!empty($request->subject_id)) {
                            'paid_amount'=>(!empty($amount_data))?$amount_data.'00':'00.00',
                            'histroy'=>$histroy
                           ];
+                          
             return $this->response($data_final, "Fetch data successfully");
             }catch (Exception $e) {
                 return $this->response($e, "Invalid token.", false, 400 );
