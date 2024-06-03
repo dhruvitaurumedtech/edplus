@@ -424,7 +424,7 @@ class TeacherController extends Controller
                 );
             }
 
-            $announcQY = Common_announcement::where('institute_id', $institute_id)->Where('teacher_id', $teacher_id)->get();
+            $announcQY = announcements_model::where('institute_id', $institute_id)->Where('role_type', 4)->get();
             // ->whereRaw("FIND_IN_SET('4', role_type)")
 
             foreach ($announcQY as $announcDT) {
