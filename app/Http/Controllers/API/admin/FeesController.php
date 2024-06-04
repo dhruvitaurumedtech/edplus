@@ -251,6 +251,8 @@ class FeesController extends Controller
             foreach($student_response as $value){
                 $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
                 $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
+
+
                 if(!empty($discount)){
                   $dis = $discount->discount_amount;
                 }else{
@@ -259,8 +261,16 @@ class FeesController extends Controller
                 if($student_fees->total_fees != $value['total_payment_amount']){
                     if(!empty($value['total_payment_amount']))
                     {
-                        $due_Amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
+                        if($discount->discount_by =='Rupee'){
+                            $due_Amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
+                            
+                        }
+                        if($discount->discount_by =='Percentage'){
+                           $revise_fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
+                           $due_Amount = $student_fees->total_fees - $value['total_payment_amount'] - $revise_fees;
                    
+                        }
+                       
                     }else{
                         $due_Amount = $student_fees->total_fees;
 
