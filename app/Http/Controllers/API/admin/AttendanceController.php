@@ -77,7 +77,7 @@ class AttendanceController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
-            'student_id' => 'required|integer',
+            'student_id' => 'required',
             'batch_id' => 'required|integer',
             'subject_id' => 'required|integer',
             'status' => 'required|in:P,A',
