@@ -4,11 +4,16 @@ namespace App\Http\Controllers\API\staff;
 
 use App\Http\Controllers\Controller;
 use App\Models\Action;
+use App\Models\Feature;
+use App\Models\Institute_detail;
 use App\Models\Module;
+use App\Models\RoleHasPermission;
 use App\Models\Roles;
 use App\Models\Staff_detail_Model;
 use App\Models\User;
+use App\Models\UserHasRole;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Hash;
@@ -35,7 +40,12 @@ class StaffController extends Controller
             $role = new Roles();
             $role->role_name = $request->role_name;
             $role->created_by = Auth::id();
-            $role->save();
+            if ($role->save()) {
+                $user_has_role = new UserHasRole();
+                $user_has_role->role_id = $role->id;
+                $user_has_role->user_id = auth()->id();
+                $user_has_role->save();
+            }
             return $this->response([], "Role Created");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -46,7 +56,8 @@ class StaffController extends Controller
     public function view_roles(Request $request)
     {
         try {
-            $roles = Roles::where('created_by', auth()->user()->id)->get();
+            $userHasRole = UserHasRole::where('user_id', Auth::id())->pluck('role_id');
+            $roles = Roles::whereIn('id', $userHasRole)->get();
             $data = [];
             foreach ($roles as $value) {
                 $data[] = ['role_id' => $value->id, 'role_name' => $value->role_name];
@@ -68,10 +79,8 @@ class StaffController extends Controller
         }
 
         try {
-            // Fetch all actions from the Action table
             $actions = Action::select('id', 'name')->get();
-
-            $modules = Module::with(['Features' => function ($query) {
+            $modules = Module::where('type', 2)->with(['Features' => function ($query) {
                 $query->select('id', 'module_id', 'feature_name');
             }])->select('id', 'module_name')->where('status', 1)->get();
 
@@ -81,10 +90,11 @@ class StaffController extends Controller
 
                     foreach ($actions as $action) {
                         if (empty($request->role_id)) {
-                            $hasPermission = false; // Default to false when no role_id is provided
+                            $hasPermission = false;
                         } else {
+                            $user_has_roles = UserHasRole::where('role_id', $request->role_id)->where('user_id', Auth::id())->first();
                             $hasPermission = DB::table('role_has_permissions')
-                                ->where('role_id', $request->role_id)
+                                ->where('user_has_role_id', $user_has_roles->id)
                                 ->where('feature_id', $feature->id)
                                 ->where('action_id', $action->id)
                                 ->exists();
@@ -97,6 +107,62 @@ class StaffController extends Controller
                         ];
                     }
 
+                    $feature->actions = $featureActions;
+                }
+            }
+
+            return $this->response($modules, "Permissions retrieved successfully.", true, 200);
+        } catch (Exception $e) {
+            return $e->getMessage();
+            return $this->response([], "An error occurred.", false, 400);
+        }
+    }
+
+    public function User_Get_Permission(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'nullable'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $actions = Action::select('id', 'name')->get();
+            $modules = Module::where('type', 2)->with(['Features' => function ($query) {
+                $query->select('id', 'module_id', 'feature_name');
+            }])->select('id', 'module_name')->where('status', 1)->get();
+
+            $permissionsIds = collect();
+            if (empty($request->institute_id)) {
+                $user = Auth::user();
+                $user_has_role = UserHasRole::where('role_id', $user->role_type)->first();
+                $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
+                    ->get(['feature_id', 'action_id']);
+            } else {
+                $user = Auth::user();
+                $institute = Institute_detail::where('id', $request->institute_id)->first();
+                $user_has_role = UserHasRole::where('role_id', $user->role_type)->where('user_id', $institute->user_id)->first();
+                $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
+                    ->get(['feature_id', 'action_id']);
+            }
+
+            foreach ($modules as $module) {
+                foreach ($module->Features as $feature) {
+                    $featureActions = [];
+
+                    foreach ($actions as $action) {
+                        $hasPermission = $permissionsIds->contains(function ($permission) use ($feature, $action) {
+                            return $permission->feature_id == $feature->id && $permission->action_id == $action->id;
+                        });
+
+                        $featureActions[] = [
+                            'id' => $action->id,
+                            'name' => $action->name,
+                            'has_permission' => $hasPermission
+                        ];
+                    }
                     $feature->actions = $featureActions;
                 }
             }
@@ -116,7 +182,7 @@ class StaffController extends Controller
             'permissions.*.feature_id' => 'required|exists:features,id',
             'permissions.*.actions' => 'required|array',
             'permissions.*.actions.*' => 'exists:actions,id',
-        ]); 
+        ]);
 
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -124,15 +190,18 @@ class StaffController extends Controller
 
         try {
             $roleId = $request->role_id;
+            $user_has_role = UserHasRole::where('role_id', $roleId)->where('user_id', Auth::id())->first();
             DB::beginTransaction();
-            DB::table('role_has_permissions')->where('role_id', $roleId)->delete();
+            DB::table('role_has_permissions')->where('user_has_role_id', $user_has_role->id)->delete();
             $permissions = [];
             foreach ($request->permissions as $permission) {
                 foreach ($permission['actions'] as $actionId) {
                     $permissions[] = [
-                        'role_id' => $roleId,
+                        'user_has_role_id' => $user_has_role->id,
                         'feature_id' => $permission['feature_id'],
                         'action_id' => $actionId,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now(),
                     ];
                 }
             }
@@ -141,6 +210,7 @@ class StaffController extends Controller
             DB::commit();
             return $this->response([], "Permissions updated successfully.", true, 200);
         } catch (Exception $e) {
+            return $e->getMessage();
             DB::rollBack();
             return $this->response([], "An error occurred while updating permissions.", false, 400);
         }
