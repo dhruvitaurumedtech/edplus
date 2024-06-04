@@ -491,6 +491,7 @@ class InstituteApiController extends Controller
             'state' => 'required',
             'city' => 'required',
             'pincode' => 'required',
+            'cover_photo' =>'required',
         ]);
 
         if ($validator->fails()) {
@@ -513,6 +514,8 @@ class InstituteApiController extends Controller
             $unique_id = $subadminPrefix . $paddedNumber;
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
+            $iconFile = $request->file('cover_photo');
+            $imagePath2 = $iconFile->store('cover_photo', 'public');
             // echo "<pre>";print_r($imagePath);exit;
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
@@ -532,6 +535,7 @@ class InstituteApiController extends Controller
                 'state' => $request->input('state'),
                 'city' => $request->input('city'),
                 'pincode' => $request->input('pincode'),
+                'cover_photo' =>$imagePath2,
                 'status' => 'active',
                 'start_academic_year' => $currentDate,
                 'end_academic_year' => $nextYear
