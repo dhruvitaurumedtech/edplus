@@ -96,7 +96,7 @@ class AttendanceController extends Controller
                                     ->where('student_id',$student_id)->update([
                                                                         'user_id' => $request->user_id,
                                                                         'institute_id' => $request->institute_id,
-                                                                        'student_id' => $request->student_id,
+                                                                        'student_id' => $student_id,
                                                                         'batch_id' => $request->batch_id,
                                                                         'subject_id' => $request->subject_id,
                                                                         'date' => date('Y-m-d',strtotime($request->date)),
@@ -107,7 +107,7 @@ class AttendanceController extends Controller
                         [
                             'user_id' => $request->user_id,
                             'institute_id' => $request->institute_id,
-                            'student_id' => $request->student_id,
+                            'student_id' => $student_id,
                             'batch_id' => $request->batch_id,
                             'subject_id' => $request->subject_id,
                             'date' => date('Y-m-d',strtotime($request->date)),
