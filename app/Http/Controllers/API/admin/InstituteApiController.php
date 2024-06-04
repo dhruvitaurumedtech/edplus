@@ -4719,7 +4719,7 @@ class InstituteApiController extends Controller
                 $board_array[] = [
                     'id' => $board_value->id,
                     'board_name' => $board_value->name,
-                    'icon' => $board_value->icon,
+                    'icon' => asset($board_value->icon),
                     'medium' => $medium_array,
                 ];
             }
