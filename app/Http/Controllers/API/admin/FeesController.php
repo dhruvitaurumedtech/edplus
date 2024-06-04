@@ -250,10 +250,16 @@ class FeesController extends Controller
            
             foreach($student_response as $value){
                 $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
+                $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
+                if(!empty($discount)){
+                  $dis = $discount->discount_amount;
+                }else{
+                  $dis = 0;
+                }
                 if($student_fees->total_fees != $value['total_payment_amount']){
                     if(!empty($value['total_payment_amount']))
                     {
-                        $due_Amount = $student_fees->total_fees - $value['total_payment_amount'];
+                        $due_Amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
                    
                     }else{
                         $due_Amount = $student_fees->total_fees;
@@ -674,9 +680,10 @@ class FeesController extends Controller
             $data[] = ['id'=>$value->id,'name'=>$value->name];
             }
             $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
+
             
             if (!empty($fees_colletion)) {
-                $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
+                // $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
                 $parts = explode('-', $fees_colletion->invoice_no);
                 
                 if (count($parts) === 2) {
@@ -694,17 +701,20 @@ class FeesController extends Controller
             $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
            
             $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
-            $discount=Discount_model::where('student_id',$request->student_id)->first();
+             $discount=Discount_model::where('student_id',$request->student_id)->first();
             
             $histroy = [];
             $paid_amount = 0;
+            $discount_data=0;
+            $revise_fee=0;
             if($discount->discount_by =='Rupee'){
                 $revise_fee= $discount->discount_amount;
                 $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
             }
             if($discount->discount_by =='Percentage'){
-                $revise_fee =  $student_fees->total_fees * ($discount->discount_amount / 100);
-                // $revise_fee = $value->payment_amount - $revise_fee;
+                 $revise_fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
+                //  echo $revise_fee = $value->payment_amount - $revise_fee;
+                // exit;
                 $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
                  
             } 
@@ -718,12 +728,21 @@ class FeesController extends Controller
                 ];
                 $revise_fee=0;
                 
-                
-                if(!empty($value->payment_amount)){
+                if($discount->discount_by =='Rupee'){
+                    if(!empty($value->payment_amount)){
+                            $paid_amount += $value->payment_amount;
+                            $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
+                    }else{
+                            $amount_data = $revise_fee;
+                    }
+                }
+                if($discount->discount_by =='Percentage'){
+                    if(!empty($value->payment_amount)){
                         $paid_amount += $value->payment_amount;
-                        $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee;
+                        $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
                 }else{
                         $amount_data = $revise_fee;
+                }
                 }
             }
             $data_final = [
@@ -734,7 +753,7 @@ class FeesController extends Controller
                            'payment_type'=>$data,
                            'student_fees'=>(!empty($student_fees->total_fees)) ? $student_fees->total_fees .'.00' : '00.00',
                            'discount'=>$discount_data,
-                           'paid_amount'=>(!empty($amount_data))?$amount_data.'00':'00.00',
+                           'paid_amount'=>(!empty($amount_data))?$amount_data.'.00':'00.00',
                            'histroy'=>$histroy
                           ];
                           
