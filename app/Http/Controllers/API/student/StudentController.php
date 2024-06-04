@@ -1057,9 +1057,8 @@ class StudentController extends Controller
                 }
                 
                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+                
                 $subjectIds = explode(',', $stdetail->subject_id);
-                $batch_id  = $stdetail->batch_id;
-                $stream_id=$stdetail->stream_id;
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                 ->join('standard', 'standard.id', '=', 'exam.standard_id')
                 ->where('exam.institute_id', $stdetail->institute_id)
