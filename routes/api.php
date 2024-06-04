@@ -121,7 +121,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
     Route::post('/institute/add-deadstock', [DeadstockController::class, 'add_deadstock']);
     Route::post('/institute/list-deadstock', [DeadstockController::class, 'list_deadstock']);
-    
+
 
     // parent api
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
@@ -167,6 +167,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/create-role', [StaffController::class, 'create_role']);
     Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
     Route::get('/institute/institute-get-permission', [StaffController::class, 'Get_Permission']);
+    Route::get('/institute/user-get-permission', [StaffController::class, 'User_Get_Permission']);
     Route::post('/institute/assign-update-permissions', [StaffController::class, 'updateRolePermissions']);
     Route::post('/institute/institute-add-staff', [StaffController::class, 'add_staff']);
     Route::post('/institute/institute-view-staff', [StaffController::class, 'view_staff']);
@@ -174,9 +175,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     // Route::post('/institute/add-fees', [FeesController::class, 'add_fees']);
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
-     Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
+    Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student']);
     Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student']);
-    
+
 
 
     Route::post('/institute/display-subject-fees', [FeesController::class, 'display_subject_fees']);
@@ -187,7 +188,6 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount']);
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection']);
-
 });
 
 
