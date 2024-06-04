@@ -243,6 +243,7 @@ class FeesController extends Controller
                             });
 
                             $student_response = $query->get()->toArray();
+                            // echo "<pre>";print_r($student_response);exit;
 
              $student = [];
             
@@ -508,6 +509,7 @@ class FeesController extends Controller
                       ->join('standard','standard.id','=','students_details.standard_id')
                       ->leftjoin('stream','stream.id','=','students_details.stream_id')
                       ->where('students_details.institute_id',$request->institute_id)
+                      ->where('students_details.status', '1')
                       ->select('users.*','standard.name as standard_name','students_details.standard_id','students_details.stream_id','stream.name as streamname','students_details.subject_id');
                         if (!empty($request->board_id)) {
                         $query->whereIn('students_details.board_id',explode(',', $request->board_id));
@@ -545,7 +547,9 @@ class FeesController extends Controller
                         ->leftjoin('standard','standard.id','=','students_details.standard_id')
                          ->where('students_details.student_id',$value->id)
                         ->where('students_details.institute_id',$request->institute_id)
+                        
                         ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
+                       
                         ->first();
                         // echo "<pre>";print_r($query);
                         $amounts =0;
