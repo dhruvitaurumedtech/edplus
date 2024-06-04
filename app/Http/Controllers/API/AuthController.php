@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Institute_detail;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -115,7 +116,7 @@ class AuthController extends Controller
             'role_type' => 'required|integer|exists:roles,id',
             'confirm_password' => 'required|string|same:password',
             'device_key' => 'nullable',
-            'country_code'=>'required',
+            'country_code' => 'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
@@ -183,13 +184,28 @@ class AuthController extends Controller
             return $this->response([], "User not found", false, 400);
         }
 
-        $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
+        // $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
 
-        if (empty($user->password) && !empty($user->social_id)) {
-            return $this->response([], "Please use Social Login", false, 400);
+        // if (empty($user->password) && !empty($user->social_id)) {
+        //     return $this->response([], "Please use Social Login", false, 400);
+        // }
+        // if (!in_array($user->role_type, $validRoles)) {
+        //     $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
+        //     return $this->response([], $errorMessage, false, 400);
+        // }
+
+        if ($request->login_type == 1) {
+            $validRoles = [5, 6];
+            $errorMessage = "Please use Institute Application";
+        } elseif ($request->login_type == 2) {
+            $allRoles = Roles::pluck('id')->toArray();
+            $validRoles = array_diff($allRoles, [5, 6]);
+            $errorMessage = "Please use Student Application";
+        } else {
+            return $this->response([], "Invalid login type", false, 400);
         }
+
         if (!in_array($user->role_type, $validRoles)) {
-            $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
             return $this->response([], $errorMessage, false, 400);
         }
 
