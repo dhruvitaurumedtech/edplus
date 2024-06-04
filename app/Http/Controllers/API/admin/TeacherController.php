@@ -67,6 +67,7 @@ class TeacherController extends Controller
                     $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                         ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
                 })->paginate($perPage);
+                // echo "<pre>";print_r($allinstitute);exit;
             $search_list = [];
             foreach ($allinstitute as $value) {
                 $search_list[] = array(

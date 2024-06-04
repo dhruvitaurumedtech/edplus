@@ -399,7 +399,7 @@ class FeesController extends Controller
            $amount +=$value->payment_amount;
         }
         // echo $amount;echo $student_fees->total_fees;exit;
-        Fees_colletion_model::where('id', $fee->id)->update(['status'=>($amount==$student_fees->total_fees)?'paid':'pending']);
+        // Fees_colletion_model::where('id', $fee->id)->update(['status'=>($amount==$student_fees->total_fees)?'paid':'pending']);
         return $this->response([], "Fees Paid successfully.");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -547,6 +547,7 @@ class FeesController extends Controller
                         ->where('students_details.institute_id',$request->institute_id)
                         ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
                         ->first();
+                        // echo "<pre>";print_r($query);
                         $amounts =0;
                         foreach(explode(',',$value->subject_id) as $subject_id){
                              $subject_sub=Subject_sub::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('amount')->get();
@@ -558,7 +559,11 @@ class FeesController extends Controller
                             
                         }
                         
-                        
+                        if(empty($query->discount_by)){
+                            $revise_fee=0;
+                            $discount_data='00.00' ;
+                            
+                        }
                         if($query->discount_by =='Rupee'){
                             $revise_fee=$amounts - $query->discount_amount;
                             $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'.00' : '00.00' ;
@@ -568,7 +573,6 @@ class FeesController extends Controller
                             $discountAmount =  $amounts * ($query->discount_amount / 100);
                              $revise_fee = $amounts - $discountAmount;
                              $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'%' : '0%' ;
-                             
                         }
                         $data[] =[
                             'student_id'=>$value->id,
@@ -633,19 +637,26 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-         
-            Discount_model::updateOrCreate(
-                [
-                    'institute_id' => $request->institute_id,
-                    'student_id' => $request->student_id,
-                    'financial_year' => date('Y'),
-                ],
-                [
-                    'discount_amount' => $request->discount_amount,
-                    'discount_by' => $request->discount_by,
-                ]
-            );
-          return $this->response([], "Discount added or updated successfully");
+            $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
+            if($discount == 1){
+                Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->update(['financial_year' => date('Y'),
+                'discount_amount' => $request->discount_amount,
+                'discount_by' => $request->discount_by]); 
+                return $this->response([], "Discount updated successfully");
+            }else{
+                Discount_model::Create(
+                    [
+                        'institute_id' => $request->institute_id,
+                        'student_id' => $request->student_id,
+                        'financial_year' => date('Y'),
+                        'discount_amount' => $request->discount_amount,
+                        'discount_by' => $request->discount_by,
+                    ]
+                );    
+                return $this->response([], "Discount added  successfully");
+       
+            }
+           
         
         }catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400 );
