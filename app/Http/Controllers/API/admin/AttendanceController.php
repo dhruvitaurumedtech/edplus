@@ -88,19 +88,36 @@ class AttendanceController extends Controller
         }
 
         try {
-            Attendance_model::updateOrCreate(
-                [
-                    'user_id' => $request->user_id,
-                    'institute_id' => $request->institute_id,
-                    'student_id' => $request->student_id,
-                    'batch_id' => $request->batch_id,
-                    'subject_id' => $request->subject_id,
-                    'date' => date('Y-m-d',strtotime($request->date)),
-                ],
-                [
-                    'attendance' => $request->status,
-                ]
-            );
+            $student_ids = explode(',',$request->student_id);
+            foreach($student_ids as $student_id){
+                $attendance=Attendance_model::where('institute_id',$request->institute_id)->where('student_id',$student_id)->count();
+                if($attendance!=0){
+                    Attendance_model::where('institute_id',$request->institute_id)
+                                    ->where('student_id',$student_id)->update([
+                                                                        'user_id' => $request->user_id,
+                                                                        'institute_id' => $request->institute_id,
+                                                                        'student_id' => $request->student_id,
+                                                                        'batch_id' => $request->batch_id,
+                                                                        'subject_id' => $request->subject_id,
+                                                                        'date' => date('Y-m-d',strtotime($request->date)),
+                                                                        'attendance' => $request->status,
+                                                                    ]);
+                }else{
+                    Attendance_model::Create(
+                        [
+                            'user_id' => $request->user_id,
+                            'institute_id' => $request->institute_id,
+                            'student_id' => $request->student_id,
+                            'batch_id' => $request->batch_id,
+                            'subject_id' => $request->subject_id,
+                            'date' => date('Y-m-d',strtotime($request->date)),
+                            'attendance' => $request->status,
+                        ]
+                    );
+                }
+                
+            }
+            
             return $this->response([], "Attendance marked successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
