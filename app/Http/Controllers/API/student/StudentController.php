@@ -927,6 +927,7 @@ class StudentController extends Controller
                 'whatsaap_link'=>$institutedeta->whatsaap_link,
                 'youtube_link'=>$institutedeta->youtube_link,
                 'logo' => asset($institutedeta->logo),
+                'cover_photo' => asset($institutedeta->cover_photo),
                 'boards' => $boards,
                 'students' => $stdcount,
                 'subject' => $subcount,
