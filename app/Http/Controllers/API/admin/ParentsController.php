@@ -188,7 +188,9 @@ class ParentsController extends Controller
 
             $getstdntdata = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
             ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-            ->select('users.firstname', 'users.lastname', 'institute_detail.institute_name','institute_detail.id as institute_id','students_details.student_id')
+            ->select('users.firstname', 'users.lastname',
+             'institute_detail.institute_name','institute_detail.id as institute_id',
+             'students_details.student_id','students_details.subject_id')
             ->where('students_details.student_id', $request->child_id)
             ->where('students_details.institute_id', $request->institute_id)->first();
 
@@ -196,9 +198,9 @@ class ParentsController extends Controller
             //child detail
             $child_detail = [];
             
-           
+            
                 $subids = explode(',', $getstdntdata->subject_id);
-                $subjectQY = Subject_model::whereIN('id', $subids);
+                $subjectQY = Subject_model::whereIN('id', $subids)->get();
                 $subjDTs = [];
                 foreach ($subjectQY as $subDT) {
                     $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
