@@ -491,7 +491,6 @@ class InstituteApiController extends Controller
             'state' => 'required',
             'city' => 'required',
             'pincode' => 'required',
-            'cover_photo' =>'required',
         ]);
 
         if ($validator->fails()) {
