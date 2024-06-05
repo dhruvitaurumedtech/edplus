@@ -1105,7 +1105,7 @@ class StudentController extends Controller
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('created_at', '<=', $cmtoday)
+                ->where('created_at', '<', $cmtoday)
                 ->where('attendance', 'P')->count();
 
                 $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
