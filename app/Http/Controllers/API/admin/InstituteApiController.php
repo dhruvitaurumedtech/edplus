@@ -513,8 +513,12 @@ class InstituteApiController extends Controller
             $unique_id = $subadminPrefix . $paddedNumber;
             $iconFile = $request->file('logo');
             $imagePath = $iconFile->store('icon', 'public');
-            $iconFile2 = $request->file('cover_photo');
-            $imagePath2 = $iconFile2->store('cover_photo', 'public');
+            if ($request->hasFile('cover_photo')) {
+                $iconFile2 = $request->file('cover_photo');
+                $imagePath2 = $iconFile2->store('cover_photo', 'public');
+            } else {
+                $imagePath2 = '';
+            }
             // echo "<pre>";print_r($imagePath);exit;
             $currentDate = date("d-m-Y");
             $nextYearDate = date("d-m-Y", strtotime("+1 year"));
