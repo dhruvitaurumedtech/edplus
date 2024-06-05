@@ -171,7 +171,6 @@ class BasetableControllerAPI extends Controller
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
-
             $data = [];
             foreach ($base_standards as $base_standard) {
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
