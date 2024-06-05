@@ -3523,6 +3523,7 @@ class InstituteApiController extends Controller
             $user_id = Auth::id();
             $exam_id = $request->exam_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
+            // echo $examdt;exit;
             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->where('students_details.institute_id', $institute_id)
