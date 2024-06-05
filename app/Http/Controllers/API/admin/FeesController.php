@@ -175,12 +175,16 @@ class FeesController extends Controller
             
            
             foreach($student_response as $value){
-                $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
-                if($student_fees->total_fees == $value['total_payment_amount']){
+                
+               $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
+                 $student=[];
+                 if(!empty($student_fees->total_fees) && !empty($value['total_payment_amount'])){
+                  if($student_fees->total_fees == $value['total_payment_amount']){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>'paid'];
+                  }
                 }
              }                    
             return $this->response($student, "Data Fetch Successfully");
@@ -250,7 +254,8 @@ class FeesController extends Controller
            
             foreach($student_response as $value){
                 $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
-                $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
+
+                $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
 
 
                 if(!empty($discount)){
@@ -258,6 +263,8 @@ class FeesController extends Controller
                 }else{
                   $dis = 0;
                 }
+                $due_Amount=0;
+                if(!empty($value['total_payment_amount']) && !empty($student_fees->total_fees)){
                 if($student_fees->total_fees != $value['total_payment_amount']){
                     if(!empty($value['total_payment_amount']))
                     {
@@ -275,12 +282,14 @@ class FeesController extends Controller
                         $due_Amount = $student_fees->total_fees;
 
                     }
+                }
+            }
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>'pending',
                     'due_amount'=>$due_Amount];
-                }
+             
              }                    
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
