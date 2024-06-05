@@ -165,6 +165,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role']);
+    // ->middleware('check.permission:1,1');
     Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles']);
     Route::get('/institute/institute-get-permission', [StaffController::class, 'Get_Permission']);
     Route::get('/institute/user-get-permission', [StaffController::class, 'User_Get_Permission']);
