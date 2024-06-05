@@ -711,6 +711,7 @@ class TeacherController extends Controller
             $user_list = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
+                ->where('teacher_detail.status', 0)
                 ->select(
                     'teacher_detail.*',
                     'users.*',
@@ -732,6 +733,7 @@ class TeacherController extends Controller
                 ->leftjoin('stream', 'stream.id', '=', 'teacher_detail.stream_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
+                ->where('teacher_detail.status', 0)
                 ->select('teacher_detail.*',
                          'users.qualification',
                          'board.name as board',
