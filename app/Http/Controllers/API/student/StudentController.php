@@ -993,6 +993,7 @@ class StudentController extends Controller
                     'time_table.lecture_date'
                 )
                 ->paginate(2);
+
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
@@ -1057,8 +1058,8 @@ class StudentController extends Controller
                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
                 }
                 
-                $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
-                
+                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+                // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                 ->join('standard', 'standard.id', '=', 'exam.standard_id')

@@ -244,6 +244,13 @@ class TeacherController extends Controller
                 // }
                 $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
+                    $subject=Subject_model::where('base_table_id',$value2['id'])->get();
+                    $subject_implode=[];
+                    foreach($subject as $value){
+                        $subject_implode[]=$value->id;  
+                    }
+                    $subject_id = implode(',',$subject_implode);
+                    // echo "<pre>";print_r($subject_name);exit;
                     Teacher_model::create([
                         'institute_id' => $request->institute_id,
                         'teacher_id' => $request->teacher_id,
@@ -253,7 +260,7 @@ class TeacherController extends Controller
                         'class_id' => $value2['institute_for_class'],
                         'standard_id' => $value2['standard'],
                         'stream_id' => $value2['stream'],
-                        'subject_id' => $value['id'],
+                        'subject_id' => $subject_id,
                         'status' => '0',
                     ]);
                 }
