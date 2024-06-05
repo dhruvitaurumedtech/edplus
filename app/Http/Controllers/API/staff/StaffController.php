@@ -21,6 +21,7 @@ use Illuminate\Support\Facades\Validator;
 use PHPOpenSourceSaver\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Cache;
 
 class StaffController extends Controller
 {
@@ -166,7 +167,8 @@ class StaffController extends Controller
                     $feature->actions = $featureActions;
                 }
             }
-
+            $cacheKey = "user_permissions_{$user->id}";
+            Cache::put($cacheKey, $modules, now()->addHours(8));
             return $this->response($modules, "Permissions retrieved successfully.", true, 200);
         } catch (Exception $e) {
             return $this->response([], "An error occurred.", false, 400);
