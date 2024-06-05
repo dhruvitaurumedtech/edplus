@@ -254,7 +254,9 @@ class FeesController extends Controller
            
             foreach($student_response as $value){
                 $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
-
+                 if(empty($student_fees)){
+                    return $this->response([], "Fees are not included in the subject");
+                 }
                 $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
 
 
