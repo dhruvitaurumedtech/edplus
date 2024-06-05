@@ -1102,12 +1102,17 @@ class StudentController extends Controller
             $totalattendlec = [];
             $cumnth = date('Y-m');
             $cmtoday = date('Y-m-d');
+            $date = new \DateTime($cmtoday);
+            $date->modify('+1 day');
+            $nextDayStr = $date->format('Y-m-d');
+
+            
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('created_at', '<', $cmtoday)
+                ->where('created_at', '<=', $nextDayStr)
                 ->where('attendance', 'P')->count();
-
+            
                 $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
