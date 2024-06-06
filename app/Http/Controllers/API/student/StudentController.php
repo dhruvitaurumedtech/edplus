@@ -910,9 +910,9 @@ class StudentController extends Controller
             // ->orderByDesc('feedbacks.created_at')->get()->toArray();
             
 
-            $stdcount = Student_detail::where('institute_id', $request->institute_id)->count();
+            $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status','1')->count();
             $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
-            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->distinct('teacher_id')->count(); //by priyanka
+            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status','1')->distinct('teacher_id')->count(); //by priyanka
 
             $institutedetaa = array(
                 'id' => $institutedeta->id,
