@@ -834,8 +834,8 @@ class InstituteApiController extends Controller
                 $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
                 $uniqueArray = array_unique($sectsbbsiqy);
                 $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
-
                 foreach ($basedtqy as $svaluee) {
+                    
                     $institute_for = $svaluee->institute_for;
                     $board = $svaluee->board;
                     $medium = $svaluee->medium;
@@ -875,9 +875,11 @@ class InstituteApiController extends Controller
                     }
 
                     //board
+                    $boardtewArray = explode(',', $request->institute_board_id);
                     $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
                     ->where('board_id', $board)->get();
-                    $boardtewArray = explode(',', $request->institute_board_id);
+                    $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
+                    
                     if ($institute_board_check->isEmpty()) {
                         if (in_array($board, $boardtewArray)) {
                         Institute_board_sub::create([
@@ -888,13 +890,16 @@ class InstituteApiController extends Controller
                         ]);
                         }
                     } else {
-                        if (!in_array($board, $boardtewArray)) {
-                            $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->first();
-                            $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->first();
+                        $boardIds = Institute_board_sub::where('institute_id', $institute->id)->pluck('board_id')->toArray();
+                        $boarddif = $this->array_symmetric_diff($boardtewArray,$boardIds);
+                    if(!empty($boarddif)){
+                        if (!in_array($boarddif, $boardtewArray)) {
+                            $student_check = Student_detail::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
+                            $teacher_check = Teacher_model::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
                             if (!empty($student_check) || !empty($teacher_check)) {
                                 return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
                             } else {
-                                $delete_sub = Institute_board_sub::where('board_id', $board)
+                                $delete_sub = Institute_board_sub::wherein('board_id', $boarddif)
                                     ->where('institute_id', $institute->id)->get();
                                 if (!empty($delete_sub)) {
                                     foreach ($delete_sub as $did) {
@@ -904,7 +909,23 @@ class InstituteApiController extends Controller
                             }
                         }
                     }
-
+                        // if (!in_array($board, $boardtewArray)) {
+                        //     $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->first();
+                        //     $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->first();
+                        //     if (!empty($student_check) || !empty($teacher_check)) {
+                        //         return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
+                        //     } else {
+                        //         $delete_sub = Institute_board_sub::where('board_id', $board)
+                        //             ->where('institute_id', $institute->id)->get();
+                        //         if (!empty($delete_sub)) {
+                        //             foreach ($delete_sub as $did) {
+                        //                 $did->delete();
+                        //             }
+                        //         }
+                        //     }
+                        // }
+                    }
+                    
                     //medium
                     $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->where('board_id', $board)->where('medium_id', $medium)->get();
                     $mediumtewArray = explode(',', $request->institute_medium_id);
@@ -984,7 +1005,7 @@ class InstituteApiController extends Controller
                             'medium_id' => $medium,
                             'class_id' => $institute_for_class
                         ]);
-                        }
+                    }
                     } else {
                         if (!in_array($standard, $standardewArray)) {
                             $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
@@ -1039,7 +1060,7 @@ class InstituteApiController extends Controller
                         }
                     }
                 }
-
+                
                 //subject
                 $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
                 if ($institute_subject_check->isEmpty()) {
