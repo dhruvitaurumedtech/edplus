@@ -828,7 +828,7 @@ class InstituteApiController extends Controller
             $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
             // print_r($institute_subjects);
             // print_r($institute_subject_ids);
-            // print_r($differenceInstituteSubjectArray);exit;
+            
             if (!empty($differenceInstituteSubjectArray)) {
 
                 $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
@@ -846,15 +846,19 @@ class InstituteApiController extends Controller
 
                     //institute
 
-                    $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)->where('institute_for_id', $institute_for)->get();
+                    $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)
+                    ->where('institute_for_id', $institute_for)->get();
+                    $instiyutewArray = explode(',', $request->institute_for_id);
                     if ($institute_for_check->isEmpty()) {
+                        if (in_array($institute_for, $instiyutewArray)) {
                         Institute_for_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
                             'institute_for_id' => $institute_for
                         ]);
+                        }
                     } else {
-                        $instiyutewArray = explode(',', $request->institute_for_id);
+                        
                         if (!in_array($institute_for, $instiyutewArray)) {
                             $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
                             $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
@@ -872,16 +876,19 @@ class InstituteApiController extends Controller
                     }
 
                     //board
-                    $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)->where('board_id', $board)->get();
+                    $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
+                    ->where('board_id', $board)->get();
+                    $boardtewArray = explode(',', $request->institute_board_id);
                     if ($institute_board_check->isEmpty()) {
+                        if (in_array($board, $boardtewArray)) {
                         Institute_board_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
                             'board_id' => $board,
                             'institute_for_id' => $institute_for
                         ]);
+                        }
                     } else {
-                        $boardtewArray = explode(',', $request->institute_board_id);
                         if (!in_array($board, $boardtewArray)) {
                             $student_check = Student_detail::where('board_id', $board)->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('board_id', $board)->where('institute_id', $institute->id)->first();
@@ -901,7 +908,9 @@ class InstituteApiController extends Controller
 
                     //medium
                     $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->where('board_id', $board)->where('medium_id', $medium)->get();
+                    $mediumtewArray = explode(',', $request->institute_medium_id);
                     if ($institute_medium_check->isEmpty()) {
+                        if (in_array($medium, $mediumtewArray)) {
                         Medium_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
@@ -909,8 +918,8 @@ class InstituteApiController extends Controller
                             'institute_for_id' => $institute_for,
                             'board_id' => $board
                         ]);
+                        }
                     } else {
-                        $mediumtewArray = explode(',', $request->institute_medium_id);
                         if (!in_array($medium, $mediumtewArray)) {
                             $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
@@ -930,7 +939,9 @@ class InstituteApiController extends Controller
                     //class
                     $class_medium_check = Class_sub::where('institute_id', $institute->id)
                         ->where('class_id', $institute_for_class)->get();
+                        $classtewArray = explode(',', $request->institute_for_class_id);    
                     if ($class_medium_check->isEmpty()) {
+                        if (in_array($institute_for_class, $classtewArray)) {
                         Class_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
@@ -939,8 +950,8 @@ class InstituteApiController extends Controller
                             'board_id' => $board,
                             'medium_id' => $medium
                         ]);
+                        }
                     } else {
-                        $classtewArray = explode(',', $request->institute_for_class_id);
                         if (!in_array($institute_for_class, $classtewArray)) {
                             $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
@@ -962,7 +973,9 @@ class InstituteApiController extends Controller
                         ->where('standard_id', $standard)
                         ->where('board_id', $board)
                         ->where('medium_id', $medium)->first();
+                        $standardewArray = explode(',', $request->standard_id);
                     if (!$standard_medium_check) {
+                        if (in_array($standard, $standardewArray)) {
                         Standard_sub::create([
                             'user_id' => $institute->user_id,
                             'institute_id' => $institute->id,
@@ -972,9 +985,8 @@ class InstituteApiController extends Controller
                             'medium_id' => $medium,
                             'class_id' => $institute_for_class
                         ]);
+                        }
                     } else {
-
-                        $standardewArray = explode(',', $request->standard_id);
                         if (!in_array($standard, $standardewArray)) {
                             $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
@@ -4738,6 +4750,7 @@ class InstituteApiController extends Controller
                     'medium' => $medium_array,
                 ];
             }
+
             $institute_response = [];
             foreach ($institute_detail as $value) {
                 $institute_response[] = [
