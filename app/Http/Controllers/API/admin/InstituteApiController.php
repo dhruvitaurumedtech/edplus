@@ -858,7 +858,6 @@ class InstituteApiController extends Controller
                         ]);
                         }
                     } else {
-                        
                         if (!in_array($institute_for, $instiyutewArray)) {
                             $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
                             $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
