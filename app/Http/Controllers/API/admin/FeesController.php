@@ -411,6 +411,7 @@ class FeesController extends Controller
         }
         try{
             $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
+            
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
             if(!empty($student_fees)){
                 if($discount->discount_by == 'Rupee'){
@@ -419,7 +420,7 @@ class FeesController extends Controller
                 if($discount->discount_by == 'Percentage'){
                     $fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
                  }
-                 if($fees > $request->payment_amount){
+                 if($fees < $request->payment_amount){
                     return $this->response([], "Enter Fees amount is wrong!");
                  }
             }
