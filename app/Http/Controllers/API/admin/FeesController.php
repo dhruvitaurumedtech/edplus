@@ -453,12 +453,14 @@ class FeesController extends Controller
                 } else {
                     // If no discount, fees remain the total fees
                     $fees_data=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
-                    $$paid_amount=0;
+                    $paid_amount=0;
+                    if(!empty($fees_data)){
+
                     foreach($fees_data as $value)
                     {
                         $paid_amount +=$value->payment_amount;
                     }
-
+                }
                     $fees = $student_fees->total_fees - $paid_amount;
                 }
     
