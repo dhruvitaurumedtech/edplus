@@ -725,12 +725,9 @@ class FeesController extends Controller
             $student_name = $student->firstname .' '.$student->lastname;
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
             $userId = Auth::user()->id;
-            
-            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
-           
-            $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
-             $discount=Discount_model::where('student_id',$request->student_id)->first();
-            
+            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
+            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
+            $discount=Discount_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
             $histroy = [];
             $paid_amount = 0;
             $discount_data=0;
