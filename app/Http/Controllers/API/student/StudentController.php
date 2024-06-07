@@ -2178,7 +2178,6 @@ class StudentController extends Controller
 
     public function student_edit_profile(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'firstname' => 'required|string',
             'lastname' => 'required|string',
