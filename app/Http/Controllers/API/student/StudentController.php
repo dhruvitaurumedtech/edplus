@@ -2178,6 +2178,7 @@ class StudentController extends Controller
 
     public function student_edit_profile(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'firstname' => 'required|string',
             'lastname' => 'required|string',
@@ -2220,7 +2221,6 @@ class StudentController extends Controller
             $user->save();
             if (!empty($request->parents)) {
                 $parents = json_decode($request->parents, true);
-
                 foreach ($parents as $parentData) {
                     // $emilfin = user::where('email', $parentData['email'])->first();
                     if ($parentData['firstname'] == '') {
@@ -2233,6 +2233,8 @@ class StudentController extends Controller
                         return $this->response([], 'mobile Requied field are missing', false, 400);
                     } elseif ($parentData['relation'] == '') {
                         return $this->response([], 'relation Requied field are missing', false, 400);
+                    } elseif ($parentData['country_code'] == '') {
+                        return $this->response([], 'country_code Requied field are missing', false, 400);
                     }
                     //  elseif (!empty($emilfin)) {
                     //     return $this->response([], 'email is already exist', false, 400);
