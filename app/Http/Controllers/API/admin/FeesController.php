@@ -284,7 +284,10 @@ class FeesController extends Controller
                         $due_Amount = $student_fees->total_fees;
 
                     }
-                }
+                }else{
+                $due_Amount = $student_fees->total_fees;
+
+                 }
             }
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
