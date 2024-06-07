@@ -3256,9 +3256,8 @@ class InstituteApiController extends Controller
                             'student_id' => $student_id,
                             'subject_id' => $request->subject_id,
                             //'total_fees' => (!empty($amount)) ? $amount : '',
-                            'total_fees' => (!empty($amount)) ? (float)$amount : null,
+                            'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
                         ]);
-                        print_r($amount);exit;
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
                         if (!empty($parets)) {
                             foreach ($parets as $prdtl) {
