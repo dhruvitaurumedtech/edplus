@@ -421,7 +421,7 @@ class FeesController extends Controller
                     $fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
                  }
                  if($fees < $request->payment_amount){
-                    return $this->response([], "Enter Fees amount is wrong!");
+                    return $this->response([], "Enter Fees amount is wrong!", false, 400);
                  }
             }
         $fee = new Fees_colletion_model;
