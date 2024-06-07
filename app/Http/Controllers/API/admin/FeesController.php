@@ -174,24 +174,36 @@ class FeesController extends Controller
                             $students = [];
 
                             foreach ($student_response as $value) {
+
                                 $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
                                                                   ->where('student_id', $value['student_id'])
                                                                   ->first();
-                            
+                                                                  
+                                                     
                                 $discount = Discount_model::where('institute_id', $request->institute_id)
                                                           ->where('student_id', $value['student_id'])
                                                           ->first();
+                                                        //   print_r($student_fees);exit;
                             
                                 $total = null;
-                            
-                                if ($student_fees && $discount) {
-                                    if ($discount->discount_by == 'Rupee') {
-                                        $total = $student_fees->total_fees - $discount->discount_amount;
-                                    } elseif ($discount->discount_by == 'Percentage') {
-                                        $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                                
+                                if ($student_fees || $discount) {
+                                    $total = $student_fees->total_fees;
+                                
+                                    // Apply discount if available
+                                    if ($discount) {
+                                        if ($discount->discount_by == 'Rupee') {
+                                            $total = $student_fees->total_fees - $discount->discount_amount;
+                                        } elseif ($discount->discount_by == 'Percentage') {
+                                            $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                                        }
                                     }
-                            
-                                    if (!is_null($total) && !empty($value['total_payment_amount'])) {
+                                
+                                    // Check if both total and total payment amount are available and not empty
+                                    if (!empty($total) && !empty($value['total_payment_amount'])) {
+                                        // Debugging output to check the values
+                                       
+                                        // Compare total with the payment amount
                                         if ($total == $value['total_payment_amount']) {
                                             $students[] = [
                                                 'student_id' => $value['student_id'],
@@ -199,7 +211,7 @@ class FeesController extends Controller
                                                 'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
                                                 'status' => 'paid'
                                             ];
-                                        } 
+                                        }
                                     }
                                 }
                             }
