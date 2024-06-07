@@ -3249,13 +3249,16 @@ class InstituteApiController extends Controller
                         foreach ($subject_amount as $value) {
                             $amount += $value->amount;
                         }
+                        
                         Student_fees_model::create([
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
                             'student_id' => $student_id,
                             'subject_id' => $request->subject_id,
-                            'total_fees' => (!empty($amount)) ? $amount : '',
+                            //'total_fees' => (!empty($amount)) ? $amount : '',
+                            'total_fees' => (!empty($amount)) ? (float)$amount : null,
                         ]);
+                        print_r($amount);exit;
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
                         if (!empty($parets)) {
                             foreach ($parets as $prdtl) {

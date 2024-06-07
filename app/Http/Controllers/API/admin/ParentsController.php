@@ -42,7 +42,8 @@ class ParentsController extends Controller
             $chilsdata = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-                ->where('parents.parent_id', Auth::id())->where('parents.verify', '1')
+                ->where('parents.parent_id', Auth::id())
+                ->where('parents.verify', '1')
                 ->select('users.firstname', 'users.lastname',
                  'institute_detail.institute_name',
                  'institute_detail.id as institute_id',
