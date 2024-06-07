@@ -570,7 +570,10 @@ class FeesController extends Controller
                       foreach($student_list as $value){
 
                         $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
-                        ->leftjoin('discount','discount.student_id','=','students_details.student_id')
+                        ->leftJoin('discount', function($join) {
+                            $join->on('discount.student_id', '=', 'students_details.student_id')
+                                 ->on('discount.institute_id', '=', 'students_details.institute_id');
+                        })
                         ->leftjoin('standard','standard.id','=','students_details.standard_id')
                          ->where('students_details.student_id',$value->id)
                         ->where('students_details.institute_id',$request->institute_id)
@@ -578,7 +581,7 @@ class FeesController extends Controller
                         ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
                        
                         ->first();
-                        // echo "<pre>";print_r($query);
+                        // echo "<pre>";print_r($query);exit;
                         $amounts =0;
                         foreach(explode(',',$value->subject_id) as $subject_id){
                              $subject_sub=Subject_sub::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('amount')->get();
@@ -669,7 +672,7 @@ class FeesController extends Controller
         }
         try{
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
-            if($discount == 1){
+             if($discount == 1){
                 Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->update(['financial_year' => date('Y'),
                 'discount_amount' => $request->discount_amount,
                 'discount_by' => $request->discount_by]); 
