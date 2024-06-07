@@ -266,7 +266,8 @@ class FeesController extends Controller
                   $dis = 0;
                 }
                 $due_Amount=0;
-                if(!empty($value['total_payment_amount']) && !empty($student_fees->total_fees)){
+                // echo $student_fees->total_fees;exit;
+                if(!empty($value['total_payment_amount']) || !empty($student_fees->total_fees)){
                 if($student_fees->total_fees != $value['total_payment_amount']){
                     if(!empty($value['total_payment_amount']))
                     {
