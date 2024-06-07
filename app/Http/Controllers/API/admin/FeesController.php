@@ -416,59 +416,80 @@ class FeesController extends Controller
     }
     public function fees_collection(Request $request){
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
-            'student_id'=>'required|integer',
-            'invoice_no' => 'required',
-            'date' => 'required',
-            'student_name'=>'required|string',
+            'institute_id' => 'required|integer',
+            'student_id' => 'required|integer',
+            'invoice_no' => 'required|string',
+            'date' => 'required|date',
+            'student_name' => 'required|string',
             'payment_amount' => 'required|integer',
-            'payment_type' => 'required',
-            'transaction_id'=>'nullable'
+            'payment_type' => 'required|string',
+            'transaction_id' => 'nullable|string'
         ]);
+    
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
-            
-            $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
-            if(!empty($student_fees)){
-                if($discount->discount_by == 'Rupee'){
-                   $fees= $student_fees->total_fees -  $discount->discount_amount;
+    
+        try {
+            // Fetch student fees and discount details
+            $student_fees = Student_fees_model::where('student_id', $request->student_id)
+                                              ->where('institute_id', $request->institute_id)
+                                              ->first();
+    
+            $discount = Discount_model::where('institute_id', $request->institute_id)
+                                      ->where('student_id', $request->student_id)
+                                      ->first();
+    
+            // Initialize fees variable
+            $fees = null;
+    
+            if ($student_fees) {
+                if ($discount) {
+                    if ($discount->discount_by == 'Rupee') {
+                        $fees = $student_fees->total_fees - $discount->discount_amount;
+                    } elseif ($discount->discount_by == 'Percentage') {
+                        $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                    }
+                } else {
+                    // If no discount, fees remain the total fees
+                    $fees = $student_fees->total_fees;
                 }
-                if($discount->discount_by == 'Percentage'){
-                    $fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
-                 }
-                 if($fees < $request->payment_amount){
-                    return $this->response([], "Enter Fees amount is wrong!", false, 400);
-                 }
+    
+                if ($fees < $request->payment_amount) {
+                    return $this->response([], "Entered fee amount is wrong!", false, 400);
+                }
+            } else {
+                return $this->response([], "Student fees record not found!", false, 400);
             }
-        $fee = new Fees_colletion_model;
-        $fee->user_id = Auth::user()->id;
-        $fee->institute_id = $request->institute_id;
-        $fee->student_id = $request->student_id;
-        $fee->student_name = $request->student_name;
-        $fee->invoice_no = $request->invoice_no;
-        $fee->date = $request->date;
-        $fee->bank_name = $request->bank_name;
-        $fee->payment_amount = $request->payment_amount;
-        $fee->payment_type = $request->payment_type;
-        $fee->transaction_id = (!empty($request->transaction_id)) ? $request->transaction_id : '';
-        $fee->save();
-        $amount = 0;
-        
-        $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
-        
-        foreach($Fees_colletion_model as $value){
-           $amount +=$value->payment_amount;
+    
+            // Save the fee collection record
+            $fee = new Fees_colletion_model;
+            $fee->user_id = Auth::user()->id;
+            $fee->institute_id = $request->institute_id;
+            $fee->student_id = $request->student_id;
+            $fee->student_name = $request->student_name;
+            $fee->invoice_no = $request->invoice_no;
+            $fee->date = $request->date;
+            $fee->bank_name = $request->bank_name;
+            $fee->payment_amount = $request->payment_amount;
+            $fee->payment_type = $request->payment_type;
+            $fee->transaction_id = $request->transaction_id ?? '';
+            $fee->save();
+    
+            // Calculate the total paid amount
+            $total_paid = Fees_colletion_model::where('student_id', $request->student_id)
+                                              ->where('institute_id', $request->institute_id)
+                                              ->sum('payment_amount');
+    
+            // Update the status of the latest fee collection record
+            // Fees_colletion_model::where('id', $fee->id)->update([
+            //     'status' => ($total_paid >= $student_fees->total_fees) ? 'paid' : 'pending'
+            // ]);
+    
+            return $this->response([], "Fees paid successfully.");
+        } catch (\Exception $e) {
+            return $this->response([], "Error: " . $e->getMessage(), false, 400);
         }
-        // echo $amount;echo $student_fees->total_fees;exit;
-        // Fees_colletion_model::where('id', $fee->id)->update(['status'=>($amount==$student_fees->total_fees)?'paid':'pending']);
-        return $this->response([], "Fees Paid successfully.");
-        } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
-        }
-
         
     }
     public function display_subject_fees(Request $request){
