@@ -290,12 +290,13 @@ class FeesController extends Controller
 
                  }
             }
+            if($due_Amount!=0){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>'pending',
                     'due_amount'=>$due_Amount];
-             
+                } 
              }                    
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
