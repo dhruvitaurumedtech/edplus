@@ -769,7 +769,8 @@ class FeesController extends Controller
                 if($discount->discount_by =='Rupee'){
                     if(!empty($value->payment_amount)){
                             $paid_amount += $value->payment_amount;
-                            $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
+                            // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
+                            $amount_data=$paid_amount;
                     }else{
                             $amount_data = $revise_fee;
                     }
@@ -777,7 +778,8 @@ class FeesController extends Controller
                 if($discount->discount_by =='Percentage'){
                     if(!empty($value->payment_amount)){
                         $paid_amount += $value->payment_amount;
-                        $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
+                        // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
+                        $amount_data=$paid_amount;
                 }else{
                         $amount_data = $revise_fee;
                 }
