@@ -733,91 +733,90 @@ class FeesController extends Controller
         }  
      }
      public function payment_type_new(Request $request){
-        try{
-        $payment_mode = Payment_type_model::whereNull('deleted_at')->get();
-            $data=[];
-            foreach($payment_mode as $value){
-            $data[] = ['id'=>$value->id,'name'=>$value->name];
+        try {
+            // Fetch payment modes
+            $payment_modes = Payment_type_model::whereNull('deleted_at')->get();
+            $data = [];
+            foreach ($payment_modes as $value) {
+                $data[] = ['id' => $value->id, 'name' => $value->name];
             }
-            $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
-
-            
-            if (!empty($fees_colletion)) {
-                // $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
-                $parts = explode('-', $fees_colletion->invoice_no);
-                
+    
+            // Fetch the latest fee collection record for the student
+            $fees_collection = Fees_colletion_model::where('student_id', $request->student_id)->latest()->first();
+    
+            // Initialize invoice number
+            $invoice = 1;
+            if (!empty($fees_collection)) {
+                $parts = explode('-', $fees_collection->invoice_no);
                 if (count($parts) === 2) {
-                    $number = $parts[1];
-                }        
-                $invoice = $number + 1 ;
-            } else {
-                $invoice = 1;
+                    $number = (int) $parts[1];
+                    $invoice = $number + 1;
+                }
             }
-            $student = User::where('id',$request->student_id)->first();
-            $student_name = $student->firstname .' '.$student->lastname;
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
-            $userId = Auth::user()->id;
-            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
-            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
-            $discount=Discount_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
-            $histroy = [];
+    
+            // Fetch student information
+            $student = User::where('id', $request->student_id)->first();
+            $student_name = $student->firstname . ' ' . $student->lastname;
+    
+            // Fetch student fee and discount information
+            $student_fees = Student_fees_model::where('student_id', $request->student_id)
+                                              ->where('institute_id', $request->institute_id)
+                                              ->first();
+    
+            $discount = Discount_model::where('student_id', $request->student_id)
+                                      ->where('institute_id', $request->institute_id)
+                                      ->first();
+    
+            // Calculate revised fee and discount data
+            $revise_fee = 0;
+            $discount_data = '00.00';
+            if ($discount) {
+                if ($discount->discount_by == 'Rupee') {
+                    $revise_fee = $discount->discount_amount;
+                    $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '.00' : '00.00';
+                } elseif ($discount->discount_by == 'Percentage') {
+                    $revise_fee = $student_fees->total_fees * ($discount->discount_amount / 100);
+                    $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '%' : '0%';
+                }
+            }
+    
+            // Fetch student payment history
+            $student_history = Fees_colletion_model::where('student_id', $request->student_id)
+                                                   ->where('institute_id', $request->institute_id)
+                                                   ->get();
+    
+            // Prepare history and calculate paid amount
+            $history = [];
             $paid_amount = 0;
-            $discount_data=0;
-            $revise_fee=0;
-            if($discount->discount_by =='Rupee'){
-                $revise_fee= $discount->discount_amount;
-                $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'.00' : '00.00' ;
-            }
-            if($discount->discount_by =='Percentage'){
-                 $revise_fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
-                //  echo $revise_fee = $value->payment_amount - $revise_fee;
-                // exit;
-                $discount_data=(!empty($discount->discount_amount)) ? $discount->discount_amount .'%' : '0%' ;
-                 
-            } 
-            foreach($student_histroy as $value){
-                $histroy[] =[
-                    'paid_amount'=>$value->payment_amount,
-                    'date'=>$value->created_at,
-                    'payment_mode'=>$value->payment_type,
-                    'invoice_no'=>$value->invoice_no,
-                    'transaction_id'=>$value->transaction_id,
+            foreach ($student_history as $value) {
+                $history[] = [
+                    'paid_amount' => $value->payment_amount,
+                    'date' => $value->created_at,
+                    'payment_mode' => $value->payment_type,
+                    'invoice_no' => $value->invoice_no,
+                    'transaction_id' => $value->transaction_id,
                 ];
-                $revise_fee=0;
-                
-                if($discount->discount_by =='Rupee'){
-                    if(!empty($value->payment_amount)){
-                            $paid_amount += $value->payment_amount;
-                            // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
-                            $amount_data=$paid_amount;
-                    }else{
-                            $amount_data = $revise_fee;
-                    }
-                }
-                if($discount->discount_by =='Percentage'){
-                    if(!empty($value->payment_amount)){
-                        $paid_amount += $value->payment_amount;
-                        // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
-                        $amount_data=$paid_amount;
-                }else{
-                        $amount_data = $revise_fee;
-                }
+                if (!empty($value->payment_amount)) {
+                    $paid_amount += $value->payment_amount;
                 }
             }
+    
+            // Prepare the final data structure
             $data_final = [
-                           'invoice_number'=>$invoiceNumber,
-                           'date'=>date('Y-m-d'),
-                           'student_id'=>$request->student_id,
-                           'student_name'=>$student_name,
-                           'payment_type'=>$data,
-                           'student_fees'=>(!empty($student_fees->total_fees)) ? $student_fees->total_fees .'.00' : '00.00',
-                           'discount'=>$discount_data,
-                           'paid_amount'=>(!empty($amount_data))?$amount_data.'.00':'00.00',
-                           'histroy'=>$histroy
-                          ];
-                          
-            return $this->response($data_final, "Fetch data successfully");
-            }catch (Exception $e) {
+                'invoice_number' => $invoiceNumber,
+                'date' => date('Y-m-d'),
+                'student_id' => $request->student_id,
+                'student_name' => $student_name,
+                'payment_type' => $data,
+                'student_fees' => !empty($student_fees->total_fees) ? $student_fees->total_fees . '.00' : '00.00',
+                'discount' => $discount_data,
+                'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
+                'history' => $history,
+            ];
+    
+            return $this->response($data_final, "Fetch data successfully");      
+              }catch (Exception $e) {
                 return $this->response($e, "Invalid token.", false, 400 );
             }  
 
