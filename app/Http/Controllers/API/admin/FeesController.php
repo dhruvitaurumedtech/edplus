@@ -266,7 +266,8 @@ class FeesController extends Controller
                   $dis = 0;
                 }
                 $due_Amount=0;
-                if(!empty($value['total_payment_amount']) && !empty($student_fees->total_fees)){
+                // echo $student_fees->total_fees;exit;
+                if(!empty($value['total_payment_amount']) || !empty($student_fees->total_fees)){
                 if($student_fees->total_fees != $value['total_payment_amount']){
                     if(!empty($value['total_payment_amount']))
                     {
@@ -284,14 +285,18 @@ class FeesController extends Controller
                         $due_Amount = $student_fees->total_fees;
 
                     }
-                }
+                }else{
+                $due_Amount = $student_fees->total_fees;
+
+                 }
             }
+            if($due_Amount!=0){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>'pending',
                     'due_amount'=>$due_Amount];
-             
+                } 
              }                    
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
@@ -406,7 +411,20 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-       
+            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
+            
+            $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+            if(!empty($student_fees)){
+                if($discount->discount_by == 'Rupee'){
+                   $fees= $student_fees->total_fees -  $discount->discount_amount;
+                }
+                if($discount->discount_by == 'Percentage'){
+                    $fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
+                 }
+                 if($fees < $request->payment_amount){
+                    return $this->response([], "Enter Fees amount is wrong!", false, 400);
+                 }
+            }
         $fee = new Fees_colletion_model;
         $fee->user_id = Auth::user()->id;
         $fee->institute_id = $request->institute_id;
@@ -420,8 +438,8 @@ class FeesController extends Controller
         $fee->transaction_id = (!empty($request->transaction_id)) ? $request->transaction_id : '';
         $fee->save();
         $amount = 0;
-        $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
-        $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->get();
+        
+        $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
         
         foreach($Fees_colletion_model as $value){
            $amount +=$value->payment_amount;
@@ -721,12 +739,9 @@ class FeesController extends Controller
             $student_name = $student->firstname .' '.$student->lastname;
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
             $userId = Auth::user()->id;
-            
-            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
-           
-            $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
-             $discount=Discount_model::where('student_id',$request->student_id)->first();
-            
+            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
+            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
+            $discount=Discount_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
             $histroy = [];
             $paid_amount = 0;
             $discount_data=0;
@@ -755,7 +770,8 @@ class FeesController extends Controller
                 if($discount->discount_by =='Rupee'){
                     if(!empty($value->payment_amount)){
                             $paid_amount += $value->payment_amount;
-                            $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
+                            // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $discount_data;
+                            $amount_data=$paid_amount;
                     }else{
                             $amount_data = $revise_fee;
                     }
@@ -763,7 +779,8 @@ class FeesController extends Controller
                 if($discount->discount_by =='Percentage'){
                     if(!empty($value->payment_amount)){
                         $paid_amount += $value->payment_amount;
-                        $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
+                        // $amount_data=$student_fees->total_fees - $paid_amount -$revise_fee - $revise_fees;
+                        $amount_data=$paid_amount;
                 }else{
                         $amount_data = $revise_fee;
                 }
