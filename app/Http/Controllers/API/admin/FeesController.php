@@ -186,7 +186,6 @@ class FeesController extends Controller
                    $total =  $student_fees->total_fees * ($discount->discount_amount / 100); 
                }
             //  exit;    
-             $student=[];
                  if(!empty($total) && !empty($value['total_payment_amount'])){
                   if($total == $value['total_payment_amount']){
                     $student[]=  ['student_id'=>$value['id'],
@@ -194,6 +193,8 @@ class FeesController extends Controller
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
                     'status'=>'paid'];
                   }
+                }else{
+                    $student= [];
                 }
              }                    
             return $this->response($student, "Data Fetch Successfully");
