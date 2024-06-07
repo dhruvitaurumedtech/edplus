@@ -170,34 +170,42 @@ class FeesController extends Controller
 
                             $student_response = $query->get()->toArray();
 
-            // echo "<pre>";print_r($student_response);exit;
-            $student = [];
-            
            
-            foreach($student_response as $value){
-                
-               $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
-               
-               $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
-               if($discount->discount_by == 'Rupee'){
-                   $total =$student_fees->total_fees - $discount->discount_amount;
-               }
-               if($discount->discount_by == 'Percentage'){
-                   $total =  $student_fees->total_fees * ($discount->discount_amount / 100); 
-               }
-            //  exit;    
-                 if(!empty($total) && !empty($value['total_payment_amount'])){
-                  if($total == $value['total_payment_amount']){
-                    $student[]=  ['student_id'=>$value['id'],
-                    'student_name'=>$value['firstname'].' '.$value['lastname'],
-                    'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
-                    'status'=>'paid'];
-                  }
-                }else{
-                    $student= [];
-                }
-             }                    
-            return $this->response($student, "Data Fetch Successfully");
+                            $students = [];
+
+                            foreach ($student_response as $value) {
+                                $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
+                                                                  ->where('student_id', $value['student_id'])
+                                                                  ->first();
+                            
+                                $discount = Discount_model::where('institute_id', $request->institute_id)
+                                                          ->where('student_id', $value['student_id'])
+                                                          ->first();
+                            
+                                $total = null;
+                            
+                                if ($student_fees && $discount) {
+                                    if ($discount->discount_by == 'Rupee') {
+                                        $total = $student_fees->total_fees - $discount->discount_amount;
+                                    } elseif ($discount->discount_by == 'Percentage') {
+                                        $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                                    }
+                            
+                                    if (!is_null($total) && !empty($value['total_payment_amount'])) {
+                                        if ($total == $value['total_payment_amount']) {
+                                            $students[] = [
+                                                'student_id' => $value['student_id'],
+                                                'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                                                'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                                                'status' => 'paid'
+                                            ];
+                                        } 
+                                    }
+                                }
+                            }
+                            
+                            return $this->response($students, "Data Fetch Successfully");
+                            
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
