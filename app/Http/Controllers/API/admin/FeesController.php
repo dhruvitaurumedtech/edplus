@@ -142,7 +142,7 @@ class FeesController extends Controller
                                 'users.firstname',
                                 'users.lastname',
                                 'users.image',
-                                'students_details.student_id', // make sure this is included if it's not part of 'users'
+                                'students_details.student_id', 
                                 DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
                             )
                             ->where('students_details.institute_id', $request->institute_id)
@@ -155,7 +155,7 @@ class FeesController extends Controller
                                 'users.firstname',
                                 'users.lastname',
                                 'users.image',
-                                'students_details.student_id' // include this in the group by as well
+                                'students_details.student_id' 
                             );
 
                             if (!empty($request->batch_id)) {
@@ -176,10 +176,19 @@ class FeesController extends Controller
            
             foreach($student_response as $value){
                 
-               $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['id'])->first();
-                 $student=[];
-                 if(!empty($student_fees->total_fees) && !empty($value['total_payment_amount'])){
-                  if($student_fees->total_fees == $value['total_payment_amount']){
+               $student_fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
+               
+               $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$value['student_id'])->first();
+               if($discount->discount_by == 'Rupee'){
+                   $total =$student_fees->total_fees - $discount->discount_amount;
+               }
+               if($discount->discount_by == 'Percentage'){
+                   $total =  $student_fees->total_fees * ($discount->discount_amount / 100); 
+               }
+            //  exit;    
+             $student=[];
+                 if(!empty($total) && !empty($value['total_payment_amount'])){
+                  if($total == $value['total_payment_amount']){
                     $student[]=  ['student_id'=>$value['id'],
                     'student_name'=>$value['firstname'].' '.$value['lastname'],
                     'profile'=>!empty($value['image'])?asset($value['image']):asset('profile/no-image.png'),
