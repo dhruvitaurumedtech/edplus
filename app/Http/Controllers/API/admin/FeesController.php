@@ -410,7 +410,19 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-       
+            $student_fees=Student_fees_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->first();
+            $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+            if(!empty($student_fees)){
+                if($discount->discount_by == 'Rupee'){
+                   $fees= $student_fees->total_fees -  $discount->discount_amount;
+                }
+                if($discount->discount_by == 'Percentage'){
+                    $fees =  $student_fees->total_fees * ($discount->discount_amount / 100);
+                 }
+                 if($fees > $request->payment_amount){
+                    return $this->response([], "Enter Fees amount is wrong!");
+                 }
+            }
         $fee = new Fees_colletion_model;
         $fee->user_id = Auth::user()->id;
         $fee->institute_id = $request->institute_id;
@@ -424,8 +436,8 @@ class FeesController extends Controller
         $fee->transaction_id = (!empty($request->transaction_id)) ? $request->transaction_id : '';
         $fee->save();
         $amount = 0;
-        $student_fees=Student_fees_model::where('student_id',$request->student_id)->first();
-        $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->get();
+        
+        $Fees_colletion_model=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
         
         foreach($Fees_colletion_model as $value){
            $amount +=$value->payment_amount;
