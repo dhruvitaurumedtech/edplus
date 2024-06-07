@@ -910,9 +910,9 @@ class StudentController extends Controller
             // ->orderByDesc('feedbacks.created_at')->get()->toArray();
             
 
-            $stdcount = Student_detail::where('institute_id', $request->institute_id)->count();
+            $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status','1')->count();
             $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
-            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->distinct('teacher_id')->count(); //by priyanka
+            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status','1')->distinct('teacher_id')->count(); //by priyanka
 
             $institutedetaa = array(
                 'id' => $institutedeta->id,
@@ -2009,13 +2009,13 @@ class StudentController extends Controller
             } else {
                 $student_id = $request->student_id;
             }
-
+            
             $studentUser = User::where('id', $student_id)->first();
-
+            
             $institute_id = $request->institute_id;
 
             $institutes = [];
-
+            
             $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($student_id) {
                     $query->select('institute_id')
@@ -2050,13 +2050,16 @@ class StudentController extends Controller
                     'subjects' => $subs
                 );
             }
+            
             $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->join('board', 'board.id', '=', 'students_details.board_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->where('students_details.student_id', $student_id)
-                ->where('students_details.status', '=', '1')
-                ->select('standard.name as standard', 'medium.name as medium', 'board.name as board', 'stream.name as stream')->first();
+                //->where('students_details.status', '=', '1')
+                ->select('standard.name as standard', 'medium.name as medium',
+                 'board.name as board', 'stream.name as stream')->first();
+            
 
             $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                 ->where('parents.student_id', $student_id)->get();
@@ -2070,11 +2073,13 @@ class StudentController extends Controller
                     'relation' => $parentsDT->relation
                 );
             }
+            
             if ($studentUser->image) {
                 $img = $studentUser->image;
             } else {
                 $img = asset('no-image.png');
             }
+            
             $userdetail = array(
                 'id' => $studentUser->id,
                 'unique_id' => $studentUser->unique_id . '',
@@ -2083,12 +2088,12 @@ class StudentController extends Controller
                 'country_code' => $studentUser->country_code,
                 'mobile' => $studentUser->mobile . '',
                 'image' => $img . '',
-                'dob' => $studentUser->dob,
-                'address' => $studentUser->address,
+                'dob' => $studentUser->dob.'',
+                'address' => $studentUser->address.'',
                 'standard' => $sdtls ? $sdtls->standard : '',
-                'stream'=>$sdtls->stream ? $sdtls->stream : '',
+                'stream'=>$sdtls ? $sdtls->stream : '',
                 'medium' => $sdtls ? $sdtls->medium  : '',
-                'board'=>$sdtls->board ? $sdtls->board : '',
+                'board'=>$sdtls ? $sdtls->board : '',
                 'school' => $studentUser->school_name,
                 'area' => $studentUser->area,
                 'institutes' => $institutes,
@@ -2098,6 +2103,7 @@ class StudentController extends Controller
                 'city' => $studentUser ? $studentUser->city . '' : '',
                 'pincode' => $studentUser ? $studentUser->pincode . '' : '',
             );
+            
             return $this->response($userdetail, "Successfully fetch data.");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
