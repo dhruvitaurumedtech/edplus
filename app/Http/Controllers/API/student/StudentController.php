@@ -490,12 +490,11 @@ class StudentController extends Controller
     //add parents details
     public function student_parents_details_add(Request $request)
     {
-
         $validator = \Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
             'parents.*.firstname' => 'required',
             'parents.*.lastname' => 'required',
-            'parents.*.email' => 'required|email|unique:users,email',
+            'parents.*.email' => 'required|email', //|unique:users,email
             'parents.*.mobile' => 'required',
             'parents.*.relation' => 'required',
             'parents.*.country_code' => 'required',
@@ -521,20 +520,26 @@ class StudentController extends Controller
                     return $this->response([], 'mobile Requied field are missing', false, 400);
                 } elseif ($parentData['relation'] == '') {
                     return $this->response([], 'relation Requied field are missing', false, 400);
-                } elseif (!empty($emilfin)) {
-                    return $this->response([], 'email is already exist', false, 400);
-                } else {
+                } 
+                    // elseif (!empty($emilfin)) {
+                    //     return $this->response([], 'email is already exist', false, 400);
+                    // } 
+                else {
+                    if (!empty($emilfin)) {
+                        $parent_id = $emilfin->id;
+                    }else{
+                        $user = User::create([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'country_code' => $parentData['country_code'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5'
+                        ]);
+                        
+                        $parent_id = $user->id;
+                    }
                     
-                    $user = User::create([
-                        'firstname' => $parentData['firstname'],
-                        'lastname' => $parentData['lastname'],
-                        'email' => $parentData['email'],
-                        'country_code' => $parentData['country_code'],
-                        'mobile' => $parentData['mobile'],
-                        'role_type' => '5'
-                    ]);
-                    
-                    $parent_id = $user->id;
                     if (!empty($parent_id)) {
                         $parnsad = Parents::create([
                             'student_id' =>  auth()->id(),
