@@ -5245,6 +5245,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'board_id' => 'required',
             'standard_id' => 'required',
+            'medium_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -5256,6 +5257,7 @@ class InstituteApiController extends Controller
                 ['user_id', Auth::id()],
                 ['institute_id', $request->institute_id],
                 ['board_id', $request->board_id],
+                ['medium_id', $request->medium_id],
                 ['standard_id', $request->standard_id]
             ])->get(['id', 'batch_name'])->toArray();
             return $this->response($batchlist, "Batch Fetch Successfully");
