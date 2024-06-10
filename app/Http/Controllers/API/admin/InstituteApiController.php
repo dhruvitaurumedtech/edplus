@@ -2272,7 +2272,8 @@ class InstituteApiController extends Controller
                 $query->where('user_id', $user_id)
                     ->where('institute_id', $institute_id);
             })
-                ->orWhere('status', 'active')
+                //->orWhere('status', 'active')
+                ->Where('status', 'active')
                 ->where('user_id', 1)
                 ->get(['id', 'banner_image', 'url']);
 
@@ -5739,7 +5740,7 @@ class InstituteApiController extends Controller
         }
     }
     public function fetch_teacher_list(Request $request)
-    {
+    { 
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
