@@ -3092,9 +3092,39 @@ class InstituteApiController extends Controller
     //         return $this->response($e, "Invalid token.", false, 400);
     //     }
     // }
+     public function student_fees_calculation(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'student_id' => 'required',
+            'subject_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
 
-    public function add_student(Request $request)
-    {
+        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+        ->whereIn('subject_id', explode(',', $request->subject_id))
+        ->select('amount')
+        ->get();
+       $amount = 0;
+        $emptyAmountCount = 0;
+
+        foreach ($subject_amount as $value) {
+            
+            if($value->amount == 0){
+                $emptyAmountCount++;
+                
+            }else{
+                $amount += $value->amount;
+            }
+        }
+        if($emptyAmountCount!=0){
+            return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects. Subject count: " . $emptyAmountCount . '. ', false, 400);
+        }
+        return $this->response([], 'Approve Screen.');
+     } 
+     public function add_student(Request $request)
+     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'user_id' => 'required',
@@ -3219,7 +3249,6 @@ class InstituteApiController extends Controller
                     } else {
                         $student_id = $student_id;
                     }
-
                     if (!empty($student_id)) {
                         $studentdetail = [
                             'user_id' => $user_id,
@@ -3236,31 +3265,30 @@ class InstituteApiController extends Controller
                             'status' => '0',
                         ];
 
-
-
                         if ($request->stream_id == 'null' || $request->stream_id == '') {
                             $studentdetail['stream_id'] = null;
                         }
 
                         $studentdetailadd = Student_detail::create($studentdetail);
-                        // print_r($request->subject_id);exit;
-                        $subject_amount = Subject_sub::where('institute_id', $institute_id)
-                            ->whereIn('subject_id', explode(',', $request->subject_id))
-                            ->select('amount')
-                            ->get();
+
+                        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+                        ->whereIn('subject_id', explode(',', $request->subject_id))
+                        ->select('amount')
+                        ->get();
                         $amount = 0;
                         foreach ($subject_amount as $value) {
+                         
                             $amount += $value->amount;
+                            
                         }
-                        
                         Student_fees_model::create([
-                            'user_id' => $user_id,
-                            'institute_id' => $request->institute_id,
-                            'student_id' => $student_id,
-                            'subject_id' => $request->subject_id,
-                            //'total_fees' => (!empty($amount)) ? $amount : '',
-                            'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
-                        ]);
+                                'user_id' => auth()->user()->user_id,
+                                'institute_id' => $request->institute_id,
+                                'student_id' => $request->student_id,
+                                'subject_id' => $request->subject_id,
+                                'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
+                            ]);
+                       
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
                         if (!empty($parets)) {
                             foreach ($parets as $prdtl) {
