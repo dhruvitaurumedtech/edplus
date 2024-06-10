@@ -2273,8 +2273,9 @@ class InstituteApiController extends Controller
                     ->where('institute_id', $institute_id);
             })
                 //->orWhere('status', 'active')
+                ->orwhere('user_id', 1)
                 ->Where('status', 'active')
-                ->where('user_id', 1)
+                
                 ->get(['id', 'banner_image', 'url']);
 
             $banner_array = $banner_list->map(function ($banner) {
