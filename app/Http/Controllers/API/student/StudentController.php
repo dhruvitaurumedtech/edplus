@@ -1128,12 +1128,12 @@ class StudentController extends Controller
                 $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('created_at', '<=', $cmtoday)
+                ->where('created_at', '<=', $nextDayStr)
                 ->where('attendance', 'A')->count();
 
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
-                ->where('lecture_date', '<=', $cmtoday)
+                ->where('lecture_date', '<=', $nextDayStr)
                 ->count();
             $totalattendlec = [
                 'total_lectures' => $totllect,
