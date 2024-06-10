@@ -5741,7 +5741,7 @@ class InstituteApiController extends Controller
         }
     }
     public function fetch_teacher_list(Request $request)
-    { 
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
