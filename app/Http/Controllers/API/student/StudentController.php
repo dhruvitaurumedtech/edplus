@@ -1039,8 +1039,9 @@ class StudentController extends Controller
                     'exam.exam_title',
                 )
                 ->orderByDesc('marks.created_at')->limit(3)->get();
-            $highestMarks = $resultQY->max('mark');
+            
             foreach ($resultQY as $resultDDt) {
+                $highestMarks = $resultDDt->max('mark');
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
