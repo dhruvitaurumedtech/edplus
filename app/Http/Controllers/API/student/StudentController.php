@@ -165,7 +165,14 @@ class StudentController extends Controller
             } else {
                 $studentparents = 1;
             }
+            $studentUser = User::where('id', $user_id)->first();
+            if ($studentUser->image) {
+                $img = $studentUser->image;
+            } else {
+                $img = asset('no-image.png');
+            }
             $data = [
+                'profile_image'=>$img,
                 'banner' => $banners_data,
                 'search_list' => $search_list,
                 'searchhistory_list' => $searchhistory_list,
