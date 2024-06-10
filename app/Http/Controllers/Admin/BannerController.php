@@ -87,10 +87,10 @@ class BannerController extends Controller
     {
         // dd($request->all());exit;
         $role = Banner_model::find($request->banner_id);
-        $request->validate([
-            'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            'status' => 'required',
-        ]);
+        // $request->validate([
+        //     'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        //     'status' => 'required',
+        // ]);
 
         $iconFile = $request->file('banner_image');
         if (!empty($iconFile)) {
