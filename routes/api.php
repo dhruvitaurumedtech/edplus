@@ -90,6 +90,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/fetch-exam-form-detail', [ExamController::class, 'fetch_exam_form_detail'])->name('fetch_exam_form_detail');
     Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
     Route::post('institute/update-institute', [InstituteApiController::class, 'update_institute']);
+    Route::post('institute/student-fees-calculation', [InstituteApiController::class, 'student_fees_calculation']);
+
     Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks');
     Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');

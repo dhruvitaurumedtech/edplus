@@ -932,7 +932,7 @@ class StudentController extends Controller
                 'whatsaap_link'=>$institutedeta->whatsaap_link,
                 'youtube_link'=>$institutedeta->youtube_link,
                 'logo' => (!empty($institutedeta->logo))?asset($institutedeta->logo):asset('no-image.png'),
-                'cover_photo' => (!empty($institutedeta->cover_photo))?asset($institutedeta->cover_photo):asset('cover_photo/default.png'),
+                'cover_photo' => (!empty($institutedeta->cover_photo))?asset($institutedeta->cover_photo):asset('cover_photo/cover_image.png'),
                 'boards' => $boards,
                 'students' => $stdcount,
                 'subject' => $subcount,

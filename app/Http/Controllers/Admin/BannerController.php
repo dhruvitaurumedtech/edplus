@@ -26,7 +26,7 @@ class BannerController extends Controller
     }
     public function create_banner()
     {
-        $institute_list = Institute_detail::paginate(10);
+        $institute_list = Institute_detail::all();
         return view('banner/create', compact('institute_list'));
     }
     public function save_banner(Request $request)
