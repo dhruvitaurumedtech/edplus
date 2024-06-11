@@ -57,7 +57,7 @@ class StaffController extends Controller
     public function view_roles(Request $request)
     {
         try {
-            $userHasRole = UserHasRole::where('user_id', Auth::id())->pluck('role_id');
+            $userHasRole = UserHasRole::where('role_id', '!=', 3)->where('user_id', Auth::id())->pluck('role_id');
             $roles = Roles::whereIn('id', $userHasRole)->get();
             $data = [];
             foreach ($roles as $value) {
