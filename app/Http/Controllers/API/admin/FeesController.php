@@ -749,9 +749,11 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+            $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->select('*')->first();
+            // print_r($fees);exit;    
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
              if($discount == 1){
-                $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+                // echo $fees;exit;
                 if($fees->total_fees != 0){
                     Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)
                     ->update(['financial_year' => date('Y'),
@@ -761,6 +763,7 @@ class FeesController extends Controller
                             } 
                     return $this->response([], "Fees is zero not enter discount!", false, 400);          
             }else{
+                if(!empty($fees)){
                 Discount_model::Create(
                     [
                         'institute_id' => $request->institute_id,
@@ -769,9 +772,10 @@ class FeesController extends Controller
                         'discount_amount' => $request->discount_amount,
                         'discount_by' => $request->discount_by,
                     ]
-                );    
+                );
                 return $this->response([], "Discount added  successfully");
-       
+            }    
+            return $this->response([], "Fees is zero not enter discount!", false, 400); 
             }
            
         
