@@ -2993,8 +2993,8 @@ class StudentController extends Controller
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                         'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
-                        'start_time' => $todayslecDT->start_time,
-                        'end_time' => $todayslecDT->end_time,
+                        'start_time' => $this->convertTo12HourFormat( $todayslecDT->start_time),
+                        'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
                     );
                 }
             }
