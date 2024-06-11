@@ -662,11 +662,11 @@ class FeesController extends Controller
                         // echo "<pre>";print_r($query);exit;
                         $amounts =0;
                         foreach(explode(',',$value->subject_id) as $subject_id){
-                             $subject_sub=Subject_sub::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('amount')->get();
+                             $subject_sub=Student_fees_model::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('total_fees')->get();
                             
                            
                             foreach($subject_sub as $values){
-                               $amounts +=$values->amount;
+                               $amounts +=$values->total_fees;
                             }
                             
                         }
