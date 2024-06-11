@@ -3288,18 +3288,21 @@ class InstituteApiController extends Controller
                             $studentdetail['stream_id'] = null;
                         }
 
-                        $studentdetailadd = Student_detail::create($studentdetail);
+                        // $studentdetailadd = Student_detail::create($studentdetail);
 
                         $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
                         ->whereIn('subject_id', explode(',', $request->subject_id))
                         ->select('amount')
                         ->get();
+                        // echo "hi";exit;
+
                         $amount = 0;
                         foreach ($subject_amount as $value) {
                          
                             $amount += $value->amount;
                             
                         }
+                        // echo $amount;exit;
                         Student_fees_model::create([
                                 'user_id' => $user_id,
                                 'institute_id' => $request->institute_id,
