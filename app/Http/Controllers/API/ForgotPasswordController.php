@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use App\Models\User;
+use Exception;
 use Illuminate\Support\Facades\Mail;
 use Hash;
 use Illuminate\Http\JsonResponse;
@@ -31,14 +32,19 @@ class ForgotPasswordController extends Controller
       // $token = $request->header('Authorization');
        //print_r($token);
       $existingUser = User::where('email', $request->email)->first();
-      
+      if (empty($existingUser)) {
+        return $this->sendError("This email is not registered", 401);
+      }
+    try {
+      $token = Str::random(60);
+
       $abc = DB::table('password_resets')->insert([
         'email' => $request->email,
-        'token' => $existingUser->token,
+        'token' => $token,
         'created_at' => Carbon::now()
       ]);
       
-      Mail::send('emails.forgot', ['token' => $existingUser->token], function ($message) use ($request) {
+      Mail::send('emails.forgot', ['token' => $token], function ($message) use ($request) {
         $message->to($request->email);
         $message->subject('Reset Password');
       });
@@ -47,6 +53,9 @@ class ForgotPasswordController extends Controller
         'status' => 200,
         'message' => 'We have e-mailed your password reset link!'
       ], 200);
+    } catch (Exception $e) {
+      return $this->sendError($e->getMessage(), 422);
+    }
       // return response()->json(['message' => 'Invalid credentials'], 401);
     } else {
       return response()->json([
