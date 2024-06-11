@@ -3102,24 +3102,28 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+         $subject_amount = Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
+        ->where('institute_id', $request->institute_id)
         ->whereIn('subject_id', explode(',', $request->subject_id))
-        ->select('amount')
+        ->select('subject_sub.amount','subject.name as subject_name')
         ->get();
+
        $amount = 0;
         $emptyAmountCount = 0;
+        $emptyAmountSubjects = [];
 
         foreach ($subject_amount as $value) {
             
             if($value->amount == 0){
                 $emptyAmountCount++;
+                $emptyAmountSubjects[] = $value->subject_name;
                 
             }else{
                 $amount += $value->amount;
             }
         }
         if($emptyAmountCount!=0){
-            return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects. Subject count: " . $emptyAmountCount . '. ', false, 400);
+            return $this->response($emptyAmountSubjects, "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.");
         }
         return $this->response([], 'Approve Screen.');
      } 
