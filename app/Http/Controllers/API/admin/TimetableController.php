@@ -252,6 +252,10 @@ class TimetableController extends Controller
     //         return $this->response($e,"Something want Wrong!!", false, 400);
     //     }
     // }
+    private  function convertTo12HourFormat($time24) {
+        $time = Carbon::createFromFormat('H:i:s', $time24);
+        return $time->format('g:i:s A');
+    }
 
     public function list_timetable_institute(Request $request) {
         $validator = validator::make($request->all(), [
@@ -287,8 +291,8 @@ class TimetableController extends Controller
                 $groupedData[$date]['sub_data'][] = [
                     'id' => $timtable->id,
                     'day' => $timtable->repeat,
-                    'start_time' => $timtable->start_time,
-                    'end_time' => $timtable->end_time,
+                    'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
+                    'end_time' => $this->convertTo12HourFormat($timtable->end_time),
                     'subject_id' => $timtable->subject_id,
                     'subject' => $timtable->subject,
                     'lecture_type_id' => $timtable->lecture_type,
