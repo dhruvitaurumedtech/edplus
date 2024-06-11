@@ -75,6 +75,10 @@ class ForgotPasswordController extends Controller
   {
     return view('auth.forgetPasswordLink', ['token' => $token]);
   }
+  public function showForgetPasswordForm(): View
+  {
+    return view('auth.forgetPasswordLink');
+  }
 
   public function verify_code(Request $request){
     //email code verify
