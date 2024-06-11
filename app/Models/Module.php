@@ -9,7 +9,7 @@ class Module extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['module_name'];
+    protected $fillable = ['module_name', 'type'];
 
     public function Features()
     {
