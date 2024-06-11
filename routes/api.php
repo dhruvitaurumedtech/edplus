@@ -35,6 +35,9 @@ Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('ve
 Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
+Route::post('/auth/verify-code', [ForgotPasswordController::class, 'verify_code']);
+Route::post('/auth/update-password', [ForgotPasswordController::class, 'update_password']);
+
 Route::group(['middleware' => ['web']], function () {
     Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
     Route::get('/auth/forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
 use App\Models\User;
+use App\Traits\ApiTrait;
 use Exception;
 use Illuminate\Support\Facades\Mail;
 use Hash;
@@ -16,13 +17,14 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Validator;
 
 
 
 
 class ForgotPasswordController extends Controller
 {
-
+  use ApiTrait;
   public function submitForgetPasswordForm(Request $request): JsonResponse
   {
    
@@ -36,7 +38,7 @@ class ForgotPasswordController extends Controller
         return $this->sendError("This email is not registered", 401);
       }
     try {
-      $token = Str::random(60);
+      $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
       $abc = DB::table('password_resets')->insert([
         'email' => $request->email,
@@ -44,14 +46,14 @@ class ForgotPasswordController extends Controller
         'created_at' => Carbon::now()
       ]);
       
-      Mail::send('emails.forgot', ['token' => $token], function ($message) use ($request) {
+      Mail::send('emails.forgot', ['token' => $token,'name' => $existingUser->firstname], function ($message) use ($request) {
         $message->to($request->email);
-        $message->subject('Reset Password');
+        $message->subject('Reset Your Password');
       });
       
       return response()->json([
         'status' => 200,
-        'message' => 'We have e-mailed your password reset link!'
+        'message' => 'We have e-mailed your verification code!'
       ], 200);
     } catch (Exception $e) {
       return $this->sendError($e->getMessage(), 422);
@@ -78,6 +80,57 @@ class ForgotPasswordController extends Controller
     return view('auth.forgetPasswordLink');
   }
 
+  public function verify_code(Request $request){
+    //email code verify
+    $validator = Validator::make($request->all(), [
+      'email' => 'required',
+      'code' => 'required',
+    ]);
+    if ($validator->fails()) {
+      return $this->response([], $validator->errors()->first(), false, 400);
+    }
+    try{
+      $updatePassword = DB::table('password_resets')
+      ->where([
+        'email' => $request->email,
+        'token' => $request->code
+      ])->first();
+
+    if (!$updatePassword) {
+      return $this->response([], "Code Not Match!!", false, 400);
+    }
+    return $this->response([], "Code Match Successfully");
+
+    } catch (Exception $e) {
+      return $this->response($e, "Something want Wrong!!", false, 400);
+    }
+  
+  }
+
+  public function update_password(Request $request){
+    $validator = Validator::make($request->all(), [
+      'email' => 'required|email|exists:users,email',
+      'password' => 'required|string|min:6',
+      'confirm_password' => 'required|string|same:password',
+    ]);
+    if ($validator->fails()) {
+      return $this->response([], $validator->errors()->first(), false, 400);
+    }
+    try{
+      $user = User::where('email', $request->email)
+      ->update(['password' => Hash::make($request->password)]);
+
+      DB::table('password_resets')->where(['email' => $request->email])->delete();
+
+    return response()->json([
+      'status' => 200,
+      'message' => 'Your password has been changed!'
+    ], 200);
+
+    }catch (Exception $e) {
+      return $this->response($e, "Something want Wrong!!", false, 400);
+    }
+  }
 
   /**
    * Write code on Method
