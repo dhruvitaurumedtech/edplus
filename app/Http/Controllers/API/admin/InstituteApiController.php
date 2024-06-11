@@ -3281,9 +3281,9 @@ class InstituteApiController extends Controller
                             
                         }
                         Student_fees_model::create([
-                                'user_id' => auth()->user()->user_id,
+                                'user_id' => $user_id,
                                 'institute_id' => $request->institute_id,
-                                'student_id' => $request->student_id,
+                                'student_id' =>$student_id,
                                 'subject_id' => $request->subject_id,
                                 'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
                             ]);

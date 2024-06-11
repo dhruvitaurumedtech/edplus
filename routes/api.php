@@ -36,8 +36,8 @@ Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::group(['middleware' => ['web']], function () {
-    //Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
-    // Route::get('/auth/forget-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
+    Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
+    Route::get('/auth/forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
     Route::get('/auth/reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
     Route::post('/auth/reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
 });
