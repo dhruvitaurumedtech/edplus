@@ -3102,11 +3102,12 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
 
-        $subject_amount = Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
+        return $subject_amount = Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
         ->where('institute_id', $request->institute_id)
         ->whereIn('subject_id', explode(',', $request->subject_id))
         ->select('subject_sub.amount','subject.name as subject_name')
         ->get();
+
        $amount = 0;
         $emptyAmountCount = 0;
         $emptyAmountSubjects = [];
