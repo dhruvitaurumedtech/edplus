@@ -662,11 +662,11 @@ class FeesController extends Controller
                         // echo "<pre>";print_r($query);exit;
                         $amounts =0;
                         foreach(explode(',',$value->subject_id) as $subject_id){
-                             $subject_sub=Subject_sub::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('amount')->get();
+                             $subject_sub=Student_fees_model::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('total_fees')->get();
                             
                            
                             foreach($subject_sub as $values){
-                               $amounts +=$values->amount;
+                               $amounts +=$values->total_fees;
                             }
                             
                         }
@@ -751,10 +751,15 @@ class FeesController extends Controller
         try{
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
              if($discount == 1){
-                Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->update(['financial_year' => date('Y'),
-                'discount_amount' => $request->discount_amount,
-                'discount_by' => $request->discount_by]); 
-                return $this->response([], "Discount updated successfully");
+                $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->first();
+                if($fees->total_fees != 0){
+                    Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)
+                    ->update(['financial_year' => date('Y'),
+                              'discount_amount' => $request->discount_amount,
+                              'discount_by' => $request->discount_by]); 
+                              return $this->response([], "Discount updated successfully");
+                            } 
+                    return $this->response([], "Fees is zero not enter discount!", false, 400);          
             }else{
                 Discount_model::Create(
                     [
