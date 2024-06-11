@@ -40,6 +40,7 @@ use Illuminate\Broadcasting\Channel;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -47,9 +48,7 @@ use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
 {
-
     use ApiTrait;
-
     public function homescreen_student(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -952,6 +951,10 @@ class StudentController extends Controller
         }
     }
 
+    private  function convertTo12HourFormat($time24) {
+        $time = Carbon::createFromFormat('H:i:s', $time24);
+        return $time->format('g:i:s A');
+    }
 
     public function student_added_detail(Request $request)
     {
@@ -1007,13 +1010,14 @@ class StudentController extends Controller
                 ->paginate(2);
 
             foreach ($todayslect as $todayslecDT) {
+                
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'lecture_date' => $todayslecDT->lecture_date,
                     'lecture_type' => $todayslecDT->lecture_type_name,
-                    'start_time' => $todayslecDT->start_time,
-                    'end_time' => $todayslecDT->end_time,
+                    'start_time' => $this->convertTo12HourFormat( $todayslecDT->start_time),  //$todayslecDT->start_time,
+                    'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
                 );
             }
             $subjects = [];

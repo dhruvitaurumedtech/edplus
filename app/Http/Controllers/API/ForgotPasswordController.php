@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Controller;
+use App\Models\Roles;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
@@ -37,6 +38,22 @@ class ForgotPasswordController extends Controller
       if (empty($existingUser)) {
         return $this->sendError("This email is not registered", 401);
       }
+
+      if ($request->login_type == 1) {
+        $validRoles = [5, 6];
+        $errorMessage = "Please use Institute Application";
+    } elseif ($request->login_type == 2) {
+        $allRoles = Roles::pluck('id')->toArray();
+        $validRoles = array_diff($allRoles, [5, 6]);
+        $errorMessage = "Please use Student Application";
+    } else {
+        return $this->response([], "Invalid login type", false, 400);
+    }
+
+    if (!in_array($existingUser->role_type, $validRoles)) {
+        return $this->response([], $errorMessage, false, 400);
+    }
+
     try {
       $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
 
