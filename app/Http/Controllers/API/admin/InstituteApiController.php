@@ -2268,16 +2268,32 @@ class InstituteApiController extends Controller
             }
 
             // Fetch banners
+            // $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
+            //     $query->where('user_id', $user_id)
+            //           ->where('status', 'active')
+            //           ->where('institute_id', $institute_id);
+            // })
+            // ->orWhere(function ($query) {
+            //     $query->where('status', 'active')
+            //           ->where('user_id', 1);
+            // })
+            // ->get(['id', 'banner_image', 'url']);
+
             $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
                 $query->where('user_id', $user_id)
                       ->where('status', 'active')
                       ->where('institute_id', $institute_id);
             })
-            ->orWhere(function ($query) {
-                $query->where('status', 'active')
-                      ->where('user_id', 1);
-            })
             ->get(['id', 'banner_image', 'url']);
+
+            if ($banner_list->isEmpty()) {
+            // If no results found, use the second condition
+            $banner_list = Banner_model::where(function ($query) {
+                                $query->where('status', 'active')
+                                    ->where('user_id', 1);
+                            })
+                            ->get(['id', 'banner_image', 'url']);
+            }
 
             $banner_array = $banner_list->map(function ($banner) {
                 return [
