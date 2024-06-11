@@ -3288,7 +3288,7 @@ class InstituteApiController extends Controller
                             $studentdetail['stream_id'] = null;
                         }
 
-                        // $studentdetailadd = Student_detail::create($studentdetail);
+                        $studentdetailadd = Student_detail::create($studentdetail);
 
                         $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
                         ->whereIn('subject_id', explode(',', $request->subject_id))
