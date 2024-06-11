@@ -417,12 +417,14 @@ class TeacherController extends Controller
                     'lecture_type.name as lecture_type_name',
                     'time_table.start_time',
                     'time_table.end_time',
-                    'time_table.lecture_date'
+                    'time_table.lecture_date',
+                    'users.image',
                 )
                 ->paginate(2);
 
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
+                    'profile' => (!empty($todayslecDT->image))?asset($todayslecDT->image):asset('no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
                     'lecture_date' => $todayslecDT->lecture_date,
