@@ -220,12 +220,14 @@ class AuthController extends Controller
             $user->save();
             $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
                 ->where('users.email', $request->email)
-                ->select('institute_detail.id')
+                ->select('institute_detail.id','institute_detail.institute_name')
                 ->first();
             if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
+                $institute_name = $userdata->institute_name;
             } else {
                 $institute_id = null;
+                $institute_name = null;
             }
 
 
@@ -238,6 +240,7 @@ class AuthController extends Controller
                 'user_image' => $user->image,
                 'role_type' => (int)$user->role_type,
                 'institute_id' => $institute_id,
+                'institute_name'=>$institute_name,
                 'token' => $token,
             ];
 
