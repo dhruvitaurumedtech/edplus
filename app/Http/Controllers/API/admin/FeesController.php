@@ -645,7 +645,7 @@ class FeesController extends Controller
                   $revise_fee='';
                   $revise_fee ='';
                   $discount_data='';
-                      foreach($student_list as $value){
+                    foreach($student_list as $value){
 
                         $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
                         ->leftJoin('discount', function($join) {
@@ -659,17 +659,23 @@ class FeesController extends Controller
                         ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
                        
                         ->first();
-                        // echo "<pre>";print_r($query);exit;
-                        $amounts =0;
-                        foreach(explode(',',$value->subject_id) as $subject_id){
-                             $subject_sub=Student_fees_model::where('subject_id',$subject_id)->where('institute_id',$request->institute_id)->select('total_fees')->get();
-                            
+                     $amounts =0;
+                        // print_r($student_list);exit;
+                        // foreach(explode(',',$value->subject_id) as $subject_id){whereIn('subject_id',explode(',', $value->subject_id))->
+                        // print_r(explode(',', $request->institute_id));exit;
+                       $subject_ids = $value->subject_id;
+                        $subject_sub = Student_fees_model::where('institute_id', $request->institute_id)
+                        ->where('subject_id', $subject_ids)
+                        ->where('student_id',$value->id)
+                        //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
+                            ->sum('total_fees');
                            
-                            foreach($subject_sub as $values){
-                               $amounts +=$values->total_fees;
-                            }
+                            // foreach($subject_sub as $values){
+                            //    $amounts +=$values->total_fees;
+                            // }
+                            $amounts = $subject_sub;
                             
-                        }
+                        // }
                         
                         if(empty($query->discount_by)){
                             $revise_fee=0;
@@ -810,6 +816,7 @@ class FeesController extends Controller
             $student_fees = Student_fees_model::where('student_id', $request->student_id)
                                               ->where('institute_id', $request->institute_id)
                                               ->first();
+                                            //   echo "<pre>";print_r($student_fees);exit;
     
             $discount = Discount_model::where('student_id', $request->student_id)
                                       ->where('institute_id', $request->institute_id)
