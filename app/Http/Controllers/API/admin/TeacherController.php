@@ -495,7 +495,7 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $teacher_data = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
+            $value = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
                 ->Join('board', 'board.id', '=', 'batches.board_id')
                 ->Join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->Join('standard', 'standard.id', '=', 'batches.standard_id')
@@ -509,10 +509,11 @@ class TeacherController extends Controller
                     'batches.batch_name',
                     'batches.subjects'
                 )
-                ->get();
+                ->first();
+                
             $teacher_response = [];
 
-            foreach ($teacher_data as $value) {
+            // foreach ($teacher_data as $value) {
                 $subject_data = Subject_model::whereIn('id', explode(',', $value->subjects))->get();
                 $subject_response = [];
                 foreach ($subject_data as $subject_value) {
@@ -523,14 +524,14 @@ class TeacherController extends Controller
                     );
                 }
 
-                $teacher_response[] = [
+                $teacher_response = [
                     'board' => $value->board_name,
                     'medium' => $value->medium_name,
                     'standard' => $value->standard_name,
                     'batch' => $value->batch_name,
                     'subject_list' => $subject_response,
                 ];
-            }
+            // }
             return $this->response($teacher_response, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
