@@ -5290,6 +5290,7 @@ class InstituteApiController extends Controller
                 ['medium_id', $request->medium_id],
                 ['standard_id', $request->standard_id]
             ])->get(['id', 'batch_name'])->toArray();
+            
             return $this->response($batchlist, "Batch Fetch Successfully");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
