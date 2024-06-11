@@ -440,7 +440,7 @@ class TeacherController extends Controller
             foreach ($announcQY as $announcDT) {
                 $announcement[] = array(
                     'title' => $announcDT->title,
-                    'desc' => $announcDT->announcement,
+                    'desc' => $announcDT->detail,
                     'time' => $announcDT->created_at
                 );
             }
