@@ -424,7 +424,7 @@ class TeacherController extends Controller
 
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
-                    'profile' => (!empty($todayslecDT->image))?asset($todayslecDT->image):asset('no-image.png'),
+                    'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
                     'lecture_date' => $todayslecDT->lecture_date,

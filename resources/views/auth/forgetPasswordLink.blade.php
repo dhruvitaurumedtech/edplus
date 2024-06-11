@@ -7,7 +7,7 @@
           <div class="card-body">
             <form action="{{ route('reset.password.post') }}" method="POST">
               @csrf
-              <input type="hidden" name="token" value="{{ $token }}">
+              <input type="hidden" name="token" value="{{ @csrf }}">
 
               <div class="form-group row">
                 <label for="email_address" class="col-md-4 col-form-label text-md-right">E-Mail Address</label>
