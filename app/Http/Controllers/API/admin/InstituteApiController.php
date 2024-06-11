@@ -3119,7 +3119,7 @@ class InstituteApiController extends Controller
             }
         }
         if($emptyAmountCount!=0){
-            return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects. Subject count: " . $emptyAmountCount);
+            return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.");
         }
         return $this->response([], 'Approve Screen.');
      } 
