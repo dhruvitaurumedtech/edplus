@@ -49,6 +49,7 @@ use App\Models\Teacher_model;
 use App\Models\UserHasRole;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use PhpParser\Node\Stmt\TryCatch;
 
 class InstituteApiController extends Controller
 {
@@ -4293,9 +4294,32 @@ class InstituteApiController extends Controller
                 ];
             });
             return $this->response($announcementDT, "Successfully fetch Data.");
-        } catch (Exception $e) {
+        } catch (Exception $e) { 
             return $this->response([], "Invalid token.", false, 400);
         }
+    }
+
+    public function delete_announcement(Request $request){
+        $validator = \Validator::make($request->all(), [
+            'announcement_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try{
+            $announc = announcements_model::where('id',$request->announcement_id);
+            if(!empty($announc)){
+                $announc->delete();
+                return $this->response([], "Announcement Delete Successfully.");
+            }else{
+                return $this->response([], "Record Not Found.");
+            }
+        }catch (Exception $e) {
+            return $this->response([], "Somthing went wrong.", false, 400);
+        }
+
     }
 
 
