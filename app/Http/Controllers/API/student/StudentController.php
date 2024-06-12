@@ -2878,12 +2878,18 @@ class StudentController extends Controller
                 });
             }
 
+            // if (!empty($request->subject_id)) {
+            //     $query->whereIn('students_details.subject_id', function ($query) use ($request) {
+            //         $query->select('id')
+            //             ->from('subject')
+            //             ->whereIn('id', explode(',', $request->subject_id));
+            //     });
+            // }
             if (!empty($request->subject_id)) {
-                $query->whereIn('students_details.subject_id', function ($query) use ($request) {
-                    $query->select('id')
-                        ->from('subject')
-                        ->whereIn('id', explode(',', $request->subject_id));
-                });
+                $subjectIds = explode(',', $request->subject_id);
+                foreach($subjectIds as $subject){
+                    $query->whereRaw("FIND_IN_SET($subject, students_details.subject_id)");
+                }
             }
 
             if (!empty($request->batch_id)) {
