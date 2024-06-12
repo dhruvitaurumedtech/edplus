@@ -2887,7 +2887,9 @@ class StudentController extends Controller
             // }
             if (!empty($request->subject_id)) {
                 $subjectIds = explode(',', $request->subject_id);
-                $query->where('students_details.subject_id', $subjectIds);
+                foreach($subjectIds as $subject){
+                    $query->whereRaw("FIND_IN_SET($subject, students_details.subject_id)");
+                }
             }
 
             if (!empty($request->batch_id)) {
