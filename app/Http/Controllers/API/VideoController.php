@@ -23,6 +23,7 @@ class VideoController extends Controller
 
     public function upload_video(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'base_table_id' => 'required',
             'user_id' => 'required',
@@ -40,7 +41,7 @@ class VideoController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
+        
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
         
         if (!$check || $check->category_id != $request->parent_category_id) {
@@ -52,17 +53,18 @@ class VideoController extends Controller
         } elseif ($request->parent_category_id == '3') {
             $extensions = ['pdf'];
         }
-
+        
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:204800', function ($input) use ($request) {
             return $request->parent_category_id == '1' || $request->parent_category_id == '3';
         });
-
+        
         if ($validator->fails()) {
             $errorMessage = $validator->errors()->first();
             return $this->response([], $errorMessage, false, 400);
         }
-
+        
         try {
+            
             // Handle file upload
             if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
                 $path = '';
@@ -74,21 +76,44 @@ class VideoController extends Controller
                     }
                 }
             }
-            $topic = Topic_model::create([
-                'user_id' => $request->input('user_id'),
-                'institute_id' => $request->input('institute_id'),
-                'base_table_id' => $request->input('base_table_id'),
-                'standard_id' => $request->input('standard_id'),
-                'subject_id' => $request->input('subject_id'),
-                'chapter_id' => $request->input('chapter_id'),
-                'topic_no' => $request->input('topic_no'),
-                'topic_description' => $request->input('topic_description'),
-                'topic_name' => $request->input('topic_name'),
-                'video_category_id' => $request->input('category_id'),
-                'topic_video' => isset($path) ? asset($path) : null,
-                'created_by' => ($request->user_id)? $request->user_id:'',
-            ]);
-            return $this->response($topic, 'Topic and file uploaded successfully');
+            $videoupld = new Topic_model();
+            $msg = 'uploaded';
+            if ($request->video_id) {
+                $msg = 'updated';
+                $videoupld = $videoupld->find($request->video_id);
+                if (!$videoupld) {
+                    return $this->response([], 'Record not found', false, 400);
+                }
+            }
+
+            $videoupld->user_id = $request->input('user_id');
+            $videoupld->institute_id = $request->input('institute_id');
+            $videoupld->base_table_id = $request->input('base_table_id');
+            $videoupld->standard_id = $request->input('standard_id');
+            $videoupld->subject_id = $request->input('subject_id');
+            $videoupld->chapter_id = $request->input('chapter_id');
+            $videoupld->topic_no = $request->input('topic_no');
+            $videoupld->topic_description = $request->input('topic_description');
+            $videoupld->topic_name = $request->input('topic_name');
+            $videoupld->video_category_id = $request->input('category_id');
+            $videoupld->topic_video = isset($path) ? asset($path) : null;
+            $videoupld->created_by = ($request->user_id)? $request->user_id:'';
+            $videoupld->save();   
+            // $topic = Topic_model::create([
+            //     $videoupld->user_id => $request->input('user_id'),
+            //     $videoupld->institute_id => $request->input('institute_id'),
+            //     'base_table_id' => $request->input('base_table_id'),
+            //     'standard_id' => $request->input('standard_id'),
+            //     'subject_id' => $request->input('subject_id'),
+            //     'chapter_id' => $request->input('chapter_id'),
+            //     'topic_no' => $request->input('topic_no'),
+            //     'topic_description' => $request->input('topic_description'),
+            //     'topic_name' => $request->input('topic_name'),
+            //     'video_category_id' => $request->input('category_id'),
+            //     'topic_video' => isset($path) ? asset($path) : null,
+            //     'created_by' => ($request->user_id)? $request->user_id:'',
+            // ]);
+            return $this->response($videoupld, "Topic and file $msg successfully");
         } catch (Exception $e) {
             return $this->response($e, 'Something went Wrong!!', false, 400);
         }
