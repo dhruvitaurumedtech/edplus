@@ -4598,7 +4598,7 @@ class InstituteApiController extends Controller
             $board_list = DB::table('board')
                 ->whereIN('id', $uniqueBoardIds)
                 ->get();
-
+            // print_r($board_list);exit;
             $board_array = [];
             foreach ($board_list as $board_value) {
 
@@ -4609,9 +4609,9 @@ class InstituteApiController extends Controller
                     ->pluck('medium_id')->toArray();
 
                 $uniquemediumds = array_unique($medium_sublist);
-
                 $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-
+                // print_r($medium_list);exit;
+                
                 $medium_array = [];
                 foreach ($medium_list as $medium_value) {
 
@@ -4621,28 +4621,26 @@ class InstituteApiController extends Controller
                         ->where('standard_sub.board_id', $board_value->id)
                         ->where('standard_sub.medium_id', $medium_value->id)
                         ->select('standard.id as std_id', 'standard.name as std_name')->distinct()->get();
+                    //    print_r($stndQY);exit; 
                     $stddata = [];
                     foreach ($stndQY as $stndDT) {
-                        $forcounstd = Student_detail::whereNull('deleted_at')
-                            ->where('user_id', auth()->user()->id)
-                            ->where('institute_id', $request->institute_id)
-                            ->where('board_id', $board_value->id)
-                            ->where('medium_id', $medium_value->id)
-                            ->get();
-                        $stdCount = $forcounstd->count();
+                        // $forcounstd = Student_detail::whereNull('deleted_at')
+                        //     ->where('user_id', auth()->user()->id)
+                        //     ->where('institute_id', $request->institute_id)
+                        //     ->where('board_id', $board_value->id)
+                        //     ->where('medium_id', $medium_value->id)
+                        //     ->get();
+                        // $stdCount = $forcounstd->count();
 
                         $stddata[] = [
                             'id' => $stndDT->std_id,
                             'name' => $stndDT->std_name,
-                            'no_of_std' => $stdCount,
+                            // 'no_of_std' => $stdCount,
                         ];
                     }
-
-
                     $medium_array[] = [
                         'id' => $medium_value->id,
                         'medium_name' => $medium_value->name,
-
                         'standard' => $stddata
                     ];
                 }
