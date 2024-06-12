@@ -3901,7 +3901,7 @@ class InstituteApiController extends Controller
                 $msg = 'updated';
                 $announcement = $announcement->find($request->announcement_id);
                 if (!$announcement) {
-                    return response()->json(['error' => 'Record not found'], 404);
+                    return $this->response([], 'Record not found', false, 400);
                 }
             }
 

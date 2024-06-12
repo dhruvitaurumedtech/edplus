@@ -82,7 +82,7 @@ class VideoController extends Controller
                 $msg = 'updated';
                 $videoupld = $videoupld->find($request->video_id);
                 if (!$videoupld) {
-                    return response()->json(['error' => 'Record not found'], 404);
+                    return $this->response([], 'Record not found', false, 400);
                 }
             }
 
