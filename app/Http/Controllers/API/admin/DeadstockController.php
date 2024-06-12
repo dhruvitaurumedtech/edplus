@@ -30,7 +30,7 @@ class DeadstockController extends Controller
             $deadStock->fill($request->all());
             $deadStock->save();
 
-            return $this->response([], "Fees inserted successfully.");
+            return $this->response([], "DeadStock inserted successfully.");
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
         }
@@ -48,7 +48,7 @@ class DeadstockController extends Controller
             $deadStocklist = DeadStock::where('institute_id',$request->institute_id)
             ->select('id','institute_id','item_name','no_of_item')
             ->get()->toArray();
-            return $this->response($deadStocklist, "Fees inserted successfully.");
+            return $this->response($deadStocklist, "Data fetch successfully.");
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
         }
