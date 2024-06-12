@@ -757,8 +757,9 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->select('*')->first();
-            if (!$fees) {
+            $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->select('total_fees')->first();
+            // print_r($fees);exit;
+            if ($fees->total_fees==0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
             }
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
