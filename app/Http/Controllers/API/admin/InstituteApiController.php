@@ -3893,6 +3893,12 @@ class InstituteApiController extends Controller
 
         try {
             $announcement = new announcements_model();
+            $msg = 'added';
+            if ($request->announcement_id) {
+                $msg = 'updated';
+                $announcement = $announcement->find($request->announcement_id);
+            }
+
             $announcement->user_id = $request->user_id;
             $announcement->institute_id = $request->institute_id;
             $announcement->board_id = $request->board_id;
@@ -3987,10 +3993,10 @@ class InstituteApiController extends Controller
 
                     curl_close($ch);
                 }
-                return $this->response([], "Announcement added successfully.");
+                return $this->response([], "Announcement $msg successfully.");
             }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
 
@@ -4295,7 +4301,7 @@ class InstituteApiController extends Controller
             });
             return $this->response($announcementDT, "Successfully fetch Data.");
         } catch (Exception $e) { 
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
 
