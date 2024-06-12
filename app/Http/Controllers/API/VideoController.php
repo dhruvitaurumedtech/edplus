@@ -14,6 +14,7 @@ use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Http\Request;
 use Auth;
 use App\Traits\ApiTrait;
+use Exception;
 use Illuminate\Support\Facades\Validator;
 
 class VideoController extends Controller
@@ -140,7 +141,28 @@ class VideoController extends Controller
         }
     }
 
+    public function delete_video(Request $request){
+        $validator = Validator::make($request->all(), [
+            'video_id' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        
+        try{
+            $videodel = Topic_model::where('id',$request->announcement_id);
+            if(!empty($videodel)){
+                $videodel->delete();
+                return $this->response([], "Video Delete Successfully.");
+            }else{
+                return $this->response([], "Record Not Found.");
+            }
+        }catch (Exception $e) {
+            return $this->response($e, "Somthing went wrong.", false, 400);
+        }
+
+    }
 
     // public function upload_video1(Request $request)
     // {
