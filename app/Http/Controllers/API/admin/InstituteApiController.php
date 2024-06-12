@@ -3371,6 +3371,7 @@ class InstituteApiController extends Controller
                 ->where('institute_for_sub.user_id', $user_id)
                 ->select('institute_for.*')
                 ->distinct()->get();
+                
             $institute_fors = [];
             foreach ($institute_for as $inst_forsd) {
                 $board = Board::join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
@@ -3382,6 +3383,7 @@ class InstituteApiController extends Controller
                     ->whereNull('board.deleted_at')
                     ->select('board.*')
                     ->get();
+                   
 
 
                 $boards = [];
@@ -3493,6 +3495,7 @@ class InstituteApiController extends Controller
                     'boards' => $boards
                 );
             }
+            // echo "<pre>";print_r($standards);exit;
             $alldata = array(
                 'institute_fors' => $institute_fors,
                 // 'boards' => $boards,
