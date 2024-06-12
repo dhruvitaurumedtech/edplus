@@ -78,7 +78,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])->name('banner_list')->middleware('check.permission:16,4');
     Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update')->middleware('check.permission:16,2');
     Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete')->middleware('check.permission:16,3');
-    Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
+    Route::post('/institute/roles', [InstituteApiController::class, 'roles'])->middleware('check.permission:27,4');
 
     Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students'])->middleware('check.permission:5,4');
     Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch'])->middleware('check.permission:8,1');
