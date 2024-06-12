@@ -666,9 +666,9 @@ class FeesController extends Controller
                         // print_r($student_list);exit;
                         // foreach(explode(',',$value->subject_id) as $subject_id){whereIn('subject_id',explode(',', $value->subject_id))->
                         // print_r(explode(',', $request->institute_id));exit;
-                       $subject_ids = $value->subject_id;
+                    //    $subject_ids = $value->subject_id;
                         $subject_sub = Student_fees_model::where('institute_id', $request->institute_id)
-                        ->where('subject_id', $subject_ids)
+                        ->where('student_id', $value->id)
                         //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
                             ->sum('total_fees');
                            
