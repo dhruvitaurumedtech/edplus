@@ -502,8 +502,11 @@ class TeacherController extends Controller
                 ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
                 ->where('batches.standard_id', $request->standard_id)
                 ->select(
+                    'board.id as board_id',
                     'board.name as board_name',
+                    'standard.id as standard_id',
                     'standard.name as standard_name',
+                    'medium.id as medium_id',
                     'medium.name as medium_name',
                     'teacher_assign_batch.batch_id',
                     'batches.batch_name',
@@ -525,8 +528,11 @@ class TeacherController extends Controller
                 }
 
                 $teacher_response = [
+                    'board_id'=>$value->board_id,
                     'board' => $value->board_name,
+                    'medium_id'=>$value->medium_id,
                     'medium' => $value->medium_name,
+                    'standard_id'=>$value->standard_id,
                     'standard' => $value->standard_name,
                     'batch' => $value->batch_name,
                     'subject_list' => $subject_response,
