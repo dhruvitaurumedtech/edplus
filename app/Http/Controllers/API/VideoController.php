@@ -151,7 +151,7 @@ class VideoController extends Controller
         }
         
         try{
-            $videodel = Topic_model::where('id',$request->announcement_id);
+            $videodel = Topic_model::where('id',$request->video_id);
             if(!empty($videodel)){
                 $videodel->delete();
                 return $this->response([], "Video Delete Successfully.");
