@@ -281,17 +281,20 @@ class FeesController extends Controller
             }
     
             $student_response = $query->get()->toArray();
-    
+    //  print_r($student_response);exit;
             $students = [];
-    
+             
             foreach ($student_response as $value) {
-                $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
-                    ->where('student_id', $value['id'])
-                    ->first();
+              
+                // $student_id = $value['student_id'];
+                // echo $request->institute_id;
+                $student_fees = Student_fees_model::where('student_id',  $value['id'])
+                                                ->where('institute_id', $request->institute_id)
+                                                ->first();
     
-                if (empty($student_fees)) {
-                    return $this->response([], "Fees are not included for the subject", false, 400);
-                }
+                // if (empty($student_fees)) {
+                //     return $this->response([], "Fees are not included for the subject", false, 400);
+                // }
     
                 $discount = Discount_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['id'])
@@ -666,7 +669,6 @@ class FeesController extends Controller
                        $subject_ids = $value->subject_id;
                         $subject_sub = Student_fees_model::where('institute_id', $request->institute_id)
                         ->where('subject_id', $subject_ids)
-                        ->where('student_id',$value->id)
                         //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
                             ->sum('total_fees');
                            
