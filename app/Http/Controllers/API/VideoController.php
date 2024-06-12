@@ -81,6 +81,9 @@ class VideoController extends Controller
             if ($request->video_id) {
                 $msg = 'updated';
                 $videoupld = $videoupld->find($request->video_id);
+                if (!$videoupld) {
+                    return response()->json(['error' => 'Record not found'], 404);
+                }
             }
 
             $videoupld->user_id = $request->input('user_id');
