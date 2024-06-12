@@ -3900,6 +3900,9 @@ class InstituteApiController extends Controller
             if ($request->announcement_id) {
                 $msg = 'updated';
                 $announcement = $announcement->find($request->announcement_id);
+                if (!$announcement) {
+                    return response()->json(['error' => 'Record not found'], 404);
+                }
             }
 
             $announcement->user_id = $request->user_id;
