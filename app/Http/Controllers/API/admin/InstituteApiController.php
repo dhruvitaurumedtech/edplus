@@ -4317,12 +4317,12 @@ class InstituteApiController extends Controller
                 return $this->response([], "Record Not Found.");
             }
         }catch (Exception $e) {
-            return $this->response([], "Somthing went wrong.", false, 400);
+            return $this->response($e, "Somthing went wrong.", false, 400);
         }
 
     }
 
-
+    
     public function delete_account(Request $request)
     {
         try {

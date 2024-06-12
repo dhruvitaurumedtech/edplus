@@ -48,6 +48,7 @@ Route::group(['middleware' => ['web']], function () {
 
 Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get');
+    Route::post('/institute/delete-video', [VideoController::class, 'delete_video']); //priyanka
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -69,7 +70,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
     Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
     Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
-    Route::post('/institute/delete-announcements', [InstituteApiController::class, 'delete_announcement'])->name('add_announcements');
+    Route::post('/institute/delete-announcements', [InstituteApiController::class, 'delete_announcement'])->name('delete_announcement'); //priyanka
     Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
     Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
     Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
