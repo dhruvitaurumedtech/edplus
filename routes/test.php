@@ -1,54 +1,4 @@
-<?php
-
-use App\Http\Controllers\Admin\BannerController;
-use App\Http\Controllers\API\admin\TeacherController;
-use App\Http\Controllers\API\admin\AttendanceController;
-use App\Http\Controllers\API\admin\BasetableControllerAPI;
-use App\Http\Controllers\API\admin\DeadstockController;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\API\AuthController;
-use App\Http\Controllers\API\ForgotPasswordController;
-use App\Http\Controllers\API\institude\board_controller;
-use App\Http\Controllers\API\admin\InstituteApiController;
-use App\Http\Controllers\API\institude\StandardController;
-use App\Http\Controllers\API\institude\SubjectChapterController;
-use App\Http\Controllers\API\institude\SubjectController;
-use App\Http\Controllers\API\institude\SubjectDetailController;
-use App\Http\Controllers\API\VideoController;
-use App\Http\Controllers\API\student\StudentController;
-use App\Http\Controllers\API\admin\ExamController;
-use App\Http\Controllers\API\admin\FeedbackController;
-use App\Http\Controllers\API\admin\FeesController;
-use App\Http\Controllers\API\admin\ParentsController;
-use App\Http\Controllers\API\admin\TimetableController;
-use App\Http\Controllers\API\BannerApiController;
-use App\Http\Controllers\API\staff\StaffController;
-use App\Http\Controllers\API\student\StudentAttendance;
-use App\Http\Controllers\PdfController;
-use App\Models\Student_detail;
-
-
-Route::post('/auth/register', [AuthController::class, 'register']);
-Route::post('/auth/google', [AuthController::class, 'handleGoogle']);
-Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
-Route::post('/auth/login', [AuthController::class, 'login']);
-
-Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
-Route::post('/auth/verify-code', [ForgotPasswordController::class, 'verify_code']);
-Route::post('/auth/update-password', [ForgotPasswordController::class, 'update_password']);
-
-Route::group(['middleware' => ['web']], function () {
-    Route::post('/auth/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail']);
-    Route::get('/auth/forgot-password', [ForgotPasswordController::class, 'showForgetPasswordForm'])->name('forget.password.get');
-    Route::get('/auth/reset-password/{token}', [ForgotPasswordController::class, 'showResetPasswordForm'])->name('reset.password.get');
-    Route::post('/auth/reset-password', [ForgotPasswordController::class, 'submitResetPasswordForm'])->name('reset.password.post');
-});
-
-
-Route::middleware(['auth:api', 'apilogs'])->group(function () {
-    Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get')->middleware('check.permission:9,1');
-    Route::post('/institute/delete-video', [VideoController::class, 'delete_video'])->middleware('check.permission:9,3'); //priyanka
+Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
     Route::post('/auth/logout', [AuthController::class, 'logout']);
@@ -70,7 +20,6 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam')->middleware('check.permission:2,2');
     Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list')->middleware('check.permission:1,4');
     Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements')->middleware('check.permission:1,1');
-    Route::post('/institute/delete-announcements', [InstituteApiController::class, 'delete_announcement'])->name('delete_announcement')->middleware('check.permission:1,3');
     Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks')->middleware('check.permission:3,4');
     Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks')->middleware('check.permission:3,1');
     Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add')->middleware('check.permission:16,1');
@@ -196,21 +145,3 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount'])->middleware('check.permission:20,1');
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
-});
-
-
-
-
-
-// Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
-// Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
-// Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
-// Route::post('/institute/get-subject-or-stream', [InstituteApiController::class, 'get_subject_stream'])->name('get_subject_stream.get');
-
-
-
-  
-//parents API's
-
-// Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-// Route::post('/child-detail', [StudentController::class, 'child_detail']);
