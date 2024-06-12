@@ -2887,7 +2887,7 @@ class StudentController extends Controller
             // }
             if (!empty($request->subject_id)) {
                 $subjectIds = explode(',', $request->subject_id);
-                $query->whereIn('students_details.subject_id', $subjectIds);
+                $query->where('students_details.subject_id', $subjectIds);
             }
 
             if (!empty($request->batch_id)) {
