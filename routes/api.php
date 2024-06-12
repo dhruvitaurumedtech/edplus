@@ -69,6 +69,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-update-dublicate-exam', [ExamController::class, 'update_exam'])->name('update_exam');
     Route::post('/institute/announcements-list', [InstituteApiController::class, 'announcements_list'])->name('announcements_list');
     Route::post('/institute/add-announcements', [InstituteApiController::class, 'add_announcements'])->name('add_announcements');
+    Route::post('/institute/delete-announcements', [InstituteApiController::class, 'delete_announcement'])->name('add_announcements');
     Route::post('/institute/student-list-with-marks', [InstituteApiController::class, 'student_list_with_marks'])->name('student_list_with_marks');
     Route::post('/institute/add-marks', [InstituteApiController::class, 'add_marks'])->name('add_marks');
     Route::post('/banner/banner-add', [BannerApiController::class, 'banner_add'])->name('banner_add');
