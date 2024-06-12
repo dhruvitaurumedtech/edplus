@@ -2860,7 +2860,6 @@ class StudentController extends Controller
                     'board.name as board_name',
                     'medium.name as medium_name'
                 )
-                ->where('students_details.user_id', Auth::id())
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.board_id', $request->board_id)
                 ->where('students_details.medium_id', $request->medium_id)
@@ -2884,7 +2883,7 @@ class StudentController extends Controller
                     $query->whereRaw("FIND_IN_SET($subject, students_details.subject_id)");
                 }
             }
-
+        
             if (!empty($request->batch_id)) {
                 $query->where('students_details.batch_id', $request->batch_id);
             }
