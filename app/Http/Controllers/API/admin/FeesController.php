@@ -459,12 +459,13 @@ class FeesController extends Controller
             $fees = null;
     
             if ($student_fees) {
-                if ($discount) {
-                    $discount_amount =0;
+                $discount_amount =0;
                     if(!empty($discount->discount_amount))
                     {
                         $discount_amount = $discount->discount_amount;
                     }
+                if ($discount) {
+                    
                     if ($discount->discount_by == 'Rupee') {
                         $fees = $student_fees->total_fees - $discount->discount_amount;
                     } elseif ($discount->discount_by == 'Percentage') {
