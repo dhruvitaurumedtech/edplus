@@ -86,7 +86,6 @@ class AttendanceController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $student_ids = explode(',',$request->student_id);
             foreach($student_ids as $student_id){
