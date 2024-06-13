@@ -481,7 +481,7 @@ class FeesController extends Controller
                 // echo $fees;echo '>='.$request->payment_amount;exit;
     
                 if ($fees <= $request->payment_amount) {
-                    return $this->response([], "Paid amount and total amount not matched!", false, 400);
+                    return $this->response([], "Amount is not matched", false, 400);
                 }
                 
             } else {
