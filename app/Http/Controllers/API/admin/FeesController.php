@@ -483,6 +483,7 @@ class FeesController extends Controller
                 if ($fees <= $request->payment_amount) {
                     return $this->response([], "Amount is not matched", false, 400);
                 }
+                // exit;
                 
             } else {
                 return $this->response([], "Student fees record not found!", false, 400);
