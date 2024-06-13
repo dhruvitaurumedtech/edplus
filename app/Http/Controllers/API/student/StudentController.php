@@ -1885,7 +1885,7 @@ class StudentController extends Controller
                            $batch_list[] = [
                               'batch_id'=>$value->id,
                               'batch_name'=>$value->batch_name,
-                              'status'=>($value->assign_status==1)?true:false,  
+                              'assign_status'=>($value->assign_status==1)?true:false,  
                            ];   
                          }
                         // echo "<pre>";print_r($reponse_video);exit;   
