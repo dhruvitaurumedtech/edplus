@@ -96,15 +96,29 @@ class TeacherController extends Controller
             }
 
             //requested institute
-            $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
-                ->where('teacher_detail.status', '!=', '1')
-                ->where('teacher_detail.teacher_id', $teacher_id)
+            // $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
+            //     ->where('teacher_detail.status', '!=', '1')
+            //     ->where('teacher_detail.teacher_id', $teacher_id)
+            //     ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')
+            //     ->groupBy('teacher_detail.institute_id', 'teacher_detail.teacher_id')
+            //     ->paginate($perPage);
+
+                $subQuery = DB::table('teacher_detail')
+                ->select('institute_id', 'teacher_id', DB::raw('MAX(id) as max_id'))
+                ->where('status', '!=', '1')
+                ->where('teacher_id', $teacher_id)
+                ->groupBy('institute_id', 'teacher_id');
+            
+            $requestInstitute = Teacher_model::joinSub($subQuery, 'sub', function($join) {
+                    $join->on('teacher_detail.id', '=', 'sub.max_id');
+                })
+                ->join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
                 ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')
-                ->groupBy('teacher_detail.institute_id', 'teacher_detail.teacher_id')
                 ->paginate($perPage);
 
+
             $requested_institute = [];
-            foreach ($requestnstitute as $value) {
+            foreach ($requestInstitute as $value) {
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
