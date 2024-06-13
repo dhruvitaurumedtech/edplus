@@ -99,7 +99,9 @@ class TeacherController extends Controller
             $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
                 ->where('teacher_detail.status', '!=', '1')
                 ->where('teacher_detail.teacher_id', $teacher_id)
-                ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')->paginate($perPage);
+                ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')
+                ->groupBy('teacher_detail.institute_id', 'teacher_detail.teacher_id')
+                ->paginate($perPage);
 
             $requested_institute = [];
             foreach ($requestnstitute as $value) {
