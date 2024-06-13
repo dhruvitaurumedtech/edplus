@@ -1827,29 +1827,68 @@ class StudentController extends Controller
 
                 $topicsArray = [];
                 foreach ($topics as $topval) {
-                    $status = Auth::user()->role_type == 6 ? VideoAssignToBatch::where('batch_id', Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first()->batch_id)
-                        ->where('video_id', $topval->id)
-                        ->where('standard_id', $topval->standard_id)
-                        ->where('chapter_id', $topval->chapter_id)
-                        ->where('subject_id', $topval->subject_id)
-                        ->exists() : false;
+                    // $status = Auth::user()->role_type == 6 ? VideoAssignToBatch::where('batch_id', Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first()->batch_id)
+                    //     ->where('video_id', $topval->id)
+                    //     ->where('standard_id', $topval->standard_id)
+                    //     ->where('chapter_id', $topval->chapter_id)
+                    //     ->where('subject_id', $topval->subject_id)
+                    //     ->exists() : false;
+                    
+                  
+                    // // $batch_response = [];
+                   
+                    // if (!$status) {
+                        
+                    //     $batch_list = Batches_model::where('institute_id', $institute_id)
+                    //         ->where('user_id', $user_id)
+                    //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
+                    //         ->select('id', 'batch_name')
+                    //         ->get();
 
-                    $batch_response = [];
-                    if (!$status) {
-                        $batch_list = Batches_model::where('institute_id', $institute_id)
-                            ->where('user_id', $user_id)
-                            ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                            ->select('id', 'batch_name')
-                            ->get();
+                    //     $batch_response = $batch_list->map(function ($batch) {
+                    //         return [
+                    //             'batch_id' => $batch->id,
+                    //             'batch_name' => $batch->batch_name,
+                    //         ];
+                    //     })->toArray();
+                    // }
+                    if(Auth::user()->role_type == 6){
+                        $batch = Student_detail::where('institute_id', $institute_id)
+                            ->where('student_id', $user_id)
+                            ->first();
 
-                        $batch_response = $batch_list->map(function ($batch) {
-                            return [
-                                'batch_id' => $batch->id,
-                                'batch_name' => $batch->batch_name,
-                            ];
-                        })->toArray();
+                        if ($batch) {
+                            $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assign_to_batch.batch_id')
+                                ->where('video_assign_to_batch.batch_id', $batch->batch_id) // Ensure this condition
+                                ->where('video_assign_to_batch.video_id', $topval->id)
+                                ->where('video_assign_to_batch.standard_id', $topval->standard_id)
+                                ->where('video_assign_to_batch.chapter_id', $topval->chapter_id)
+                                ->where('video_assign_to_batch.subject_id', $topval->subject_id)
+                                ->select('video_assign_to_batch.*', 'batches.*') // Adjust select as needed
+                                ->get();
+                                
+                        }
+      
                     }
-
+                    if(Auth::user()->role_type == 3)
+                    {
+                        $reponse_video=VideoAssignToBatch::join('batches','batches.id','=','video_assignbatch.batch_id')
+                                        ->where('video_assignbatch.video_id', $topval->id)
+                                        ->where('video_assignbatch.standard_id', $topval->standard_id)
+                                        ->where('video_assignbatch.chapter_id', $topval->chapter_id)
+                                        ->where('video_assignbatch.subject_id', $topval->subject_id)
+                                        ->Select('batches.*','video_assignbatch.assign_status')
+                                        ->get();
+                        $batch_list =[];
+                        foreach($reponse_video as $value){
+                           $batch_list[] = [
+                              'batch_id'=>$value->id,
+                              'batch_name'=>$value->batch_name,
+                              'status'=>($value->assign_status==1)?true:false,  
+                           ];   
+                         }
+                        // echo "<pre>";print_r($reponse_video);exit;   
+                    }
                     $topicsArray[] = [
                         "id" => $topval->id,
                         "topic_no" => $topval->topic_no,
@@ -1859,8 +1898,8 @@ class StudentController extends Controller
                         "subject_name" => $topval->sname,
                         "chapter_id" => $topval->chapter_id,
                         "chapter_name" => $topval->chname,
-                        "status" => $status,
-                        "batch_list" => $batch_response,
+                        // "status" => ($topval->status==0)?false:True,
+                        "batch_list" => $batch_list,
                     ];
                 }
 
