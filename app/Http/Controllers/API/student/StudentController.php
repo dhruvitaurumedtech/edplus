@@ -1868,6 +1868,7 @@ class StudentController extends Controller
                                 ->get();
                                 
                         }
+                        $batch_list =[];
       
                     }
                     if(Auth::user()->role_type == 3)
