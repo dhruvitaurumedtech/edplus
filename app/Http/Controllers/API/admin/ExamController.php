@@ -631,6 +631,18 @@ class ExamController extends Controller
         }
 
         try {
+            $existing_exam = Exam_Model::where([
+                ['user_id', $request->user_id],
+                ['institute_id', $request->institute_id],
+                ['standard_id', $request->standard_id],
+                ['exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d')],
+                ['start_time', $request->start_time],
+                ['end_time', $request->end_time],
+            ])->exists();
+
+            if ($existing_exam) {
+                return $this->response([], "Exam already exists for this standard!", false, 400);
+            }
             if ($request->exam_id) {
                 $exam = Exam_Model::where('id', $request->exam_id)->first();
             } else {
