@@ -10,7 +10,9 @@ use App\Models\Batch_assign_teacher_model;
 use App\Models\Batches_model;
 use App\Models\board;
 use App\Models\Common_announcement;
+use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
+use App\Models\Medium_model;
 use App\Models\Search_history;
 use App\Models\Standard_model;
 use App\Models\Student_detail;
@@ -329,36 +331,110 @@ class TeacherController extends Controller
     }
     public function institute_detail(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|integer',
-            'teacher_id' => 'required'
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
+
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
+
         try {
-            $institute_id = $request->institute_id;
+            $institute_data = [];
             $boards = [];
-            $institutedeta = Institute_detail::where('id', $institute_id)
-                ->select('id', 'institute_name', 'address', 'about_us')->first();
-            $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-                ->where('board_sub.institute_id', $institute_id)->select('board.name')->get();
-            $stdcount = Teacher_model::where('institute_id', $institute_id)->count();
-            $subcount = Subject_sub::where('institute_id', $institute_id)->count();
+
+            $institutedeta = Institute_detail::where('id', $request->institute_id)
+                ->select('id', 'institute_name', 'address', 'about_us','contact_no','email',
+                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link')
+                ->first();
+
+            // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
+            //     ->where('board_sub.institute_id', $request->institute_id)
+            //     ->select('board.name')->get();
+            $institute_id = $request->institute_id;
+            $uniqueBoardIds = Institute_board_sub::where('institute_id', $institute_id)
+                ->distinct()
+                ->pluck('board_id')
+                ->toArray();
+
+            // Fetch board details
+            $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name', 'icon']);
+
+            $board_array = [];
+            foreach ($board_list as $board) {
+                $medium_list = Medium_model::whereIn('id', function ($query) use ($institute_id, $board) {
+                    $query->select('medium_id')
+                        ->from('medium_sub')
+                        ->where('board_id', $board->id)
+                        ->where('institute_id', $institute_id);
+                })->get(['id', 'name', 'icon']);
+
+                $medium_array = $medium_list->map(function ($medium) {
+                    return [
+                        'id' => $medium->id,
+                        'medium_name' => $medium->name,
+                        'medium_icon' => asset($medium->icon)
+                    ];
+                })->toArray();
+
+                $boards[] = [
+                    'id' => $board->id,
+                    'board_name' => $board->name,
+                    'board_icon' => asset($board->icon),
+                    'medium' => $medium_array,
+                    // Include banner_array inside board_array
+                ];
+            }
+
+            //feedbacks
+            // $feedback_list = FeedbackModel::select(
+            //     'feedbacks.id as feedback_id',
+            //     'feedbacks.feedback',
+            //     'feedbacks.feedback_to_id',
+            //     'feedbacks.institute_id',
+            //     'feedbacks.rating',
+            //     'feedbacks.role_type',
+            //     'feedbacks.created_at',
+            //     'users.firstname',
+            //     'users.lastname',
+            //     'users.image',
+            //     'roles.role_name',
+            // )
+            // ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
+            // ->Join('roles', 'roles.id', '=', 'users.role_type')
+            // ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
+            // ->where('feedbacks.institute_id', $institute_id)
+            // ->where('feedbacks.role_type', '1')
+            // ->orderByDesc('feedbacks.created_at')->get()->toArray();
+            
+
+            $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status','1')->count();
+            $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
+            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status','1')->distinct('teacher_id')->count(); //by priyanka
+
             $institutedetaa = array(
                 'id' => $institutedeta->id,
                 'institute_name' => $institutedeta->institute_name,
                 'address' => $institutedeta->address,
+                'contact_no' => $institutedeta->contact_no,
+                'email' => $institutedeta->email,
                 'about_us' => $institutedeta->about_us,
-                'logo' => asset($institutedeta->logo),
+                'website_link'=>$institutedeta->website_link,
+                'instagram_link'=>$institutedeta->instagram_link,
+                'facebook_link'=>$institutedeta->facebook_link,
+                'whatsaap_link'=>$institutedeta->whatsaap_link,
+                'youtube_link'=>$institutedeta->youtube_link,
+                'logo' => (!empty($institutedeta->logo))?asset($institutedeta->logo):asset('no-image.png'),
+                'cover_photo' => (!empty($institutedeta->cover_photo))?asset($institutedeta->cover_photo):asset('cover_photo/cover_image.png'),
                 'boards' => $boards,
                 'students' => $stdcount,
                 'subject' => $subcount,
-                'total_board' => count($boards),
-                'teacher' => 0
+                'teacher' => $teacherdt,
+                //'feedback'=>$feedback_list
             );
             return $this->response($institutedetaa, "Successfully fetch data.");
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
