@@ -1855,26 +1855,14 @@ class StudentController extends Controller
                     //     })->toArray();
                     // }
                     if (Auth::user()->role_type == 6) {
-                        $batch = Student_detail::where('institute_id', $institute_id)
-                            ->where('student_id', $user_id)
-                            ->first();
-
-                        if ($batch) {
-                            $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assign_to_batch.batch_id')
-                                ->where('video_assign_to_batch.batch_id', $batch->batch_id) // Ensure this condition
-                                ->where('video_assign_to_batch.video_id', $topval->id)
-                                ->where('video_assign_to_batch.standard_id', $topval->standard_id)
-                                ->where('video_assign_to_batch.chapter_id', $topval->chapter_id)
-                                ->where('video_assign_to_batch.subject_id', $topval->subject_id)
-                                ->select('video_assign_to_batch.*', 'batches.*') // Adjust select as needed
-                                ->get();
-                        }
+                       
                         $batch_list =[];
                         
       
                     }
                     if(Auth::user()->role_type == 3)
                     {
+                       
                         $reponse_video=VideoAssignToBatch::join('batches','batches.id','=','video_assignbatch.batch_id')
                                         ->where('video_assignbatch.video_id', $topval->id)
                                         ->where('video_assignbatch.standard_id', $topval->standard_id)
