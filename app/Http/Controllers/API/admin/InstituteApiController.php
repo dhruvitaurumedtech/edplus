@@ -5324,7 +5324,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'board_id' => 'required',
             'standard_id' => 'required',
-            'medium_id' => 'required',
+            //'medium_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -5332,13 +5332,24 @@ class InstituteApiController extends Controller
         }
 
         try {
-            $batchlist = Batches_model::where([
-                ['user_id', Auth::id()],
-                ['institute_id', $request->institute_id],
-                ['board_id', $request->board_id],
-                ['medium_id', $request->medium_id],
-                ['standard_id', $request->standard_id]
-            ])->get(['id', 'batch_name'])->toArray();
+            // $batchlist = Batches_model::where([
+            //     ['user_id', Auth::id()],
+            //     ['institute_id', $request->institute_id],
+            //     ['board_id', $request->board_id],
+            //     ['medium_id', $request->medium_id],
+            //     ['standard_id', $request->standard_id]
+            // ])->get(['id', 'batch_name'])->toArray();
+            $batchlistQuery = Batches_model::where('user_id', Auth::id())
+                ->where('institute_id', $request->institute_id)
+                ->where('board_id', $request->board_id)
+                ->where('standard_id', $request->standard_id);
+
+                if (!empty($request->medium_id)) {
+                    $batchlistQuery->where('medium_id', $request->medium_id);
+                }
+
+                $batchlist = $batchlistQuery->get(['id', 'batch_name'])->toArray();
+
             
             return $this->response($batchlist, "Batch Fetch Successfully");
         } catch (Exception $e) {
