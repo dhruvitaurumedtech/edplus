@@ -479,7 +479,7 @@ class FeesController extends Controller
                     $fees = $student_fees->total_fees - $paid_amount;
                 }
     
-                if ($fees < $request->payment_amount) {
+                if ($fees >= $request->payment_amount) {
                     return $this->response([], "Paid amount and total amount not matched!", false, 400);
                 }
             } else {
