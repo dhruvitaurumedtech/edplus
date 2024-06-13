@@ -139,7 +139,7 @@ class StudentController extends Controller
                         ->where('status', '=', '1')
                         ->whereNull('deleted_at');
                 })
-                ->whereRaw("STR_TO_DATE(end_academic_year, '%d-%m-%Y') >= STR_TO_DATE(?, '%d-%m-%Y')", [$ctdmy]) 
+                ->whereRaw("STR_TO_DATE(end_academic_year, '%d-%m-%Y') >= STR_TO_DATE(?, '%d-%m-%Y')", [$ctdmy])
                 ->paginate($perPage);
             $join_with = [];
             foreach ($joininstitute as $value) {
@@ -171,7 +171,7 @@ class StudentController extends Controller
                 $img = asset('no-image.png');
             }
             $data = [
-                'profile_image'=>$img,
+                'profile_image' => $img,
                 'banner' => $banners_data,
                 'search_list' => $search_list,
                 'searchhistory_list' => $searchhistory_list,
@@ -526,14 +526,14 @@ class StudentController extends Controller
                     return $this->response([], 'mobile Requied field are missing', false, 400);
                 } elseif ($parentData['relation'] == '') {
                     return $this->response([], 'relation Requied field are missing', false, 400);
-                } 
-                    // elseif (!empty($emilfin)) {
-                    //     return $this->response([], 'email is already exist', false, 400);
-                    // } 
+                }
+                // elseif (!empty($emilfin)) {
+                //     return $this->response([], 'email is already exist', false, 400);
+                // } 
                 else {
                     if (!empty($emilfin)) {
                         $parent_id = $emilfin->id;
-                    }else{
+                    } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
@@ -542,10 +542,10 @@ class StudentController extends Controller
                             'mobile' => $parentData['mobile'],
                             'role_type' => '5'
                         ]);
-                        
+
                         $parent_id = $user->id;
                     }
-                    
+
                     if (!empty($parent_id)) {
                         $parnsad = Parents::create([
                             'student_id' =>  auth()->id(),
@@ -649,8 +649,7 @@ class StudentController extends Controller
                     $serverKey = env('SERVER_KEY');
 
                     $url = "https://fcm.googleapis.com/fcm/send";
-                    $inst_owner_id = Institute_detail::where('id', $request->institute_id)->first();
-                    $users = User::where('id', $inst_owner_id->user_id)->pluck('device_key');
+                    $users = User::where('id', $getuid->user_id)->pluck('device_key');
 
                     $notificationTitle = "Student Join Request";
                     $notificationBody = $request->firstname . " Student Join Request to  Your Institute";
@@ -919,11 +918,11 @@ class StudentController extends Controller
             // ->where('feedbacks.institute_id', $institute_id)
             // ->where('feedbacks.role_type', '1')
             // ->orderByDesc('feedbacks.created_at')->get()->toArray();
-            
 
-            $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status','1')->count();
+
+            $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status', '1')->count();
             $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
-            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status','1')->distinct('teacher_id')->count(); //by priyanka
+            $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status', '1')->distinct('teacher_id')->count(); //by priyanka
 
             $institutedetaa = array(
                 'id' => $institutedeta->id,
@@ -932,13 +931,13 @@ class StudentController extends Controller
                 'contact_no' => $institutedeta->contact_no,
                 'email' => $institutedeta->email,
                 'about_us' => $institutedeta->about_us,
-                'website_link'=>$institutedeta->website_link,
-                'instagram_link'=>$institutedeta->instagram_link,
-                'facebook_link'=>$institutedeta->facebook_link,
-                'whatsaap_link'=>$institutedeta->whatsaap_link,
-                'youtube_link'=>$institutedeta->youtube_link,
-                'logo' => (!empty($institutedeta->logo))?asset($institutedeta->logo):asset('no-image.png'),
-                'cover_photo' => (!empty($institutedeta->cover_photo))?asset($institutedeta->cover_photo):asset('cover_photo/cover_image.png'),
+                'website_link' => $institutedeta->website_link,
+                'instagram_link' => $institutedeta->instagram_link,
+                'facebook_link' => $institutedeta->facebook_link,
+                'whatsaap_link' => $institutedeta->whatsaap_link,
+                'youtube_link' => $institutedeta->youtube_link,
+                'logo' => (!empty($institutedeta->logo)) ? asset($institutedeta->logo) : asset('no-image.png'),
+                'cover_photo' => (!empty($institutedeta->cover_photo)) ? asset($institutedeta->cover_photo) : asset('cover_photo/cover_image.png'),
                 'boards' => $boards,
                 'students' => $stdcount,
                 'subject' => $subcount,
@@ -951,7 +950,8 @@ class StudentController extends Controller
         }
     }
 
-    private  function convertTo12HourFormat($time24) {
+    private  function convertTo12HourFormat($time24)
+    {
         $time = Carbon::createFromFormat('H:i:s', $time24);
         return $time->format('g:i:s A');
     }
@@ -1010,13 +1010,13 @@ class StudentController extends Controller
                 ->paginate(2);
 
             foreach ($todayslect as $todayslecDT) {
-                
+
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'lecture_date' => $todayslecDT->lecture_date,
                     'lecture_type' => $todayslecDT->lecture_type_name,
-                    'start_time' => $this->convertTo12HourFormat( $todayslecDT->start_time),  //$todayslecDT->start_time,
+                    'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),  //$todayslecDT->start_time,
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
                 );
             }
@@ -1050,11 +1050,11 @@ class StudentController extends Controller
                     'exam.exam_title',
                 )
                 ->orderByDesc('marks.created_at')->limit(3)->get();
-            
+
             foreach ($resultQY as $resultDDt) {
                 $highestMarks = Marks_model::where('exam_id', $resultDDt->exam_id)
-                               ->max('mark');
-                
+                    ->max('mark');
+
                 $result[] = array(
                     'subject' => $resultDDt->subject,
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
@@ -1076,36 +1076,36 @@ class StudentController extends Controller
                     }
                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
                 }
-                
-                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+
+                $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
                 // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
-                ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                ->where('exam.institute_id', $stdetail->institute_id)
-                // ->where('exam.batch_id', $stdetail->batch_id)
-                ->where('exam.board_id', $stdetail->board_id)
-                ->where('exam.medium_id', $stdetail->medium_id)
-                // ->where(function($query) use ($stdetail) {
-                //     $query->where('exam.standard_id', $stdetail->standard_id)
-                //           ->orWhere('exam.stream_id', $stdetail->stream_id);
-                // })
+                    ->join('standard', 'standard.id', '=', 'exam.standard_id')
+                    ->where('exam.institute_id', $stdetail->institute_id)
+                    // ->where('exam.batch_id', $stdetail->batch_id)
+                    ->where('exam.board_id', $stdetail->board_id)
+                    ->where('exam.medium_id', $stdetail->medium_id)
+                    // ->where(function($query) use ($stdetail) {
+                    //     $query->where('exam.standard_id', $stdetail->standard_id)
+                    //           ->orWhere('exam.stream_id', $stdetail->stream_id);
+                    // })
 
-                ->when($stdetail->batch_id, function ($query, $batch_id) {
-                    return $query->where('exam.batch_id', $batch_id);
-                })
-                ->where('exam.standard_id', $stdetail->standard_id)
-                ->when($stdetail->stream_id, function ($query, $stream_id) {
-                    return $query->where('exam.stream_id', $stream_id);
-                })
+                    ->when($stdetail->batch_id, function ($query, $batch_id) {
+                        return $query->where('exam.batch_id', $batch_id);
+                    })
+                    ->where('exam.standard_id', $stdetail->standard_id)
+                    ->when($stdetail->stream_id, function ($query, $stream_id) {
+                        return $query->where('exam.stream_id', $stream_id);
+                    })
 
 
-                ->whereIn('exam.subject_id', $subjectIds)
-                ->orderBy('exam.created_at', 'desc')
-                ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                ->limit(3)
-                ->get();
-                
+                    ->whereIn('exam.subject_id', $subjectIds)
+                    ->orderBy('exam.created_at', 'desc')
+                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                    ->limit(3)
+                    ->get();
+
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
@@ -1125,14 +1125,14 @@ class StudentController extends Controller
             $date->modify('+1 day');
             $nextDayStr = $date->format('Y-m-d');
 
-            
+
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<=', $nextDayStr)
                 ->where('attendance', 'P')->count();
-            
-                $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
+
+            $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<=', $nextDayStr)
@@ -1833,12 +1833,12 @@ class StudentController extends Controller
                     //     ->where('chapter_id', $topval->chapter_id)
                     //     ->where('subject_id', $topval->subject_id)
                     //     ->exists() : false;
-                    
-                  
+
+
                     // // $batch_response = [];
-                   
+
                     // if (!$status) {
-                        
+
                     //     $batch_list = Batches_model::where('institute_id', $institute_id)
                     //         ->where('user_id', $user_id)
                     //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
@@ -1854,7 +1854,7 @@ class StudentController extends Controller
                     //         ];
                     //     })->toArray();
                     // }
-                    if(Auth::user()->role_type == 6){
+                    if (Auth::user()->role_type == 6) {
                         $batch = Student_detail::where('institute_id', $institute_id)
                             ->where('student_id', $user_id)
                             ->first();
@@ -1868,7 +1868,6 @@ class StudentController extends Controller
                                 ->where('video_assign_to_batch.subject_id', $topval->subject_id)
                                 ->select('video_assign_to_batch.*', 'batches.*') // Adjust select as needed
                                 ->get();
-                                
                         }
                         $batch_list =[];
                         
@@ -2071,13 +2070,13 @@ class StudentController extends Controller
             } else {
                 $student_id = $request->student_id;
             }
-            
+
             $studentUser = User::where('id', $student_id)->first();
-            
+
             $institute_id = $request->institute_id;
 
             $institutes = [];
-            
+
             $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($student_id) {
                     $query->select('institute_id')
@@ -2112,16 +2111,20 @@ class StudentController extends Controller
                     'subjects' => $subs
                 );
             }
-            
+
             $sdtls =  Student_detail::join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->join('board', 'board.id', '=', 'students_details.board_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->join('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->where('students_details.student_id', $student_id)
                 //->where('students_details.status', '=', '1')
-                ->select('standard.name as standard', 'medium.name as medium',
-                 'board.name as board', 'stream.name as stream')->first();
-            
+                ->select(
+                    'standard.name as standard',
+                    'medium.name as medium',
+                    'board.name as board',
+                    'stream.name as stream'
+                )->first();
+
 
             $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                 ->where('parents.student_id', $student_id)->get();
@@ -2135,13 +2138,13 @@ class StudentController extends Controller
                     'relation' => $parentsDT->relation
                 );
             }
-            
+
             if ($studentUser->image) {
                 $img = $studentUser->image;
             } else {
                 $img = asset('no-image.png');
             }
-            
+
             $userdetail = array(
                 'id' => $studentUser->id,
                 'unique_id' => $studentUser->unique_id . '',
@@ -2150,12 +2153,12 @@ class StudentController extends Controller
                 'country_code' => $studentUser->country_code,
                 'mobile' => $studentUser->mobile . '',
                 'image' => $img . '',
-                'dob' => $studentUser->dob.'',
-                'address' => $studentUser->address.'',
+                'dob' => $studentUser->dob . '',
+                'address' => $studentUser->address . '',
                 'standard' => $sdtls ? $sdtls->standard : '',
-                'stream'=>$sdtls ? $sdtls->stream : '',
+                'stream' => $sdtls ? $sdtls->stream : '',
                 'medium' => $sdtls ? $sdtls->medium  : '',
-                'board'=>$sdtls ? $sdtls->board : '',
+                'board' => $sdtls ? $sdtls->board : '',
                 'school' => $studentUser->school_name,
                 'area' => $studentUser->area,
                 'institutes' => $institutes,
@@ -2165,7 +2168,7 @@ class StudentController extends Controller
                 'city' => $studentUser ? $studentUser->city . '' : '',
                 'pincode' => $studentUser ? $studentUser->pincode . '' : '',
             );
-            
+
             return $this->response($userdetail, "Successfully fetch data.");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -2251,7 +2254,7 @@ class StudentController extends Controller
             'state' => 'required|string',
             'city' => 'required|string',
             'pincode' => 'required|string',
-            'country_code'=>'required',
+            'country_code' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -2474,11 +2477,11 @@ class StudentController extends Controller
             $examlist = [];
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
-                    $stream_id =$stdetail->stream_id;
-                    $batch_id =$stdetail->batch_id;
+                    $stream_id = $stdetail->stream_id;
+                    $batch_id = $stdetail->batch_id;
                     $subjectIds = explode(',', $stdetail->subject_id);
-                    
-                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+
+                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
                         ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
                         ->where('institute_detail.end_academic_year', '>=', Carbon::now())
@@ -2498,7 +2501,7 @@ class StudentController extends Controller
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
                         ->orderByDesc('exam.created_at')
                         ->get();
-                       
+
                     foreach ($exams as $examsDT) {
                         $examlist[] = array(
                             'institute_id' => $examsDT->institute_id,
@@ -2922,11 +2925,11 @@ class StudentController extends Controller
 
             if (!empty($request->subject_id)) {
                 $subjectIds = explode(',', $request->subject_id);
-                foreach($subjectIds as $subject){
+                foreach ($subjectIds as $subject) {
                     $query->whereRaw("FIND_IN_SET($subject, students_details.subject_id)");
                 }
             }
-        
+
             if (!empty($request->batch_id)) {
                 $query->where('students_details.batch_id', $request->batch_id);
             }
@@ -2952,7 +2955,7 @@ class StudentController extends Controller
                             ->get()
                             ->toArray();
                     }
-                    
+
                     $attendances = [];
 
                     foreach ($attendance_records as $attendance_record) {
@@ -3034,7 +3037,7 @@ class StudentController extends Controller
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                         'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
-                        'start_time' => $this->convertTo12HourFormat( $todayslecDT->start_time),
+                        'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                         'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
                     );
                 }
