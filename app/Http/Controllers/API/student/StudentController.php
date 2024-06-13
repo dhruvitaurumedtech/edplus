@@ -858,7 +858,7 @@ class StudentController extends Controller
 
             $institutedeta = Institute_detail::where('id', $request->institute_id)
                 ->select('id', 'institute_name', 'address', 'about_us','contact_no','email',
-                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link')
+                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link','cover_photo')
                 ->first();
 
             // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
@@ -1849,6 +1849,8 @@ class StudentController extends Controller
                     //         return [
                     //             'batch_id' => $batch->id,
                     //             'batch_name' => $batch->batch_name,
+                    //             'assign_status'=>($batch->assign_status==1)?true:false,  
+                                
                     //         ];
                     //     })->toArray();
                     // }
@@ -1869,6 +1871,7 @@ class StudentController extends Controller
                                 
                         }
                         $batch_list =[];
+                        
       
                     }
                     if(Auth::user()->role_type == 3)
@@ -1885,7 +1888,7 @@ class StudentController extends Controller
                            $batch_list[] = [
                               'batch_id'=>$value->id,
                               'batch_name'=>$value->batch_name,
-                            //   'assign_status'=>($value->assign_status==1)?true:false,  
+                              'status'=>($value->assign_status==1)?true:false,  
                            ];   
                          }
                         // echo "<pre>";print_r($reponse_video);exit;   

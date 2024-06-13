@@ -646,6 +646,7 @@ class TeacherController extends Controller
                     'medium' => $value->medium_name,
                     'standard_id'=>$value->standard_id,
                     'standard' => $value->standard_name,
+                    'batch_id'=>$value->batch_id,
                     'batch' => $value->batch_name,
                     'subject_list' => $subject_response,
                 ];
