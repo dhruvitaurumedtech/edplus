@@ -4478,13 +4478,24 @@ class InstituteApiController extends Controller
         try {
             $rolesDT = [];
             $suad = [1, 2, 3];
-            $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
-            foreach ($roleqry as $roldel) {
-                $rolesDT[] = array(
-                    'id' => $roldel->id,
-                    'role_name' => $roldel->role_name
-                );
+            $teacher = Teacher_model::where('teacher_id',$request->user_id)->first();
+            if(!empty($teacher)){
+                 $suad2 = ['student', 'parent'];
+                 $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
+                 
+                   
+            }else{
+
+                $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
             }
+          foreach ($roleqry as $roldel) {
+            $rolesDT[] = array(
+                'id' => $roldel->id,
+                'role_name' => $roldel->role_name
+            );
+        }
+   
+
             return $this->response($rolesDT, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
