@@ -32,7 +32,7 @@ use App\Models\Student_detail;
 Route::post('/auth/register', [AuthController::class, 'register']);
 Route::post('/auth/google', [AuthController::class, 'handleGoogle']);
 Route::post('/auth/verify-otp', [AuthController::class, 'verify_otp'])->name('verify_otp.get');
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login'])->middleware('apilogs');
 
 Route::post('/auth/forget-password', [ForgotPasswordController::class, 'submitForgetPasswordForm'])->name('forget.password.post');
 Route::post('/auth/verify-code', [ForgotPasswordController::class, 'verify_code']);
