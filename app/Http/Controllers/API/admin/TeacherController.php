@@ -129,12 +129,15 @@ class TeacherController extends Controller
             }
 
             //join with
+            $date = Carbon::now()->format('Y-m-d');
+
             $teachrdt = Teacher_model::where('teacher_id', $teacher_id)
             ->where('status', '1')
             ->whereNull('deleted_at')->pluck('institute_id');
-            $date = date('d-m-Y');
+            
             $joininstitute = Institute_detail::where('status', 'active')
-               ->where('end_academic_year', '>=', $date)
+                //->where('end_academic_year', '>=', $date)
+                ->whereDate('end_academic_year', '>=', $date)
                 ->whereNull('deleted_at')
                 ->whereIN('id',$teachrdt)
                 ->paginate($perPage);
