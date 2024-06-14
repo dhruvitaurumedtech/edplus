@@ -131,7 +131,7 @@ class StudentController extends Controller
             }
 
             //join with
-            $ctdmy = date('d-m-Y');
+            $date = Carbon::now()->format('Y-m-d');
             $joininstitute = Institute_detail::where('status', 'active')
                 ->whereIn('id', function ($query) use ($user_id) {
                     $query->select('institute_id')
@@ -140,7 +140,7 @@ class StudentController extends Controller
                         ->where('status', '=', '1')
                         ->whereNull('deleted_at');
                 })
-                ->whereRaw("STR_TO_DATE(end_academic_year, '%d-%m-%Y') >= STR_TO_DATE(?, '%d-%m-%Y')", [$ctdmy])
+                ->whereDate('end_academic_year', '>=', $date)
                 ->paginate($perPage);
             $join_with = [];
             foreach ($joininstitute as $value) {
