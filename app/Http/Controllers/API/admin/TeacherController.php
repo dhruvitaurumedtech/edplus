@@ -138,7 +138,7 @@ class TeacherController extends Controller
                 ->where('institute_detail.end_academic_year', '>=', now())
                 ->whereNull('institute_detail.deleted_at')
                 ->select('institute_detail.*')
-                ->groupBy('teacher_detail.institute_id')
+                ->groupBy('teacher_detail.institute_id','institute_detail.id')
                 ->paginate($perPage);
 
             // echo "<pre>";
@@ -247,6 +247,18 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            $subids = explode(",",$request->subject_id);
+            $valueCounts = array_count_values($subids);
+            $repeatedValues = array_filter($valueCounts, function($count) {
+                return $count > 1;
+            });
+            
+            // Extract the keys (the repeated values) from the filtered array
+            $repeatedValues = array_keys($repeatedValues);
+            
+            if(!empty($repeatedValues)){
+                return $this->response([], "Subject Is Repeated.", false, 400);
+            }
             $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
             foreach ($subject as $value) {
