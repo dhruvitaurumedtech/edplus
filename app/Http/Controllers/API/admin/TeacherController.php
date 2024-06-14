@@ -262,6 +262,18 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            $subids = explode(",",$request->subject_id);
+            $valueCounts = array_count_values($subids);
+            $repeatedValues = array_filter($valueCounts, function($count) {
+                return $count > 1;
+            });
+            
+            // Extract the keys (the repeated values) from the filtered array
+            $repeatedValues = array_keys($repeatedValues);
+            
+            if(!empty($repeatedValues)){
+                return $this->response([], "Subject Is Repeated.", false, 400);
+            }
             $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
             foreach ($subject as $value) {
