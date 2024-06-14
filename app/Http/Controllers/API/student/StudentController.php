@@ -49,6 +49,7 @@ use Illuminate\Support\Facades\Hash;
 class StudentController extends Controller
 {
     use ApiTrait;
+    
     public function homescreen_student(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -2463,6 +2464,8 @@ class StudentController extends Controller
                 ->get();
 
             $examlist = [];
+            
+            $tdate = Carbon::now()->format('Y-m-d');
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
                     $stream_id = $stdetail->stream_id;
@@ -2472,7 +2475,7 @@ class StudentController extends Controller
                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
                         ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
-                        ->where('institute_detail.end_academic_year', '>=', Carbon::now())
+                        ->whereDate('institute_detail.end_academic_year', '>=', $tdate)
                         ->where('exam.board_id', $stdetail->board_id)
                         ->where('exam.medium_id', $stdetail->medium_id)
                         //->where('exam.class_id', $stdetail->class_id)
@@ -2701,10 +2704,11 @@ class StudentController extends Controller
                 $student_id = AUth::id();
             }
 
+            $tdate = Carbon::now()->format('Y-m-d');
             $result = [];
             $stdetails = Exam_Model::join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
                 ->where('exam.id', $request->exam_id)
-                ->where('institute_detail.end_academic_year', '>=', now())
+                ->whereDate('institute_detail.end_academic_year', '>=', $tdate)
                 ->first();
 
 
