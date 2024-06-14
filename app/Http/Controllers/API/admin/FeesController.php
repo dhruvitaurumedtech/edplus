@@ -459,29 +459,39 @@ class FeesController extends Controller
             $fees = null;
     
             if ($student_fees) {
+                $discount_amount =0;
+                    if(!empty($discount->discount_amount))
+                    {
+                        $discount_amount = $discount->discount_amount;
+                    }
                 if ($discount) {
+                    
                     if ($discount->discount_by == 'Rupee') {
                         $fees = $student_fees->total_fees - $discount->discount_amount;
                     } elseif ($discount->discount_by == 'Percentage') {
                         $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
                     }
-                } else {
+                    
+                } 
                     // If no discount, fees remain the total fees
                     $fees_data=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
                     $paid_amount=0;
                     if(!empty($fees_data)){
-
                     foreach($fees_data as $value)
                     {
                         $paid_amount +=$value->payment_amount;
                     }
+                    // echo $paid_amount;exit;
                 }
-                    $fees = $student_fees->total_fees - $paid_amount;
-                }
+                    $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
+                
+                // echo $fees;echo '=>'.$request->payment_amount;
     
-                if ($fees >= $request->payment_amount) {
-                    return $this->response([], "Paid amount and total amount not matched!", false, 400);
+                if ($fees < $request->payment_amount) {
+                    return $this->response([], "Amount is not matched", false, 400);
                 }
+                // exit;
+                
             } else {
                 return $this->response([], "Student fees record not found!", false, 400);
             }
