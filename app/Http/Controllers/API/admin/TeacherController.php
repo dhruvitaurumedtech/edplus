@@ -140,16 +140,26 @@ class TeacherController extends Controller
             //     ->select('institute_detail.*')
             //     ->groupBy('teacher_detail.institute_id')
             //     ->paginate($perPage);
+            // $joininstitute = Institute_detail::where('institute_detail.status', 'active')
+            //     ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
+            //     ->where('teacher_detail.teacher_id', $teacher_id)
+            //     ->where('teacher_detail.status', '1')
+            //     ->whereNull('teacher_detail.deleted_at')
+            //     ->where('institute_detail.end_academic_year', '>=', now())
+            //     ->whereNull('institute_detail.deleted_at')
+            //     ->select('institute_detail.*')
+            //     ->groupBy('teacher_detail.institute_id','institute_detail.id')
+            //     ->paginate($perPage);
             $joininstitute = Institute_detail::where('institute_detail.status', 'active')
-                ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
-                ->where('teacher_detail.teacher_id', $teacher_id)
-                ->where('teacher_detail.status', '1')
-                ->whereNull('teacher_detail.deleted_at')
-                ->where('institute_detail.end_academic_year', '>=', now())
-                ->whereNull('institute_detail.deleted_at')
-                ->select('institute_detail.*')
-                ->groupBy('teacher_detail.institute_id','institute_detail.id')
-                ->paginate($perPage);
+    ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
+    ->where('teacher_detail.teacher_id', $teacher_id)
+    ->where('teacher_detail.status', '1')
+    ->whereNull('teacher_detail.deleted_at')
+    ->where('institute_detail.end_academic_year', '>=', now())
+    ->whereNull('institute_detail.deleted_at')
+    ->select('institute_detail.*')
+    ->groupBy('institute_detail.id', 'institute_detail.unique_id', 'institute_detail.status', 'institute_detail.end_academic_year') // Include all selected columns from institute_detail in GROUP BY
+    ->paginate($perPage);
 
 
             // echo "<pre>";
