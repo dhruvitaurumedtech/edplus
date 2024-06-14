@@ -732,25 +732,26 @@ class TeacherController extends Controller
         try {
             $user = Auth::user();
             $request_list = Teacher_model::where('institute_id', $request->institute_id)
-                ->where('status', '0')
-                ->get();
-            if (!empty($request_list)) {
-                $response = $request_list->filter(function ($value) {
-                    return $user_data = User::find($value->teacher_id);
-                })->map(function ($value) {
+            ->where('status', '0')
+            ->get();
+
+                if ($request_list->isNotEmpty()) {
+                $response = $request_list->map(function ($value) {
                     $user_data = User::find($value->teacher_id);
-                    // print_r($user_data->image);exit;
-                    return [
-                        // 'id'=>$value->id,
-                        'teacher_id' => $user_data->id,
-                        'name' => $user_data->firstname . ' ' . $user_data->lastname,
-                        'photo' => $user_data->image,
-                    ];
-                })->toArray();
+                    if ($user_data) {
+                        return [
+                            'teacher_id' => $user_data->id,
+                            'name' => $user_data->firstname . ' ' . $user_data->lastname,
+                            'photo' => $user_data->image,
+                        ];
+                    }
+                })->filter()->unique('teacher_id')->values()->toArray();
+
                 return $this->response($response, "Fetch teacher request list.");
-            } else {
-                return $this->response([], "teacher not found.", false, 400);
-            }
+                } else {
+                return $this->response([], "Teacher not found.", false, 400);
+                }
+
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
