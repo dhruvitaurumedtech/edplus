@@ -158,7 +158,7 @@ class TeacherController extends Controller
     ->where('institute_detail.end_academic_year', '>=', now())
     ->whereNull('institute_detail.deleted_at')
     ->select('institute_detail.*')
-    ->groupBy('institute_detail.id', 'institute_detail.unique_id', 'institute_detail.status', 'institute_detail.end_academic_year') // Include all selected columns from institute_detail in GROUP BY
+    ->groupBy('teacher_detail.institute_id') // Include all selected columns from institute_detail in GROUP BY
     ->paginate($perPage);
 
 
