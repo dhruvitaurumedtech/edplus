@@ -1081,32 +1081,26 @@ class StudentController extends Controller
                 $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
                 // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
+                $tdasy = date('Y-m-d');
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
                     ->where('exam.institute_id', $stdetail->institute_id)
-                    // ->where('exam.batch_id', $stdetail->batch_id)
                     ->where('exam.board_id', $stdetail->board_id)
                     ->where('exam.medium_id', $stdetail->medium_id)
-                    // ->where(function($query) use ($stdetail) {
-                    //     $query->where('exam.standard_id', $stdetail->standard_id)
-                    //           ->orWhere('exam.stream_id', $stdetail->stream_id);
-                    // })
-
                     ->when($stdetail->batch_id, function ($query, $batch_id) {
                         return $query->where('exam.batch_id', $batch_id);
                     })
                     ->where('exam.standard_id', $stdetail->standard_id)
-                    ->when($stdetail->stream_id, function ($query, $stream_id) {
-                        return $query->where('exam.stream_id', $stream_id);
-                    })
-
-
+                    // ->when($stdetail->stream_id, function ($query, $stream_id) {
+                    //     return $query->where('exam.stream_id', $stream_id);
+                    // })
                     ->whereIn('exam.subject_id', $subjectIds)
+                    ->where('exam.exam_date','>',$tdasy)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     ->limit(3)
                     ->get();
-
+                    
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
