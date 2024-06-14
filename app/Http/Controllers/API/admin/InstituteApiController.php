@@ -5863,7 +5863,8 @@ class InstituteApiController extends Controller
                         $subject = $request->subject_id;
                     }
 
-                    $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id);
+                    $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
+                    ->where('institute_id', $request->institute_id);
                     $teacher_detail->update([
                         'institute_id' => $request->institute_id,
                         'teacher_id' => $request->teacher_id,

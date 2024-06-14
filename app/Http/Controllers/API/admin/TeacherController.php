@@ -129,34 +129,17 @@ class TeacherController extends Controller
             }
 
             //join with
-
-            // $joininstitute = Institute_detail::where('institute_detail.status', 'active')
-            //     ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
-            //     ->where('teacher_detail.teacher_id', $teacher_id)
-            //     ->where('teacher_detail.status', '1')
-            //     ->whereNull('teacher_detail.deleted_at')
-            //     ->where('institute_detail.end_academic_year', '>=', now())
-            //     ->whereNull('institute_detail.deleted_at')
-            //     ->select('institute_detail.*')
-            //     ->groupBy('teacher_detail.institute_id')
-            //     ->paginate($perPage);
             $teachrdt = Teacher_model::where('teacher_id', $teacher_id)
             ->where('status', '1')
             ->whereNull('deleted_at')->pluck('institute_id');
-
+            $date = date('d-m-Y');
             $joininstitute = Institute_detail::where('status', 'active')
-               ->where('end_academic_year', '>=', now())
+               ->where('end_academic_year', '>=', $date)
                 ->whereNull('deleted_at')
                 ->whereIN('id',$teachrdt)
-                ->select('id', 
-                         'institute_name', 
-                         'status',
-                         'end_academic_year',
-                         'created_at',
-                         'updated_at')
                 ->paginate($perPage);
 
-
+            
             // echo "<pre>";
             // print_r($joininstitute);
             // exit; // ->where('end_academic_year', '>=', now())
