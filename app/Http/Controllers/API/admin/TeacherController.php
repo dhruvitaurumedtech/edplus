@@ -141,7 +141,6 @@ class TeacherController extends Controller
                 ->groupBy('teacher_detail.institute_id')
                 ->paginate($perPage);
 
-
             // echo "<pre>";
             // print_r($joininstitute);
             // exit; // ->where('end_academic_year', '>=', now())
