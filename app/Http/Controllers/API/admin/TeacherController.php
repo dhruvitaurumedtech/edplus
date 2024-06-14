@@ -140,20 +140,20 @@ class TeacherController extends Controller
             //     ->select('institute_detail.*')
             //     ->groupBy('teacher_detail.institute_id')
             //     ->paginate($perPage);
-            $joininstitute = Institute_detail::where('institute_detail.status', 'active')
-                ->join('teacher_detail', 'teacher_detail.institute_id', '=', 'institute_detail.id')
-                ->where('teacher_detail.teacher_id', $teacher_id)
-                ->where('teacher_detail.status', '1')
-                ->whereNull('teacher_detail.deleted_at')
-                ->where('institute_detail.end_academic_year', '>=', now())
-                ->whereNull('institute_detail.deleted_at')
-                ->select('institute_detail.id', 
-                         'institute_detail.institute_name', 
-                         'institute_detail.status',
-                         'institute_detail.end_academic_year',
-                         'institute_detail.created_at',
-                         'institute_detail.updated_at')
-                ->groupBy('teacher_detail.institute_id')
+            $teachrdt = Teacher_model::where('teacher_id', $teacher_id)
+            ->where('status', '1')
+            ->whereNull('deleted_at')->pluck('institute_id');
+
+            $joininstitute = Institute_detail::where('status', 'active')
+               ->where('end_academic_year', '>=', now())
+                ->whereNull('deleted_at')
+                ->whereIN('id',$teachrdt)
+                ->select('id', 
+                         'institute_name', 
+                         'status',
+                         'end_academic_year',
+                         'created_at',
+                         'updated_at')
                 ->paginate($perPage);
 
 
@@ -203,9 +203,9 @@ class TeacherController extends Controller
 
             ];
 
-            return $this->response($final_repsonse, "Successfully fetch data.");
+            return $this->response($final_repsonse, "Successfully fetch.");
         } catch (\Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Invalid token .", false, 400);
         }
     }
 
@@ -242,7 +242,6 @@ class TeacherController extends Controller
 
     public function add_teacher(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
