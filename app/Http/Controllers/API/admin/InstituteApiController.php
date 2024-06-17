@@ -3709,7 +3709,14 @@ class InstituteApiController extends Controller
             $user_id = Auth::id();
             $exam_id = $request->exam_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-            // echo $examdt;exit;
+            $stream='';
+            if($examdt->stream_id == 'null'){
+                $stream = null;
+            }
+             else{
+                $stream= $examdt->stream;
+             }
+            //  echo $stream;exit;
             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->where('students_details.institute_id', $institute_id)
@@ -3720,10 +3727,13 @@ class InstituteApiController extends Controller
                 //->where('students_details.class_id', $examdt->class_id)
                 ->where('students_details.standard_id', $examdt->standard_id)
                 //->where('students_details.stream_id', $examdt->stream_id)
-                ->when($examdt->stream_id, function ($query, $stream_id) {
-                    return $query->where('students_details.stream_id', $stream_id);
-                })
+                // ->when(!empty($examdt->stream_id), function ($query) use ($examdt) {
+                //     return $query->where('students_details.stream_id', $examdt->stream_id);
+                // })
+                ->where('students_details.stream_id', $stream)
                 // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
+               
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
             $studentsDET = [];
