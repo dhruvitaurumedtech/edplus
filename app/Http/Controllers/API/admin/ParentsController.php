@@ -309,7 +309,7 @@ class ParentsController extends Controller
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
                 'total_marks' => $resultDDt->total_marks,
-                'achiveddmarks_marks' => boolval($resultDDt->mark),
+                'achiveddmarks_marks' => $resultDDt->mark,
                 'date' => $resultDDt->exam_date,
                 'class_highest' => $highestMarks
             );
@@ -350,27 +350,14 @@ class ParentsController extends Controller
             
     }
     public function view_profile(Request $request){
-        // $validator = Validator::make($request->all(), [
-        //     'parent_id' => 'required',
-        // ]);
-        // if ($validator->fails()) {
-        //     return $this->response([], $validator->errors()->first(), false, 400);
-        // }
+        
         $parent_id = Auth::id();
         try{
             $data1 = [];
             $parent = Parents::join('users', 'users.id', '=', 'parents.parent_id')
             ->where('parents.parent_id', $parent_id)
             ->first();
-              
-            // foreach($parent as $value_parent){
-            //     $data1 = ['first_name'=>$value_parent->firstname,
-            //                'last_name'=>$value_parent->lastname,
-            //                'email'=>$value_parent->email,
-            //                'phone'=>$value_parent->mobile,
-            //                'profile'=>(!empty($value_parent->image))?asset($value_parent->image):asset('no-image.png'),
-            //                'address'=>$value_parent->address];
-            // }
+            
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
             ->where('parents.parent_id', $parent_id)
