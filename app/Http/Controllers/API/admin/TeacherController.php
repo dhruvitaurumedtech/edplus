@@ -260,9 +260,9 @@ class TeacherController extends Controller
             if(!empty($repeatedValues)){
                 return $this->response([], "Subject Is Repeated.", false, 400);
             }
-            $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
+            $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->pluck('base_table_id');
 
-            foreach ($subject as $value) {
+            //foreach ($subject as $value) {
                 // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
                 //     ->select('*')->get()->toarray();
 
@@ -295,12 +295,13 @@ class TeacherController extends Controller
                 //         'status' => '0',
                 //     ]);
                 // }
-                $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toArray();
-
+                
+                $base_table_response = Base_table::whereIN('id', $subject)->get()->toArray();
                     foreach ($base_table_response as $value2) {
                         $subjects = Subject_model::where('base_table_id', $value2['id'])->get();
                         
                         foreach ($subjects as $subject) {
+                            if(in_array($subject->id, explode(',', $request->subject_id))){
                             Teacher_model::create([
                                 'institute_id' => $request->institute_id,
                                 'teacher_id' => $request->teacher_id,
@@ -314,8 +315,9 @@ class TeacherController extends Controller
                                 'status' => '0',
                             ]);
                         }
+                        }
                     }
-            }
+            //}
             User::where('id', $request->teacher_id)->update([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
