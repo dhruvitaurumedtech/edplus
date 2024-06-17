@@ -3713,7 +3713,7 @@ class InstituteApiController extends Controller
             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->where('students_details.institute_id', $institute_id)
-                ->where('students_details.user_id', $user_id)
+                // ->where('students_details.user_id', $user_id)
                 ->where('students_details.board_id', $examdt->board_id)
                 ->where('students_details.medium_id', $examdt->medium_id)
                 ->where('students_details.batch_id', $examdt->batch_id)
@@ -3723,7 +3723,7 @@ class InstituteApiController extends Controller
                 ->when($examdt->stream_id, function ($query, $stream_id) {
                     return $query->where('students_details.stream_id', $stream_id);
                 })
-                ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
             $studentsDET = [];
