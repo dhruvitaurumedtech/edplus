@@ -398,4 +398,44 @@ class ParentsController extends Controller
             }
 
     }
+
+    public function edit_profile(Request $request){
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'mobile' => 'required|string',
+            'address' => 'required|string',
+            'state' => 'required|string',
+            'city' => 'required|string',
+            'pincode' => 'required|string',
+            'country_code' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $user = Auth::user();
+            $user->firstname = $request->firstname;
+            $user->lastname = $request->lastname;
+            $user->country_code = $request->country_code;
+            $user->mobile = $request->mobile;
+            $user->address = $request->address;
+            $user->state = $request->state;
+            $user->city = $request->city;
+            $user->pincode = $request->pincode;
+            if ($request->file('image')) {
+                $iconFile = $request->file('image');
+                $imagePath = $iconFile->store('profile', 'public');
+                $user->image = $imagePath;
+            }
+            
+            $user->save();
+            
+            return $this->response([], "Updated Successfully!");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }

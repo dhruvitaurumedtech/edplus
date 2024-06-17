@@ -2261,10 +2261,9 @@ class StudentController extends Controller
             if ($request->file('image')) {
                 $iconFile = $request->file('image');
                 $imagePath = $iconFile->store('profile', 'public');
-            } else {
-                $imagePath = null;
+                $user->image = $imagePath;
             }
-            $user->image = $imagePath;
+            
             $user->save();
             if (!empty($request->parents)) {
                 $parents = json_decode($request->parents, true);
