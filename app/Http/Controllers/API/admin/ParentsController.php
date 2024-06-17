@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\ApiTrait;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class ParentsController extends Controller
@@ -147,7 +148,7 @@ class ParentsController extends Controller
     // }
 
 
-
+    
 
     //pending work in below
     public function parents_child_homescreen(Request $request)
@@ -191,7 +192,7 @@ class ParentsController extends Controller
             ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
             ->select('users.firstname', 'users.lastname',
              'institute_detail.institute_name','institute_detail.id as institute_id',
-             'students_details.student_id','students_details.subject_id')
+             'students_details.*')
             ->where('students_details.student_id', $request->child_id)
             ->where('students_details.institute_id', $request->institute_id)->first();
 
@@ -259,24 +260,48 @@ class ParentsController extends Controller
                 );
             }
 
+           
             //upcoming exam
+            function bindValues($query, $bindings)
+    {
+        $fullQuery = $query;
+    
+        foreach ($bindings as $binding) {
+            // If the binding is a string, enclose it in quotes
+            if (is_string($binding)) {
+                $binding = "'$binding'";
+            } elseif (is_null($binding)) {
+                // If the binding is null, replace with 'null'
+                $binding = 'null';
+            }
+    
+            // Replace the first occurrence of '?' with the binding value
+            $fullQuery = preg_replace('/\?/', $binding, $fullQuery, 1);
+        }
+    
+        return $fullQuery;
+    }
             $examlist = [];
-            $subjectIds = explode(',', $getstdntdata->subject_id);
-            $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                    $subjectIds = explode(',', $getstdntdata->subject_id);
+                    $tdasy = date('Y-m-d');
+                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                    ->where('institute_id', $getstdntdata->institute_id)
-                    ->where('batch_id', $getstdntdata->batch_id)
+                    ->where('exam.exam_date','>',$tdasy)
+                    ->where('exam.institute_id', $getstdntdata->institute_id)
                     ->where('exam.board_id', $getstdntdata->board_id)
                     ->where('exam.medium_id', $getstdntdata->medium_id)
-                    ->where(function($query) use ($getstdntdata) {
-                        $query->where('exam.standard_id', $getstdntdata->standard_id)
-                              ->orWhere('exam.stream_id', $getstdntdata->stream_id);
+                    ->when($getstdntdata->batch_id, function ($query, $batch_id) {
+                        return $query->where('exam.batch_id', $batch_id);
                     })
-                    ->whereIN('exam.subject_id', $subjectIds)
-                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                    ->where('exam.standard_id', $getstdntdata->standard_id)
+                    // ->when($stdetail->stream_id, function ($query, $stream_id) {
+                    //     return $query->where('exam.stream_id', $stream_id);
+                    // })
+                    ->whereIn('exam.subject_id', $subjectIds)
                     ->orderBy('exam.created_at', 'desc')
-                    ->limit(3)
-                    ->get();
+                    ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
+                    ->limit(3)->get();
+                   
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
