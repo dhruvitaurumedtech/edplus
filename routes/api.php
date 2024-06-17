@@ -134,7 +134,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/parents/child-list-parents', [ParentsController::class, 'child_list'])->name('child_list');
     Route::post('/parents/child-homescreen-parents', [ParentsController::class, 'parents_child_homescreen'])->name('parents_child_homescreen');
     Route::post('/parents/view-profile', [ParentsController::class, 'view_profile']);
-
+    Route::post('/parents/edit-profile', [ParentsController::class, 'edit_profile']);
     // Student Api 
     Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add']);
     Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request']);
