@@ -212,7 +212,7 @@ class ParentsController extends Controller
                     'child_id' => $getstdntdata->student_id,
                     'firstname' => $getstdntdata->firstname,
                     'lastname' => $getstdntdata->lastname,
-                    'institute_id' => $getstdntdata->institute_id,
+                    'institute_id' => intval($getstdntdata->institute_id),
                     'institute_name' => $getstdntdata->institute_name,
                     'subjects' => $subjDTs
                 );
