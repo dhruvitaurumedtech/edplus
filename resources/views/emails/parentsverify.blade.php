@@ -9,9 +9,6 @@
 <body>
     <form >
         @csrf
-        
-        
-            
         @if($institute !='')
             <p>Please click the button below to verify your email address For {{$institute}}:</p>
             <a href="{{ url('/update-value/' . $id) }}" class="btn btn-success">Verify  Email </a>
