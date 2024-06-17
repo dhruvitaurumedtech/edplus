@@ -262,25 +262,6 @@ class ParentsController extends Controller
 
            
             //upcoming exam
-            function bindValues($query, $bindings)
-    {
-        $fullQuery = $query;
-    
-        foreach ($bindings as $binding) {
-            // If the binding is a string, enclose it in quotes
-            if (is_string($binding)) {
-                $binding = "'$binding'";
-            } elseif (is_null($binding)) {
-                // If the binding is null, replace with 'null'
-                $binding = 'null';
-            }
-    
-            // Replace the first occurrence of '?' with the binding value
-            $fullQuery = preg_replace('/\?/', $binding, $fullQuery, 1);
-        }
-    
-        return $fullQuery;
-    }
             $examlist = [];
                     $subjectIds = explode(',', $getstdntdata->subject_id);
                     $tdasy = date('Y-m-d');
