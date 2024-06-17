@@ -303,12 +303,12 @@ class ParentsController extends Controller
             ->where('exam.institute_id', $getstdntdata->institute_id)
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
             ->orderByDesc('marks.created_at')->limit(3)->get();
-        $highestMarks = $resultQY->max('marks');
+        $highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
             $result[] = array(
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                'total_marks' => $resultDDt->total_marks,
+                'total_marks' => $resultDDt->total_mark,
                 'achiveddmarks_marks' => $resultDDt->mark,
                 'date' => $resultDDt->exam_date,
                 'class_highest' => $highestMarks
