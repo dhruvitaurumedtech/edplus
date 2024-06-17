@@ -212,7 +212,7 @@ class ParentsController extends Controller
                     'child_id' => $getstdntdata->student_id,
                     'firstname' => $getstdntdata->firstname,
                     'lastname' => $getstdntdata->lastname,
-                    'institute_id' => $getstdntdata->institute_id,
+                    'institute_id' => intval($getstdntdata->institute_id),
                     'institute_name' => $getstdntdata->institute_name,
                     'subjects' => $subjDTs
                 );
@@ -262,25 +262,6 @@ class ParentsController extends Controller
 
            
             //upcoming exam
-            function bindValues($query, $bindings)
-    {
-        $fullQuery = $query;
-    
-        foreach ($bindings as $binding) {
-            // If the binding is a string, enclose it in quotes
-            if (is_string($binding)) {
-                $binding = "'$binding'";
-            } elseif (is_null($binding)) {
-                // If the binding is null, replace with 'null'
-                $binding = 'null';
-            }
-    
-            // Replace the first occurrence of '?' with the binding value
-            $fullQuery = preg_replace('/\?/', $binding, $fullQuery, 1);
-        }
-    
-        return $fullQuery;
-    }
             $examlist = [];
                     $subjectIds = explode(',', $getstdntdata->subject_id);
                     $tdasy = date('Y-m-d');
@@ -322,13 +303,13 @@ class ParentsController extends Controller
             ->where('exam.institute_id', $getstdntdata->institute_id)
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
             ->orderByDesc('marks.created_at')->limit(3)->get();
-        $highestMarks = $resultQY->max('marks');
+        $highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
             $result[] = array(
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                'total_marks' => $resultDDt->total_marks,
-                'achiveddmarks_marks' => boolval($resultDDt->mark),
+                'total_marks' => $resultDDt->total_mark,
+                'achiveddmarks_marks' => $resultDDt->mark,
                 'date' => $resultDDt->exam_date,
                 'class_highest' => $highestMarks
             );
@@ -369,52 +350,98 @@ class ParentsController extends Controller
             
     }
     public function view_profile(Request $request){
-        $validator = Validator::make($request->all(), [
-            'parent_id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
+        
+        $parent_id = Auth::id();
         try{
+            $data1 = [];
             $parent = Parents::join('users', 'users.id', '=', 'parents.parent_id')
-            ->where('parents.parent_id', $request->parent_id)
-            ->get();
-              $data1 = [];
-            foreach($parent as $value_parent){
-                $data1[] = ['first_name'=>$value_parent->firstname,
-                           'last_name'=>$value_parent->lastname,
-                           'email'=>$value_parent->email,
-                           'phone'=>$value_parent->mobile,
-                           'profile'=>(!empty($value_parent->image))?asset($value_parent->image):asset('no-image.png'),
-                           'address'=>$value_parent->address];
-            }
+            ->where('parents.parent_id', $parent_id)
+            ->first();
+            
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
-            ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-              ->where('parents.parent_id', $request->parent_id)
-              ->select('users.*','institute_detail.institute_name')
+            ->where('parents.parent_id', $parent_id)
+              ->select('users.*')
               ->get();
-              $data2 = [];
-            foreach($student as $value_student){
+              $uniqueStudents = $student->unique('id')->values();
+
+              $response = [];
+            foreach($uniqueStudents as $value_student){
                 $student2 = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-                ->where('parents.parent_id', $request->parent_id)
-                ->select('users.*','institute_detail.institute_name')
+                ->where('parents.parent_id', $parent_id)
+                ->where('parents.student_id', $value_student->id)
+                ->select('users.*','institute_detail.institute_name',
+                'institute_detail.logo','institute_detail.address')
                 ->get();
-
-                $data2[] = ['first_name'=>$value_student->firstname,
+                $insts=[];
+                foreach($student2 as $insdat){
+                    $insts[] = ['institute_name'=>$insdat->institute_name,
+                    'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('no-image.png'),
+                    'institute_address'=>$insdat->address,];
+                }
+                $data2[] = ['child_id'=>$value_student->id,
+                            'first_name'=>$value_student->firstname,
                             'last_name'=>$value_student->lastname,
                             'email'=>$value_student->email,
                             'phone'=>$value_student->mobile,
-                            'institute_name'=>$value_student->institute_name];
+                            'institutes'=>$insts];
             }
-                $response = ['parent'=>$data1,'student'=>$data2];
+            $response = ['id'=>$parent->id,
+                            'first_name'=>$parent->firstname,
+                           'last_name'=>$parent->lastname,
+                           'email'=>$parent->email,
+                           'phone'=>$parent->mobile,
+                           'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
+                           'address'=>$parent->address,
+                            'child'=>$data2];
+                //$response = ['parent'=>$data1,'student'=>$data2];
                 // echo "<pre>";print_r($parent);exit;
                 return $this->response($response, "Data Fetch Successfully");
             }catch(\Exception $e){
                 return $this->response($e, "Something want Wrong!!.", false, 400);
             }
 
+    }
+
+    public function edit_profile(Request $request){
+        $validator = Validator::make($request->all(), [
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'mobile' => 'required|string',
+            'address' => 'required|string',
+            'state' => 'required|string',
+            'city' => 'required|string',
+            'pincode' => 'required|string',
+            'country_code' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $user = Auth::user();
+            $user->firstname = $request->firstname;
+            $user->lastname = $request->lastname;
+            $user->country_code = $request->country_code;
+            $user->mobile = $request->mobile;
+            $user->address = $request->address;
+            $user->state = $request->state;
+            $user->city = $request->city;
+            $user->pincode = $request->pincode;
+            if ($request->file('image')) {
+                $iconFile = $request->file('image');
+                $imagePath = $iconFile->store('profile', 'public');
+                $user->image = $imagePath;
+            }
+            
+            $user->save();
+            
+            return $this->response([], "Updated Successfully!");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 }

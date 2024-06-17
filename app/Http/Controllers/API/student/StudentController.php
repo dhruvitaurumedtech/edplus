@@ -858,7 +858,7 @@ class StudentController extends Controller
 
             $institutedeta = Institute_detail::where('id', $request->institute_id)
                 ->select('id', 'institute_name', 'address', 'about_us','contact_no','email',
-                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link','cover_photo')
+                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link','logo','cover_photo')
                 ->first();
 
             // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
@@ -2261,10 +2261,9 @@ class StudentController extends Controller
             if ($request->file('image')) {
                 $iconFile = $request->file('image');
                 $imagePath = $iconFile->store('profile', 'public');
-            } else {
-                $imagePath = null;
+                $user->image = $imagePath;
             }
-            $user->image = $imagePath;
+            
             $user->save();
             if (!empty($request->parents)) {
                 $parents = json_decode($request->parents, true);
