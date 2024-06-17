@@ -350,47 +350,66 @@ class ParentsController extends Controller
             
     }
     public function view_profile(Request $request){
-        $validator = Validator::make($request->all(), [
-            'parent_id' => 'required',
-        ]);
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
+        // $validator = Validator::make($request->all(), [
+        //     'parent_id' => 'required',
+        // ]);
+        // if ($validator->fails()) {
+        //     return $this->response([], $validator->errors()->first(), false, 400);
+        // }
+        $parent_id = Auth::id();
         try{
+            $data1 = [];
             $parent = Parents::join('users', 'users.id', '=', 'parents.parent_id')
-            ->where('parents.parent_id', $request->parent_id)
-            ->get();
-              $data1 = [];
-            foreach($parent as $value_parent){
-                $data1[] = ['first_name'=>$value_parent->firstname,
-                           'last_name'=>$value_parent->lastname,
-                           'email'=>$value_parent->email,
-                           'phone'=>$value_parent->mobile,
-                           'profile'=>(!empty($value_parent->image))?asset($value_parent->image):asset('no-image.png'),
-                           'address'=>$value_parent->address];
-            }
+            ->where('parents.parent_id', $parent_id)
+            ->first();
+              
+            // foreach($parent as $value_parent){
+            //     $data1 = ['first_name'=>$value_parent->firstname,
+            //                'last_name'=>$value_parent->lastname,
+            //                'email'=>$value_parent->email,
+            //                'phone'=>$value_parent->mobile,
+            //                'profile'=>(!empty($value_parent->image))?asset($value_parent->image):asset('no-image.png'),
+            //                'address'=>$value_parent->address];
+            // }
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
-            ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-              ->where('parents.parent_id', $request->parent_id)
-              ->select('users.*','institute_detail.institute_name')
+            ->where('parents.parent_id', $parent_id)
+              ->select('users.*')
               ->get();
-              $data2 = [];
-            foreach($student as $value_student){
+              $uniqueStudents = $student->unique('id')->values();
+
+              $response = [];
+            foreach($uniqueStudents as $value_student){
                 $student2 = Parents::join('users', 'users.id', '=', 'parents.student_id')
                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-                ->where('parents.parent_id', $request->parent_id)
-                ->select('users.*','institute_detail.institute_name')
+                ->where('parents.parent_id', $parent_id)
+                ->where('parents.student_id', $value_student->id)
+                ->select('users.*','institute_detail.institute_name',
+                'institute_detail.logo','institute_detail.address')
                 ->get();
-
-                $data2[] = ['first_name'=>$value_student->firstname,
+                $insts=[];
+                foreach($student2 as $insdat){
+                    $insts[] = ['institute_name'=>$insdat->institute_name,
+                    'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('no-image.png'),
+                    'institute_address'=>$insdat->address,];
+                }
+                $data2[] = ['child_id'=>$value_student->id,
+                            'first_name'=>$value_student->firstname,
                             'last_name'=>$value_student->lastname,
                             'email'=>$value_student->email,
                             'phone'=>$value_student->mobile,
-                            'institute_name'=>$value_student->institute_name];
+                            'institutes'=>$insts];
             }
-                $response = ['parent'=>$data1,'student'=>$data2];
+            $response = ['id'=>$parent->id,
+                            'first_name'=>$parent->firstname,
+                           'last_name'=>$parent->lastname,
+                           'email'=>$parent->email,
+                           'phone'=>$parent->mobile,
+                           'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
+                           'address'=>$parent->address,
+                            'child'=>$data2];
+                //$response = ['parent'=>$data1,'student'=>$data2];
                 // echo "<pre>";print_r($parent);exit;
                 return $this->response($response, "Data Fetch Successfully");
             }catch(\Exception $e){
