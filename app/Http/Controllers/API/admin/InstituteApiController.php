@@ -521,9 +521,9 @@ class InstituteApiController extends Controller
                 $imagePath2 = '';
             }
             // echo "<pre>";print_r($imagePath);exit;
-            $currentDate = date("d-m-Y");
-            $nextYearDate = date("d-m-Y", strtotime("+1 year"));
-            $nextYear = date("d-m-Y", strtotime($nextYearDate));
+            $currentDate = date("Y-m-d");
+            $nextYearDate = date("Y-m-d", strtotime("+1 year"));
+            $nextYear = date("Y-m-d", strtotime($nextYearDate));
             $dateString = $currentDate . " / " . $nextYear;
             $instituteDetail = Institute_detail::create([
                 'unique_id' => $unique_id,
@@ -2244,28 +2244,51 @@ class InstituteApiController extends Controller
 
             $board_array = [];
             foreach ($board_list as $board) {
-                $medium_list = Medium_model::whereIn('id', function ($query) use ($user_id, $institute_id, $board) {
-                    $query->select('medium_id')
-                        ->from('medium_sub')
-                        ->where('user_id', $user_id)
-                        ->where('board_id', $board->id)
-                        ->where('institute_id', $institute_id);
-                })->get(['id', 'name', 'icon']);
-                $medium_array = $medium_list->map(function ($medium) {
-                    return [
-                        'id' => $medium->id,
-                        'medium_name' => $medium->name,
-                        'medium_icon' => asset($medium->icon)
-                    ];
-                })
-                    ->toArray();
-                $board_array[] = [
-                    'id' => $board->id,
-                    'board_name' => $board->name,
-                    'board_icon' => asset($board->icon),
-                    'medium' => $medium_array,
-                    // Include banner_array inside board_array
-                ];
+                // $medium_list = Medium_model::whereIn('id', function ($query) use ($user_id, $institute_id, $board) {
+                //     $query->select('medium_id')
+                //         ->from('medium_sub')
+                //         ->where('user_id', $user_id)
+                //         ->where('board_id', $board->id)
+                //         ->where('institute_id', $institute_id);
+                // })->get(['id', 'name', 'icon']);
+                // $medium_array = $medium_list->map(function ($medium) {
+                //     return [ 
+                //         'id' => $medium->id,
+                //         'medium_name' => $medium->name,
+                //         'medium_icon' => asset($medium->icon)
+                //     ];
+                // })
+                //     ->toArray();
+                // $board_array[] = [
+                //     'id' => $board->id,
+                //     'board_name' => $board->name,
+                //     'board_icon' => asset($board->icon),
+                //     'medium' => $medium_array,
+                //     // Include banner_array inside board_array
+                // ];
+                $medium_sublist = DB::table('medium_sub')
+                                ->where('user_id', $user_id)
+                                ->where('board_id', $board->id)
+                                ->where('institute_id', $institute_id)
+                                ->pluck('medium_id')->toArray();
+                            $uniquemediumds = array_unique($medium_sublist);
+                            
+                            $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+            
+                            $medium_array = [];
+                            foreach ($medium_list as $medium_value) {
+                                $medium_array[] = [
+                                    'id' => $medium_value->id,
+                                    'medium_name' => $medium_value->name,
+                                    'medium_icon' => asset($medium_value->icon)
+                                ];
+                            }
+                            $board_array[] = [
+                                'id' => $board->id,
+                                'board_name' => $board->name,
+                                'board_icon' => asset($board->icon),
+                                'medium' => $medium_array,
+                            ];
             }
 
             // Fetch banners
