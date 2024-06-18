@@ -281,7 +281,8 @@ class ParentsController extends Controller
                     ->whereIn('exam.subject_id', $subjectIds)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                    ->limit(3)->get();
+                    //->limit(3) I remove this on Parin's request
+                    ->get();
                    
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
@@ -302,7 +303,9 @@ class ParentsController extends Controller
             ->where('marks.student_id', $request->child_id)
             ->where('exam.institute_id', $getstdntdata->institute_id)
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
-            ->orderByDesc('marks.created_at')->limit(3)->get();
+            ->orderByDesc('marks.created_at')
+            //->limit(3) I remove this on Parin's request
+            ->get();
         $highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
             $result[] = array(
