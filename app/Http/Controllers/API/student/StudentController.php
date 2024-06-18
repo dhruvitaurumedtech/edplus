@@ -885,7 +885,7 @@ class StudentController extends Controller
             // Fetch board details
             $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name', 'icon']);
 
-            $board_array = [];
+            $boards = [];
             foreach ($board_list as $board) {
                 $medium_list = Medium_model::whereIn('id', function ($query) use ($institute_id, $board) {
                     $query->select('medium_id')
@@ -1033,6 +1033,7 @@ class StudentController extends Controller
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
                 );
             }
+
             $subjects = [];
             $result = [];
             $announcement = [];
