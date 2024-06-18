@@ -1119,7 +1119,28 @@ class TeacherController extends Controller
             $institds = institute_detail::whereIN('id', $instrdids)->get();
             $workwith = [];
             foreach ($institds as $instdata) {
-                $workwith[] = ['id' => $instdata->id, 'institute_name' => $instdata->institute_name];
+                //start
+                $institute_id = $instdata->id;
+                $uniqueBoardIds = Institute_board_sub::where('institute_id', $institute_id)
+                ->distinct()
+                ->pluck('board_id')
+                ->toArray();
+                $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name']);
+
+                    $boards = [];
+                    foreach ($board_list as $board) {
+
+                        $boards[] = [
+                            'id' => $board->id,
+                            'board_name' => $board->name,
+                        ];
+                    }
+
+                $workwith[] = ['id' => $instdata->id, 
+                'institute_name' => $instdata->institute_name,
+                'logo'=>(!empty($instdata->logo))?url($instdata->logo):asset('no-image.png'),
+                'address'=>$instdata->address,
+                'board'=>$boards];
             }
 
           $educationds = Users_sub_qualification::where('user_id',$teacher_id)->get();
