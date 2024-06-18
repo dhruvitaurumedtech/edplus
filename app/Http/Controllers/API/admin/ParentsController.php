@@ -281,12 +281,13 @@ class ParentsController extends Controller
                     ->whereIn('exam.subject_id', $subjectIds)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                    ->limit(3)->get();
+                    //->limit(3) I remove this on Parin's request
+                    ->get();
                    
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
-                        'total_mark' => $examsDT->total_mark,
+                        'total_mark' => intval($examsDT->total_mark),
                         'exam_type' => $examsDT->exam_type,
                         'subject' => $examsDT->subject,
                         'standard' => $examsDT->standard,
@@ -302,13 +303,15 @@ class ParentsController extends Controller
             ->where('marks.student_id', $request->child_id)
             ->where('exam.institute_id', $getstdntdata->institute_id)
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
-            ->orderByDesc('marks.created_at')->limit(3)->get();
+            ->orderByDesc('marks.created_at')
+            //->limit(3) I remove this on Parin's request
+            ->get();
         $highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
             $result[] = array(
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
-                'total_marks' => $resultDDt->total_mark,
+                'total_marks' => intval($resultDDt->total_mark),
                 'achiveddmarks_marks' => $resultDDt->mark,
                 'date' => $resultDDt->exam_date,
                 'class_highest' => $highestMarks
@@ -388,13 +391,13 @@ class ParentsController extends Controller
                             'phone'=>$value_student->mobile,
                             'institutes'=>$insts];
             }
-            $response = ['id'=>$parent->id,
+            $response =     ['id'=>$parent->id,
                             'first_name'=>$parent->firstname,
-                           'last_name'=>$parent->lastname,
-                           'email'=>$parent->email,
-                           'phone'=>$parent->mobile,
-                           'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
-                           'address'=>$parent->address,
+                            'last_name'=>$parent->lastname,
+                            'email'=>$parent->email,
+                            'phone'=>$parent->mobile,
+                            'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
+                            'address'=>$parent->address,
                             'child'=>$data2];
                 //$response = ['parent'=>$data1,'student'=>$data2];
                 // echo "<pre>";print_r($parent);exit;
