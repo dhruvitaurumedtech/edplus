@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class General_timetable_model extends Model
 {
     use HasFactory,SoftDeletes;
-    protected $table = 'class_room';
+    protected $table = 'general_timetable';
     protected $fillable = [
          'class_room_id', 'batch_id', 'standard_id', 'subject_id', 'lecture_type', 'day', 'start_time', 'end_time',
     ];
