@@ -3385,8 +3385,8 @@ class InstituteApiController extends Controller
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $users = User::where('id', $student_id)->pluck('device_key');
 
-                        $notificationTitle = "Your Request Approved successfully!!";
-                        $notificationBody = "Your Student Request Approved successfully!!";
+                        $notificationTitle = "Your Request Send successfully!!";
+                        $notificationBody = "Your Student Request Send successfully!!";
 
                         $data = [
                             'registration_ids' => $users,
@@ -3709,21 +3709,31 @@ class InstituteApiController extends Controller
             $user_id = Auth::id();
             $exam_id = $request->exam_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-            // echo $examdt;exit;
+            $stream='';
+            if($examdt->stream_id == 'null'){
+                $stream = null;
+            }
+             else{
+                $stream= $examdt->stream;
+             }
+            //  echo $stream;exit;
             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->where('students_details.institute_id', $institute_id)
-                ->where('students_details.user_id', $user_id)
+                // ->where('students_details.user_id', $user_id)
                 ->where('students_details.board_id', $examdt->board_id)
                 ->where('students_details.medium_id', $examdt->medium_id)
                 ->where('students_details.batch_id', $examdt->batch_id)
                 //->where('students_details.class_id', $examdt->class_id)
                 ->where('students_details.standard_id', $examdt->standard_id)
                 //->where('students_details.stream_id', $examdt->stream_id)
-                ->when($examdt->stream_id, function ($query, $stream_id) {
-                    return $query->where('students_details.stream_id', $stream_id);
-                })
-                ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                // ->when(!empty($examdt->stream_id), function ($query) use ($examdt) {
+                //     return $query->where('students_details.stream_id', $examdt->stream_id);
+                // })
+                ->where('students_details.stream_id', $stream)
+                // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
+                ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
+               
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
             $studentsDET = [];
