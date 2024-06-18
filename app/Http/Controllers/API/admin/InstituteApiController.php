@@ -3371,7 +3371,7 @@ class InstituteApiController extends Controller
 
                             $amount += $value->amount;
                         }
-                        // echo $amount;exit;
+                        //echo $amount;exit;
                         Student_fees_model::create([
                             'user_id' => $user_id,
                             'institute_id' => $request->institute_id,
@@ -3381,7 +3381,9 @@ class InstituteApiController extends Controller
                         ]);
 
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
-                        if (!empty($parets)) {
+                        
+                        if (!$parets->isEmpty()) {
+                            
                             foreach ($parets as $prdtl) {
                                 $parnsad = Parents::where('id', $prdtl->id)->update([
                                     'institute_id' => $request->institute_id
@@ -3390,7 +3392,8 @@ class InstituteApiController extends Controller
                         } else {
                             $pare = Parents::where('student_id', $student_id)
                                 ->where('institute_id', $request->institute_id)->get();
-                            if (empty($pare)) {
+                            if ($pare->isEmpty()) {
+                                
                                 foreach ($parets as $prdtl) {
                                     $parnsad = Parents::create([
                                         'student_id' =>  $student_id,
