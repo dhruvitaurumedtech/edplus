@@ -91,7 +91,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address' => $value->address,
-                    'logo' => asset($value->logo),
+                    'logo' => (!empty($value->logo))?url($value->logo):asset('no-image.png'),
                 );
             }
 
@@ -102,10 +102,14 @@ class StudentController extends Controller
                 // Check if the title already exists in the $searchhistory_list array
                 $existingTitles = array_column($searchhistory_list, 'title');
                 if (!in_array($value->title, $existingTitles)) {
-
+                    $instdl = Institute_detail::where('id',$value->institute_id)
+                    ->select('institute_name','logo')
+                    ->first();
                     $searchhistory_list[] = [
                         'id' => $value->id,
                         'institute_id' => (int) $value->institute_id,
+                        'institute_name'=>$instdl ? $instdl->institute_name : '',
+                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('no-image.png'),
                         'user_id' => $value->user_id,
                         'title' => $value->title,
                     ];
@@ -885,7 +889,7 @@ class StudentController extends Controller
             // Fetch board details
             $board_list = Board::whereIn('id', $uniqueBoardIds)->get(['id', 'name', 'icon']);
 
-            $board_array = [];
+            $boards = [];
             foreach ($board_list as $board) {
                 $medium_list = Medium_model::whereIn('id', function ($query) use ($institute_id, $board) {
                     $query->select('medium_id')
@@ -1033,6 +1037,7 @@ class StudentController extends Controller
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
                 );
             }
+
             $subjects = [];
             $result = [];
             $announcement = [];
