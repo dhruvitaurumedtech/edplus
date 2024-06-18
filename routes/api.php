@@ -20,6 +20,7 @@ use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
 use App\Http\Controllers\API\admin\FeesController;
+use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -196,7 +197,16 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount'])->middleware('check.permission:20,1');
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
+    
+    
+
 });
+Route::post('/institute/create-general-timetable', [General_timetableController::class, 'create_general_timetable']);
+Route::post('/institute/display-general-timetable', [General_timetableController::class, 'display_general_timetable']);
+Route::post('/institute/edit-general-timetable', [General_timetableController::class, 'edit_general_timetable']);
+Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
+Route::post('/institute/filter-general-timetable', [General_timetableController::class, 'filter_general_timetable']);
+    
 
 
 
