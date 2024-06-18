@@ -49,7 +49,7 @@ use Illuminate\Support\Facades\Hash;
 class StudentController extends Controller
 {
     use ApiTrait;
-    
+
     public function homescreen_student(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -590,14 +590,13 @@ class StudentController extends Controller
     public function verifyEmail($updateid)
     {
         $parent = Parents::find($updateid);
-
         if ($parent) {
             if ($parent->verify == 0) {
                 $parent->verify = '1';
                 $parent->save();
 
                 $passcheck = User::where('id', $parent->parent_id)->first();
-                if (empty($passcheck->password)) {
+                if ($passcheck->password == null) {
                     $password = Str::random(12);
                     user::where('id', $parent->parent_id)->update(['password' => Hash::make($password)]);
                     $parDT = [
@@ -857,8 +856,21 @@ class StudentController extends Controller
             $boards = [];
 
             $institutedeta = Institute_detail::where('id', $request->institute_id)
-                ->select('id', 'institute_name', 'address', 'about_us','contact_no','email',
-                'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link','logo','cover_photo')
+                ->select(
+                    'id',
+                    'institute_name',
+                    'address',
+                    'about_us',
+                    'contact_no',
+                    'email',
+                    'website_link',
+                    'instagram_link',
+                    'facebook_link',
+                    'whatsaap_link',
+                    'youtube_link',
+                    'logo',
+                    'cover_photo'
+                )
                 ->first();
 
             // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
@@ -1095,12 +1107,12 @@ class StudentController extends Controller
                     //     return $query->where('exam.stream_id', $stream_id);
                     // })
                     ->whereIn('exam.subject_id', $subjectIds)
-                    ->where('exam.exam_date','>',$tdasy)
+                    ->where('exam.exam_date', '>', $tdasy)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     ->limit(3)
                     ->get();
-                    
+
                 foreach ($exams as $examsDT) {
                     $examlist[] = array(
                         'exam_title' => $examsDT->exam_title,
@@ -1845,34 +1857,31 @@ class StudentController extends Controller
                     //             'batch_id' => $batch->id,
                     //             'batch_name' => $batch->batch_name,
                     //             'assign_status'=>($batch->assign_status==1)?true:false,  
-                                
+
                     //         ];
                     //     })->toArray();
                     // }
                     if (Auth::user()->role_type == 6) {
-                       
-                        $batch_list =[];
-                        
-      
+
+                        $batch_list = [];
                     }
-                    if(Auth::user()->role_type == 3)
-                    {
-                       
-                        $reponse_video=VideoAssignToBatch::join('batches','batches.id','=','video_assignbatch.batch_id')
-                                        ->where('video_assignbatch.video_id', $topval->id)
-                                        ->where('video_assignbatch.standard_id', $topval->standard_id)
-                                        ->where('video_assignbatch.chapter_id', $topval->chapter_id)
-                                        ->where('video_assignbatch.subject_id', $topval->subject_id)
-                                        ->Select('batches.*','video_assignbatch.assign_status')
-                                        ->get();
-                        $batch_list =[];
-                        foreach($reponse_video as $value){
-                           $batch_list[] = [
-                              'batch_id'=>$value->id,
-                              'batch_name'=>$value->batch_name,
-                              'status'=>($value->assign_status==1)?true:false,  
-                           ];   
-                         }
+                    if (Auth::user()->role_type == 3) {
+
+                        $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
+                            ->where('video_assignbatch.video_id', $topval->id)
+                            ->where('video_assignbatch.standard_id', $topval->standard_id)
+                            ->where('video_assignbatch.chapter_id', $topval->chapter_id)
+                            ->where('video_assignbatch.subject_id', $topval->subject_id)
+                            ->Select('batches.*', 'video_assignbatch.assign_status')
+                            ->get();
+                        $batch_list = [];
+                        foreach ($reponse_video as $value) {
+                            $batch_list[] = [
+                                'batch_id' => $value->id,
+                                'batch_name' => $value->batch_name,
+                                'status' => ($value->assign_status == 1) ? true : false,
+                            ];
+                        }
                         // echo "<pre>";print_r($reponse_video);exit;   
                     }
                     $topicsArray[] = [
@@ -2263,7 +2272,7 @@ class StudentController extends Controller
                 $imagePath = $iconFile->store('profile', 'public');
                 $user->image = $imagePath;
             }
-            
+
             $user->save();
             if (!empty($request->parents)) {
                 $parents = json_decode($request->parents, true);
@@ -2457,7 +2466,7 @@ class StudentController extends Controller
                 ->get();
 
             $examlist = [];
-            
+
             $tdate = Carbon::now()->format('Y-m-d');
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
