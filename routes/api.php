@@ -171,6 +171,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
 
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
+    Route::post('/teacher/remove-institute-teacher', [TeacherController::class, 'remove_institute_teacher']);
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role'])->middleware('check.permission:27,1');
     // ->middleware('check.permission:1,1');
@@ -197,9 +198,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount'])->middleware('check.permission:20,1');
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
-    
-    
 
+    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
 });
 Route::post('/institute/create-general-timetable', [General_timetableController::class, 'create_general_timetable']);
 Route::post('/institute/display-general-timetable', [General_timetableController::class, 'display_general_timetable']);

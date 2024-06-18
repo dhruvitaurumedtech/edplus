@@ -1196,4 +1196,33 @@ class TeacherController extends Controller
             return $this->response([], "Somthing went wrong!!", false, 400);
         }
     }
+
+    public function remove_institute_teacher(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $institute_id = $request->institute_id;
+            $teacher_id = Auth::id();
+            $gette = Teacher_model::where('teacher_id', $teacher_id)
+                ->where('institute_id', $institute_id)
+                ->first();
+            if (!empty($gette)) {
+                $remove = Teacher_model::where('teacher_id', $teacher_id)
+                    ->where('institute_id', $institute_id)
+                    ->delete();
+                return $this->response([], "Institute Removed");
+            } else {
+                return $this->response([], "Data not found", false, 400);
+            }
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }
