@@ -3244,8 +3244,17 @@ class InstituteApiController extends Controller
                             'mobile' => $request->mobile_no,
                         ]);
 
-                        $response = Student_detail::where('institute_id', $institute_id)
-                            ->where('student_id', $student_id)->first();
+                        $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
+                        ->join('standard','standard.id','students_details.standard_id')
+                        ->where('students_details.institute_id', $institute_id)
+                        ->where('students_details.student_id', $student_id)
+                        ->select('students_details.*','users.firstname', 'users.lastname','standard.name as standardn')
+                        ->first();
+                        $subcts = Subject_model::whereIN('id',explode(",",$response->subject_id))->get();
+                        $sujids=[];
+                        foreach($subcts as $subnames){
+                            $sujids[] = ['subname'=>$subnames->name,'image'=>(!empty($subnames->image))?url($subnames->image):asset('no-image.png'),];
+                        }
 
                         $reject_list = Student_detail::find($response->id);
                         $data = $reject_list->update(['status' => '1']);
@@ -3254,15 +3263,31 @@ class InstituteApiController extends Controller
                         $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
                             ->join('institute_detail', 'institute_detail.id', 'parents.institute_id')
                             ->where('parents.student_id', $student_id)
-                            ->select('users.firstname', 'users.lastname', 'users.email', 'parents.id', 'institute_detail.institute_name')
+                            ->where('parents.institute_id',$institute_id)
+                            ->select('users.firstname', 'users.lastname', 'users.email',
+                             'parents.id', 
+                             'institute_detail.institute_name','institute_detail.address',
+                             'institute_detail.email as Iemail','institute_detail.contact_no',
+                             'institute_detail.website_link','institute_detail.start_academic_year','institute_detail.end_academic_year')
                             ->get();
                         foreach ($prnts as $prdetail) {
+                            $startAcademicYear = $prdetail->start_academic_year;
+                            $endAcademicYear = $prdetail->end_academic_year;
                             $parDT = [
                                 'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
-                                'email' => $prdetail,
+                                'sname' => $response['firstname'] . ' ' . $response['lastname'],
+                                'email' => $prdetail->email,
+                                'standard' => $response->standardn,
                                 'id' => $prdetail->id,
                                 'institute' => $prdetail->institute_name,
+                                'address' => $prdetail->address,
+                                'Iemail' => $prdetail->Iemail,
+                                'contact_no' => $prdetail->contact_no,
+                                'website_link'=>$prdetail->website_link,
+                                'year'=>$startAcademicYear.' '.$endAcademicYear,
+                                'subjects'=>$sujids
                             ];
+                            //print_r($parDT);exit;
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 
@@ -3462,6 +3487,7 @@ class InstituteApiController extends Controller
             // DB::commit();
         } catch (\Exception $e) {
             // DB::rollback();
+            return $e;
             return $this->response($e, "Something went wrong.", false, 400);
         }
     }

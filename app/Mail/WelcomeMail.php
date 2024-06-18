@@ -19,7 +19,8 @@ class WelcomeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Welcome to our website!')
+        
+        return $this->subject("Verification of Enrollment")
         ->view('emails.parentsverify')
         ->with($this->data);
     }
