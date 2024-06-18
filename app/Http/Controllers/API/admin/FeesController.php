@@ -772,6 +772,9 @@ class FeesController extends Controller
             if ($fees->total_fees==0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
             }
+            if ($fees->total_fees < $request->discount_amount) {
+                return $this->response([], "Discount amount is to large!", false, 404);
+            }
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
              if($discount == 1){
                 // echo $fees;exit;
