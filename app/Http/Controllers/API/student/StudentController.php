@@ -2079,8 +2079,9 @@ class StudentController extends Controller
                 })
                 ->when($institute_id, function ($query, $institute_id) {
                     return $query->where('id', $institute_id);
-                })
-                ->get();
+                })->get();
+                
+                
             foreach ($joininstitute as $value) {
                 $substdnt = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $value->id)->first();
