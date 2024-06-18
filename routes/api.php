@@ -205,7 +205,8 @@ Route::post('/institute/create-general-timetable', [General_timetableController:
 Route::post('/institute/display-general-timetable', [General_timetableController::class, 'display_general_timetable']);
 Route::post('/institute/edit-general-timetable', [General_timetableController::class, 'edit_general_timetable']);
 Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
-Route::post('/institute/filter-general-timetable', [General_timetableController::class, 'filter_general_timetable']);
+Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
+Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
     
 
 
