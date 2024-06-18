@@ -7,6 +7,7 @@ use App\Models\announcements_model;
 use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Class_model;
+use App\Models\Class_room_model;
 use App\Models\Class_sub;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Dobusinesswith_sub;
@@ -2267,28 +2268,28 @@ class InstituteApiController extends Controller
                 //     // Include banner_array inside board_array
                 // ];
                 $medium_sublist = DB::table('medium_sub')
-                                ->where('user_id', $user_id)
-                                ->where('board_id', $board->id)
-                                ->where('institute_id', $institute_id)
-                                ->pluck('medium_id')->toArray();
-                            $uniquemediumds = array_unique($medium_sublist);
-                            
-                            $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
-            
-                            $medium_array = [];
-                            foreach ($medium_list as $medium_value) {
-                                $medium_array[] = [
-                                    'id' => $medium_value->id,
-                                    'medium_name' => $medium_value->name,
-                                    'medium_icon' => asset($medium_value->icon)
-                                ];
-                            }
-                            $board_array[] = [
-                                'id' => $board->id,
-                                'board_name' => $board->name,
-                                'board_icon' => asset($board->icon),
-                                'medium' => $medium_array,
-                            ];
+                    ->where('user_id', $user_id)
+                    ->where('board_id', $board->id)
+                    ->where('institute_id', $institute_id)
+                    ->pluck('medium_id')->toArray();
+                $uniquemediumds = array_unique($medium_sublist);
+
+                $medium_list = Medium_model::whereIN('id', $uniquemediumds)->get();
+
+                $medium_array = [];
+                foreach ($medium_list as $medium_value) {
+                    $medium_array[] = [
+                        'id' => $medium_value->id,
+                        'medium_name' => $medium_value->name,
+                        'medium_icon' => asset($medium_value->icon)
+                    ];
+                }
+                $board_array[] = [
+                    'id' => $board->id,
+                    'board_name' => $board->name,
+                    'board_icon' => asset($board->icon),
+                    'medium' => $medium_array,
+                ];
             }
 
             // Fetch banners
@@ -3381,9 +3382,9 @@ class InstituteApiController extends Controller
                         ]);
 
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
-                        
+
                         if (!$parets->isEmpty()) {
-                            
+
                             foreach ($parets as $prdtl) {
                                 $parnsad = Parents::where('id', $prdtl->id)->update([
                                     'institute_id' => $request->institute_id
@@ -3735,13 +3736,12 @@ class InstituteApiController extends Controller
             $user_id = Auth::id();
             $exam_id = $request->exam_id;
             $examdt = Exam_Model::where('id', $exam_id)->first();
-            $stream='';
-            if($examdt->stream_id == 'null'){
+            $stream = '';
+            if ($examdt->stream_id == 'null') {
                 $stream = null;
+            } else {
+                $stream = $examdt->stream;
             }
-             else{
-                $stream= $examdt->stream;
-             }
             //  echo $stream;exit;
             $studentDT = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
@@ -3759,7 +3759,7 @@ class InstituteApiController extends Controller
                 ->where('students_details.stream_id', $stream)
                 // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                 ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
-               
+
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
             $studentsDET = [];
@@ -4081,10 +4081,10 @@ class InstituteApiController extends Controller
                         ->where('medium_id', $request->medium_id)
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('student_id');
-                        // print_r($studentId);exit;
-                        
-                        // ->where('subject_id', $request->subject_id)->pluck('student_id');
-                        // echo $request->subject_id;exit;
+                    // print_r($studentId);exit;
+
+                    // ->where('subject_id', $request->subject_id)->pluck('student_id');
+                    // echo $request->subject_id;exit;
                     $combinedIds = array_merge($combinedIds, $studentId->toArray());
                 }
                 $serverKey = env('SERVER_KEY');
@@ -4514,23 +4514,21 @@ class InstituteApiController extends Controller
         try {
             $rolesDT = [];
             $suad = [1, 2, 3];
-            $teacher = Teacher_model::where('teacher_id',$request->user_id)->first();
-            if(!empty($teacher)){
-                 $suad2 = ['student', 'parent'];
-                 $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-                 
-                   
-            }else{
+            $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
+            if (!empty($teacher)) {
+                $suad2 = ['student', 'parent'];
+                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
+            } else {
 
                 $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
             }
-          foreach ($roleqry as $roldel) {
-            $rolesDT[] = array(
-                'id' => $roldel->id,
-                'role_name' => $roldel->role_name
-            );
-        }
-   
+            foreach ($roleqry as $roldel) {
+                $rolesDT[] = array(
+                    'id' => $roldel->id,
+                    'role_name' => $roldel->role_name
+                );
+            }
+
 
             return $this->response($rolesDT, "Data Fetch Successfully");
         } catch (Exception $e) {
@@ -5012,7 +5010,7 @@ class InstituteApiController extends Controller
                     'facebook_link' => $value['facebook_link'] . '',
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
-                    'logo' => (!empty($value['logo']))?url($value['logo']):asset('no-image.png'),
+                    'logo' => (!empty($value['logo'])) ? url($value['logo']) : asset('no-image.png'),
                     'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_photo/cover_image.png')),
                     'country' => $value['country'] . '',
                     'state' => $value['state'] . '',
@@ -5900,7 +5898,7 @@ class InstituteApiController extends Controller
                     }
 
                     $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
-                    ->where('institute_id', $request->institute_id);
+                        ->where('institute_id', $request->institute_id);
                     $teacher_detail->update([
                         'institute_id' => $request->institute_id,
                         'teacher_id' => $request->teacher_id,
@@ -6026,6 +6024,33 @@ class InstituteApiController extends Controller
 
             return $this->response($response, "Data Fetch Successfully");
         } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
+
+    public function Add_classRoom(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'name' => 'required',
+            'capacity' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            if (empty($request->edit_id)) {
+                $class = new Class_room_model();
+            } else {
+                $class = Class_room_model::where('id', $request->edit_id)->first();
+            }
+            $class->institute_id = $request->institute_id;
+            $class->name = $request->name;
+            $class->capacity = $request->capacity;
+            $class->save();
+            return $this->response([], "Data Saved.");
+        } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }

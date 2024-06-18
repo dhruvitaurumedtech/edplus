@@ -197,6 +197,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount'])->middleware('check.permission:20,1');
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
+
+    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
 });
 
 
