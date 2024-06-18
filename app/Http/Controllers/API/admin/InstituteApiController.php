@@ -3393,8 +3393,8 @@ class InstituteApiController extends Controller
                             $pare = Parents::where('student_id', $student_id)
                                 ->where('institute_id', $request->institute_id)->get();
                             if ($pare->isEmpty()) {
-                                
-                                foreach ($parets as $prdtl) {
+                                $paretsd = Parents::where('student_id', $student_id)->get();
+                                foreach ($paretsd as $prdtl) {
                                     $parnsad = Parents::create([
                                         'student_id' =>  $student_id,
                                         'parent_id' => $prdtl->parent_id,
