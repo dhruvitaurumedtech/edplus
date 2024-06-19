@@ -219,6 +219,8 @@ class ExamController extends Controller
                 ->leftJoin('batches', 'batches.id', '=', 'exam.batch_id')
                 ->where('exam.institute_id', $request->institute_id)
                 ->where('exam.standard_id', $request->standard_id)
+                ->where('exam.board_id', $request->board_id)
+                ->where('exam.medium_id', $request->medium_id)
                 ->where('exam.user_id', Auth::id())
                 ->whereNull('exam.deleted_at')
                 ->orderByDesc('exam.created_at')
