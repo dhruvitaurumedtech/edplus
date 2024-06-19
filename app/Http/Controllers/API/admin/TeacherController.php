@@ -975,6 +975,11 @@ class TeacherController extends Controller
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
         $user->area = $request['area'];
+        if ($request->file('image')) {
+            $iconFile = $request->file('image');
+            $imagePath = $iconFile->store('profile', 'public');
+            $user->image = $imagePath;
+        }
         
         $user->save();
         try {
@@ -1182,6 +1187,7 @@ class TeacherController extends Controller
             'state' => $userdetl ? $userdetl->state . '' : '',
             'city' => $userdetl ? $userdetl->city . '' : '',
             'pincode' => $userdetl ? $userdetl->pincode . '' : '',
+            'area'=>$userdetl ? $userdetl->area . '' : '',
             'about_us' => $userdetl->about_us,
             'standard' => $stds,
             'institutes' => $workwith, // work with
