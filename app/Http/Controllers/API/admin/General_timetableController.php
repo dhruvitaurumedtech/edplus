@@ -110,7 +110,7 @@ class General_timetableController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         $institute_id = $request->institute_id;
-        $day = $request->day;
+        $day = explode(',',$request->day);
 
         try {
             $class_room_id = Class_room_model::where('institute_id', $institute_id)->pluck('id');
@@ -130,7 +130,7 @@ class General_timetableController extends Controller
                         'general_timetable.*'
                     )
                     ->where('general_timetable.class_room_id', $class_room_id)
-                    ->where('general_timetable.day', $day)
+                    ->whereIn('general_timetable.day', $day)
                     ->get()->toarray();
                 $data = [];
                 foreach ($General_timetable_model as $value) {
