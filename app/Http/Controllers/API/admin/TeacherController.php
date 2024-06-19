@@ -1060,7 +1060,7 @@ class TeacherController extends Controller
                 $name = explode(',', $request['name']);
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
-                $country_code = explode(',', $request['emergency_country_code']);
+                $emergency_country_code = explode(',', $request['emergency_country_code']);
 
                 for ($i = 0; $i < count($qualification); $i++) {
                     Users_sub_emergency::create([
@@ -1068,19 +1068,22 @@ class TeacherController extends Controller
                         'name' => $name[$i],
                         'relation_with' => $relation_with[$i],
                         'mobile_no' => $mobile_no[$i],
-                        'country_code'=>$country_code[$i],
+                        'country_code'=>$emergency_country_code[$i],
                     ]);
                 }
             } else {
                 $name = explode(',', $request['name']);
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
+                $emergency_country_code = explode(',', $request['emergency_country_code']);
+
                 for ($i = 0; $i < count($qualification); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
                         'name' => $name[$i],
                         'relation_with' => $relation_with[$i],
-                        'mobile_no' => $mobile_no[$i]
+                        'mobile_no' => $mobile_no[$i],
+                        'country_code'=>$emergency_country_code[$i],
                     ]);
                 }
             }
