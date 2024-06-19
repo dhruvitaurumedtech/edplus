@@ -1116,7 +1116,7 @@ class StudentController extends Controller
                     ->where('exam.exam_date', '>', $tdasy)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                    ->limit(3)
+                    //->limit(3)
                     ->get();
 
                 foreach ($exams as $examsDT) {
@@ -2465,7 +2465,6 @@ class StudentController extends Controller
             } else {
                 $student_id = Auth::id();
             }
-
             $stdetails = Student_detail::where('student_id', $student_id)
                 ->when($institute_id, function ($query, $institute_id) {
                     return $query->where('institute_id', $institute_id);
@@ -2482,7 +2481,7 @@ class StudentController extends Controller
                     $batch_id = $stdetail->batch_id;
                     $subjectIds = explode(',', $stdetail->subject_id);
 
-                    $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
+                    $examsDELS = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                         ->join('standard', 'standard.id', '=', 'exam.standard_id')
                         ->join('institute_detail', 'institute_detail.id', '=', 'exam.institute_id')
                         ->whereDate('institute_detail.end_academic_year', '>=', $tdate)
@@ -2502,8 +2501,13 @@ class StudentController extends Controller
                         ->select('exam.*', 'subject.name as subject', 'standard.name as standard', 'institute_detail.institute_name', 'institute_detail.end_academic_year')
                         ->orderByDesc('exam.created_at')
                         ->get();
-
-                    foreach ($exams as $examsDT) {
+                        // print_r($examsDELS[0]);exit;
+                        // print_r($examsDELS);
+                     
+                        
+                    foreach ($examsDELS as $examsDT) {
+                        // print_r($examsDELS);exit;
+                    
                         $examlist[] = array(
                             'institute_id' => $examsDT->institute_id,
                             'institute_name' => $examsDT->institute_name,
