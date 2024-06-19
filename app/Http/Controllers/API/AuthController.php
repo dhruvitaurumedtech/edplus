@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Institute_detail;
 use App\Models\Roles;
+use App\Models\Staff_detail_Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
@@ -220,11 +221,15 @@ class AuthController extends Controller
             $user->save();
             $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
                 ->where('users.email', $request->email)
-                ->select('institute_detail.id','institute_detail.institute_name')
+                ->select('institute_detail.id', 'institute_detail.institute_name')
                 ->first();
             if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
                 $institute_name = $userdata->institute_name;
+            } elseif ($user->role_type != 3 || $user->role_type != 4 || $user->role_type != 5 || $user->role_type != 6) {
+                $ins = Staff_detail_Model::where('user_id', $user->id)->first();
+                $institute_id = $ins->institute_id;
+                $institute_name = null;
             } else {
                 $institute_id = null;
                 $institute_name = null;
@@ -240,7 +245,7 @@ class AuthController extends Controller
                 'user_image' => $user->image,
                 'role_type' => (int)$user->role_type,
                 'institute_id' => $institute_id,
-                'institute_name'=>$institute_name,
+                'institute_name' => $institute_name,
                 'token' => $token,
             ];
 
