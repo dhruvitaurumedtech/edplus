@@ -2268,7 +2268,7 @@ class InstituteApiController extends Controller
                 //     // Include banner_array inside board_array
                 // ];
                 $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $user_id)
+                    // ->where('user_id', $user_id)
                     ->where('board_id', $board->id)
                     ->where('institute_id', $institute_id)
                     ->pluck('medium_id')->toArray();
