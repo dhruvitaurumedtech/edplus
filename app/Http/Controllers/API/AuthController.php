@@ -223,19 +223,20 @@ class AuthController extends Controller
                 ->where('users.email', $request->email)
                 ->select('institute_detail.id', 'institute_detail.institute_name')
                 ->first();
-                // echo "<pre>";print_r($userdata);exit;
             if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
                 $institute_name = $userdata->institute_name;
             } elseif ($user->role_type != 3 || $user->role_type != 4 || $user->role_type != 5 || $user->role_type != 6) {
-                $ins = Staff_detail_Model::where('user_id', $user->id)->first();
-                $institute_id = $ins->institute_id;
-                $institute_name = null;
-            } else {
+                // $ins = Staff_detail_Model::where('user_id', $user->id)->first();
+                // $institute_id = $ins->institute_id;
+                // $institute_name = null;
                 $ins = Staff_detail_Model::where('user_id', $user->id)->first();
                 $institute_id = $ins->institute_id;
                 $institutename = Institute_detail::where('id', $institute_id)->first();
                 $institute_name = $institutename->institute_name;
+            } else {
+                $institute_id = null;
+                $institute_name = null;
             }
 
 
