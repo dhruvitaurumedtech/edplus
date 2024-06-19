@@ -3273,7 +3273,13 @@ class InstituteApiController extends Controller
                             ->get();
                         foreach ($prnts as $prdetail) {
                             $startAcademicYear = $prdetail->start_academic_year;
+                            $startDate = Carbon::parse($startAcademicYear);
+                            $syear = $startDate->year;
+
                             $endAcademicYear = $prdetail->end_academic_year;
+                            $endtDate = Carbon::parse($endAcademicYear);
+                            $eyear = $endtDate->year;
+
                             $parDT = [
                                 'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
                                 'sname' => $response['firstname'] . ' ' . $response['lastname'],
@@ -3285,10 +3291,10 @@ class InstituteApiController extends Controller
                                 'Iemail' => $prdetail->Iemail,
                                 'contact_no' => $prdetail->contact_no,
                                 'website_link'=>$prdetail->website_link,
-                                'year'=>$startAcademicYear.' '.$endAcademicYear,
+                                'year'=>$syear.'-'.$eyear,
                                 'subjects'=>$sujids
                             ];
-                            //print_r($parDT);exit;
+                            
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 

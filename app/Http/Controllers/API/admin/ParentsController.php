@@ -398,6 +398,10 @@ class ParentsController extends Controller
                             'phone'=>$parent->mobile,
                             'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
                             'address'=>$parent->address,
+                            'country_code'=>$parent->country_code,
+                            'state'=>$parent->state,
+                            'city'=>$parent->city,
+                            'pincode'=>$parent->pincode,
                             'child'=>$data2];
                 //$response = ['parent'=>$data1,'student'=>$data2];
                 // echo "<pre>";print_r($parent);exit;
