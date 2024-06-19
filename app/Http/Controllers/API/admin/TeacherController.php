@@ -950,7 +950,7 @@ class TeacherController extends Controller
             'dob' => 'required',
             'address' => 'required|string|max:255',
             'pincode' => 'required|string|max:10',
-            'area' => 'required|string|max:255',
+            //'area' => 'required|string|max:255',
             'about_us' => 'nullable|string',
             'qualification' => 'required|string|max:255',
             'institute_name' => 'required|string|max:255',
@@ -975,7 +975,7 @@ class TeacherController extends Controller
         $user->dob = date('Y-m-d', strtotime($request['dob']));
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
-        $user->area = $request['area'];
+        //$user->area = $request['area'];
         if ($request->file('image')) {
             $iconFile = $request->file('image');
             $imagePath = $iconFile->store('profile', 'public');
@@ -1195,7 +1195,7 @@ class TeacherController extends Controller
             'state' => $userdetl ? $userdetl->state . '' : '',
             'city' => $userdetl ? $userdetl->city . '' : '',
             'pincode' => $userdetl ? $userdetl->pincode . '' : '',
-            'area'=>$userdetl ? $userdetl->area . '' : '',
+            //'area'=>$userdetl ? $userdetl->area . '' : '',
             'about_us' => $userdetl->about_us,
             'standard' => $stds,
             'institutes' => $workwith, // work with
