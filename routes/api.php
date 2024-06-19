@@ -174,7 +174,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/remove-institute-teacher', [TeacherController::class, 'remove_institute_teacher']);
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role'])->middleware('check.permission:27,1');
-    Route::post('/institute/edit-role', [StaffController::class, 'edit_role'])->middleware('check.permission:27,1');
+    Route::post('/institute/edit-role', [StaffController::class, 'edit_role'])->middleware('check.permission:27,2');
+    Route::post('/institute/delete-role', [StaffController::class, 'delete_role'])->middleware('check.permission:27,3');
     // ->middleware('check.permission:1,1');
     Route::post('/institute/institute-view-roles', [StaffController::class, 'view_roles'])->middleware('check.permission:27,4');
     Route::get('/institute/institute-get-permission', [StaffController::class, 'Get_Permission']);
@@ -207,8 +208,6 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
     Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
     Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
-    
-
 });
 
 

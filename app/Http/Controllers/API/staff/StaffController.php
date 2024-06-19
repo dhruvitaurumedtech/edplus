@@ -74,15 +74,42 @@ class StaffController extends Controller
         }
     }
 
+    public function delete_role(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'role_id' => 'required|exists:roles,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $role = Roles::where('id', $request->role_id)->delete();
+            return $this->response([], "Role Deleted");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
 
     public function view_roles(Request $request)
     {
         try {
-            $userHasRole = UserHasRole::where('role_id', '!=', 3)->where('user_id', Auth::id())->pluck('role_id');
+            $userHasRole = UserHasRole::where('role_id', '!=', 3)
+                ->where('user_id', Auth::id())
+                ->pluck('role_id');
             $roles = Roles::whereIn('id', $userHasRole)->get();
             $data = [];
+
             foreach ($roles as $value) {
-                $data[] = ['role_id' => $value->id, 'role_name' => $value->role_name];
+                $isEditable = !in_array($value->id, [4, 5, 6]);
+                $data[] = [
+                    'role_id' => $value->id,
+                    'role_name' => $value->role_name,
+                    'is_edit' => $isEditable,
+                    'is_delete' => $isEditable
+                ];
             }
             return $this->response($data, "Successfully Display Roles.");
         } catch (Exception $e) {
