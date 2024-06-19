@@ -1083,7 +1083,8 @@ class StudentController extends Controller
                 );
             }
             $subdta = Student_detail::where('student_id', $user_id)
-                ->where('institute_id', $institute_id)->whereNull('deleted_at')->select('students_details.*')->first();
+                ->where('institute_id', $institute_id)
+                ->whereNull('deleted_at')->select('students_details.*')->first();
             if (!empty($subdta)) {
                 $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
                 foreach ($subjecqy as $subjcdt) {
@@ -1141,18 +1142,19 @@ class StudentController extends Controller
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('created_at', '<=', $nextDayStr)
+                ->where('created_at', '<', $nextDayStr)
                 ->where('attendance', 'P')->count();
 
             $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('created_at', '<=', $nextDayStr)
+                ->where('created_at', '<', $nextDayStr)
                 ->where('attendance', 'A')->count();
 
+               
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
-                ->where('lecture_date', '<=', $nextDayStr)
+                ->where('lecture_date', '<', $nextDayStr)
                 ->count();
             $totalattendlec = [
                 'total_lectures' => $totllect,
