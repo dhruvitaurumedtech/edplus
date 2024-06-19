@@ -2234,8 +2234,8 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id ?: Institute_detail::where('user_id', $user_id)->value('id');
 
             // Fetch unique board ids
-            $uniqueBoardIds = Institute_board_sub::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
+            // where('user_id', $user_id)
+            $uniqueBoardIds = Institute_board_sub::where('institute_id', $institute_id)
                 ->distinct()
                 ->pluck('board_id')
                 ->toArray();
@@ -2268,7 +2268,7 @@ class InstituteApiController extends Controller
                 //     // Include banner_array inside board_array
                 // ];
                 $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', $user_id)
+                    // ->where('user_id', $user_id)
                     ->where('board_id', $board->id)
                     ->where('institute_id', $institute_id)
                     ->pluck('medium_id')->toArray();
