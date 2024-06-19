@@ -1112,6 +1112,7 @@ class TeacherController extends Controller
             }
             
             $userdetl = user::where('id', $teacher_id)->first();
+            $user_sub=Users_sub_model::where('user_id', $teacher_id)->first();
 
             if ($userdetl->image) {
                 $img = $userdetl->image;
@@ -1157,7 +1158,7 @@ class TeacherController extends Controller
                 'address'=>$instdata->address,
                 'board'=>$boards];
             }
-
+            
           $educationds = Users_sub_qualification::where('user_id',$teacher_id)->get();
           $education = [];
           foreach($educationds as $edudata){
@@ -1199,7 +1200,7 @@ class TeacherController extends Controller
             'city' => $userdetl ? $userdetl->city . '' : '',
             'pincode' => $userdetl ? $userdetl->pincode . '' : '',
             //'area'=>$userdetl ? $userdetl->area . '' : '',
-            'about_us' => $userdetl->about_us,
+            'about_us' => $user_sub ? $user_sub->about_us .'' : '',
             'standard' => $stds,
             'institutes' => $workwith, // work with
             'education' => $education,
