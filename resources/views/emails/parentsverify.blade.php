@@ -23,7 +23,6 @@
             <p>Student Name: {{$sname}}</p>
             <p>Standard: {{$standard}}</p>
             <p>Subject Applied For: </p>
-
             @foreach($subjects as $sub)
                 <p>{{$sub['subname']}}</p> 
             @endforeach
