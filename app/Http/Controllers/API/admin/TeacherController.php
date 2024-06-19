@@ -1054,6 +1054,7 @@ class TeacherController extends Controller
                 }
             }
             $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
+            // echo "<pre>";print_r($userSub2);exit;
             if (!empty($userSub2)) {
                 $delete_qualification = Users_sub_emergency::where('user_id', $request->teacher_id);
                 $delete_qualification->delete();
@@ -1061,7 +1062,8 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
-
+                //print_r(count($qualification));exit;
+                // print_r($emergency_country_code);exit;
                 for ($i = 0; $i < count($qualification); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
@@ -1076,7 +1078,7 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
-
+                // print_r($emergency_country_code);exit;
                 for ($i = 0; $i < count($qualification); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
@@ -1089,6 +1091,7 @@ class TeacherController extends Controller
             }
             return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
+            return $e;exit;
             return $this->response([], "Invalid token.", false, 400);
         }
     }
