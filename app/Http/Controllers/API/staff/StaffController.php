@@ -53,6 +53,27 @@ class StaffController extends Controller
         }
     }
 
+    public function edit_role(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'edit_id' => 'required|exists:roles,id',
+            'role_name' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $role = Roles::find($request->edit_id);
+            $role->role_name = $request->role_name;
+            $role->save();
+            return $this->response([], "Role Updated");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
 
     public function view_roles(Request $request)
     {
