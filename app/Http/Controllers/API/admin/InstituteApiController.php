@@ -2310,7 +2310,7 @@ class InstituteApiController extends Controller
                     ->where('institute_id', $institute_id);
             })
                 ->get(['id', 'banner_image', 'url']);
-
+            // print_r($banner_list);exit;
             if ($banner_list->isEmpty()) {
                 // If no results found, use the second condition
                 $banner_list = Banner_model::where(function ($query) {

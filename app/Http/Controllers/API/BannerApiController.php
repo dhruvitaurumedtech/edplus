@@ -106,7 +106,7 @@ class BannerApiController extends Controller
                 $imagePath = $banner_image->store('banner_image', 'public');
                 $bannerad->banner_image = $imagePath;
             }
-            $bannerad->url = $request->url;
+            $bannerad->url = (!empty($request->url))?$request->url:'';
             $bannerad->status = 'inactive';
             $bannerad->save();
             return $this->response([], "Banner create Successfully");
@@ -313,7 +313,7 @@ class BannerApiController extends Controller
                 $imagePath = $banner_image->store('banner_image', 'public');
                 $bannerad->banner_image = $imagePath;
             }
-            $bannerad->url = $request->url;
+            $bannerad->url = (!empty($request->url))?$request->url:'';
             $bannerad->status = 'active';
             $bannerad->save();
             return $this->response([], "Banner Updated Successfully");
