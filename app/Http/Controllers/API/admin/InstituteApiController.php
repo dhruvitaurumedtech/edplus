@@ -5537,8 +5537,9 @@ class InstituteApiController extends Controller
             //     ['medium_id', $request->medium_id],
             //     ['standard_id', $request->standard_id]
             // ])->get(['id', 'batch_name'])->toArray();
-            $batchlistQuery = Batches_model::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
+            $batchlistQuery = Batches_model::
+                // where('user_id', Auth::id())->
+                where('institute_id', $request->institute_id)
                 ->where('board_id', $request->board_id)
                 ->where('standard_id', $request->standard_id);
 
