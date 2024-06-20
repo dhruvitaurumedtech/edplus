@@ -901,7 +901,8 @@ class TeacherController extends Controller
                         );
 
                     }
-                    $batches=Batches_model::where('board_id',$values->board_id)
+                    $batches=Batches_model::where('institute_id',$request->institute_id)
+                                   ->where('board_id',$values->board_id)
                                   ->where('medium_id',$values->medium_id)
                                   ->where('standard_id',$values->standard_id)
                                   ->WhereRaw("FIND_IN_SET(?, subjects)", [$values->subject_id])
