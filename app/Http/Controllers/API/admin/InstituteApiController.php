@@ -3380,17 +3380,6 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
-                        $usrfin = User::find($student_id);
-                        if ($usrfin) {
-                            // $usrfin->firstname = $request->first_name;
-                            // $usrfin->lastname = $request->lastname;
-                            $usrfin->dob = (!empty($request->date_of_birth)) ? date('d-m-Y', strtotime($request->date_of_birth)) : '';
-                            $usrfin->address = $request->address;
-                            // $usrfin->email = $request->email;
-                            // $usrfin->country_code = $request->country_code;
-                            // $usrfin->mobile = $request->mobile;
-                            $usrfin->save();
-                        }
                     }
                     if (!empty($student_id)) {
                         $studentdetail = [
@@ -4435,9 +4424,12 @@ class InstituteApiController extends Controller
         try {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
+            $board_id = $request->board_id;
+            $standard_id = $request->standard_id;
             $batch_id = $request->batch_id;
             $subject_id = $request->subject_id;
             $searchData = $request->searchData;
+
 
             $announcements = announcements_model::where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
@@ -4447,6 +4439,12 @@ class InstituteApiController extends Controller
                             ->orWhere('detail', 'like', '%' . $searchData . '%');
                     });
                 })
+                ->when($board_id, function ($query, $board_id) {
+                    $query->where('board_id', $board_id);
+                })
+                ->when($standard_id, function ($query, $standard_id) {
+                    $query->where('standard_id', $standard_id);
+                })
                 ->when($batch_id, function ($query, $batch_id) {
                     $query->where('batch_id', $batch_id);
                 })
@@ -4455,6 +4453,7 @@ class InstituteApiController extends Controller
                 })
                 ->orderByDesc('created_at')
                 ->get();
+            // print_r($announcements);exit;
 
             if ($announcements->isEmpty()) {
                 return $this->response([], "Data not found.", false, 400);
