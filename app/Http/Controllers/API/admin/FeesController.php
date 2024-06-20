@@ -697,10 +697,10 @@ class FeesController extends Controller
                             $revise_fee = (float)$revise_fee;
                             $paid_amount = (float)$paid_amount;
 
-                            $revise_fee = $revise_fee - $paid_amount;
+                            $revise_fees = $revise_fee - $paid_amount;
                         }
                         else{
-                            $revise_fee = $revise_fee;  
+                            $revise_fees = $revise_fee;  
                         }
                         if(empty($query->discount_by)){
                             $revise_fee=0;
@@ -728,7 +728,7 @@ class FeesController extends Controller
                             'total_fees_amount' => !empty($amounts) ? $amounts . '.00' : '00.00',
                             'discount' =>$discount_data,
                             'paid_amount'=>!empty($paid_amount) ? $paid_amount . '.00' : '00.00',
-                            'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
+                            'revise_fee'=>!empty($revise_fees) ? $revise_fees . '.00' : '00.00',
                             'discount_by'=>$query->discount_by
                           ];
                       }
