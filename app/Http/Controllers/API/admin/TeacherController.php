@@ -860,13 +860,13 @@ class TeacherController extends Controller
                 ->select(
                     'teacher_detail.*',
                     'users.*',
-                    'users.qualification',
-                    'users.lastname',
-                    'users.dob',
-                    'users.address',
-                    'users.email',
-                    'users.mobile',
-                    'users.employee_type'
+                    // 'users.qualification',
+                    // 'users.lastname',
+                    // 'users.dob',
+                    // 'users.address',
+                    // 'users.email',
+                    // 'users.mobile',
+                    // 'users.employee_type'
                     
                 )
                 ->first();

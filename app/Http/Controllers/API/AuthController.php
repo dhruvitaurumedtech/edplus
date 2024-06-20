@@ -121,6 +121,7 @@ class AuthController extends Controller
             'confirm_password' => 'required|string|same:password',
             'device_key' => 'nullable',
             'country_code' => 'required',
+            'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
@@ -134,7 +135,7 @@ class AuthController extends Controller
             $user->email = $request->email;
             $user->password = Hash::make($request->password);
             $user->country_code = $request->country_code;
-            $user->currency_code = $request->currency_code;
+            $user->country_code_name = $request->country_code_name;
             $user->mobile = $request->mobile;
             $user->role_type = $request->role_type;
             $user->otp_num = rand(100000, 999999);
@@ -156,7 +157,7 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
                 'country_code' => $user->country_code,
-                'currency_code' => $user->currency_code,
+                'country_code_name' => $user->country_code_name,
                 'mobile_no' => (int)$user->mobile,
                 'user_email' => $user->email,
                 'user_image' => $user->image,
@@ -246,7 +247,7 @@ class AuthController extends Controller
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
                 'country_code' => $user->country_code,
-                'currency_code'=>$user->currency_code,
+                'country_code_name'=>$user->country_code_name,
                 'mobile_no' => $user->mobile,
                 'user_email' => $user->email,
                 'user_image' => $user->image,
@@ -399,7 +400,7 @@ class AuthController extends Controller
                     'user_id' => $user->id,
                     'user_name' => $user->firstname . ' ' . $user->lastname,
                     'country_code' => $user->country_code,
-                    'currency_code'=>$user->currency_code,
+                    'country_code_name'=>$user->country_code_name,
                     'mobile_no' => $user->mobile,
                     'user_email' => $user->email,
                     'user_image' => $user->image,
