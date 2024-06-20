@@ -1079,9 +1079,10 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
+                
                 //print_r(count($qualification));exit;
                 // print_r($emergency_country_code);exit;
-                for ($i = 0; $i < count($qualification); $i++) {
+                for ($i = 0; $i < count($name); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
                         'name' => $name[$i],
@@ -1095,8 +1096,8 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
-                // print_r($emergency_country_code);exit;
-                for ($i = 0; $i < count($qualification); $i++) {
+                 //print_r($emergency_country_code);exit;
+                for ($i = 0; $i < count($name); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
                         'name' => $name[$i],
@@ -1109,7 +1110,7 @@ class TeacherController extends Controller
             return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
             return $e;exit;
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
     public function teacher_profile(Request $request)
