@@ -3381,10 +3381,10 @@ class InstituteApiController extends Controller
                     } else {
                         $student_id = $student_id;
                         $usrfin = User::find($student_id);
-                        if($usrfin){
+                        if ($usrfin) {
                             // $usrfin->firstname = $request->first_name;
                             // $usrfin->lastname = $request->lastname;
-                            $usrfin->dob = (!empty($request->date_of_birth)) ? date('d-m-Y', strtotime($request->date_of_birth)): '';
+                            $usrfin->dob = (!empty($request->date_of_birth)) ? date('d-m-Y', strtotime($request->date_of_birth)) : '';
                             $usrfin->address = $request->address;
                             // $usrfin->email = $request->email;
                             // $usrfin->country_code = $request->country_code;
@@ -5538,8 +5538,9 @@ class InstituteApiController extends Controller
             //     ['medium_id', $request->medium_id],
             //     ['standard_id', $request->standard_id]
             // ])->get(['id', 'batch_name'])->toArray();
-            $batchlistQuery = Batches_model::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
+            $batchlistQuery = Batches_model::
+                // where('user_id', Auth::id())->
+                where('institute_id', $request->institute_id)
                 ->where('board_id', $request->board_id)
                 ->where('standard_id', $request->standard_id);
 
