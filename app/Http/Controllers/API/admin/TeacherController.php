@@ -876,6 +876,7 @@ class TeacherController extends Controller
                 ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'teacher_detail.stream_id')
+
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->where('teacher_detail.status', '0')
@@ -898,7 +899,22 @@ class TeacherController extends Controller
                             'name' => $subDT->name,
                             'image' => asset($subDT->image)
                         );
+
                     }
+                    $batches=Batches_model::where('institute_id',$request->institute_id)
+                                   ->where('board_id',$values->board_id)
+                                  ->where('medium_id',$values->medium_id)
+                                  ->where('standard_id',$values->standard_id)
+                                  ->WhereRaw("FIND_IN_SET(?, subjects)", [$values->subject_id])
+                                  ->get()->toarray();
+                     $batch_detail = [];
+                     foreach($batches as $value2){
+                        $batch_detail[] = [
+                            'id'=>$value2['id'],
+                            'batch_name'=>$value2['batch_name']
+                        ];
+                     }          
+
                     $response_data_two[]=[ 'board' => $values->board,
                             'board_id' => $values->board_id,
                             'medium' => $values->medium,
@@ -907,7 +923,8 @@ class TeacherController extends Controller
                             'standard_id' => $values->standard_id,
                             'stream' => $values->stream,
                             'stream_id' => $values->stream_id,
-                            'subject'=>$subjectslist ];
+                            'subject'=>$subjectslist,
+                            'batches'=>$batch_detail ];
                  }
                 $response_data = [
                     'id' => $user_list->id,
