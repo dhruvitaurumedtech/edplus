@@ -79,12 +79,14 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/banner/banner-list', [BannerApiController::class, 'banner_list'])->name('banner_list')->middleware('check.permission:16,4');
     Route::post('/banner/banner-update-details', [BannerApiController::class, 'banner_detail_update'])->name('banner_detail_update')->middleware('check.permission:16,2');
     Route::post('/banner/banner-delete', [BannerApiController::class, 'banner_delete'])->name('banner_delete')->middleware('check.permission:16,3');
-    Route::post('/institute/roles', [InstituteApiController::class, 'roles'])->middleware('check.permission:27,4');
+    Route::post('/institute/roles', [InstituteApiController::class, 'roles']);
+    // ->middleware('check.permission:27,4');
 
     Route::post('/institute/students_list', [InstituteApiController::class, 'institute_students'])->middleware('check.permission:5,4');
     Route::post('/institute/create-batch', [InstituteApiController::class, 'create_batch'])->middleware('check.permission:8,1');
     Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign'])->middleware('check.permission:10,1');
-    Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list'])->middleware('check.permission:8,4');
+    Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list']);
+    // ->middleware('check.permission:8,4');
     Route::post('/institute/student_list', [StudentController::class, 'student_list'])->middleware('check.permission:5,4');
     Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
     Route::post('/institute/institute-profile-edit', [InstituteApiController::class, 'institute_profile_edit']);
