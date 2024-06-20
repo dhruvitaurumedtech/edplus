@@ -3371,7 +3371,7 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
-                        $usrfin = user::find($student_id);
+                        $usrfin = user::where('id',$student_id);
                         if(!empty($usrfin)){
                             $usrfin->firstname = $request->first_name;
                             $usrfin->lastname = $request->lastname;
