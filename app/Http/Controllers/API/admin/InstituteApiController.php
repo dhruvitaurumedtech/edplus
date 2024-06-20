@@ -2821,7 +2821,7 @@ class InstituteApiController extends Controller
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->where('students_details.student_id', $request->student_id)
-                ->where('students_details.user_id', Auth::id())
+                // ->where('students_details.user_id', Auth::id())
                 ->where('students_details.institute_id', $request->institute_id)
                 ->select(
                     'students_details.*',
