@@ -694,6 +694,9 @@ class FeesController extends Controller
                             ->sum('payment_amount');
                       
                         if(!empty($paid_amount)){
+                            $revise_fee = (float)$revise_fee;
+                            $paid_amount = (float)$paid_amount;
+
                             $revise_fee = $revise_fee - $paid_amount;
                         }
                         else{
