@@ -3239,7 +3239,7 @@ class InstituteApiController extends Controller
                         $data = $student_details->update([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' => $request->date_of_birth,
+                            'dob' => date('d-m-Y',strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
@@ -3362,7 +3362,7 @@ class InstituteApiController extends Controller
                         $data = user::create([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' => $request->date_of_birth,
+                            'dob' =>  date('d-m-Y',strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
