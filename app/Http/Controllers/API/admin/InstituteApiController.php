@@ -45,7 +45,6 @@ use App\Mail\WelcomeMail;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Parents;
 use App\Models\RoleHasPermission;
-use App\Models\Staff_detail_Model;
 use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\UserHasRole;
@@ -2307,7 +2306,7 @@ class InstituteApiController extends Controller
 
             $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
                 $query
-                    // ->where('user_id', $user_id)
+                // ->where('user_id', $user_id)
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
@@ -3240,7 +3239,7 @@ class InstituteApiController extends Controller
                         $data = $student_details->update([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' => date('d-m-Y', strtotime($request->date_of_birth)),
+                            'dob' => date('d-m-Y',strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
@@ -3248,15 +3247,15 @@ class InstituteApiController extends Controller
                         ]);
 
                         $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
-                            ->join('standard', 'standard.id', 'students_details.standard_id')
-                            ->where('students_details.institute_id', $institute_id)
-                            ->where('students_details.student_id', $student_id)
-                            ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardn')
-                            ->first();
-                        $subcts = Subject_model::whereIN('id', explode(",", $response->subject_id))->get();
-                        $sujids = [];
-                        foreach ($subcts as $subnames) {
-                            $sujids[] = ['subname' => $subnames->name, 'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('no-image.png'),];
+                        ->join('standard','standard.id','students_details.standard_id')
+                        ->where('students_details.institute_id', $institute_id)
+                        ->where('students_details.student_id', $student_id)
+                        ->select('students_details.*','users.firstname', 'users.lastname','standard.name as standardn')
+                        ->first();
+                        $subcts = Subject_model::whereIN('id',explode(",",$response->subject_id))->get();
+                        $sujids=[];
+                        foreach($subcts as $subnames){
+                            $sujids[] = ['subname'=>$subnames->name,'image'=>(!empty($subnames->image))?url($subnames->image):asset('no-image.png'),];
                         }
 
                         $reject_list = Student_detail::find($response->id);
@@ -3266,20 +3265,12 @@ class InstituteApiController extends Controller
                         $prnts = Parents::join('users', 'users.id', 'parents.parent_id')
                             ->join('institute_detail', 'institute_detail.id', 'parents.institute_id')
                             ->where('parents.student_id', $student_id)
-                            ->where('parents.institute_id', $institute_id)
-                            ->select(
-                                'users.firstname',
-                                'users.lastname',
-                                'users.email',
-                                'parents.id',
-                                'institute_detail.institute_name',
-                                'institute_detail.address',
-                                'institute_detail.email as Iemail',
-                                'institute_detail.contact_no',
-                                'institute_detail.website_link',
-                                'institute_detail.start_academic_year',
-                                'institute_detail.end_academic_year'
-                            )
+                            ->where('parents.institute_id',$institute_id)
+                            ->select('users.firstname', 'users.lastname', 'users.email',
+                             'parents.id', 
+                             'institute_detail.institute_name','institute_detail.address',
+                             'institute_detail.email as Iemail','institute_detail.contact_no',
+                             'institute_detail.website_link','institute_detail.start_academic_year','institute_detail.end_academic_year')
                             ->get();
                         foreach ($prnts as $prdetail) {
                             $startAcademicYear = $prdetail->start_academic_year;
@@ -3300,11 +3291,11 @@ class InstituteApiController extends Controller
                                 'address' => $prdetail->address,
                                 'Iemail' => $prdetail->Iemail,
                                 'contact_no' => $prdetail->contact_no,
-                                'website_link' => $prdetail->website_link,
-                                'year' => $syear . '-' . $eyear,
-                                'subjects' => $sujids
+                                'website_link'=>$prdetail->website_link,
+                                'year'=>$syear.'-'.$eyear,
+                                'subjects'=>$sujids
                             ];
-
+                            
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 
@@ -3371,7 +3362,7 @@ class InstituteApiController extends Controller
                         $data = user::create([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' =>  date('d-m-Y', strtotime($request->date_of_birth)),
+                            'dob' =>  date('d-m-Y',strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
@@ -3380,17 +3371,6 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
-                        $usrfin = User::find($student_id);
-                        if ($usrfin) {
-                            // $usrfin->firstname = $request->first_name;
-                            // $usrfin->lastname = $request->lastname;
-                            $usrfin->dob = (!empty($request->date_of_birth)) ? date('d-m-Y', strtotime($request->date_of_birth)) : '';
-                            $usrfin->address = $request->address;
-                            // $usrfin->email = $request->email;
-                            // $usrfin->country_code = $request->country_code;
-                            // $usrfin->mobile = $request->mobile;
-                            $usrfin->save();
-                        }
                     }
                     if (!empty($student_id)) {
                         $studentdetail = [
@@ -4435,9 +4415,12 @@ class InstituteApiController extends Controller
         try {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
+            $board_id = $request->board_id;
+            $standard_id = $request->standard_id;
             $batch_id = $request->batch_id;
             $subject_id = $request->subject_id;
             $searchData = $request->searchData;
+
 
             $announcements = announcements_model::where('user_id', $user_id)
                 ->where('institute_id', $institute_id)
@@ -4447,6 +4430,12 @@ class InstituteApiController extends Controller
                             ->orWhere('detail', 'like', '%' . $searchData . '%');
                     });
                 })
+                ->when($board_id, function ($query, $board_id) {
+                    $query->where('board_id', $board_id);
+                })
+                ->when($standard_id, function ($query, $standard_id) {
+                    $query->where('standard_id', $standard_id);
+                })
                 ->when($batch_id, function ($query, $batch_id) {
                     $query->where('batch_id', $batch_id);
                 })
@@ -4455,6 +4444,7 @@ class InstituteApiController extends Controller
                 })
                 ->orderByDesc('created_at')
                 ->get();
+                // print_r($announcements);exit;
 
             if ($announcements->isEmpty()) {
                 return $this->response([], "Data not found.", false, 400);
@@ -4566,17 +4556,14 @@ class InstituteApiController extends Controller
     {
         try {
             $rolesDT = [];
-            $suad = [4, 5, 6];
+            $suad = [1, 2, 3];
             $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
-            $staff = Staff_detail_Model::where('user_id', $request->user_id)->first();
             if (!empty($teacher)) {
                 $suad2 = ['student', 'parent'];
                 $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-            } elseif (!empty($staff)) {
-                $suad2 = ['student', 'parent'];
-                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
             } else {
-                $roleqry = Role::whereNull('deleted_at')->whereIN('id', $suad)->get();
+
+                $roleqry = Role::whereNull('deleted_at')->whereNotIN('id', $suad)->get();
             }
             foreach ($roleqry as $roldel) {
                 $rolesDT[] = array(
@@ -5538,9 +5525,8 @@ class InstituteApiController extends Controller
             //     ['medium_id', $request->medium_id],
             //     ['standard_id', $request->standard_id]
             // ])->get(['id', 'batch_name'])->toArray();
-            $batchlistQuery = Batches_model::
-                // where('user_id', Auth::id())->
-                where('institute_id', $request->institute_id)
+            $batchlistQuery = Batches_model::where('user_id', Auth::id())
+                ->where('institute_id', $request->institute_id)
                 ->where('board_id', $request->board_id)
                 ->where('standard_id', $request->standard_id);
 
