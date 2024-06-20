@@ -2853,7 +2853,7 @@ class InstituteApiController extends Controller
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
-                    'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
+                    'date_of_birth' => (!empty($user_list->dob)) ? date('d-m-Y', strtotime($user_list->dob)) : '',
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
