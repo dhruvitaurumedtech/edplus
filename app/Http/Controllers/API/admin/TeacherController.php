@@ -30,6 +30,7 @@ use Illuminate\Bus\Batch;
 use Illuminate\Http\Request;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
+use DateTime;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -1051,8 +1052,8 @@ class TeacherController extends Controller
                 $startdate = explode(',', $request['startdate']);
                 $enddate = explode(',', $request['enddate']);
                 for ($i = 0; $i < count($experience); $i++) {
-                    $startdates = date('Y-m-d', strtotime($startdate[$i]));
-                    $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                    $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
+                    $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
                     Users_sub_experience::create([
                         'user_id' => $teacher_id,
                         'institute_name' => $experience[$i],
@@ -1065,8 +1066,8 @@ class TeacherController extends Controller
                 $startdate = explode(',', $request['startdate']);
                 $enddate = explode(',', $request['enddate']);
                 for ($i = 0; $i < count($experience); $i++) {
-                    $startdates = date('Y-m-d', strtotime($startdate[$i]));
-                    $enddates = date('Y-m-d', strtotime($enddate[$i]));
+                    $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
+                    $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
                     Users_sub_experience::create([
                         'user_id' => $teacher_id,
                         'institute_name' => $experience[$i],
