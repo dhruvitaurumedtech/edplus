@@ -399,7 +399,7 @@ class ParentsController extends Controller
                             'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
                             'address'=>$parent->address,
                             'country_code'=>$parent->country_code,
-                            'country_code_name'=>$parent->country_code_name ,
+                            'country_code_name'=>$parent->country_code_name,
                             'state'=>$parent->state,
                             'city'=>$parent->city,
                             'pincode'=>$parent->pincode,
