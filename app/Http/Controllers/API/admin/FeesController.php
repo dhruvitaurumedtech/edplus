@@ -688,20 +688,7 @@ class FeesController extends Controller
                             $amounts = $subject_sub;
                             
                         // }
-                        $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
-                        ->where('student_id', $value->id)
-                        //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
-                            ->sum('payment_amount');
-                      
-                        if(!empty($paid_amount)){
-                            $revise_fee = (float)$revise_fee;
-                            $paid_amount = (float)$paid_amount;
-
-                            $revise_fees = $revise_fee - $paid_amount;
-                        }
-                        else{
-                            $revise_fees = $revise_fee;  
-                        }
+                       
                         if(empty($query->discount_by)){
                             $revise_fee=0;
                             $discount_data='00.00' ;
@@ -717,6 +704,16 @@ class FeesController extends Controller
                              $revise_fee = $amounts - $discountAmount;
                              $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'%' : '0%' ;
                         }
+                        $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
+                        ->where('student_id', $value->id)
+                            ->sum('payment_amount');
+                            if(!empty($paid_amount)){
+                                
+                                $revise_fee = $revise_fee - $paid_amount;
+                            }
+                            else{
+                                $revise_fee = $revise_fee;  
+                            }
                         $data[] =[
                             'student_id'=>$value->id,
                             'student_name'=>$value->firstname.' '.$value->lastname,
@@ -728,7 +725,7 @@ class FeesController extends Controller
                             'total_fees_amount' => !empty($amounts) ? $amounts . '.00' : '00.00',
                             'discount' =>$discount_data,
                             'paid_amount'=>!empty($paid_amount) ? $paid_amount . '.00' : '00.00',
-                            'revise_fee'=>!empty($revise_fees) ? $revise_fees . '.00' : '00.00',
+                            'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
                             'discount_by'=>$query->discount_by
                           ];
                       }
