@@ -2305,7 +2305,8 @@ class InstituteApiController extends Controller
             // ->get(['id', 'banner_image', 'url']);
 
             $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
-                $query->where('user_id', $user_id)
+                $query
+                // ->where('user_id', $user_id)
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
