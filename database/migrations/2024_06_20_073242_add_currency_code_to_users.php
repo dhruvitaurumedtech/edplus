@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->text('currency_code')->nullable()->after('country_code');
+            $table->text('country_code_name')->nullable()->after('country_code');
         });
     }
 
@@ -22,7 +22,7 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('currency_code');
+            $table->dropColumn('country_code_name');
         });
     }
 };
