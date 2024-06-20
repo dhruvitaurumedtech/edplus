@@ -2475,7 +2475,7 @@ class InstituteApiController extends Controller
             $standard_list = DB::table('standard_sub')
                 ->join('standard', 'standard_sub.standard_id', '=', 'standard.id')
                 ->select('standard.*')
-                ->where('standard_sub.user_id', $user_id)
+                // ->where('standard_sub.user_id', $user_id)
                 ->where('standard_sub.institute_id', $institute_id)
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
@@ -2492,7 +2492,7 @@ class InstituteApiController extends Controller
                 $subject_list = DB::table('subject_sub')
                     ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
                     ->select('subject.*')
-                    ->where('subject_sub.user_id', $user_id)
+                    // ->where('subject_sub.user_id', $user_id)
                     ->where('subject_sub.institute_id', $institute_id)
                     ->whereIN('subject.base_table_id', $getbsiqy)
                     ->get();
@@ -2512,7 +2512,7 @@ class InstituteApiController extends Controller
                     ->leftjoin('stream', 'stream.id', '=', 'batches.stream_id')
                     ->where('batches.institute_id', $institute_id)
                     ->where('batches.standard_id', $standard_value->id)
-                    ->where('batches.user_id', $user_id)
+                    // ->where('batches.user_id', $user_id)
                     ->select('batches.*', 'board.name as board', 'medium.name as medium', 'stream.name as stream')->get();
                 $batchesDT = [];
                 foreach ($batchqY as $batDT) {
