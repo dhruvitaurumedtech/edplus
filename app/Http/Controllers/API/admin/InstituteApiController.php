@@ -3382,13 +3382,13 @@ class InstituteApiController extends Controller
                         $student_id = $student_id;
                         $usrfin = user::where('id',$student_id);
                         if(!empty($usrfin)){
-                            $usrfin->firstname = $request->first_name;
-                            $usrfin->lastname = $request->lastname;
+                            // $usrfin->firstname = $request->first_name;
+                            // $usrfin->lastname = $request->lastname;
                             $usrfin->dob = $request->dob;
                             $usrfin->address = $request->address;
-                            $usrfin->email = $request->email;
-                            $usrfin->country_code = $request->country_code;
-                            $usrfin->mobile = $request->mobile;
+                            // $usrfin->email = $request->email;
+                            // $usrfin->country_code = $request->country_code;
+                            // $usrfin->mobile = $request->mobile;
                             $usrfin->save();
                         }
                     }
