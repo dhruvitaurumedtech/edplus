@@ -399,6 +399,7 @@ class ParentsController extends Controller
                             'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
                             'address'=>$parent->address,
                             'country_code'=>$parent->country_code,
+                            'country_code_name'=>$parent->country_code_name,
                             'state'=>$parent->state,
                             'city'=>$parent->city,
                             'pincode'=>$parent->pincode,
@@ -422,6 +423,7 @@ class ParentsController extends Controller
             'city' => 'required|string',
             'pincode' => 'required|string',
             'country_code' => 'required',
+            'country_code_name'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -433,6 +435,7 @@ class ParentsController extends Controller
             $user->firstname = $request->firstname;
             $user->lastname = $request->lastname;
             $user->country_code = $request->country_code;
+            $user->country_code_name = $request->country_code_name;
             $user->mobile = $request->mobile;
             $user->address = $request->address;
             $user->state = $request->state;
