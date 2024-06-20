@@ -4435,8 +4435,8 @@ class InstituteApiController extends Controller
         try {
             $user_id = $request->user_id;
             $institute_id = $request->institute_id;
-            $board_id = $request->board_id;
-            $standard_id = $request->standard_id;
+            $batch_id = $request->batch_id;
+            $subject_id = $request->subject_id;
             $searchData = $request->searchData;
 
             $announcements = announcements_model::where('user_id', $user_id)
@@ -4447,11 +4447,11 @@ class InstituteApiController extends Controller
                             ->orWhere('detail', 'like', '%' . $searchData . '%');
                     });
                 })
-                ->when($board_id, function ($query, $board_id) {
-                    $query->where('board_id', $board_id);
+                ->when($batch_id, function ($query, $batch_id) {
+                    $query->where('batch_id', $batch_id);
                 })
-                ->when($standard_id, function ($query, $standard_id) {
-                    $query->where('standard_id', $standard_id);
+                ->when($subject_id, function ($query, $subject_id) {
+                    $query->where('subject_id', $subject_id);
                 })
                 ->orderByDesc('created_at')
                 ->get();
