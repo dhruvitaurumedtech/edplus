@@ -535,6 +535,7 @@ class InstituteApiController extends Controller
                 'institute_name' => $request->input('institute_name'),
                 'address' => $request->input('address'),
                 'country_code' => $request->input('country_code'),
+                'country_code_name'=>$request->input('country_code_name'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
                 'country' => $request->input('country'),
@@ -2831,6 +2832,7 @@ class InstituteApiController extends Controller
                     'users.address',
                     'users.email',
                     'users.country_code',
+                    'users.country_code_name',
                     'users.mobile',
                     'board.name as board',
                     'medium.name as medium',
@@ -2858,6 +2860,7 @@ class InstituteApiController extends Controller
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
+                    'country_code_name'=>$user_list->country_code_name,
                     'mobile_no' => $user_list->mobile,
                     //'institute_for' => $institute_for_list,
                     'board' => $user_list->board,
@@ -3176,6 +3179,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'country_code' => 'required',
+            'country_code_name'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -3244,6 +3248,7 @@ class InstituteApiController extends Controller
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
+                            'country_code_name'=>$request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
 
@@ -3375,6 +3380,7 @@ class InstituteApiController extends Controller
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
+                            'country_code_name'=>$request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
                         $student_id = $data->id;
@@ -5056,6 +5062,7 @@ class InstituteApiController extends Controller
                     'institute_name' => $value['institute_name'],
                     'address' => $value['address'] . '',
                     'country_code' => $value['country_code'],
+                    'country_code_name'=>$value['country_code_name'],
                     'contact_no' => $value['contact_no'] . '',
                     'email' => $value['email'] . '',
                     'about_us' => $value['about_us'] . '',
@@ -5303,6 +5310,7 @@ class InstituteApiController extends Controller
             $institutedt->institute_name = $request->institute_name;
             $institutedt->address = $request->address;
             $institutedt->country_code = $request->country_code;
+            $institutedt->country_code_name = $request->country_code_name;
             $institutedt->contact_no = $request->contact_no;
             $institutedt->email = $request->email;
             $institutedt->about_us = $request->about_us;

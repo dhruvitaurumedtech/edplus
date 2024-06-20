@@ -242,6 +242,7 @@ class TeacherController extends Controller
             'subject_id' => 'required',
             'teacher_id' => 'required',
             'country_code' =>'required',
+            'country_code_name'=>'required',
         ]);
 
         if ($validator->fails()) {
@@ -324,6 +325,7 @@ class TeacherController extends Controller
                 'address' => $request->address,
                 'email' => $request->email,
                 'country_code' => $request->country_code,
+                'country_code_name'=>$request->country_code_name,
                 'mobile' => $request->mobile,
                 'employee_type' => $request->employee_type,
                 'qualification' => $request->qualification,
@@ -938,6 +940,7 @@ class TeacherController extends Controller
                     'employee_type'=> $user_list->employee_type,
                     'qualification' => $user_list->qualification,
                     'country_code' => $user_list->country_code,
+                    'country_code_name'=>$user_list->country_code_name,
                     'mobile_no' => $user_list->mobile,
                     'education'=>$response_data_two,
                 ];
@@ -977,6 +980,7 @@ class TeacherController extends Controller
             'relation_with' => 'required|string|max:255',
             'mobile_no' => 'required|string|max:255',
             'country_code' =>'required',
+            'country_code_name'=>'required',
             'emergency_country_code' =>'required',
         ]);
 
@@ -989,6 +993,7 @@ class TeacherController extends Controller
         $user->lastname = $request->input('lastname');
         $user->email = $request->input('email');
         $user->country_code = $request->input('country_code');
+        $user->country_code_name = $request->input('country_code_name');
         $user->dob = date('Y-m-d', strtotime($request['dob']));
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
@@ -1209,6 +1214,7 @@ class TeacherController extends Controller
             'lastname' => $userdetl->lastname.'',
             'email' => $userdetl->email,
             'country_code' => $userdetl->country_code,
+            'country_code_name'=>$userdetl->country_code_name,
             'mobile' => $userdetl->mobile . '',
             'image' => $img . '',
             'dob' => $userdetl->dob,
