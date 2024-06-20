@@ -672,7 +672,7 @@ class FeesController extends Controller
                         ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
                        
                         ->first();
-                     $amounts =0;
+                        $amounts =0;
                         // print_r($student_list);exit;
                         // foreach(explode(',',$value->subject_id) as $subject_id){whereIn('subject_id',explode(',', $value->subject_id))->
                         // print_r(explode(',', $request->institute_id));exit;
@@ -688,7 +688,17 @@ class FeesController extends Controller
                             $amounts = $subject_sub;
                             
                         // }
-                        
+                        $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
+                        ->where('student_id', $value->id)
+                        //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
+                            ->sum('payment_amount');
+                      
+                        if(!empty($paid_amount)){
+                            $revise_fee = $revise_fee - $paid_amount;
+                        }
+                        else{
+                            $revise_fee = $revise_fee;  
+                        }
                         if(empty($query->discount_by)){
                             $revise_fee=0;
                             $discount_data='00.00' ;
@@ -714,6 +724,7 @@ class FeesController extends Controller
                             'streamname'=>$value->streamname,
                             'total_fees_amount' => !empty($amounts) ? $amounts . '.00' : '00.00',
                             'discount' =>$discount_data,
+                            'paid_amount'=>!empty($paid_amount) ? $paid_amount . '.00' : '00.00',
                             'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
                             'discount_by'=>$query->discount_by
                           ];
