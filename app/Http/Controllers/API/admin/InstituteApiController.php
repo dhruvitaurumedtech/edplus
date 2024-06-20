@@ -2822,7 +2822,7 @@ class InstituteApiController extends Controller
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->where('students_details.student_id', $request->student_id)
-                ->where('students_details.user_id', Auth::id())
+                // ->where('students_details.user_id', Auth::id())
                 ->where('students_details.institute_id', $request->institute_id)
                 ->select(
                     'students_details.*',
@@ -5021,8 +5021,9 @@ class InstituteApiController extends Controller
             if (empty($institute_id)) {
                 $institute_id = Institute_detail::where('user_id', Auth::id())->select('id')->first();
             }
-            $boarids = Institute_board_sub::where('user_id', Auth::id())
-                ->where('institute_id', $institute_id)->pluck('board_id')->toArray();
+            $boarids = Institute_board_sub::
+            // where('user_id', Auth::id())->
+            where('institute_id', $institute_id)->pluck('board_id')->toArray();
             $uniqueBoardIds = array_unique($boarids);
 
             $board_list = DB::table('board')
@@ -5033,7 +5034,7 @@ class InstituteApiController extends Controller
             foreach ($board_list as $board_value) {
 
                 $medium_sublist = DB::table('medium_sub')
-                    ->where('user_id', Auth::id())
+                    // ->where('user_id', Auth::id())
                     ->where('board_id', $board_value->id)
                     ->where('institute_id', $institute_id)
                     ->pluck('medium_id')->toArray();
