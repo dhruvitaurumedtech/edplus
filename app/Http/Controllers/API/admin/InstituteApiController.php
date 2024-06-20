@@ -3384,7 +3384,7 @@ class InstituteApiController extends Controller
                         if($usrfin){
                             // $usrfin->firstname = $request->first_name;
                             // $usrfin->lastname = $request->lastname;
-                            $usrfin->dob = $request->dob;
+                            $usrfin->dob = (!empty($request->date_of_birth)) ? date('d-m-Y', strtotime($request->date_of_birth)): '';
                             $usrfin->address = $request->address;
                             // $usrfin->email = $request->email;
                             // $usrfin->country_code = $request->country_code;
