@@ -5930,13 +5930,13 @@ class InstituteApiController extends Controller
             'email' => 'required',
             'qualification' => 'required',
             'employee_type' => 'required',
-            'board_id' => 'required|integer',
-            'medium_id' => 'required|integer',
-            'standard_id' => 'required|integer',
-            'batch_id' => 'required|integer',
+            'board_id' => 'required|string',
+            'medium_id' => 'required|string',
+            'standard_id' => 'required|string',
+            'batch_id' => 'required|string',
             // 'stream_id' => 'required',
-            'subject_id' => 'required|integer',
-            'teacher_id' => 'required|integer',
+            'subject_id' => 'required|string',
+            'teacher_id' => 'required|string',
         ]);
 
         if ($validator->fails()) {
