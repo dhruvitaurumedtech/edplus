@@ -28,17 +28,13 @@ class SendReminders extends Command
      */
     public function handle()
     {
-        $today = Carbon::today()->format('m-d');
-
-        $users = User::whereRaw('DATE_FORMAT(dob, "%m-%d") = ?', [$today])->get();
-
-        foreach ($users as $user) {
-            Mail::raw("Happy Birthday, {$user->firstname}!", function ($message) use ($user) {
+        
+            Mail::raw("Happy Birthday,!", function ($message) {
                 $message->to('iitjeeneetexam@gmail.com')
                         ->subject('Happy Birthday!');
             });
 
-            $this->info("Birthday reminder sent to: {iitjeeneetexam@gmail.com}");
-        }
+            $this->info("Birthday reminder sent to: iitjeeneetexam@gmail.com");
+        
     }
 }
