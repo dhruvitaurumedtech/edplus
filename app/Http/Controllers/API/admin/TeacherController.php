@@ -493,6 +493,12 @@ class TeacherController extends Controller
         }
     }
 
+    private  function convertTo12HourFormat($time24)
+    {
+        $time = Carbon::createFromFormat('H:i:s', $time24);
+        return $time->format('g:i:s A');
+    }
+    
     public function teacher_added_detail(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -557,10 +563,10 @@ class TeacherController extends Controller
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
-                    'lecture_date' => $todayslecDT->lecture_date,
+                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
-                    'start_time' => $todayslecDT->start_time,
-                    'end_time' => $todayslecDT->end_time,
+                    'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
+                    'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
                 );
             }
 
