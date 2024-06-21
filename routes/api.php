@@ -215,6 +215,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
 
 Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
+Route::post('test', [InstituteApiController::class, 'test']);
 
 
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
