@@ -44,6 +44,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Parents;
+use App\Models\Remainder_model;
 use App\Models\RoleHasPermission;
 use App\Models\Staff_detail_Model;
 use App\Models\Student_fees_model;
@@ -3251,6 +3252,28 @@ class InstituteApiController extends Controller
                             'country_code_name'=>$request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
+                        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+                        ->whereIn('subject_id', explode(',', $request->subject_id))
+                        ->select('amount')
+                        ->get();
+                    
+                            $amount = 0;
+                            foreach ($subject_amount as $value) {
+
+                                $amount += $value->amount;
+                            }
+                            //echo $amount;exit;
+                            $studentFee = Student_fees_model::where('student_id',$student_id);
+                            if ($studentFee) {
+                                $studentFee->update([
+                                    'user_id' => $user_id,
+                                    'institute_id' => $request->institute_id,
+                                    'student_id' => $student_id,
+                                    'subject_id' => $request->subject_id,
+                                    'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
+                                ]); 
+                            
+                            }
 
                         $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
                             ->join('standard', 'standard.id', 'students_details.standard_id')
@@ -6117,6 +6140,34 @@ class InstituteApiController extends Controller
             return $this->response([], "Data Saved.");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    function create_remainder(Request $request){
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+            'title' => 'required',
+            'message' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $date=Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
+            $time = date('H:i', strtotime($request->input('time')));
+
+            Remainder_model::create([
+                'role_type_id' => $request->input('role_type_id'),
+                'student_id' => $request->input('student_id'),
+                'date' => $date,
+                'time' => $time,
+                'title' => $request->input('title'),
+                'message' => $request->input('message'),
+            ]);
+            return $this->response([], "Remainder set successfully.");
+
+        }catch(Exception $e){
+            return $this->response($e, "Invalid token.", false, 400);
+
         }
     }
 }
