@@ -3179,7 +3179,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'country_code' => 'required',
-            //'country_code_name'=>'required',
+            'country_code_name'=>'required',
         ]);
 
         if ($validator->fails()) {
