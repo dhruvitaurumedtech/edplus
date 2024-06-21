@@ -33,7 +33,7 @@ class SendReminders extends Command
         $users = User::whereRaw('DATE_FORMAT(dob, "%m-%d") = ?', [$today])->get();
 
         foreach ($users as $user) {
-            Mail::raw("Happy Birthday, {$user->name}!", function ($message) use ($user) {
+            Mail::raw("Happy Birthday, {$user->firstname}!", function ($message) use ($user) {
                 $message->to('iitjeeneetexam@gmail.com')
                         ->subject('Happy Birthday!');
             });
