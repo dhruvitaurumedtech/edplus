@@ -45,7 +45,7 @@ class ParentsController extends Controller
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                 ->where('parents.parent_id', Auth::id())
                 ->where('parents.verify', '1')
-                ->select('users.firstname', 'users.lastname',
+                ->select('users.firstname', 'users.lastname','users.image',
                  'institute_detail.institute_name',
                  'institute_detail.id as institute_id',
                  'parents.student_id','students_details.subject_id')->get();
@@ -62,6 +62,7 @@ class ParentsController extends Controller
                     'child_id' => $chilDT->student_id,
                     'firstname' => $chilDT->firstname,
                     'lastname' => $chilDT->lastname,
+                    'image' => (!empty($chilDT->image)) ? asset($chilDT->image) : asset('no-image.png'),
                     'institute_id' => $chilDT->institute_id,
                     'institute_name' => $chilDT->institute_name,
                     'subjects' => $subjDTs
