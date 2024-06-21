@@ -509,7 +509,7 @@ class StudentController extends Controller
             'parents.*.mobile' => 'required',
             'parents.*.relation' => 'required',
             'parents.*.country_code' => 'required',
-            //'parents.*.country_code_name' => 'required',
+            'parents.*.country_code_name' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -2261,7 +2261,7 @@ class StudentController extends Controller
             'city' => 'required|string',
             'pincode' => 'required|string',
             'country_code' => 'required',
-            //'country_code_name' => 'required',
+            'country_code_name' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -2306,10 +2306,9 @@ class StudentController extends Controller
                         return $this->response([], 'relation Requied field are missing', false, 400);
                     } elseif ($parentData['country_code'] == '') {
                         return $this->response([], 'country_code Requied field are missing', false, 400);
+                    }elseif ($parentData['country_code_name'] == '') {
+                        return $this->response([], 'country_code_name Requied field are missing', false, 400);
                     }
-                    // elseif ($parentData['country_code_name'] == '') {
-                    //     return $this->response([], 'country_code_name Requied field are missing', false, 400);
-                    // }
                     
                     //  elseif (!empty($emilfin)) {
                     //     return $this->response([], 'email is already exist', false, 400);
