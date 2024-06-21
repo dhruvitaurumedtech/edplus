@@ -46,10 +46,10 @@ class RemainderCronJob extends Command
 
                 $url = "https://fcm.googleapis.com/fcm/send";
                 if(!empty($value->student_id)){
-                    $users = User::where('id', $value->student_id)->pluck('device_key');
+                    $users = User::where('id', $value->student_id)->pluck('device_key')->toArray();;
                 }
                 if(!empty($value->role_type_id)){
-                    $users = User::where('role_type', $value->role_type_id)->pluck('device_key');
+                    $users = User::where('role_type', $value->role_type_id)->pluck('device_key')->toArray();;
                 }
                 $notificationTitle = $value->title;
                 $notificationBody = $value->message;
