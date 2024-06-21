@@ -122,7 +122,7 @@ class AuthController extends Controller
             'confirm_password' => 'required|string|same:password',
             'device_key' => 'nullable',
             'country_code' => 'required',
-            'country_code_name'=>'required',
+            //'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
