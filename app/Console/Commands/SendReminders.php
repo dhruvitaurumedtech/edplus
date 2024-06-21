@@ -30,7 +30,7 @@ class SendReminders extends Command
     {
         $today = Carbon::today()->format('m-d');
 
-        $users = User::whereRaw('DATE_FORMAT(birthday, "%m-%d") = ?', [$today])->get();
+        $users = User::whereRaw('DATE_FORMAT(dob, "%m-%d") = ?', [$today])->get();
 
         foreach ($users as $user) {
             Mail::raw("Happy Birthday, {$user->name}!", function ($message) use ($user) {
