@@ -3251,6 +3251,33 @@ class InstituteApiController extends Controller
                             'country_code_name'=>$request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
+                       
+
+                        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+                        ->whereIn('subject_id', explode(',', $request->subject_id))
+                        ->select('amount')
+                        ->get();
+                    // echo "hi";exit;
+
+                            $amount = 0;
+                            foreach ($subject_amount as $value) {
+
+                                $amount += $value->amount;
+                            }
+                            //echo $amount;exit;
+                            $studentFee = Student_fees_model::where('student_id',$student_id);
+                            if ($studentFee) {
+                                $studentFee->update([
+                                    'user_id' => $user_id,
+                                    'institute_id' => $request->institute_id,
+                                    'student_id' => $student_id,
+                                    'subject_id' => $request->subject_id,
+                                    'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
+                                ]); 
+                            
+                            }
+
+                            
 
                         $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
                             ->join('standard', 'standard.id', 'students_details.standard_id')
