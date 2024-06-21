@@ -423,7 +423,7 @@ class ParentsController extends Controller
             'city' => 'required|string',
             'pincode' => 'required|string',
             'country_code' => 'required',
-            'country_code_name'=>'required',
+            //'country_code_name'=>'required',
         ]);
 
         if ($validator->fails()) {
