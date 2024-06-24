@@ -191,7 +191,7 @@ class ParentsController extends Controller
 
             $getstdntdata = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
             ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-            ->select('users.firstname', 'users.lastname',
+            ->select('users.firstname', 'users.lastname','users.image',
              'institute_detail.institute_name','institute_detail.id as institute_id',
              'students_details.*')
             ->where('students_details.student_id', $request->child_id)
@@ -213,6 +213,7 @@ class ParentsController extends Controller
                     'child_id' => $getstdntdata->student_id,
                     'firstname' => $getstdntdata->firstname,
                     'lastname' => $getstdntdata->lastname,
+                    'image'=> (!empty($getstdntdata->image)) ? asset($getstdntdata->image) : asset('no-image.png'),
                     'institute_id' => intval($getstdntdata->institute_id),
                     'institute_name' => $getstdntdata->institute_name,
                     'subjects' => $subjDTs
