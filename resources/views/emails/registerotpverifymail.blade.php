@@ -24,7 +24,7 @@
 </head>
 <body>
     <h1>Please use the verification code below to sign in.</h1>
-    <p>Dear {{$token}},</p>
+    <p>{{$token}},</p>
 
     <p>If you didn’t request this, you can ignore this email.</p>
 

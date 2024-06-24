@@ -160,7 +160,7 @@ class AuthController extends Controller
                         
             User::where('email',$request->email)->update(['otp_num'=>$token]);
 
-            Mail::send('emails.registerotpverifymail.blade', ['token' => $token], function ($message) use ($request) {
+            Mail::send('emails.registerotpverifymail', ['token' => $token], function ($message) use ($request) {
               $message->to($request->email);
               $message->subject('Verification Code');
             });
@@ -175,10 +175,11 @@ class AuthController extends Controller
                 'user_image' => $user->image,
                 'role_type' => (int)$user->role_type,
                 'institute_id' => $institute_id,
-                'token' => $token,
+                //'token' => $token,
             ];
             return $this->response($data, "Registration Successfully !");
         } catch (Exception $e) {
+            return $e;
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
@@ -400,39 +401,11 @@ class AuthController extends Controller
     //     }
     // }
 
-    public function registerverification_mail(Request $request){
-        if ($request->validate([
-            'email' => 'required|email|exists:users',
-          ])) {
-        try {
-            $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-                        
-            User::where('email',$request->email)->update(['otp_num'=>$token]);
-
-            Mail::send('emails.registerotpverifymail.blade', ['token' => $token], function ($message) use ($request) {
-              $message->to($request->email);
-              $message->subject('Verification Code');
-            });
-            
-            return response()->json([
-              'status' => 200,
-              'message' => 'We have e-mailed your verification code!'
-            ], 200);
-          } catch (Exception $e) {
-            return $this->sendError($e->getMessage(), 422);
-          }
-        }else {
-            return response()->json([
-              'status' => 400,
-              'message' => 'Invalid email address'
-            ], 400);
-          }
-    }
 
     public function verify_otp(Request $request)
     {
         try {
-            $user = User::where('mobile', $request->mobile)
+            $user = User::where('email', $request->email)
                 ->where('otp_num', $request->otp_num)
                 ->first();
 
@@ -448,13 +421,14 @@ class AuthController extends Controller
                     'role_type' => (int)$user->role_type,
                     'token' => $user->token
                 ];
-                if ($user->mobile == $request->mobile && $user->otp_num == $request->otp_num) {
+                if ($user->otp_num == $request->otp_num) {
+                    User::where('email',$request->email)->update(['status'=>'1']);
                     return $this->response($data, "OTP verification successful");
                 } else {
-                    return $this->response([], "Mobile number and OTP do not match", false, 400);
+                    return $this->response([], "OTP do not match", false, 400);
                 }
             } else {
-                return $this->response([], "User not found or OTP incorrect", false, 400);
+                return $this->response([], "OTP do not match", false, 400);
             }
         } catch (Exception $e) {
             return $this->response([], "Something went wrong!", false, 400);
