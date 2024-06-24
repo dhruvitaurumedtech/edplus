@@ -19,6 +19,7 @@ use App\Traits\ApiTrait;
 use Carbon\Carbon;
 use Exception;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Mail;
 use Laravel\Socialite\Facades\Socialite;
 
 
@@ -388,6 +389,41 @@ class AuthController extends Controller
     //         ]);
     //     }
     // }
+
+    public function registerverification_mail(Request $request){
+        if ($request->validate([
+            'email' => 'required|email|exists:users',
+          ])) {
+        try {
+            $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+      
+            $abc = DB::table('password_resets')->insert([
+              'email' => $request->email,
+              'token' => $token,
+              'created_at' => Carbon::now()
+            ]);
+            
+            User::where('email',$request->email)->update(['otp_num'=>$token]);
+
+            Mail::send('emails.forgot', ['token' => $token,'name' => $request->firstname], function ($message) use ($request) {
+              $message->to($request->email);
+              $message->subject('Reset Your Password');
+            });
+            
+            return response()->json([
+              'status' => 200,
+              'message' => 'We have e-mailed your verification code!'
+            ], 200);
+          } catch (Exception $e) {
+            return $this->sendError($e->getMessage(), 422);
+          }
+        }else {
+            return response()->json([
+              'status' => 400,
+              'message' => 'Invalid email address'
+            ], 400);
+          }
+        }
 
     public function verify_otp(Request $request)
     {
