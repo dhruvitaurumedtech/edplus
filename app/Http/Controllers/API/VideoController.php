@@ -3,8 +3,15 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Models\Base_table;
+use App\Models\board;
+use App\Models\Class_model;
 use App\Models\Dobusinesswith_Model;
 use App\Models\Dobusinesswith_sub;
+use App\Models\Institute_detail;
+use App\Models\Medium_model;
+use App\Models\Standard_model;
+use App\Models\Subject_model;
 use App\Models\Topic_model;
 use App\Models\User;
 use App\Models\VideoAssignToBatch;
@@ -15,6 +22,7 @@ use Illuminate\Http\Request;
 use Auth;
 use App\Traits\ApiTrait;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 
 class VideoController extends Controller
@@ -41,7 +49,24 @@ class VideoController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        
+        $institute_name=Institute_detail::where('id',$request->input('institute_id'))->first();
+        $base_table = Base_table::where('id',$request->base_table_id)->first();
+        $ins_name=$institute_name->institute_name;
+        $board = board::where('id',$base_table->board)->first();
+        $board_name = $board->name;
+        $medium = Medium_model::where('id',$base_table->medium)->first();
+        $medium_name = $medium->name;
+        $class = Class_model::where('id',$base_table->institute_for_class)->first();
+        $class_name = $class->name;
+        $standard = Standard_model::where('id',$base_table->standard)->first();
+        $standard_name = $standard->name;
+        $subject = Subject_model::where('id',$request->subject_id)->first();
+        $subject_name = $subject->name;
+         
+        $dynamicPath = "$ins_name/$board_name/$medium_name/$class_name/$standard_name/$subject_name";
+        if (!Storage::exists("public/$dynamicPath")) {
+            Storage::makeDirectory("public/$dynamicPath", 0775, true);
+        }
         $check = Dobusinesswith_Model::where('id', $request->category_id)->select('category_id')->first();
         
         if (!$check || $check->category_id != $request->parent_category_id) {
@@ -53,7 +78,7 @@ class VideoController extends Controller
         } elseif ($request->parent_category_id == '3') {
             $extensions = ['pdf'];
         }
-        
+        $validator = Validator::make($request->all(), []);
         $validator->sometimes('topic_video_pdf', 'required|mimes:' . implode(',', $extensions) . '|max:204800', function ($input) use ($request) {
             return $request->parent_category_id == '1' || $request->parent_category_id == '3';
         });
@@ -64,15 +89,20 @@ class VideoController extends Controller
         }
         
         try {
-            
+            // print_r($request->file('topic_video_pdf'));exit;
             // Handle file upload
             if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
                 $path = '';
+                // echo "$dynamicPath/video";exit;
                 if ($request->parent_category_id == '1') {
-                    $path = $request->file('topic_video_pdf')->store('videos', 'public');
+                    // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
+                    $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
+                    $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileName);
                 } elseif ($request->parent_category_id == '3') {
                     if (implode(',', $extensions) == 'pdf') {
-                        $path = $request->file('topic_video_pdf')->store('pdfs', 'public');
+                        // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
+                        $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
+                        $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileName);
                     }
                 }
             }
