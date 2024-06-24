@@ -1160,6 +1160,7 @@ class TeacherController extends Controller
             }
 
             $instrdids = Teacher_model::where('teacher_id', $teacher_id)
+                ->where('status', '1')
                 ->whereNull('deleted_at')->pluck('institute_id');
 
             $institds = institute_detail::whereIN('id', $instrdids)->get();
