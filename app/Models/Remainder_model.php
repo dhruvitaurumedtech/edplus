@@ -11,6 +11,6 @@ class Remainder_model extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'remainder';
     protected $fillable = [
-        'role_type_id', 'student_id', 'date', 'time', 'title', 'message'
+        'type_field','role_type_id', 'student_id', 'date', 'time', 'title', 'message'
     ];
 }

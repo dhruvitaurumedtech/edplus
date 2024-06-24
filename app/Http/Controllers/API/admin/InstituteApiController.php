@@ -6156,6 +6156,7 @@ class InstituteApiController extends Controller
             $time = date('H:i', strtotime($request->input('time')));
 
             Remainder_model::create([
+                'type_field'=>'1',
                 'role_type_id' => $request->input('role_type_id'),
                 'student_id' => $request->input('student_id'),
                 'date' => $date,
@@ -6164,6 +6165,34 @@ class InstituteApiController extends Controller
                 'message' => $request->input('message'),
             ]);
             return $this->response([], "Remainder set successfully.");
+
+        }catch(Exception $e){
+            return $this->response($e, "Invalid token.", false, 400);
+
+        }
+    }
+    function create_greeting(Request $request){
+        $validator = Validator::make($request->all(), [
+            'date' => 'required',
+            'title' => 'required',
+            'message' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $date=Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
+            // $time = date('H:i', strtotime($request->input('time')));
+
+            Remainder_model::create([
+                'type_field'=>'2',
+                'role_type_id' => $request->input('role_type_id'),
+                'student_id' => $request->input('student_id'),
+                'date' => $date,
+                'title' => $request->input('title'),
+                'message' => $request->input('message'),
+            ]);
+            return $this->response([], "Greeting set successfully.");
 
         }catch(Exception $e){
             return $this->response($e, "Invalid token.", false, 400);
