@@ -547,7 +547,8 @@ class StudentController extends Controller
                             'country_code' => $parentData['country_code'],
                             'country_code_name' => $parentData['country_code_name'],
                             'mobile' => $parentData['mobile'],
-                            'role_type' => '5'
+                            'role_type' => '5',
+                            'status' => '1'
                         ]);
 
                         $parent_id = $user->id;
