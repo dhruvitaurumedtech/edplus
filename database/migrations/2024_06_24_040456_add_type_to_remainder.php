@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('remainder', function (Blueprint $table) {
             $table->unsignedTinyInteger('type_field')->comment('1: remainder, 2: greeting')->after('id');
+            $table->string('status')->default('false')->after('message');
         });
     }
 
