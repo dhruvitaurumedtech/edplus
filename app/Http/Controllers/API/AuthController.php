@@ -155,6 +155,16 @@ class AuthController extends Controller
             } else {
                 $institute_id = null;
             }
+
+            $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
+                        
+            User::where('email',$request->email)->update(['otp_num'=>$token]);
+
+            Mail::send('emails.registerotpverifymail.blade', ['token' => $token], function ($message) use ($request) {
+              $message->to($request->email);
+              $message->subject('Verification Code');
+            });
+            
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
@@ -396,18 +406,12 @@ class AuthController extends Controller
           ])) {
         try {
             $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-      
-            $abc = DB::table('password_resets')->insert([
-              'email' => $request->email,
-              'token' => $token,
-              'created_at' => Carbon::now()
-            ]);
-            
+                        
             User::where('email',$request->email)->update(['otp_num'=>$token]);
 
-            Mail::send('emails.forgot', ['token' => $token,'name' => $request->firstname], function ($message) use ($request) {
+            Mail::send('emails.registerotpverifymail.blade', ['token' => $token], function ($message) use ($request) {
               $message->to($request->email);
-              $message->subject('Reset Your Password');
+              $message->subject('Verification Code');
             });
             
             return response()->json([
@@ -423,7 +427,7 @@ class AuthController extends Controller
               'message' => 'Invalid email address'
             ], 400);
           }
-        }
+    }
 
     public function verify_otp(Request $request)
     {
