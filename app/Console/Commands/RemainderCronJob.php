@@ -40,7 +40,7 @@ class RemainderCronJob extends Command
             $givenDateTime = Carbon::createFromFormat('Y-m-d H:i', "$givenDateString $givenTimeString");
             $currentDateTime = Carbon::now()->format('Y-m-d H:i'); 
 
-            if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime) {
+            if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime ||  $givenDateTime->format('Y-m-d') ===$givenDateString) {
                 
                 $serverKey = env('SERVER_KEY');
 
