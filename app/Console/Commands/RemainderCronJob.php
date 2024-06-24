@@ -40,9 +40,9 @@ class RemainderCronJob extends Command
             $givenTimeString = $dateTime->format('H:i');
             $givenDateTime = Carbon::createFromFormat('Y-m-d H:i', "$givenDateString $givenTimeString");
             $currentDateTime = Carbon::now()->format('Y-m-d H:i'); 
-            if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime) {
+            if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime && $value->status == 'false') {
            
-                Remainder_model::where('id',$value->id)->update([]);
+                Remainder_model::where('id',$value->id)->update(['status'=>'success']);
            
                 $serverKey = env('SERVER_KEY');
 
@@ -101,8 +101,9 @@ class RemainderCronJob extends Command
             $givenDateString = $value->date;
             $currentDateString = Carbon::now()->format('Y-m-d');
 
-            if ($givenDateString === $currentDateString) {
+            if ($givenDateString === $currentDateString && $value->status == 'false') {
                 
+                Remainder_model::where('id',$value->id)->update(['status'=>'success']);
                 $serverKey = env('SERVER_KEY');
 
                 $url = "https://fcm.googleapis.com/fcm/send";
