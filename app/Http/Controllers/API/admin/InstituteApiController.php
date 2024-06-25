@@ -5996,24 +5996,41 @@ class InstituteApiController extends Controller
                     // } else {
                     //     $subject = $request->subject_id;
                     // }
-                    $subjects = Subject_model::where('base_table_id', $value2['id'])->get();
-                    foreach ($subjects as $subject) {
 
-                    $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
-                        ->where('institute_id', $request->institute_id);
-                    $teacher_detail->update([
-                        'institute_id' => $request->institute_id,
-                        'teacher_id' => $request->teacher_id,
-                        'institute_for_id' => $value2['institute_for'],
-                        'board_id' => $value2['board'],
-                        'medium_id' => $value2['medium'],
-                        'class_id' => $value2['institute_for_class'],
-                        'standard_id' => $value2['standard'],
-                        'stream_id' => $value2['stream'],
-                        'subject_id' => $subject->id,
-                        'status' => '1',
-                    ]);
-                   }
+                    // $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
+                    //     ->where('institute_id', $request->institute_id);
+                    // $teacher_detail->update([
+                    //     'institute_id' => $request->institute_id,
+                    //     'teacher_id' => $request->teacher_id,
+                    //     'institute_for_id' => $value2['institute_for'],
+                    //     'board_id' => $value2['board'],
+                    //     'medium_id' => $value2['medium'],
+                    //     'class_id' => $value2['institute_for_class'],
+                    //     'standard_id' => $value2['standard'],
+                    //     'stream_id' => $value2['stream'],
+                    //     'subject_id' => $subject,
+                    //     'status' => '1',
+                    // ]);
+                    $teacherDetail = Teacher_model::where('teacher_id', $request->teacher_id)
+                        ->where('institute_id', $request->institute_id)
+                        ->first(); // Use first() to get a single model instance
+
+                        if ($teacherDetail) {
+                            foreach ($request->subject_id as $subject_id) {
+                                $teacherDetail->update([
+                                    'institute_id' => $request->institute_id,
+                                    'teacher_id' => $request->teacher_id,
+                                    'institute_for_id' => $value2['institute_for'],
+                                    'board_id' => $value2['board'],
+                                    'medium_id' => $value2['medium'],
+                                    'class_id' => $value2['institute_for_class'],
+                                    'standard_id' => $value2['standard'],
+                                    'stream_id' => $value2['stream'],
+                                    'subject_id' => $subject_id,
+                                    'status' => '1',
+                                ]);
+                            }
+                        } 
                 }
             }
             User::where('id', $request->teacher_id)->update([
