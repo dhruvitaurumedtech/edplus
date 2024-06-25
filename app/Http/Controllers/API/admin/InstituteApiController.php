@@ -2858,7 +2858,7 @@ class InstituteApiController extends Controller
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
-                    'date_of_birth' => (!empty($user_list->dob)) ? date('d-m-y', strtotime($user_list->dob)) : '',
+                    'date_of_birth' => (!empty($user_list->dob)) ? date('d-m-Y', strtotime($user_list->dob)) : '',
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
@@ -3246,7 +3246,7 @@ class InstituteApiController extends Controller
                         $data = $student_details->update([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' => date('d-m-y', strtotime($request->date_of_birth)),
+                            'dob' => date('d-m-Y', strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
@@ -3410,6 +3410,17 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
+                        $student_details = User::find($student_id);
+                        $data = $student_details->update([
+                            'firstname' => $request->first_name,
+                            'lastname' => $request->last_name,
+                            'dob' => date('d-m-Y', strtotime($request->date_of_birth)),
+                            'address' => $request->address,
+                            'email' => $request->email_id,
+                            'country_code' => $request->country_code,
+                            'country_code_name'=>$request->country_code_name,
+                            'mobile' => $request->mobile_no,
+                        ]);
                     }
                     if (!empty($student_id)) {
                         $studentdetail = [
