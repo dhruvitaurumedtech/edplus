@@ -5991,11 +5991,13 @@ class InstituteApiController extends Controller
                 }
                 $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
                 foreach ($base_table_response as $value2) {
-                    if (is_array($request->subject_id)) {
-                        $subject = implode(',', $request->subject_id);
-                    } else {
-                        $subject = $request->subject_id;
-                    }
+                    // if (is_array($request->subject_id)) {
+                    //     $subject = implode(',', $request->subject_id);
+                    // } else {
+                    //     $subject = $request->subject_id;
+                    // }
+                    $subjects = Subject_model::where('base_table_id', $value2['id'])->get();
+                    foreach ($subjects as $subject) {
 
                     $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
                         ->where('institute_id', $request->institute_id);
@@ -6008,9 +6010,10 @@ class InstituteApiController extends Controller
                         'class_id' => $value2['institute_for_class'],
                         'standard_id' => $value2['standard'],
                         'stream_id' => $value2['stream'],
-                        'subject_id' => $subject,
+                        'subject_id' => $subject->id,
                         'status' => '1',
                     ]);
+                   }
                 }
             }
             User::where('id', $request->teacher_id)->update([
