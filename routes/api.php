@@ -56,7 +56,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/videoAssign', [VideoController::class, 'videoassign'])->middleware('check.permission:10,1');
     Route::post('/institute/category-list', [VideoController::class, 'video_category']);
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
-    Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
+    Route::post('/institute/0-first', [InstituteApiController::class, 'get_homescreen_first']);
     Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
     Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get')->middleware('check.permission:11,4');
     Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request')->middleware('check.permission:12,1');

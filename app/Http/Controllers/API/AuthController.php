@@ -160,7 +160,7 @@ class AuthController extends Controller
                         
             User::where('email',$request->email)->update(['otp_num'=>$token]);
 
-            Mail::send('emails.registerotpverifymail', ['token' => $token], function ($message) use ($request) {
+            Mail::send('emails.registerotpverifymail', ['token' => $token,'name'=>$request->firstname], function ($message) use ($request) {
               $message->to($request->email);
               $message->subject('Verification Code');
             });
