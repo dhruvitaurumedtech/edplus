@@ -2852,12 +2852,13 @@ class InstituteApiController extends Controller
                         'image' => asset($subDT->image)
                     );
                 }
+                
                 $response_data = [
                     'student_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
-                    'date_of_birth' => (!empty($user_list->dob)) ? date('d-m-Y', strtotime($user_list->dob)) : '',
+                    'date_of_birth' => (!empty($user_list->dob)) ? date('d-m-y', strtotime($user_list->dob)) : '',
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
@@ -3245,7 +3246,7 @@ class InstituteApiController extends Controller
                         $data = $student_details->update([
                             'firstname' => $request->first_name,
                             'lastname' => $request->last_name,
-                            'dob' => date('d-m-Y', strtotime($request->date_of_birth)),
+                            'dob' => date('d-m-y', strtotime($request->date_of_birth)),
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
