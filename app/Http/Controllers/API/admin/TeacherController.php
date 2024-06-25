@@ -908,8 +908,7 @@ class TeacherController extends Controller
                             'name' => $subDT->name,
                             'image' => asset($subDT->image)
                         );
-
-                    }
+           }
                     $batches=Batches_model::where('institute_id',$request->institute_id)
                                    ->where('board_id',$values->board_id)
                                   ->where('medium_id',$values->medium_id)
@@ -924,7 +923,9 @@ class TeacherController extends Controller
                         ];
                      }          
 
-                    $response_data_two[]=[ 'board' => $values->board,
+                    $response_data_two[]=[
+                            'teacher_detail_id' => $values->id,
+                            'board' => $values->board,
                             'board_id' => $values->board_id,
                             'medium' => $values->medium,
                             'medium_id' => $values->medium_id,
@@ -933,7 +934,8 @@ class TeacherController extends Controller
                             'stream' => $values->stream,
                             'stream_id' => $values->stream_id,
                             'subject'=>$subjectslist,
-                            'batches'=>$batch_detail ];
+                            'batches'=>$batch_detail
+                         ];
                  }
                 $response_data = [
                     'id' => $user_list->id,
