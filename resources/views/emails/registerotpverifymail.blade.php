@@ -23,14 +23,18 @@
     </style>
 </head>
 <body>
-    <h1>Please use the verification code below to sign in.</h1>
-    <p>{{$token}},</p>
+Hey {{$name}},
 
-    <p>If you didn’t request this, you can ignore this email.</p>
+<p>Welcome to EdWide! We’re excited to have you on board. To complete your account setup, please use the verification code below:</p>
 
-    <p>Thank you,</p>
-    <p>The Support Team</p>
-    
+<p>Verification Code: {{$token}}</p>
+
+<p>Please enter this code in the verification section of your account settings to activate your account. If you didn’t sign up for [Your Platform], you can ignore this email.</p>
+
+<p>Thank you for choosing EdWide!</p>
+
+<p>Best Regards,</p>
+<p>EdWide</p>    
 </body>
 </html>
 
