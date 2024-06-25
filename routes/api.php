@@ -210,12 +210,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
     Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
     Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
+
+    //remainder
+    Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
+    Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
 });
 
 
 
-Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
-Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+
 Route::post('test', [InstituteApiController::class, 'test']);
 
 
