@@ -2852,6 +2852,7 @@ class InstituteApiController extends Controller
                         'image' => asset($subDT->image)
                     );
                 }
+                
                 $response_data = [
                     'student_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
@@ -3409,6 +3410,17 @@ class InstituteApiController extends Controller
                         $student_id = $data->id;
                     } else {
                         $student_id = $student_id;
+                        $student_details = User::find($student_id);
+                        $data = $student_details->update([
+                            'firstname' => $request->first_name,
+                            'lastname' => $request->last_name,
+                            'dob' => date('d-m-Y', strtotime($request->date_of_birth)),
+                            'address' => $request->address,
+                            'email' => $request->email_id,
+                            'country_code' => $request->country_code,
+                            'country_code_name'=>$request->country_code_name,
+                            'mobile' => $request->mobile_no,
+                        ]);
                     }
                     if (!empty($student_id)) {
                         $studentdetail = [
