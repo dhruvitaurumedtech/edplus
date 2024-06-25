@@ -6012,11 +6012,11 @@ class InstituteApiController extends Controller
                     //     'status' => '1',
                     // ]);
                     $teacherDetail = Teacher_model::where('teacher_id', $request->teacher_id)
-                        ->where('institute_id', $request->institute_id)
-                        ->first(); // Use first() to get a single model instance
+                        ->where('institute_id', $request->institute_id);
+                        // ->first(); // Use first() to get a single model instance
 
-                        if ($teacherDetail) {
-                            foreach ($request->subject_id as $subject_id) {
+                        // if ($teacherDetail) {
+                            foreach(explode(',',$request->subject_id) as $subject_id) {
                                 $teacherDetail->update([
                                     'institute_id' => $request->institute_id,
                                     'teacher_id' => $request->teacher_id,
@@ -6030,7 +6030,7 @@ class InstituteApiController extends Controller
                                     'status' => '1',
                                 ]);
                             }
-                        } 
+                        // } 
                 }
             }
             User::where('id', $request->teacher_id)->update([
