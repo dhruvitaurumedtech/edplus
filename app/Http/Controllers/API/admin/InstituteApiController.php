@@ -5984,7 +5984,7 @@ class InstituteApiController extends Controller
                 $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
                     ->select('*')->get()->toarray();
                 foreach (explode(',', $request->batch_id) as $batchId) {
-                    Batch_assign_teacher_model::create([
+                    Batch_assign_teacher_model::firstOrCreate([
                         'teacher_id' => $request->teacher_id,
                         'batch_id' => $batchId,
                     ]);
