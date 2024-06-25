@@ -56,7 +56,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/videoAssign', [VideoController::class, 'videoassign'])->middleware('check.permission:10,1');
     Route::post('/institute/category-list', [VideoController::class, 'video_category']);
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
-    Route::post('/institute/0-first', [InstituteApiController::class, 'get_homescreen_first']);
+    Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
     Route::post('/institute/get-homescreen-second', [InstituteApiController::class, 'get_homescreen_second']);
     Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get')->middleware('check.permission:11,4');
     Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request')->middleware('check.permission:12,1');
@@ -100,7 +100,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('institute/update-institute', [InstituteApiController::class, 'update_institute']);
     Route::post('institute/student-fees-calculation', [InstituteApiController::class, 'student_fees_calculation'])->middleware('check.permission:7,1');
 
-    Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student')->middleware('check.permission:12,1');
+    Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks')->middleware('check.permission:5,4');
     Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
     Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
@@ -210,12 +210,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
     Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
     Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
+
+    //remainder
+    Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
+    Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
 });
 
 
 
-Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
-Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+
 Route::post('test', [InstituteApiController::class, 'test']);
 
 

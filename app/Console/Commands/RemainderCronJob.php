@@ -6,6 +6,7 @@ use App\Models\Remainder_model;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 use PDO;
 
 class RemainderCronJob extends Command
@@ -36,12 +37,11 @@ class RemainderCronJob extends Command
             $givenDateString = $value->date;
             $timeString = $value->time;
             $dateTime = Carbon::createFromFormat('H:i:s', $timeString);
-
             $givenTimeString = $dateTime->format('H:i');
             $givenDateTime = Carbon::createFromFormat('Y-m-d H:i', "$givenDateString $givenTimeString");
             $currentDateTime = Carbon::now()->format('Y-m-d H:i'); 
             if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime && $value->status == 'false') {
-           
+         
                 Remainder_model::where('id',$value->id)->update(['status'=>'success']);
            
                 $serverKey = env('SERVER_KEY');
@@ -157,7 +157,9 @@ class RemainderCronJob extends Command
                 }
             } 
          }
-         
+         Log::info('Test message.');
+
+
 
        }
     }
