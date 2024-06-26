@@ -157,12 +157,14 @@ class ChapterController extends Controller
             )
             ->where('standard.status', 'active')
             ->get();
+            // echo "<pre>";print_r($Standard);
+            // echo "<pre>";print_r($Standard_list);exit;
         $subject = Subject_model::get();
         return view('chapter.edit', compact('Standard', 'subject', 'Standard_list'));
     }
     public function chapter_update(Request $request)
     {
-
+        // echo "<pre>";print_r($request->all());exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
@@ -178,9 +180,10 @@ class ChapterController extends Controller
             ->where('base_table_id', $request->input('standard_id'))
             ->exists();
         if ($exists > 0) {
-            echo "hi";
+           
             return redirect()->route('chapter.list')->with('success', 'Already Exists!');
         } else {
+            
             foreach ($request->chapter_name as $i => $chapterName) {
                 $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
@@ -189,8 +192,8 @@ class ChapterController extends Controller
                     $imagePath = $chapter_imageFile->store('chapter', 'public');
                     $chapter->chapter_image = $imagePath;
                 }
-                $chapter->base_table_id = $request->input('standard_id')[$i];
-                $chapter->subject_id = $request->input('subject')[$i];
+                $chapter->base_table_id = $request->input('standard_id');
+                $chapter->subject_id = $request->input('subject');
                 $chapter->chapter_no = $request->input('chapter_no')[$i];
                 $chapter->chapter_name = $chapterName;
 
