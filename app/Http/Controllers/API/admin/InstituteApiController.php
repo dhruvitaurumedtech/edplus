@@ -5986,7 +5986,7 @@ class InstituteApiController extends Controller
                 return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
             }
             foreach ($request->teacher_detail_id as $index => $teacher_detail_id) {
-                $teacherDetail = Teacher_model::find($teacher_detail_id);
+                $teacherDetail = Teacher_model::find($teacher_detail_id[$index]);
         
                 if ($teacherDetail) {
                     // Update the existing teacher detail record
