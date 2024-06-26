@@ -592,7 +592,6 @@ class TeacherController extends Controller
                     'standard.id as standard_id',
                     'standard.name as standard_name',
                     'medium.name as medium_name',
-                    'batches.batch_id',
                     'batches.batch_name'
                 )
                 ->get()
