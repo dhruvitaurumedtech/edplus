@@ -588,7 +588,7 @@ class TeacherController extends Controller
                 ->where('teacher_detail.institute_id', $institute_id)
                 //->whereNull('teacher_detail.deleted_at')
                 // ->groupBy('standard.id')
-                ->groupBy('teacher_detail.standard_id')
+                ->groupBy('teacher_detail.standard_id', 'standard.id')
 
                 ->select(
                     // 'board.name as board_name',
