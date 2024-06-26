@@ -1017,6 +1017,7 @@ class StudentController extends Controller
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->where('time_table.batch_id', $getstdntdata->batch_id)
+                ->whereRaw("FIND_IN_SET(?, time_table.subject_id)", [$getstdntdata->subject_id])
                 ->where('time_table.lecture_date', $today)
                 ->select(
                     'subject.name as subject',
