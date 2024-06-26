@@ -27,7 +27,7 @@
                             <select class="form-control" id="standard_id" name="standard_id">
                                 <option value=" ">Select Option</option>
                                 @foreach($Standard_list as $value)
-                                <option value="{{$value->base_id}}" {{($value->id==$Standard_value->id)?'selected':''}}>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</option>
+                                <option value="{{$value->base_id}}" {{($value->base_id==$Standard_value->id)?'selected':''}}>{{$value->name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}</option>
                                 @endforeach
                             </select>
                         </div>
