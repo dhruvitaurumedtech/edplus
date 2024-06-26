@@ -227,6 +227,7 @@ class ParentsController extends Controller
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->where('time_table.batch_id', $getstdntdata->batch_id)
+                ->whereRaw("FIND_IN_SET(?, time_table.subject_id)", [$getstdntdata->subject_id])
                 ->where('time_table.lecture_date', $today)
                 ->select(
                     'subject.name as subject',
@@ -330,6 +331,7 @@ class ParentsController extends Controller
 
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
+                ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
                 ->count();
             $totalattendlec = array(
                 'total_lectures' => $totllect,

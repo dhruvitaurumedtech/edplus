@@ -1161,6 +1161,7 @@ class StudentController extends Controller
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->where('lecture_date', '<', $nextDayStr)
+                ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
                 ->count();
             $totalattendlec = [
                 'total_lectures' => $totllect,
