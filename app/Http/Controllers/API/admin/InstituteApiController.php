@@ -5959,7 +5959,7 @@ class InstituteApiController extends Controller
     public function approve_teacher(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'teacher_detail_id'=>'required',
+            'teacher_detail_id'=>'required|string',
             'firstname' => 'required',
             'lastname' => 'required',
             'mobile' => 'required',
@@ -5982,10 +5982,10 @@ class InstituteApiController extends Controller
             $batch_ids = explode(',', $request->batch_id);
             $subject_ids = explode(',', $request->subject_id);
 
-            if (count($batch_ids) !== count($subject_ids)) {
-                return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
-            }
-            foreach ($request->teacher_detail_id as $index => $teacher_detail_id) {
+            // if (count($batch_ids) !== count($subject_ids)) {
+            //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
+            // }
+            foreach (explode(',',$request->teacher_detail_id) as $index => $teacher_detail_id) {
                 $teacherDetail = Teacher_model::find($teacher_detail_id);
         
                 if ($teacherDetail) {
@@ -6000,8 +6000,8 @@ class InstituteApiController extends Controller
                         'board_id' => $request->board_id,
                         'medium_id' => $request->medium_id,
                         'standard_id' => $request->standard_id,
-                        'batch_id' => $batch_ids[$index],
-                        'subject_id' => $subject_ids[$index],
+                        'batch_id' => $batch_ids[$index] ?? null,
+                        'subject_id' => $subject_ids[$index] ?? null,
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
                     ]);
