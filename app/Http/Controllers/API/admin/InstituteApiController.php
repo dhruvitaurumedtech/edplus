@@ -5959,7 +5959,7 @@ class InstituteApiController extends Controller
     public function approve_teacher(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'teacher_detail_id'=>'required',
+            'teacher_detail_id'=>'required|string',
             'firstname' => 'required',
             'lastname' => 'required',
             'mobile' => 'required',
