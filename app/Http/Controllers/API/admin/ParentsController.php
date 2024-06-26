@@ -161,7 +161,6 @@ class ParentsController extends Controller
     //pending work in below
     public function parents_child_homescreen(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'child_id' => 'required',
             'institute_id'=>'required'
@@ -330,20 +329,35 @@ class ParentsController extends Controller
 
         //attendance
         $totalattendlec = [];
-            $cumnth = date('Y-m');
-            $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
-                ->where('student_id', $request->child_id)
-                ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('attendance', 'P')->count();
+        $cumnth = date('Y-m');
+        $cmtoday = date('Y-m-d');
+        $date = new \DateTime($cmtoday);
+        $date->modify('+1 day');
+        $nextDayStr = $date->format('Y-m-d');
 
+            $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
+            ->where('student_id', $user_id)
+            ->where('created_at', 'like', '%' . $cumnth . '%')
+            ->where('created_at', '<', $nextDayStr)
+            ->where('attendance', 'P')->count();
+
+            $totalmissattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
+                ->where('student_id', $user_id)
+                ->where('created_at', 'like', '%' . $cumnth . '%')
+                ->where('created_at', '<', $nextDayStr)
+                ->where('attendance', 'A')->count();
+
+            
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
+                ->where('lecture_date', '<', $nextDayStr)
                 ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
-                ->count();
+                ->count();    
+
             $totalattendlec = array(
                 'total_lectures' => $totllect,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => $totllect - $totalattlec
+                'miss_lectures' => $totalmissattlec 
             );
         $data = [
             'banners_data'=>$banners_data,
