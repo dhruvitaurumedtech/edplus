@@ -182,7 +182,7 @@ class StaffController extends Controller
             $modules = Module::where('type', 2)->with(['Features' => function ($query) {
                 $query->select('id', 'module_id', 'feature_name');
             }])->select('id', 'module_name')->where('status', 1)->get();
-
+            
             $permissionsIds = collect();
             if (empty($request->institute_id)) {
                 $user = Auth::user();
@@ -198,11 +198,14 @@ class StaffController extends Controller
             }
 
             foreach ($modules as $module) {
+                // echo "<pre>";print_r($module->Features);
                 foreach ($module->Features as $feature) {
                     $featureActions = [];
 
                     foreach ($actions as $action) {
+
                         $hasPermission = $permissionsIds->contains(function ($permission) use ($feature, $action) {
+                        //    echo $permission->action_id;echo "<br>";echo $action->id;
                             return $permission->feature_id == $feature->id && $permission->action_id == $action->id;
                         });
 
