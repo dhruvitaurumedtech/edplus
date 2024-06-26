@@ -5959,20 +5959,20 @@ class InstituteApiController extends Controller
     public function approve_teacher(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'teacher_detail_id'=>'required|string',
+            'teacher_detail_id'=>'required',
             'firstname' => 'required',
             'lastname' => 'required',
             'mobile' => 'required',
             'email' => 'required',
             'qualification' => 'required',
             'employee_type' => 'required',
-            'board_id' => 'required|string',
-            'medium_id' => 'required|string',
-            'standard_id' => 'required|string',
-            'batch_id' => 'required|string',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+            'standard_id' => 'required',
+            'batch_id' => 'required',
             // 'stream_id' => 'required',
-            'subject_id' => 'required|string',
-            'teacher_id' => 'required|string',
+            'subject_id' => 'required',
+            'teacher_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -5981,6 +5981,9 @@ class InstituteApiController extends Controller
         try {
             $batch_ids = explode(',', $request->batch_id);
             $subject_ids = explode(',', $request->subject_id);
+            $board_ids = explode(',',$request->board_id);
+            $medium_ids = explode(',',$request->medium_id);
+            $standard_ids = explode(',',$request->standard_id);
 
             // if (count($batch_ids) !== count($subject_ids)) {
             //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
@@ -5998,11 +6001,11 @@ class InstituteApiController extends Controller
                         'email' => $request->email,
                         'qualification' => $request->qualification,
                         'employee_type' => $request->employee_type,
-                        'board_id' => $request->board_id,
-                        'medium_id' => $request->medium_id,
-                        'standard_id' => $request->standard_id,
-                        'batch_id' => $batch_ids[$index] ?? null,
-                        'subject_id' => $subject_ids[$index] ?? null,
+                        'board_id' => $board_ids[$index],
+                        'medium_id' => $medium_ids[$index],
+                        'standard_id' => $standard_ids[$index],
+                        'batch_id' => $batch_ids[$index],
+                        'subject_id' => $subject_ids[$index],
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
                     ]);
