@@ -5985,7 +5985,8 @@ class InstituteApiController extends Controller
             // if (count($batch_ids) !== count($subject_ids)) {
             //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
             // }
-            foreach (explode(',',$request->teacher_detail_id) as $index => $teacher_detail_id) {
+            $teacher_Explode = explode(',', $request->teacher_detail_id);
+            foreach ($teacher_Explode as $index => $teacher_detail_id) {
                 $teacherDetail = Teacher_model::find($teacher_detail_id);
         
                 if ($teacherDetail) {
