@@ -588,14 +588,15 @@ class TeacherController extends Controller
                 ->where('teacher_detail.institute_id', $institute_id)
                 //->whereNull('teacher_detail.deleted_at')
                 // ->groupBy('standard.id')
-                ->groupBy('standard.id', 'board.name', 'standard.name', 'medium.name', 'batches.batch_name')
+                ->groupBy('teacher_detail.standard_id')
 
                 ->select(
-                    'board.name as board_name',
+                    // 'board.name as board_name',
                     'standard.id as standard_id',
                     'standard.name as standard_name',
-                    'medium.name as medium_name',
-                    'batches.batch_name'
+                    DB::raw('MAX(board.name) as board_name'),
+                    DB::raw('MAX(medium.name) as medium_name'),
+                    DB::raw('MAX(batches.batch_name) as batch_name')
                 )
                 ->get()
                 ->toArray();
