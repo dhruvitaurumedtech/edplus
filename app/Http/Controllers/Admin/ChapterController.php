@@ -143,6 +143,7 @@ class ChapterController extends Controller
             )
             ->where('standard.status', 'active')
             ->where('chapters.id', $id)->get();
+            // echo "<pre>";print_r($Standard);exit;
         $Standard_list = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
 
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
@@ -196,7 +197,6 @@ class ChapterController extends Controller
                 $chapter->subject_id = $request->input('subject');
                 $chapter->chapter_no = $request->input('chapter_no')[$i];
                 $chapter->chapter_name = $chapterName;
-
                 $chapter->save();
             }
         }
@@ -207,7 +207,7 @@ class ChapterController extends Controller
     {
         $chapter_id = $request->input('id');
         $class_list = Chapter::where('id', $chapter_id);
-
+       
         if (!$class_list) {
             return redirect()->route('chapter.list')->with('error', 'Chapters not found');
         }

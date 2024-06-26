@@ -702,6 +702,36 @@ document.querySelectorAll('.business_deletebutton').forEach(function (button) {
         });
     });
 });
+document.querySelectorAll('.chapter_delete').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var id = this.getAttribute('data-user-id');
+        
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('chapter-delete', {
+                    id: id
+                })
+                    .then(response => {
+                        location.reload(true);
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+    });
+});
 //banner-size
 $(document).ready(function () {
 
