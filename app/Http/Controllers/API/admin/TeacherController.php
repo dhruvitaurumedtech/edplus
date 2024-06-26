@@ -635,7 +635,7 @@ class TeacherController extends Controller
                 ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('batches.standard_id', $request->standard_id)
                 ->select(
                     'board.id as board_id',
