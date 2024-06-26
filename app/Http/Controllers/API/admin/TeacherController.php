@@ -631,10 +631,10 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $value = TeacherAssignBatch::join('batches', 'batches.id', '=', 'teacher_assign_batch.batch_id')
-                ->Join('board', 'board.id', '=', 'batches.board_id')
-                ->Join('medium', 'medium.id', '=', 'batches.medium_id')
-                ->Join('standard', 'standard.id', '=', 'batches.standard_id')
+            $value = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+                ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->where('teacher_assign_batch.teacher_id', $request->teacher_id)
                 ->where('batches.standard_id', $request->standard_id)
                 ->select(
@@ -644,7 +644,7 @@ class TeacherController extends Controller
                     'standard.name as standard_name',
                     'medium.id as medium_id',
                     'medium.name as medium_name',
-                    'teacher_assign_batch.batch_id',
+                    'teacher_detail.batch_id',
                     'batches.batch_name',
                     'batches.subjects'
                 )
