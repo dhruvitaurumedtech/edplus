@@ -642,7 +642,7 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $teacher_data = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+            $value = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
                 ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
@@ -659,11 +659,11 @@ class TeacherController extends Controller
                     'batches.batch_name',
                     'batches.subjects'
                 )
-                ->get()->toarray();
+                ->first();
                 
             $teacher_response = [];
 
-            foreach ($teacher_data as $value) {
+            // foreach ($teacher_data as $value) {
                 $subject_data = Subject_model::whereIn('id', explode(',', $value->subjects))->get();
                 $subject_response = [];
                 foreach ($subject_data as $subject_value) {
@@ -685,7 +685,7 @@ class TeacherController extends Controller
                     'batch' => $value->batch_name,
                     'subject_list' => $subject_response,
                 ];
-            }
+            // }
             return $this->response($teacher_response, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
