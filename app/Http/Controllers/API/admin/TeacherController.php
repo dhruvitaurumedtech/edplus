@@ -626,6 +626,7 @@ class TeacherController extends Controller
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'teacher_id' => 'required',
+            'standard_id' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
