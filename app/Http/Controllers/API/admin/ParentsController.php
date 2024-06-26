@@ -41,14 +41,21 @@ class ParentsController extends Controller
             
             $childs = [];
             $chilsdata = Parents::join('users', 'users.id', '=', 'parents.student_id')
-                ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
-                ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-                ->where('parents.parent_id', Auth::id())
-                ->where('parents.verify', '1')
-                ->select('users.firstname', 'users.lastname','users.image',
-                 'institute_detail.institute_name',
-                 'institute_detail.id as institute_id',
-                 'parents.student_id','students_details.subject_id')->get();
+                    ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
+                    ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+                    ->where('parents.parent_id', Auth::id())
+                    ->where('parents.verify', '1')
+                    ->distinct()
+                    ->select(
+                        'users.firstname',
+                        'users.lastname',
+                        'users.image',
+                        'institute_detail.institute_name',
+                        'institute_detail.id as institute_id',
+                        'parents.student_id',
+                        'students_details.subject_id'
+                    )
+                    ->get();
                 
                 foreach ($chilsdata as $chilDT) {
                 $subids = explode(',', $chilDT->subject_id);
@@ -154,7 +161,6 @@ class ParentsController extends Controller
     //pending work in below
     public function parents_child_homescreen(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'child_id' => 'required',
             'institute_id'=>'required'
@@ -323,20 +329,35 @@ class ParentsController extends Controller
 
         //attendance
         $totalattendlec = [];
-            $cumnth = date('Y-m');
-            $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
-                ->where('student_id', $request->child_id)
-                ->where('created_at', 'like', '%' . $cumnth . '%')
-                ->where('attendance', 'P')->count();
+        $cumnth = date('Y-m');
+        $cmtoday = date('Y-m-d');
+        $date = new \DateTime($cmtoday);
+        $date->modify('+1 day');
+        $nextDayStr = $date->format('Y-m-d');
 
+            $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
+            ->where('student_id', $user_id)
+            ->where('created_at', 'like', '%' . $cumnth . '%')
+            ->where('created_at', '<', $nextDayStr)
+            ->where('attendance', 'P')->count();
+
+            $totalmissattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
+                ->where('student_id', $user_id)
+                ->where('created_at', 'like', '%' . $cumnth . '%')
+                ->where('created_at', '<', $nextDayStr)
+                ->where('attendance', 'A')->count();
+
+            
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
+                ->where('lecture_date', '<', $nextDayStr)
                 ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
-                ->count();
+                ->count();    
+
             $totalattendlec = array(
                 'total_lectures' => $totllect,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => $totllect - $totalattlec
+                'miss_lectures' => $totalmissattlec 
             );
         $data = [
             'banners_data'=>$banners_data,
@@ -379,8 +400,17 @@ class ParentsController extends Controller
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                 ->where('parents.parent_id', $parent_id)
                 ->where('parents.student_id', $value_student->id)
-                ->select('users.*','institute_detail.institute_name',
-                'institute_detail.logo','institute_detail.address')
+                ->select(
+                    DB::raw('MAX(users.id) as user_id'),
+                    DB::raw('MAX(users.firstname) as firstname'),
+                    DB::raw('MAX(users.lastname) as lastname'),
+                    DB::raw('MAX(users.email) as email'),
+                    DB::raw('MAX(users.mobile) as mobile'),
+                    'institute_detail.institute_name',
+                    'institute_detail.logo',
+                    'institute_detail.address'
+                )
+                ->groupBy('institute_detail.id', 'institute_detail.institute_name', 'institute_detail.logo', 'institute_detail.address', 'students_details.institute_id')
                 ->get();
                 $insts=[];
                 foreach($student2 as $insdat){
