@@ -641,10 +641,12 @@ class ExamController extends Controller
                 ['standard_id', $request->standard_id],
                 ['exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d')],
                 ['start_time', $request->start_time],
-                ['end_time', $request->end_time],
-                ['batch_id',$request->batch_id],
+                ['end_time', '<',$request->end_time],
+                ['batch_id', '>',  $request->batch_id],
             ])->exists();
 
+
+            
             if ($existing_exam) {
                 return $this->response([], "Exam already exists for this standard!", false, 400);
             }
