@@ -594,6 +594,7 @@ class TeacherController extends Controller
                     'standard.id',
                     'standard.name',
                     'medium.name',
+                    'batches.id',
                     'batches.batch_name'
                 )
 
