@@ -669,34 +669,40 @@ class TeacherController extends Controller
                 ->get();
 
             $teacher_data = [];
-
+            $result = [
+                'board_id' => null,
+                'board_name' => null,
+                'standard_id' => null,
+                'standard_name' => null,
+                'medium_id' => null,
+                'medium_name' => null,
+                'batch_id' => null,
+                'batch_name' => null,
+                'subject_list' => []
+            ];
             foreach ($teacher_details as $detail) {
-                $key = $detail->board_id . '_' . $detail->medium_id . '_' . $detail->standard_id . '_' . $detail->batch_id;
+                $result['board_id'] = $detail->board_id;
+                $result['board_name'] = $detail->board_name;
+                $result['standard_id'] = $detail->standard_id;
+                $result['standard_name'] = $detail->standard_name;
+                $result['medium_id'] = $detail->medium_id;
+                $result['medium_name'] = $detail->medium_name;
+                $result['batch_id'] = $detail->batch_id;
+                $result['batch_name'] = $detail->batch_name;
 
-                    if (!isset($teacher_data[$key])) {
-                        $teacher_data[$key] = [
-                            'board_id' => $detail->board_id,
-                            'board_name' => $detail->board_name,
-                            'standard_id' => $detail->standard_id,
-                            'standard_name' => $detail->standard_name,
-                            'medium_id' => $detail->medium_id,
-                            'medium_name' => $detail->medium_name,
-                            'batch_id' => $detail->batch_id,
-                            'batch_name' => $detail->batch_name,
-                            'subject_list' => []
-                        ];
-                    }
-
-                    $teacher_data[$key]['subject_list'][] = [
-                        'id' => $detail->subject_id,
-                        'subject_name' => $detail->subject_name,
-                        'image' =>!empty($detail->subject_image) ? url($detail->subject_image) : ''
-                    ];
+                $result['subject_list'][] = [
+                    'id' => $detail->subject_id,
+                    'subject_name' => $detail->subject_name,
+                    'image' => $detail->subject_image
+                ];
             }
 
-            $teacher_data = array_values($teacher_data);
+            $result['subject_list'] = array_map(
+                "unserialize",
+                array_unique(array_map("serialize", $result['subject_list']))
+            );
             
-            return $this->response($teacher_data, "Data Fetch Successfully");
+            return $this->response($result, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
