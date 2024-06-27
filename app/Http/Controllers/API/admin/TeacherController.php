@@ -644,31 +644,31 @@ class TeacherController extends Controller
         }
         try {
 
-$teacher_details = DB::table('teacher_detail')
-    ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-    ->join('board', 'board.id', '=', 'teacher_detail.board_id')
-    ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-    ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-    ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
-    ->where('teacher_detail.teacher_id', $request->teacher_id)
-    ->where('teacher_detail.standard_id', $request->standard_id)
-    ->where('teacher_detail.batch_id', $request->batch_id)
-    ->select(
-        'board.id as board_id',
-        'board.name as board_name',
-        'standard.id as standard_id',
-        'standard.name as standard_name',
-        'medium.id as medium_id',
-        'medium.name as medium_name',
-        'teacher_detail.batch_id',
-        'batches.batch_name',
-        'subject.id as subject_id',
-        'subject.name as subject_name',
-        'subject.image as subject_image'
-    )
-    ->get();
+            $teacher_details = DB::table('teacher_detail')
+                ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+                ->join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->where('teacher_detail.standard_id', $request->standard_id)
+                ->where('teacher_detail.batch_id', $request->batch_id)
+                ->select(
+                    'board.id as board_id',
+                    'board.name as board_name',
+                    'standard.id as standard_id',
+                    'standard.name as standard_name',
+                    'medium.id as medium_id',
+                    'medium.name as medium_name',
+                    'teacher_detail.batch_id',
+                    'batches.batch_name',
+                    'subject.id as subject_id',
+                    'subject.name as subject_name',
+                    'subject.image as subject_image'
+                )
+                ->get();
 
-$teacher_data = [];
+            $teacher_data = [];
 
             foreach ($teacher_details as $detail) {
                 $key = $detail->board_id . '_' . $detail->medium_id . '_' . $detail->standard_id . '_' . $detail->batch_id;
@@ -690,7 +690,7 @@ $teacher_data = [];
                     $teacher_data[$key]['subject_list'][] = [
                         'id' => $detail->subject_id,
                         'subject_name' => $detail->subject_name,
-                        'image' => $detail->subject_image
+                        'image' =>!empty($detail->subject_image) ? url($detail->subject_image) : ''
                     ];
             }
 
