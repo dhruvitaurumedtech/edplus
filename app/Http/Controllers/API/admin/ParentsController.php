@@ -345,7 +345,8 @@ class ParentsController extends Controller
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
-                ->where('attendance', 'A')->count();
+                ->where('attendance', 'A')
+                ->count();
 
             
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
