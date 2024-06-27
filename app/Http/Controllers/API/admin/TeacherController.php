@@ -991,8 +991,8 @@ class TeacherController extends Controller
             'address' => 'required|string|max:255',
             'pincode' => 'required|string|max:10',
             //'area' => 'required|string|max:255',
-            'about_us' => 'nullable|string',
-            'qualification' => 'required|string|max:255',
+            //'about_us' => 'nullable|string',
+            //'qualification' => 'required|string|max:255',
             'institute_name' => 'required|string|max:255',
             'startdate' => 'required',
             'enddate' => 'nullable',
@@ -1001,14 +1001,12 @@ class TeacherController extends Controller
             'mobile_no' => 'required|string|max:255',
             'country_code' =>'required',
             'country_code_name'=>'required',
-            'emergency_country_code' =>'required',
+            //'emergency_country_code' =>'required',
         ]);
 
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-
-
         $user = User::findOrFail($teacher_id);
-
+        
         $user->firstname = $request->input('firstname');
         $user->lastname = $request->input('lastname');
         $user->email = $request->input('email');
@@ -1023,7 +1021,6 @@ class TeacherController extends Controller
             $imagePath = $iconFile->store('profile', 'public');
             $user->image = $imagePath;
         }
-        
         $user->save();
         try {
             $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
@@ -1104,6 +1101,7 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
+                $emergency_country_code_name = explode(',', $request['emergency_country_code_name']);
                 
                 //print_r(count($qualification));exit;
                 // print_r($emergency_country_code);exit;
@@ -1114,6 +1112,8 @@ class TeacherController extends Controller
                         'relation_with' => $relation_with[$i],
                         'mobile_no' => $mobile_no[$i],
                         'country_code'=>$emergency_country_code[$i],
+                        'country_code_name'=>$emergency_country_code_name[$i],
+
                     ]);
                 }
             } else {
@@ -1121,7 +1121,8 @@ class TeacherController extends Controller
                 $relation_with = explode(',', $request['relation_with']);
                 $mobile_no = explode(',', $request['mobile_no']);
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
-                 //print_r($emergency_country_code);exit;
+                $emergency_country_code_name = explode(',', $request['emergency_country_code_name']);
+                //print_r($emergency_country_code);exit;
                 for ($i = 0; $i < count($name); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
@@ -1129,18 +1130,18 @@ class TeacherController extends Controller
                         'relation_with' => $relation_with[$i],
                         'mobile_no' => $mobile_no[$i],
                         'country_code'=>$emergency_country_code[$i],
+                        'country_code_name'=>$emergency_country_code_name[$i],
                     ]);
                 }
             }
             return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
-            return $e;exit;
+            
             return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
     public function teacher_profile(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             //'teacher_id' => 'required|integer',
         ]);
@@ -1225,7 +1226,8 @@ class TeacherController extends Controller
             'name'=>$emergencydata->name,
             'relation_with'=>$emergencydata->relation_with,
             'mobile_no'=>$emergencydata->mobile_no,
-            'country_code'=>$emergencydata->country_code];
+            'country_code'=>$emergencydata->country_code,
+            'country_code_name'=>$emergencydata->country_code_name];
           }
 
            $userdetail = array(
