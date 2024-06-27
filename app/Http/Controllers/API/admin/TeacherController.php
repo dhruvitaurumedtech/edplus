@@ -643,60 +643,60 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $teacher_data = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-            ->join('board', 'board.id', '=', 'teacher_detail.board_id')
-            ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-            ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-            ->where('teacher_detail.teacher_id', $request->teacher_id)
-            ->where('teacher_detail.standard_id', $request->standard_id)
-            ->where('teacher_detail.batch_id', $request->batch_id)
-            
-            ->select(
-                'board.id as board_id',
-                'board.name as board_name',
-                'standard.id as standard_id',
-                'standard.name as standard_name',
-                'medium.id as medium_id',
-                'medium.name as medium_name',
-                'teacher_detail.batch_id',
-                'batches.batch_name',
-                'teacher_detail.subject_id',
-                // DB::raw('GROUP_CONCAT(teacher_detail.subject_id) as subject_ids') 
-            )
-            // ->groupBy('board_id', 'board_name', 'standard_id', 'standard_name', 'medium_id', 'medium_name', 'teacher_detail.batch_id', 'batches.batch_name')
-   
-            ->get();
-        
-        $teacher_response = [];
-        
-        foreach ($teacher_data as $value) {
-            $subject_response = [];
-        
-            $subject_data = Subject_model::where('id', $value->subject_id)->get();
-        
-            foreach ($subject_data as $subject_value) {
-                $subject_response[] = [
-                    'id' => $subject_value->id,
-                    'subject_name' => $subject_value->name,
-                    'image' => !empty($subject_value->image) ? url($subject_value->image) : ''
-                ];
+
+$teacher_details = DB::table('teacher_detail')
+    ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+    ->join('board', 'board.id', '=', 'teacher_detail.board_id')
+    ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+    ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+    ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
+    ->where('teacher_detail.teacher_id', $request->teacher_id)
+    ->where('teacher_detail.standard_id', $request->standard_id)
+    ->where('teacher_detail.batch_id', $request->batch_id)
+    ->select(
+        'board.id as board_id',
+        'board.name as board_name',
+        'standard.id as standard_id',
+        'standard.name as standard_name',
+        'medium.id as medium_id',
+        'medium.name as medium_name',
+        'teacher_detail.batch_id',
+        'batches.batch_name',
+        'subject.id as subject_id',
+        'subject.name as subject_name',
+        'subject.image as subject_image'
+    )
+    ->get();
+
+$teacher_data = [];
+
+            foreach ($teacher_details as $detail) {
+                $key = $detail->board_id . '_' . $detail->medium_id . '_' . $detail->standard_id . '_' . $detail->batch_id;
+
+                    if (!isset($teacher_data[$key])) {
+                        $teacher_data[$key] = [
+                            'board_id' => $detail->board_id,
+                            'board_name' => $detail->board_name,
+                            'standard_id' => $detail->standard_id,
+                            'standard_name' => $detail->standard_name,
+                            'medium_id' => $detail->medium_id,
+                            'medium_name' => $detail->medium_name,
+                            'batch_id' => $detail->batch_id,
+                            'batch_name' => $detail->batch_name,
+                            'subject_list' => []
+                        ];
+                    }
+
+                    $teacher_data[$key]['subject_list'][] = [
+                        'id' => $detail->subject_id,
+                        'subject_name' => $detail->subject_name,
+                        'image' => $detail->subject_image
+                    ];
             }
-        
-            $teacher_response[] = [
-                'board_id' => $value->board_id,
-                'board' => $value->board_name,
-                'medium_id' => $value->medium_id,
-                'medium' => $value->medium_name,
-                'standard_id' => $value->standard_id,
-                'standard' => $value->standard_name,
-                'batch_id' => $value->batch_id,
-                'batch' => $value->batch_name,
-                'subject_list' => $subject_response, 
-            ];
-        }
-        
-        
-            return $this->response($teacher_response, "Data Fetch Successfully");
+
+            $teacher_data = array_values($teacher_data);
+            
+            return $this->response($teacher_data, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
