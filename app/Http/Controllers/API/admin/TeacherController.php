@@ -637,62 +637,72 @@ class TeacherController extends Controller
             'institute_id' => 'required',
             'teacher_id' => 'required',
             'standard_id' => 'required',
+            'batch_id' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $value = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-                ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
-                ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->where('teacher_detail.teacher_id', $request->teacher_id)
-                ->where('teacher_detail.standard_id', $request->standard_id)
-                ->select(
-                    'board.id as board_id',
-                    'board.name as board_name',
-                    'standard.id as standard_id',
-                    'standard.name as standard_name',
-                    'medium.id as medium_id',
-                    'medium.name as medium_name',
-                    'teacher_detail.batch_id',
-                    'batches.batch_name',
-                    'batches.subjects'
-                )
-                ->first();
-                
-            $teacher_response = [];
-
-            // foreach ($teacher_data as $value) {
-                $subject_data = Subject_model::whereIn('id', explode(',', $value->subjects))->get();
-                $subject_response = [];
-                foreach ($subject_data as $subject_value) {
-                    $subject_response[] = array(
-                        'id' => $subject_value->id,
-                        'subject_name' => $subject_value->name,
-                        'image' => !empty($subject_value->image) ? url($subject_value->image) : ''
-                    );
-                }
-
-                $teacher_response = [
-                    'board_id'=>$value->board_id,
-                    'board' => $value->board_name,
-                    'medium_id'=>$value->medium_id,
-                    'medium' => $value->medium_name,
-                    'standard_id'=>$value->standard_id,
-                    'standard' => $value->standard_name,
-                    'batch_id'=>$value->batch_id,
-                    'batch' => $value->batch_name,
-                    'subject_list' => $subject_response,
+            $teacher_data = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+            ->join('board', 'board.id', '=', 'teacher_detail.board_id')
+            ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+            ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->where('teacher_detail.standard_id', $request->standard_id)
+            ->where('teacher_detail.batch_id', $request->batch_id)
+            
+            ->select(
+                'board.id as board_id',
+                'board.name as board_name',
+                'standard.id as standard_id',
+                'standard.name as standard_name',
+                'medium.id as medium_id',
+                'medium.name as medium_name',
+                'teacher_detail.batch_id',
+                'batches.batch_name',
+                'teacher_detail.subject_id',
+                // DB::raw('GROUP_CONCAT(teacher_detail.subject_id) as subject_ids') 
+            )
+            // ->groupBy('board_id', 'board_name', 'standard_id', 'standard_name', 'medium_id', 'medium_name', 'teacher_detail.batch_id', 'batches.batch_name')
+   
+            ->get();
+        
+        $teacher_response = [];
+        
+        foreach ($teacher_data as $value) {
+            $subject_response = [];
+        
+            $subject_data = Subject_model::where('id', $value->subject_id)->get();
+        
+            foreach ($subject_data as $subject_value) {
+                $subject_response[] = [
+                    'id' => $subject_value->id,
+                    'subject_name' => $subject_value->name,
+                    'image' => !empty($subject_value->image) ? url($subject_value->image) : ''
                 ];
-            // }
+            }
+        
+            $teacher_response[] = [
+                'board_id' => $value->board_id,
+                'board' => $value->board_name,
+                'medium_id' => $value->medium_id,
+                'medium' => $value->medium_name,
+                'standard_id' => $value->standard_id,
+                'standard' => $value->standard_name,
+                'batch_id' => $value->batch_id,
+                'batch' => $value->batch_name,
+                'subject_list' => $subject_response, 
+            ];
+        }
+        
+        
             return $this->response($teacher_response, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
     //timetable list
-    public function timetable_list_teache(Request $request)
+    public function timetable_list_teacher(Request $request)
     {
 
         $validator = Validator::make($request->all(), [
