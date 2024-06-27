@@ -55,8 +55,16 @@ class SubjectController extends Controller
             //'stream' => 'required',
             //'subject' => 'required',
             'status' => 'required',
+            'subject' => 'required|array',
+            'subject.*' => 'required',
+            'subject_image'=>'required',
+            'subject_image.*'=>'required|mimes:svg,jpeg,png,pdf|max:2048',
 
-
+        ],[
+            'subject.*.required' => 'Subject name is required.',
+            'subject_image.*.required' => 'Subject image image is required.',
+            'subject_image.*.mimes' => 'Subject image image must be a valid SVG, JPEG, PNG, or PDF file.',
+            'subject_image.*.max' => 'Subject image image may not be greater than 2048 kilobytes in size.',
         ]);
 
         // Build the query
