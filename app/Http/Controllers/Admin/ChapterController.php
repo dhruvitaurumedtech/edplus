@@ -34,8 +34,6 @@ class ChapterController extends Controller
     }
     public function chapter_list(Request $request)
     {
-
-
         $Standards = Chapter::join('base_table', 'chapters.base_table_id', '=', 'base_table.id')
             ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
