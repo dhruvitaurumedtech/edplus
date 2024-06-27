@@ -26,9 +26,10 @@ class DeadstockController extends Controller
         }
         
         try{
-            $deadStock = new DeadStock();
+            
             $dedst = json_decode($request->item_name_qty, true);
             foreach ($dedst as $deadST) {
+                $deadStock = new DeadStock();
                 $deadStock->institute_id = $request->institute_id;
                 $deadStock->item_name = $deadST['item_name'];
                 $deadStock->no_of_item = $deadST['no_of_item'];
