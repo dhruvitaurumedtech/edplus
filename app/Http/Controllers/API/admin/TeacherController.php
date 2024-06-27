@@ -690,7 +690,7 @@ $teacher_data = [];
                     $teacher_data[$key]['subject_list'][] = [
                         'id' => $detail->subject_id,
                         'subject_name' => $detail->subject_name,
-                        'image' => $detail->subject_image
+                        'image' => asset($detail->subject_image)
                     ];
             }
 
