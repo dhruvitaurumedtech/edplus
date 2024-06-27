@@ -696,7 +696,8 @@ class TeacherController extends Controller
                 $result['subject_list'][] = [
                     'id' => $detail->subject_id,
                     'subject_name' => $detail->subject_name,
-                    'image' => $detail->subject_image
+                    'image' => !empty($detail->subject_image) ? url($detail->subject_image) : ''
+
                 ];
             }
 

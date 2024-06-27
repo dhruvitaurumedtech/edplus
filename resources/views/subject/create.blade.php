@@ -128,11 +128,20 @@
                                 <div class="col-md-4">
                                     <h3>Subject Name</h3>
                                     <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
+                                    @error('subject.*')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                                 </div>
+                               
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
                                     <input type="file" name="subject_image[]" class="form-control" onchange='openFile(event,"output")' placeholder="Select Subject Image">
+                                    @error('subject_image.*')
+                                    <div class="text-danger">{{ $message }}</div>
+                                @enderror
                                 </div>
+                               
+                               
                                 <div class="col-md-2"><img src="" id='output' class="subject-img-resize mt-4" style="display: none;"></div>
 
                                 <div class="col-md-2">
@@ -141,9 +150,7 @@
                             </div>
                             <div id="container"></div>
                         </div>
-                        @error('subject')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
+                       
 
                     </div>
 
