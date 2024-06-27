@@ -639,12 +639,22 @@ class ExamController extends Controller
                 ['user_id', $request->user_id],
                 ['institute_id', $request->institute_id],
                 ['standard_id', $request->standard_id],
-                ['exam_date', Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d')],
-                ['start_time', '<',$request->start_time],
-                ['end_time', '>',$request->end_time],
-                ['batch_id',$request->batch_id],
-            ])->exists();
-
+                ['exam_date', $request->exam_date],
+                ['batch_id', $request->batch_id],
+                ])
+                ->where(function ($query) use ($request) {
+                    // Check for overlapping time intervals
+                    $query->where(function ($query) use ($request) {
+                        $query->whereRaw("'$request->start_time' < end_time")
+                              ->whereRaw("'$request->end_time' > start_time");
+                    })
+                    ->orWhere(function ($query) use ($request) {
+                        $query->whereRaw("start_time < '$request->end_time'")
+                              ->whereRaw("end_time > '$request->start_time'");
+                    });
+                })
+                ->exists();
+            
 
             
             if ($existing_exam) {
