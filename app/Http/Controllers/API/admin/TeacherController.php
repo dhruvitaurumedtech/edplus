@@ -1012,7 +1012,7 @@ class TeacherController extends Controller
         $user->email = $request->input('email');
         $user->country_code = $request->input('country_code');
         $user->country_code_name = $request->input('country_code_name');
-        $user->dob = (!empty($request['dob'])) ? date('Y-m-d', strtotime($request['dob'])) : '';
+        $user->dob = (!empty($request['dob'])) ? date('d-m-Y', strtotime($request['dob'])) : '';
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
         //$user->area = $request['area'];
