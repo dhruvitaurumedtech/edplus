@@ -600,6 +600,7 @@ class TeacherController extends Controller
                 ->select(
                     // 'board.name as board_name',
                     'standard.id as standard_id',
+                    'batches.id as batch_id',
                     'standard.name as standard_name',
                     DB::raw('MAX(board.name) as board_name'),
                     DB::raw('MAX(medium.name) as medium_name'),
@@ -615,6 +616,7 @@ class TeacherController extends Controller
                     'standard_id' => $value['standard_id'],
                     'standard' => $value['standard_name'],
                     'medium' => $value['medium_name'],
+                    'batch_id' =>$value['batch_id'],
                     'batch' => $value['batch_name']
 
                 ];
