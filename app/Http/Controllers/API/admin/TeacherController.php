@@ -1113,7 +1113,6 @@ class TeacherController extends Controller
                         'mobile_no' => $mobile_no[$i],
                         'country_code'=>$emergency_country_code[$i],
                         'country_code_name'=>$emergency_country_code_name[$i],
-
                     ]);
                 }
             } else {

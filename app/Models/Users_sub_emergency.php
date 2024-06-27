@@ -11,6 +11,6 @@ class Users_sub_emergency extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'users_sub_emergency';
     protected $fillable = [
-        'user_id', 'name', 'relation_with', 'mobile_no','country_code'
+        'user_id', 'name', 'relation_with', 'mobile_no','country_code','country_code_name'
     ];
 }
