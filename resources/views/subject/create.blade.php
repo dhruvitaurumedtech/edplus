@@ -129,14 +129,14 @@
                                     <h3>Subject Name</h3>
                                     <input type="text" name="subject[]" class="form-control" placeholder="Add Subject Name">
                                 </div>
-                                @error('subject')
+                                @error('subject.*')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
                                     <input type="file" name="subject_image[]" class="form-control" onchange='openFile(event,"output")' placeholder="Select Subject Image">
                                 </div>
-                                @error('subject_image')
+                                @error('subject_image.*')
                                     <div class="text-danger">{{ $message }}</div>
                                 @enderror
                                
