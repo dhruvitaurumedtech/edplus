@@ -116,7 +116,8 @@ class AuthController extends Controller
         $validator = Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
-            'email' => 'required|email|unique:users,email',
+            //'email' => 'required|email|unique:users,email',
+            'email' => 'required',
             'password' => 'required|string|min:6',
             'mobile' => 'required|min:10',
             'role_type' => 'required|integer|exists:roles,id',
@@ -126,23 +127,29 @@ class AuthController extends Controller
             'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+        ->where('status', '1')->first();
+
         if (isset($user)) {
             return $this->response([], 'This email already exists.', false, 400);
         }
         try {
-            $user = new User();
-            $user->firstname = $request->firstname;
-            $user->lastname = $request->lastname;
-            $user->email = $request->email;
-            $user->password = Hash::make($request->password);
-            $user->country_code = $request->country_code;
-            $user->country_code_name = $request->country_code_name;
-            $user->mobile = $request->mobile;
-            $user->role_type = $request->role_type;
-            $user->otp_num = rand(100000, 999999);
-            $user->device_key = $request->device_key;
-            $user->save();
+            $user = User::where('email', $request->email)->first();
+            if(!isset($user)){
+                $user = new User();
+                $user->firstname = $request->firstname;
+                $user->lastname = $request->lastname;
+                $user->email = $request->email;
+                $user->password = Hash::make($request->password);
+                $user->country_code = $request->country_code;
+                $user->country_code_name = $request->country_code_name;
+                $user->mobile = $request->mobile;
+                $user->role_type = $request->role_type;
+                $user->otp_num = rand(100000, 999999);
+                $user->device_key = $request->device_key;
+                $user->save();
+            }
+            
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
             $user->save();
@@ -179,7 +186,6 @@ class AuthController extends Controller
             ];
             return $this->response($data, "Registration Successfully !");
         } catch (Exception $e) {
-            return $e;
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
     }
