@@ -635,26 +635,17 @@ class ExamController extends Controller
         }
 
         try {
-            $existing_exam = Exam_Model::where([
-                ['user_id', $request->user_id],
-                ['institute_id', $request->institute_id],
-                ['standard_id', $request->standard_id],
-                ['exam_date', $request->exam_date],
-                ['batch_id', $request->batch_id],
-                ])
-                ->where(function ($query) use ($request) {
-                    // Check for overlapping time intervals
-                    $query->where(function ($query) use ($request) {
-                        $query->whereRaw("'$request->start_time' < end_time")
-                              ->whereRaw("'$request->end_time' > start_time");
-                    })
-                    ->orWhere(function ($query) use ($request) {
-                        $query->whereRaw("start_time < '$request->end_time'")
-                              ->whereRaw("end_time > '$request->start_time'");
-                    });
-                })
-                ->exists();
+            $exam_date = date('Y-m-d',strtotime($request->exam_date));
             
+            $existing_exam = Exam_Model::where('user_id', $request->user_id)
+                ->where('institute_id', $request->institute_id)
+                ->where('standard_id', $request->standard_id)
+                ->where('exam_date', $exam_date)
+                ->where('start_time', '<', $request->end_time)
+                ->where('end_time','>', $request->start_time)
+                ->where('batch_id', $request->batch_id)
+                ->exists();
+
 
             
             if ($existing_exam) {
