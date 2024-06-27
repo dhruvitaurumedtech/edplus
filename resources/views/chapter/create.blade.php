@@ -47,14 +47,23 @@
                             <div class="search-box-2 form-group">
                                 <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
                             </div>
+                            @error('chapter_no.*')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                             <h3>Chapter Name</h3>
                             <div class="search-box-2 form-group">
                                 <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
                             </div>
+                            @error('chapter_name.*')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                             <h3>Chapter Image</h3>
                             <div class="search-box-2 form-group">
                                 <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
                             </div>
+                            @error('chapter_image.*')
+                                <div class="text-danger">{{ $message }}</div>
+                            @enderror
                             <img id="output" src="" class="img-resize" style="display: none;" />
                         </div>
                         <div class="add-chapter-btn">
