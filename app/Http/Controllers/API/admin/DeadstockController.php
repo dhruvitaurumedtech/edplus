@@ -17,8 +17,8 @@ class DeadstockController extends Controller
         
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'item_name' => 'required',
-            'no_of_item' => 'required',
+            'item_name_qty' => 'required',
+            //'no_of_item' => 'required',
         ]);
         
         if ($validator->fails()) {
@@ -27,9 +27,13 @@ class DeadstockController extends Controller
         
         try{
             $deadStock = new DeadStock();
-            $deadStock->fill($request->all());
-            $deadStock->save();
-
+            $dedst = json_decode($request->item_name_qty, true);
+            foreach ($dedst as $deadST) {
+                $deadStock->institute_id = $request->institute_id;
+                $deadStock->item_name = $deadST['item_name'];
+                $deadStock->no_of_item = $deadST['no_of_item'];
+                $deadStock->save();
+            }
             return $this->response([], "DeadStock inserted successfully.");
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
