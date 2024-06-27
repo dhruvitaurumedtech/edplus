@@ -635,14 +635,14 @@ class ExamController extends Controller
         }
 
         try {
-            $exam_date = Carbon::createFromFormat('d-m-Y', $request->exam_date)->format('Y-m-d');
-
+            $exam_date = date('Y-m-d',strtotime($request->exam_date));
+            
             $existing_exam = Exam_Model::where('user_id', $request->user_id)
                 ->where('institute_id', $request->institute_id)
                 ->where('standard_id', $request->standard_id)
-                ->whereDate('exam_date', $exam_date)
-                ->whereTime('start_time', '<', $request->end_time)
-                ->whereTime('end_time', '>', $request->start_time)
+                ->where('exam_date', $exam_date)
+                ->where('start_time', '<', $request->end_time)
+                ->where('end_time','>', $request->start_time)
                 ->where('batch_id', $request->batch_id)
                 ->exists();
 
