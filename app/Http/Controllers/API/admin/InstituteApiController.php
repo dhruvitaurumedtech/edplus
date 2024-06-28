@@ -3343,13 +3343,13 @@ class InstituteApiController extends Controller
                         $users = User::where('id', $student_id)->pluck('device_key');
 
                         $notificationTitle = "Your Request Accepted successfully!!";
-                        $notificationBody = "Your Student Request Accepted successfully!!";
+                        // $notificationBody = "Your Student Request Accepted successfully!!";
 
                         $data = [
                             'registration_ids' => $users,
                             'notification' => [
                                 'title' => $notificationTitle,
-                                'body' => $notificationBody,
+                                // 'body' => $notificationBody,
                                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                             ],
                         ];
