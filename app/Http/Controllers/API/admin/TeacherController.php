@@ -646,7 +646,6 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-
             $teacher_details = DB::table('teacher_detail')
                 ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
                 ->join('board', 'board.id', '=', 'teacher_detail.board_id')
@@ -656,8 +655,7 @@ class TeacherController extends Controller
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.standard_id', $request->standard_id)
                 ->where('teacher_detail.batch_id', $request->batch_id)
-                ->select(
-                    'board.id as board_id',
+                ->select('board.id as board_id',
                     'board.name as board_name',
                     'standard.id as standard_id',
                     'standard.name as standard_name',
@@ -667,8 +665,7 @@ class TeacherController extends Controller
                     'batches.batch_name',
                     'subject.id as subject_id',
                     'subject.name as subject_name',
-                    'subject.image as subject_image'
-                )
+                    'subject.image as subject_image')
                 ->get();
 
             $teacher_data = [];
@@ -697,7 +694,6 @@ class TeacherController extends Controller
                     'id' => $detail->subject_id,
                     'subject_name' => $detail->subject_name,
                     'image' => !empty($detail->subject_image) ? url($detail->subject_image) : ''
-
                 ];
             }
 

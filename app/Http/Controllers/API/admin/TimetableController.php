@@ -48,7 +48,6 @@ class TimetableController extends Controller
     public function add_timetable(Request $request){
         
         $validator = validator::make($request->all(),[
-            
             'subject_id'=>'required|exists:subject,id',
             'batch_id'=>'required|exists:batches,id',
             'teacher_id'=>'required|exists:users,id',
@@ -65,7 +64,6 @@ class TimetableController extends Controller
 
     try {
         //DB::beginTransaction();
-
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
         $timetablebase->batch_id = $request->batch_id;
