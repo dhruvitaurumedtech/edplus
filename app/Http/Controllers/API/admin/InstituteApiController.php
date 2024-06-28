@@ -3492,19 +3492,13 @@ class InstituteApiController extends Controller
                         $serverKey = env('SERVER_KEY');
 
                         $url = "https://fcm.googleapis.com/fcm/send";
-                        $studentdevicekey = User::where('id', $student_id)->pluck('device_key');
+                        $users = User::where('id', $student_id)->pluck('device_key');
 
-
-
-                        $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
-                        $institutedevicekey = User::where('id', $institute_user_id)->pluck('device_key');
-                        $deviceKeys = array_merge($studentdevicekey, $institutedevicekey);
- 
                         $notificationTitle = "Your Request Send successfully!!";
                         $notificationBody = "Your Student Request Send successfully!!";
 
                         $data = [
-                            'registration_ids' => $deviceKeys,
+                            'registration_ids' => $users,
                             'notification' => [
                                 'title' => $notificationTitle,
                                 'body' => $notificationBody,
@@ -3512,7 +3506,7 @@ class InstituteApiController extends Controller
                             ],
                         ];
 
-                        if ($deviceKeys->isNotEmpty()) {
+                        if ($users->isNotEmpty()) {
                             $json = json_encode($data);
 
                             $headers = [
@@ -6146,11 +6140,6 @@ class InstituteApiController extends Controller
                 ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification')
                 ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification');
 
-            if (!empty($request->subject_id)) {
-                $teacher_data->where(function ($query) use ($request) {
-                    $query->where('teacher_detail.subject_id',$request->subject_id);
-                });
-            }
 
             if (!empty($request->search)) {
                 $teacher_data->where(function ($query) use ($request) {
