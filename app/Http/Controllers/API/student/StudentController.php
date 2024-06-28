@@ -151,7 +151,7 @@ class StudentController extends Controller
                 $join_with[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
-                    'address' => $value->address,
+                    'address' => $value->address.' '.$value->state. ' '.$value->city.' '.$value->pincode,
                     'logo' => asset($value->logo),
                 );
             }
@@ -2114,7 +2114,7 @@ class StudentController extends Controller
                 $institutes[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
-                    'address' => $value->address,
+                    'address' => $value->address.' '.$value->state. ' '.$value->city.' '.$value->pincode,
                     'logo' => asset($value->logo),
                     'subjects' => $subs
                 );
