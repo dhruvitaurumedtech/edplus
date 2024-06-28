@@ -936,7 +936,7 @@ document.querySelectorAll('.announcement_deletebutton').forEach(function (button
         event.preventDefault(); // Prevent the default form submission
 
         var announcement_id = this.getAttribute('data-user-id');
-
+       
         // Show SweetAlert confirmation
         Swal.fire({
             title: 'Are you sure want to delete?',

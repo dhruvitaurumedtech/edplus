@@ -3492,13 +3492,19 @@ class InstituteApiController extends Controller
                         $serverKey = env('SERVER_KEY');
 
                         $url = "https://fcm.googleapis.com/fcm/send";
-                        $users = User::where('id', $student_id)->pluck('device_key');
+                        $studentdevicekey = User::where('id', $student_id)->pluck('device_key');
 
+
+
+                        $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
+                        $institutedevicekey = User::where('id', $institute_user_id)->pluck('device_key');
+                        $deviceKeys = array_merge($studentdevicekey, $institutedevicekey);
+ 
                         $notificationTitle = "Your Request Send successfully!!";
                         $notificationBody = "Your Student Request Send successfully!!";
 
                         $data = [
-                            'registration_ids' => $users,
+                            'registration_ids' => $deviceKeys,
                             'notification' => [
                                 'title' => $notificationTitle,
                                 'body' => $notificationBody,
@@ -3506,7 +3512,7 @@ class InstituteApiController extends Controller
                             ],
                         ];
 
-                        if ($users->isNotEmpty()) {
+                        if ($deviceKeys->isNotEmpty()) {
                             $json = json_encode($data);
 
                             $headers = [
