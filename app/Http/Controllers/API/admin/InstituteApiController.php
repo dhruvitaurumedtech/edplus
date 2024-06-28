@@ -3492,12 +3492,12 @@ class InstituteApiController extends Controller
                         $serverKey = env('SERVER_KEY');
 
                         $url = "https://fcm.googleapis.com/fcm/send";
-                        // $users = User::where('id', $student_id)->pluck('device_key');
+                        $user_detail = User::where('id', $student_id)->first();
                         $institute_user_id = institute_detail::where('id',$request->institute_id)->pluck('user_id');
                         $users = User::where('id', $institute_user_id)->pluck('device_key');
-
-                        $notificationTitle = "Your Request Send successfully!!";
-                        $notificationBody = "Your Student Request Send successfully!!";
+                         
+                        $notificationTitle = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
+                        $notificationBody = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
 
                         $data = [
                             'registration_ids' => $users,
