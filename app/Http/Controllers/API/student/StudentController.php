@@ -128,7 +128,7 @@ class StudentController extends Controller
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
-                    'address' => $value->address,
+                    'address' => $value->address.' '.$value->state. ' '.$value->city.' '.$value->pincode,
                     'logo' => asset($value->logo),
                     'status' => (int)$value->sstatus,
                 );
