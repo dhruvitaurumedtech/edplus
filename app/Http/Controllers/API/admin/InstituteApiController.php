@@ -6146,6 +6146,11 @@ class InstituteApiController extends Controller
                 ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification')
                 ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification');
 
+            if (!empty($request->subject_id)) {
+                $teacher_data->where(function ($query) use ($request) {
+                    $query->where('teacher_detail.subject_id',$request->subject_id);
+                });
+            }
 
             if (!empty($request->search)) {
                 $teacher_data->where(function ($query) use ($request) {
