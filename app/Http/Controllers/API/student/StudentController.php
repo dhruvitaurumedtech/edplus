@@ -1477,6 +1477,7 @@ class StudentController extends Controller
     // }
     public function subject_chapers(Request $request)
     {
+        echo "hi";
         $validator = Validator::make($request->all(), [
             'subject_id' => 'required|exists:subject,id',
         ]);
