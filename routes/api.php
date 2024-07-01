@@ -21,6 +21,7 @@ use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
 use App\Http\Controllers\API\admin\FeesController;
 use App\Http\Controllers\API\admin\General_timetableController;
+use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -216,10 +217,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
     Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
-
     Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
-
     Route::post('/institute/get-subject', [InstituteApiController::class, 'get_subject']);
+
+    //homework
+    Route::post('/teacher/add-homework', [HomeworkController::class, 'add_homework']);
 
 });
 
