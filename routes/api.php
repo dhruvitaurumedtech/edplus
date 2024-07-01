@@ -214,6 +214,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
     Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+
+    Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+
+    Route::post('/institute/get-subject', [InstituteApiController::class, 'get_subject']);
+
 });
 
 

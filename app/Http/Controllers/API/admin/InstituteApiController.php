@@ -6267,7 +6267,6 @@ class InstituteApiController extends Controller
 
         }catch(Exception $e){
             return $this->response($e, "Invalid token.", false, 400);
-
         }
     }
     public function test(Request $request){
@@ -6331,13 +6330,29 @@ class InstituteApiController extends Controller
 
                     if ($result === FALSE) {
                     }
-
                     curl_close($ch);
                 }
             } 
         }
-
-
-
+    }
+    function get_subject(Request $request){
+        $validator = Validator::make($request->all(), [
+            'batch_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $subjects=Batches_model::where('id',$request->batch_id)->where('user_id',auth()->user()->id)->first();
+            $subject_list=Subject_model::whereIn('id',explode(',',$subjects->subjects))->get();
+            $data=[];
+            foreach($subject_list as $value){
+                $data[]= ['id'=>$value->id,
+                          'subject_name'=>$value->name];
+            }
+            return $this->response($data, "Fetch successfully.");
+        }catch(Exception $e){
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 }
