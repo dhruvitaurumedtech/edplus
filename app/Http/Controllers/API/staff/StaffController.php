@@ -305,6 +305,7 @@ class StaffController extends Controller
             $user->role_type = $request->role_type;
             $user->otp_num = rand(100000, 999999);
             $user->device_key = $request->device_key;
+            $user->status = '1';
             $user->save();
 
             $staff = new Staff_detail_Model();

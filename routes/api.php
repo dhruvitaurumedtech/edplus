@@ -21,6 +21,7 @@ use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
 use App\Http\Controllers\API\admin\FeesController;
 use App\Http\Controllers\API\admin\General_timetableController;
+use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -204,7 +205,6 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
 
-    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
     Route::post('/institute/create-general-timetable', [General_timetableController::class, 'create_general_timetable']);
     Route::post('/institute/display-general-timetable', [General_timetableController::class, 'display_general_timetable']);
     Route::post('/institute/edit-general-timetable', [General_timetableController::class, 'edit_general_timetable']);
@@ -216,10 +216,22 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
     Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+    Route::post('/institute/create-greeting', [InstituteApiController::class, 'create_greeting']);
+    Route::post('/institute/get-subject', [InstituteApiController::class, 'get_subject']);
+
+    //homework
+    Route::post('/teacher/add-homework', [HomeworkController::class, 'add_homework']);
+    Route::post('/student/view-homework', [HomeworkController::class, 'view_homework']);
+
+    //classroom
+    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
+    Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
+
 });
 
 
 
+   
 
 Route::post('test', [InstituteApiController::class, 'test']);
 

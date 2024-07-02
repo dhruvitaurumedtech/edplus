@@ -48,6 +48,7 @@ class ChapterController extends Controller
                 'base_table.id as base_id',
             )
             ->paginate(10);
+            // print_r($Standards);exit;
 
 
 
@@ -117,6 +118,7 @@ class ChapterController extends Controller
 
         $chapters = Chapter::where('subject_id', $subject_id)
             ->where('base_table_id', $base_id)->get();
+            
         return response()->json(['chapters' => $chapters]);
     }
     function chapter_edit(Request $request, $id)

@@ -536,7 +536,7 @@ class InstituteApiController extends Controller
                 'institute_name' => $request->input('institute_name'),
                 'address' => $request->input('address'),
                 'country_code' => $request->input('country_code'),
-                'country_code_name'=>$request->input('country_code_name'),
+                'country_code_name' => $request->input('country_code_name'),
                 'contact_no' => $request->input('contact_no'),
                 'email' => $request->input('email'),
                 'country' => $request->input('country'),
@@ -2478,11 +2478,12 @@ class InstituteApiController extends Controller
             $standard_list = DB::table('standard_sub')
                 ->join('standard', 'standard_sub.standard_id', '=', 'standard.id')
                 ->select('standard.*')
-                // ->where('standard_sub.user_id', $user_id)
+                ->where('standard_sub.user_id', $user_id)
                 ->where('standard_sub.institute_id', $institute_id)
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
                 ->get();
+            // print_r($standard_list);exit;    
 
             $standard_array = [];
             foreach ($standard_list as $standard_value) {
@@ -2492,10 +2493,11 @@ class InstituteApiController extends Controller
                     ->where('standard', $standard_value->id)
                     ->pluck('id')
                     ->toArray();
+                // print_r($getbsiqy);exit;
                 $subject_list = DB::table('subject_sub')
                     ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
                     ->select('subject.*')
-                    // ->where('subject_sub.user_id', $user_id)
+                    ->where('subject_sub.user_id', $user_id)
                     ->where('subject_sub.institute_id', $institute_id)
                     ->whereIN('subject.base_table_id', $getbsiqy)
                     ->get();
@@ -2508,6 +2510,7 @@ class InstituteApiController extends Controller
                         'image' => !empty($subject_value->image) ? asset($subject_value->image) : '',
                     ];
                 }
+                // print_r($subject_array);
 
                 //batch list
                 $batchqY = Batches_model::join('board', 'board.id', '=', 'batches.board_id')
@@ -2515,7 +2518,7 @@ class InstituteApiController extends Controller
                     ->leftjoin('stream', 'stream.id', '=', 'batches.stream_id')
                     ->where('batches.institute_id', $institute_id)
                     ->where('batches.standard_id', $standard_value->id)
-                    // ->where('batches.user_id', $user_id)
+                    ->where('batches.user_id', $user_id)
                     ->select('batches.*', 'board.name as board', 'medium.name as medium', 'stream.name as stream')->get();
                 $batchesDT = [];
                 foreach ($batchqY as $batDT) {
@@ -2852,7 +2855,7 @@ class InstituteApiController extends Controller
                         'image' => asset($subDT->image)
                     );
                 }
-                
+
                 $response_data = [
                     'student_id' => $user_list->student_id,
                     'institute_id' => $user_list->institute_id,
@@ -2862,7 +2865,7 @@ class InstituteApiController extends Controller
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'country_code' => $user_list->country_code,
-                    'country_code_name'=>$user_list->country_code_name,
+                    'country_code_name' => $user_list->country_code_name,
                     'mobile_no' => $user_list->mobile,
                     //'institute_for' => $institute_for_list,
                     'board' => $user_list->board,
@@ -3181,7 +3184,7 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'user_id' => 'required',
             'country_code' => 'required',
-            'country_code_name'=>'required',
+            'country_code_name' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -3250,31 +3253,30 @@ class InstituteApiController extends Controller
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
-                            'country_code_name'=>$request->country_code_name,
+                            'country_code_name' => $request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
                         $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
-                        ->whereIn('subject_id', explode(',', $request->subject_id))
-                        ->select('amount')
-                        ->get();
-                    
-                            $amount = 0;
-                            foreach ($subject_amount as $value) {
+                            ->whereIn('subject_id', explode(',', $request->subject_id))
+                            ->select('amount')
+                            ->get();
 
-                                $amount += $value->amount;
-                            }
-                            //echo $amount;exit;
-                            $studentFee = Student_fees_model::where('student_id',$student_id);
-                            if ($studentFee) {
-                                $studentFee->update([
-                                    'user_id' => $user_id,
-                                    'institute_id' => $request->institute_id,
-                                    'student_id' => $student_id,
-                                    'subject_id' => $request->subject_id,
-                                    'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
-                                ]); 
-                            
-                            }
+                        $amount = 0;
+                        foreach ($subject_amount as $value) {
+
+                            $amount += $value->amount;
+                        }
+                        //echo $amount;exit;
+                        $studentFee = Student_fees_model::where('student_id', $student_id);
+                        if ($studentFee) {
+                            $studentFee->update([
+                                'user_id' => $user_id,
+                                'institute_id' => $request->institute_id,
+                                'student_id' => $student_id,
+                                'subject_id' => $request->subject_id,
+                                'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
+                            ]);
+                        }
 
                         $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
                             ->join('standard', 'standard.id', 'students_details.standard_id')
@@ -3404,7 +3406,7 @@ class InstituteApiController extends Controller
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
-                            'country_code_name'=>$request->country_code_name,
+                            'country_code_name' => $request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
                         $student_id = $data->id;
@@ -3418,7 +3420,7 @@ class InstituteApiController extends Controller
                             'address' => $request->address,
                             'email' => $request->email_id,
                             'country_code' => $request->country_code,
-                            'country_code_name'=>$request->country_code_name,
+                            'country_code_name' => $request->country_code_name,
                             'mobile' => $request->mobile_no,
                         ]);
                     }
@@ -3493,10 +3495,10 @@ class InstituteApiController extends Controller
 
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $user_detail = User::where('id', $student_id)->first();
-                        $institute_user_id = institute_detail::where('id',$request->institute_id)->pluck('user_id');
+                        $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
                         $users = User::where('id', $institute_user_id)->pluck('device_key');
-                         
-                        $notificationTitle = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
+
+                        $notificationTitle = $user_detail->firstname . ' ' . $user_detail->lastname . " Send Request!!";
                         // $notificationBody = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
 
                         $data = [
@@ -5059,8 +5061,8 @@ class InstituteApiController extends Controller
                 $institute_id = Institute_detail::where('user_id', Auth::id())->select('id')->first();
             }
             $boarids = Institute_board_sub::
-            // where('user_id', Auth::id())->
-            where('institute_id', $institute_id)->pluck('board_id')->toArray();
+                // where('user_id', Auth::id())->
+                where('institute_id', $institute_id)->pluck('board_id')->toArray();
             $uniqueBoardIds = array_unique($boarids);
 
             $board_list = DB::table('board')
@@ -5100,7 +5102,7 @@ class InstituteApiController extends Controller
                     'institute_name' => $value['institute_name'],
                     'address' => $value['address'] . '',
                     'country_code' => $value['country_code'],
-                    'country_code_name'=>$value['country_code_name'],
+                    'country_code_name' => $value['country_code_name'],
                     'contact_no' => $value['contact_no'] . '',
                     'email' => $value['email'] . '',
                     'about_us' => $value['about_us'] . '',
@@ -5961,7 +5963,7 @@ class InstituteApiController extends Controller
     public function approve_teacher(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'teacher_detail_id'=>'required',
+            'teacher_detail_id' => 'required',
             'firstname' => 'required',
             'lastname' => 'required',
             'mobile' => 'required',
@@ -5983,9 +5985,9 @@ class InstituteApiController extends Controller
         try {
             $batch_ids = explode(',', $request->batch_id);
             $subject_ids = explode(',', $request->subject_id);
-            $board_ids = explode(',',$request->board_id);
-            $medium_ids = explode(',',$request->medium_id);
-            $standard_ids = explode(',',$request->standard_id);
+            $board_ids = explode(',', $request->board_id);
+            $medium_ids = explode(',', $request->medium_id);
+            $standard_ids = explode(',', $request->standard_id);
 
             // if (count($batch_ids) !== count($subject_ids)) {
             //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
@@ -5993,7 +5995,7 @@ class InstituteApiController extends Controller
             $teacher_Explode = explode(',', $request->teacher_detail_id);
             foreach ($teacher_Explode as $index => $teacher_detail_id) {
                 $teacherDetail = Teacher_model::find($teacher_detail_id);
-        
+
                 if ($teacherDetail) {
                     // Update the existing teacher detail record
                     $teacherDetail->update([
@@ -6011,62 +6013,62 @@ class InstituteApiController extends Controller
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
                     ]);
-                } 
+                }
             }
-        //     $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
+            //     $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
 
-        //     foreach ($subject as $value) {
-                // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-                //     ->select('*')->get()->toarray();
-                // foreach (explode(',', $request->batch_id) as $batchId) {
-                //     Batch_assign_teacher_model::firstOrCreate([
-                //         'teacher_id' => $request->teacher_id,
-                //         'batch_id' => $batchId,
-                //     ]);
-                // }
-                // $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
-                // foreach ($base_table_response as $value2) {
-                    // if (is_array($request->subject_id)) {
-                    //     $subject = implode(',', $request->subject_id);
-                    // } else {
-                    //     $subject = $request->subject_id;
-                    // }
+            //     foreach ($subject as $value) {
+            // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
+            //     ->select('*')->get()->toarray();
+            // foreach (explode(',', $request->batch_id) as $batchId) {
+            //     Batch_assign_teacher_model::firstOrCreate([
+            //         'teacher_id' => $request->teacher_id,
+            //         'batch_id' => $batchId,
+            //     ]);
+            // }
+            // $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
+            // foreach ($base_table_response as $value2) {
+            // if (is_array($request->subject_id)) {
+            //     $subject = implode(',', $request->subject_id);
+            // } else {
+            //     $subject = $request->subject_id;
+            // }
 
-                    // $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
-                    //     ->where('institute_id', $request->institute_id);
-                    // $teacher_detail->update([
-                    //     'institute_id' => $request->institute_id,
-                    //     'teacher_id' => $request->teacher_id,
-                    //     'institute_for_id' => $value2['institute_for'],
-                    //     'board_id' => $value2['board'],
-                    //     'medium_id' => $value2['medium'],
-                    //     'class_id' => $value2['institute_for_class'],
-                    //     'standard_id' => $value2['standard'],
-                    //     'stream_id' => $value2['stream'],
-                    //     'subject_id' => $subject,
-                    //     'status' => '1',
-                    // ]);
-                    // $teacherDetail = Teacher_model::where('teacher_id', $request->teacher_id)
-                    //     ->where('institute_id', $request->institute_id);
-                    //     // ->first(); // Use first() to get a single model instance
+            // $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
+            //     ->where('institute_id', $request->institute_id);
+            // $teacher_detail->update([
+            //     'institute_id' => $request->institute_id,
+            //     'teacher_id' => $request->teacher_id,
+            //     'institute_for_id' => $value2['institute_for'],
+            //     'board_id' => $value2['board'],
+            //     'medium_id' => $value2['medium'],
+            //     'class_id' => $value2['institute_for_class'],
+            //     'standard_id' => $value2['standard'],
+            //     'stream_id' => $value2['stream'],
+            //     'subject_id' => $subject,
+            //     'status' => '1',
+            // ]);
+            // $teacherDetail = Teacher_model::where('teacher_id', $request->teacher_id)
+            //     ->where('institute_id', $request->institute_id);
+            //     // ->first(); // Use first() to get a single model instance
 
-                    //     // if ($teacherDetail) {
-                    //         foreach(explode(',',$request->subject_id) as $subject_id) {
-                    //             $teacherDetail->update([
-                    //                 'institute_id' => $request->institute_id,
-                    //                 'teacher_id' => $request->teacher_id,
-                    //                 'institute_for_id' => $value2['institute_for'],
-                    //                 'board_id' => $value2['board'],
-                    //                 'medium_id' => $value2['medium'],
-                    //                 'class_id' => $value2['institute_for_class'],
-                    //                 'standard_id' => $value2['standard'],
-                    //                 'stream_id' => $value2['stream'],
-                    //                 'subject_id' => $subject_id,
-                    //                 'status' => '1',
-                    //             ]);
-                    //         }
-                         
-                
+            //     // if ($teacherDetail) {
+            //         foreach(explode(',',$request->subject_id) as $subject_id) {
+            //             $teacherDetail->update([
+            //                 'institute_id' => $request->institute_id,
+            //                 'teacher_id' => $request->teacher_id,
+            //                 'institute_for_id' => $value2['institute_for'],
+            //                 'board_id' => $value2['board'],
+            //                 'medium_id' => $value2['medium'],
+            //                 'class_id' => $value2['institute_for_class'],
+            //                 'standard_id' => $value2['standard'],
+            //                 'stream_id' => $value2['stream'],
+            //                 'subject_id' => $subject_id,
+            //                 'status' => '1',
+            //             ]);
+            //         }
+
+
             User::where('id', $request->teacher_id)->update([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
@@ -6144,7 +6146,7 @@ class InstituteApiController extends Controller
 
             if (!empty($request->subject_id)) {
                 $teacher_data->where(function ($query) use ($request) {
-                    $query->where('teacher_detail.subject_id',$request->subject_id);
+                    $query->where('teacher_detail.subject_id', $request->subject_id);
                 });
             }
 
@@ -6198,22 +6200,64 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
+        $institute_id = $request->institute_id;
+        $names = array_map('trim', explode(',', $request->name));
+        $capacities = array_map('trim', explode(',', $request->capacity));
+
+        if (count($names) !== count($capacities)) {
+            return response()->json([
+                'error' => 'The number of names and capacities must match.',
+            ], 400);
+        }
+
         try {
-            if (empty($request->edit_id)) {
-                $class = new Class_room_model();
-            } else {
-                $class = Class_room_model::where('id', $request->edit_id)->first();
+            foreach ($names as $index => $name) {
+                $capacity = $capacities[$index];
+                if (empty($request->edit_id)) {
+                    $class = new Class_room_model();
+                } else {
+                    $class = Class_room_model::find($request->edit_id);
+                }
+
+                if (!$class) {
+                    return $this->response([], "Class with id {$request->edit_id} not found.", false, 400);
+                    continue; 
+                }
+
+                $class->institute_id = $institute_id;
+                $class->name = $name;
+                $class->capacity = $capacity;
+
+                $class->save();
             }
-            $class->institute_id = $request->institute_id;
-            $class->name = $request->name;
-            $class->capacity = $request->capacity;
-            $class->save();
-            return $this->response([], "Data Saved.");
+            if(!empty($request->edit_id)) {
+                return $this->response([], "Class updated successfully:");
+            
+            }else{
+                return $this->response([], "Class saved successfully:");
+            }
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    function create_remainder(Request $request){
+    public function view_classRoom(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        $data=Class_room_model::where('institute_id',$request->institute_id)->get();
+        $response =[];
+        foreach($data as $value){
+           $response[] =['name'=>$value->name,'capacity'=>$value->capacity];
+        } 
+        return $this->response($response, "Classroom display successfully");
+
+    }
+    function create_remainder(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
             'title' => 'required',
@@ -6222,12 +6266,12 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $date=Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
+        try {
+            $date = Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
             $time = date('H:i', strtotime($request->input('time')));
 
             Remainder_model::create([
-                'type_field'=>'1',
+                'type_field' => '1',
                 'role_type_id' => $request->input('role_type_id'),
                 'student_id' => $request->input('student_id'),
                 'date' => $date,
@@ -6236,13 +6280,12 @@ class InstituteApiController extends Controller
                 'message' => $request->input('message'),
             ]);
             return $this->response([], "Remainder set successfully.");
-
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
-
         }
     }
-    function create_greeting(Request $request){
+    function create_greeting(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'date' => 'required',
             'title' => 'required',
@@ -6251,12 +6294,12 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $date=Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
+        try {
+            $date = Carbon::createFromFormat('d-m-Y', $request->date)->format('Y-m-d');
             // $time = date('H:i', strtotime($request->input('time')));
 
             Remainder_model::create([
-                'type_field'=>'2',
+                'type_field' => '2',
                 'role_type_id' => $request->input('role_type_id'),
                 'student_id' => $request->input('student_id'),
                 'date' => $date,
@@ -6264,33 +6307,32 @@ class InstituteApiController extends Controller
                 'message' => $request->input('message'),
             ]);
             return $this->response([], "Greeting set successfully.");
-
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
-
         }
     }
-    public function test(Request $request){
+    public function test(Request $request)
+    {
         date_default_timezone_set('Asia/Kolkata');
-        $data=Remainder_model::get();
-        foreach($data as $value){
+        $data = Remainder_model::get();
+        foreach ($data as $value) {
             $givenDateString = $value->date;
             $timeString = $value->time;
             $dateTime = Carbon::createFromFormat('H:i:s', $timeString);
 
             $givenTimeString = $dateTime->format('H:i');
             $givenDateTime = Carbon::createFromFormat('Y-m-d H:i', "$givenDateString $givenTimeString");
-            $currentDateTime = Carbon::now()->format('Y-m-d H:i'); 
+            $currentDateTime = Carbon::now()->format('Y-m-d H:i');
 
             if ($givenDateTime->format('Y-m-d H:i') === $currentDateTime) {
-                
+
                 $serverKey = env('SERVER_KEY');
 
                 $url = "https://fcm.googleapis.com/fcm/send";
-                if(!empty($value->student_id)){
+                if (!empty($value->student_id)) {
                     $users = User::where('id', $value->student_id)->pluck('device_key');
                 }
-                if(!empty($value->role_type_id)){
+                if (!empty($value->role_type_id)) {
                     $users = User::where('role_type', $value->role_type_id)->pluck('device_key');
                 }
                 $notificationTitle = $value->title;
@@ -6331,13 +6373,32 @@ class InstituteApiController extends Controller
 
                     if ($result === FALSE) {
                     }
-
                     curl_close($ch);
                 }
-            } 
+            }
         }
-
-
-
+    }
+    function get_subject(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'batch_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $subjects = Batches_model::where('id', $request->batch_id)->where('user_id', auth()->user()->id)->first();
+            $subject_list = Subject_model::whereIn('id', explode(',', $subjects->subjects))->get();
+            $data = [];
+            foreach ($subject_list as $value) {
+                $data[] = [
+                    'id' => $value->id,
+                    'subject_name' => $value->name
+                ];
+            }
+            return $this->response($data, "Fetch successfully.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 }
