@@ -146,7 +146,7 @@ class BasetableControllerAPI extends Controller
         $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
-            'medium_id' => 'required',
+            //'medium_id' => 'required',
             'class_id' => 'required',
         ]);
 
@@ -157,22 +157,24 @@ class BasetableControllerAPI extends Controller
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
-            $medium_ids = explode(',', $request->medium_id);
+            //$medium_ids = explode(',', $request->medium_id);
             //$class_ids = explode(',', $request->class_id);
 
             //$input = "1{1},2{2}";
             $class_mappings = explode(',', $request->class_id);
             //$class_ids_by_medium = [];
-            $data = [];
+            
+            $data = [];  
+            
             foreach ($class_mappings as $mapping) {
                 // Extract the class ID and the medium ID within the brackets
                 preg_match('/(\d+)\{(\d+)\}/', $mapping, $matches);
                 if (count($matches) != 3) {
                     continue; // Skip invalid mappings
                 }
-                $class_id = $matches[1];
-                $medium_id = $matches[2];
-    
+                $medium_id = $matches[1];
+                $class_id = $matches[2];
+                
                 $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
@@ -184,7 +186,7 @@ class BasetableControllerAPI extends Controller
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
-                
+                  
             foreach ($base_standards as $base_standard) {
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
@@ -202,7 +204,6 @@ class BasetableControllerAPI extends Controller
             }
             $data = array_values($data);
         }
-
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went Wrong!!", false, 400);
