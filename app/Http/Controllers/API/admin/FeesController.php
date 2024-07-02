@@ -787,12 +787,25 @@ class FeesController extends Controller
              if ($fees->total_fees <= $request->discount_amount) {
                 return $this->response([], "Discount amount is to large!", false, 404);
             }
+            if($request->discount_by =='Percentage'){
+                if($request->discount_amount >=100){
+                    $discount_amount=$request->discount_amount;
+                  }else{
+                    return $this->response([], "Enter Discount Amount less 100.");
+                  }
+                }
+                if($request->discount_by =='Rupee'){
+                        $discount_amount=$request->discount_amount;
+                 }
+       
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
-             if($discount == 1){
+           
+            if($discount == 1){
                 // echo $fees;exit;
+                
                     Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)
                     ->update(['financial_year' => date('Y'),
-                              'discount_amount' => $request->discount_amount,
+                              'discount_amount' => $discount_amount,
                               'discount_by' => $request->discount_by]); 
                               return $this->response([], "Discount updated successfully");
             }else{
@@ -801,7 +814,7 @@ class FeesController extends Controller
                         'institute_id' => $request->institute_id,
                         'student_id' => $request->student_id,
                         'financial_year' => date('Y'),
-                        'discount_amount' => $request->discount_amount,
+                        'discount_amount' => $discount_amount,
                         'discount_by' => $request->discount_by,
                     ]
                 );
