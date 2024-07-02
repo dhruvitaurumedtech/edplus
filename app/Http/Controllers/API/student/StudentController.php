@@ -548,7 +548,7 @@ class StudentController extends Controller
                             'country_code_name' => $parentData['country_code_name'],
                             'mobile' => $parentData['mobile'],
                             'role_type' => '5',
-                            'status' => '1'
+                            'status' => 1
                         ]);
 
                         $parent_id = $user->id;
@@ -1089,6 +1089,7 @@ class StudentController extends Controller
                     'class_highest' => $highestMarks
                 );
             }
+
             $subdta = Student_detail::where('student_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->whereNull('deleted_at')->select('students_details.*')->first();
@@ -1138,6 +1139,7 @@ class StudentController extends Controller
                     );
                 }
             }
+
             $totalattendlec = [];
             $cumnth = date('Y-m');
             $cmtoday = date('Y-m-d');
