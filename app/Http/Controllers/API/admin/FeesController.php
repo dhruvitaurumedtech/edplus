@@ -791,7 +791,7 @@ class FeesController extends Controller
                 if($request->discount_amount >=100){
                     $discount_amount=$request->discount_amount;
                   }else{
-                    return $this->response([], "Enter Discount Amount less 100.");
+                    return $this->response([], "Enter Discount Amount less 100.", false, 400);
                   }
                 }
                 if($request->discount_by =='Rupee'){
