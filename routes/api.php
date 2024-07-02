@@ -222,6 +222,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     //homework
     Route::post('/teacher/add-homework', [HomeworkController::class, 'add_homework']);
+    Route::post('/student/view-homework', [HomeworkController::class, 'view_homework']);
 
 });
 
