@@ -990,8 +990,7 @@ class StudentController extends Controller
             $user_id = Auth::id();
             $existingUser = User::where('id', $user_id)->first();
             $institute_id = $request->institute_id;
-            $getstdntdata = Student_detail::where('student_id', $user_id)
-                ->where('institute_id', $request->institute_id)->first();
+            $getstdntdata = Student_detail::where('institute_id', $request->institute_id)->first();
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->paginate(10);
@@ -1010,8 +1009,10 @@ class StudentController extends Controller
                     'banner_image' => $imgpath,
                 );
             }
+           
             $today = date('Y-m-d');
             $todays_lecture = [];
+          
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
@@ -1030,7 +1031,8 @@ class StudentController extends Controller
                     'time_table.lecture_date'
                 )
                 ->paginate(2);
-                
+         
+                // print_r($todayslect);exit;
             foreach ($todayslect as $todayslecDT) {
 
                 $todays_lecture[] = array(
@@ -1158,14 +1160,13 @@ class StudentController extends Controller
                 ->where('created_at', '<', $nextDayStr)
                 ->where('attendance', 'A')->count();
 
-               
-            $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
+            //    echo $getstdntdata->subject_id;exit;
+            $totalLectures = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
-                ->where('lecture_date', '<', $nextDayStr)
-                ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
-                ->count();
+                ->where('lecture_date', '>', $nextDayStr)
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))->count();
             $totalattendlec = [
-                'total_lectures' => $totllect,
+                'total_lectures' => $totalLectures,
                 'attend_lectures' => $totalattlec,
                 //'miss_lectures' => $totllect - $totalattlec
                 'miss_lectures' => $totalmissattlec
