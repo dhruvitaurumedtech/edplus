@@ -780,7 +780,7 @@ class FeesController extends Controller
         }
         try{
             $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->select('total_fees')->first();
-            // print_r($fees);exit;
+            // print_r($fees->total_fees);exit;
             if ($fees->total_fees==0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
             }
@@ -788,14 +788,17 @@ class FeesController extends Controller
                 return $this->response([], "Discount amount is to large!", false, 404);
             }
             if($request->discount_by =='Percentage'){
-                if($request->discount_amount >=100){
-                    $discount_amount=$request->discount_amount;
-                  }else{
+                if($request->discount_amount <=100){
+                    $discount_amount =  $fees->total_fees * ($request->discount_amount / 100);
+                    //  $discount_amount = $fees->total_fees - $discountAmount;
+                // exit; 
+                }else{
                     return $this->response([], "Enter Discount Amount less 100.", false, 400);
                   }
                 }
                 if($request->discount_by =='Rupee'){
-                        $discount_amount=$request->discount_amount;
+                         
+                        $discount_amount=$request->discount_amount; 
                  }
        
             $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
