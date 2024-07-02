@@ -6231,10 +6231,10 @@ class InstituteApiController extends Controller
                 $class->save();
             }
             if(!empty($request->edit_id)) {
-                return $this->response([], "Class updated successfully:", false, 400);
+                return $this->response([], "Class updated successfully:");
             
             }else{
-                return $this->response([], "Class saved successfully:", false, 400);
+                return $this->response([], "Class saved successfully:");
             }
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
@@ -6253,7 +6253,7 @@ class InstituteApiController extends Controller
         foreach($data as $value){
            $response[] =['name'=>$value->name,'capacity'=>$value->capacity];
         } 
-        return $this->response($response, "Classroom display successfully", false, 400);
+        return $this->response($response, "Classroom display successfully");
 
     }
     function create_remainder(Request $request)

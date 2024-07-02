@@ -115,6 +115,7 @@ class FeesController extends Controller
      
     }
     public function paid_fees_student(Request $request){
+        // echo"hi";exit;
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'batch_id' =>'required|exists:batches,id',

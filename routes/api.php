@@ -225,9 +225,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     //classroom
     Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
+    Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
 
 });
-Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
 
 
 
