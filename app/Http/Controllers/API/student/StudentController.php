@@ -1091,6 +1091,7 @@ class StudentController extends Controller
                     'class_highest' => $highestMarks
                 );
             }
+
             $subdta = Student_detail::where('student_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->whereNull('deleted_at')->select('students_details.*')->first();
@@ -1140,6 +1141,7 @@ class StudentController extends Controller
                     );
                 }
             }
+
             $totalattendlec = [];
             $cumnth = date('Y-m');
             $cmtoday = date('Y-m-d');
