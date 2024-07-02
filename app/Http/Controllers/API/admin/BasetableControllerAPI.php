@@ -158,20 +158,33 @@ class BasetableControllerAPI extends Controller
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
             $medium_ids = explode(',', $request->medium_id);
-            $class_ids = explode(',', $request->class_id);
+            //$class_ids = explode(',', $request->class_id);
 
-            $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+            //$input = "1{1},2{2}";
+            $class_mappings = explode(',', $request->class_id);
+            //$class_ids_by_medium = [];
+            $data = [];
+            foreach ($class_mappings as $mapping) {
+                // Extract the class ID and the medium ID within the brackets
+                preg_match('/(\d+)\{(\d+)\}/', $mapping, $matches);
+                if (count($matches) != 3) {
+                    continue; // Skip invalid mappings
+                }
+                $class_id = $matches[1];
+                $medium_id = $matches[2];
+    
+                $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
                 ->whereIN('base_table.institute_for', $institute_for_ids)
                 ->whereIN('base_table.board', $board_ids)
-                ->whereIN('base_table.medium', $medium_ids)
-                ->whereIN('base_table.institute_for_class', $class_ids)
+                ->where('base_table.medium', $medium_id)
+                ->where('base_table.institute_for_class', $class_id)
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
-            $data = [];
+                
             foreach ($base_standards as $base_standard) {
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
@@ -188,6 +201,7 @@ class BasetableControllerAPI extends Controller
                 ];
             }
             $data = array_values($data);
+        }
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
@@ -197,7 +211,6 @@ class BasetableControllerAPI extends Controller
 
     public function stream(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
@@ -239,7 +252,6 @@ class BasetableControllerAPI extends Controller
 
     public function subject(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
