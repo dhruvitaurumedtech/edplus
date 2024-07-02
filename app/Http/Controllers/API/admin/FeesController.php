@@ -789,7 +789,7 @@ class FeesController extends Controller
             }
             if($request->discount_by =='Percentage'){
                 if($request->discount_amount <=100){
-                    $discount_amount =  $fees->total_fees * ($request->discount_amount / 100);
+                    $discount_amount=$request->discount_amount; 
                     //  $discount_amount = $fees->total_fees - $discountAmount;
                 // exit; 
                 }else{
