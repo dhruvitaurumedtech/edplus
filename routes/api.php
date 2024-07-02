@@ -205,7 +205,6 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
 
-    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
     Route::post('/institute/create-general-timetable', [General_timetableController::class, 'create_general_timetable']);
     Route::post('/institute/display-general-timetable', [General_timetableController::class, 'display_general_timetable']);
     Route::post('/institute/edit-general-timetable', [General_timetableController::class, 'edit_general_timetable']);
@@ -224,10 +223,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/add-homework', [HomeworkController::class, 'add_homework']);
     Route::post('/student/view-homework', [HomeworkController::class, 'view_homework']);
 
+    //classroom
+    Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
+
 });
+Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
 
 
 
+   
 
 Route::post('test', [InstituteApiController::class, 'test']);
 
