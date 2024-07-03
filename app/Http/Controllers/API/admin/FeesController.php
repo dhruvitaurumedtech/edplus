@@ -23,7 +23,7 @@ use Illuminate\Validation\Rule;
 
 class FeesController extends Controller
 {
-    
+
     use ApiTrait;
     public function add_fees(Request $request)
     {
@@ -34,196 +34,88 @@ class FeesController extends Controller
             'standard_id' => 'required|exists:standard,id',
             'subject_id' => 'required|exists:subject,id',
             'amount' => 'required',
-            'stream_id' =>'nullable|integer|exists:stream,id',
+            'stream_id' => 'nullable|integer|exists:stream,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-        $existingFee = Fees_model::where('user_id',Auth::user()->id)
-                                 ->where('institute_id', $request->institute_id)
-                                 ->where('board_id', $request->board_id)
-                                 ->where('medium_id', $request->medium_id)
-                                 ->where('standard_id', $request->standard_id)
-                                 ->where('stream_id', $request->stream_id)
-                                 ->where('subject_id', $request->subject_id)
-                                 ->first();
+        try {
+            $existingFee = Fees_model::where('user_id', Auth::user()->id)
+                ->where('institute_id', $request->institute_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->where('stream_id', $request->stream_id)
+                ->where('subject_id', $request->subject_id)
+                ->first();
 
-        if ($existingFee) {
-            return $this->response([], "Fees for the given criteria already exist.", false, 400);
-        }
+            if ($existingFee) {
+                return $this->response([], "Fees for the given criteria already exist.", false, 400);
+            }
 
-        $fee = new Fees_model;
-        $fee->user_id = Auth::user()->id;
-        $fee->institute_id = $request->institute_id;
-        $fee->board_id = $request->board_id;
-        $fee->medium_id = $request->medium_id;
-        $fee->standard_id = $request->standard_id;
-        $fee->stream_id = $request->stream_id;
-        $fee->subject_id = $request->subject_id;
-        $fee->amount = $request->amount;
-        $fee->save();
-        return $this->response([], "Fees inserted successfully.");
+            $fee = new Fees_model;
+            $fee->user_id = Auth::user()->id;
+            $fee->institute_id = $request->institute_id;
+            $fee->board_id = $request->board_id;
+            $fee->medium_id = $request->medium_id;
+            $fee->standard_id = $request->standard_id;
+            $fee->stream_id = $request->stream_id;
+            $fee->subject_id = $request->subject_id;
+            $fee->amount = $request->amount;
+            $fee->save();
+            return $this->response([], "Fees inserted successfully.");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function view_fees_detail(Request $request){
+    public function view_fees_detail(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-        $fees = Fees_model::join('board', 'board.id', '=', 'fees.board_id')
-        ->leftjoin('medium', 'medium.id', '=', 'fees.medium_id')
-        ->leftjoin('standard', 'standard.id', '=', 'fees.standard_id')
-        ->leftjoin('stream', 'stream.id', '=', 'fees.stream_id')
-        ->leftjoin('subject', 'subject.id', '=', 'fees.subject_id')
-        ->select(
-            'fees.amount',
-            'board.name as board_name',
-            'medium.name as medium_name',
-            'standard.name as standard_name',
-            'stream.name as stream_name',
-            'subject.name as subject_name'
-        )
-        ->where('fees.institute_id', $request->institute_id)
-        ->get()->toarray();
-        $data=[];
-        if(!empty($fees)){
+        try {
+            $fees = Fees_model::join('board', 'board.id', '=', 'fees.board_id')
+                ->leftjoin('medium', 'medium.id', '=', 'fees.medium_id')
+                ->leftjoin('standard', 'standard.id', '=', 'fees.standard_id')
+                ->leftjoin('stream', 'stream.id', '=', 'fees.stream_id')
+                ->leftjoin('subject', 'subject.id', '=', 'fees.subject_id')
+                ->select(
+                    'fees.amount',
+                    'board.name as board_name',
+                    'medium.name as medium_name',
+                    'standard.name as standard_name',
+                    'stream.name as stream_name',
+                    'subject.name as subject_name'
+                )
+                ->where('fees.institute_id', $request->institute_id)
+                ->get()->toarray();
+            $data = [];
+            if (!empty($fees)) {
 
-        foreach($fees as $value){
-             $data[] = [
-                  'board_name'=>$value['board_name'],
-                  'medium_name'=>$value['medium_name'],
-                  'standard_name'=>$value['standard_name'],
-                  'stream_name'=>$value['stream_name'],
-                  'subject_name'=>$value['subject_name'],
-                  'amount'=>$value['amount'],
-             ];
-           
-              }
-            }else{
-                return $this->response([],"No record found", false, 400);
-            } 
+                foreach ($fees as $value) {
+                    $data[] = [
+                        'board_name' => $value['board_name'],
+                        'medium_name' => $value['medium_name'],
+                        'standard_name' => $value['standard_name'],
+                        'stream_name' => $value['stream_name'],
+                        'subject_name' => $value['subject_name'],
+                        'amount' => $value['amount'],
+                    ];
+                }
+            } else {
+                return $this->response([], "No record found", false, 400);
+            }
             return $this->response($data, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
-     
     }
-    public function paid_fees_student(Request $request){
+    public function paid_fees_student(Request $request)
+    {
         // echo"hi";exit;
-        $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|integer',
-            'batch_id' =>'required|exists:batches,id',
-            'board_id' => 'required|exists:board,id',
-            'medium_id' => 'required|exists:medium,id',
-            'standard_id' => 'required|exists:standard,id',
-        ]);
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
-        try{
-            $subjectIds = [];
-                if (!empty($request->subject_id)) {
-                    $subjectIds = explode(',', $request->subject_id);
-
-                }
-                            $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
-                            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
-                            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                            ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                            ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
-                            ->select(
-                                'users.id',
-                                'users.firstname',
-                                'users.lastname',
-                                'users.image',
-                                'students_details.student_id', 
-                                DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
-                            )
-                            ->where('students_details.institute_id', $request->institute_id)
-                            ->where('students_details.board_id', $request->board_id)
-                            ->where('students_details.medium_id', $request->medium_id)
-                            ->where('students_details.standard_id', $request->standard_id)
-                            ->where('students_details.status', '1')
-                            ->groupBy(
-                                'users.id',
-                                'users.firstname',
-                                'users.lastname',
-                                'users.image',
-                                'students_details.student_id' 
-                            );
-
-                            if (!empty($request->batch_id)) {
-                            $query->where('students_details.batch_id', $request->batch_id);
-                            }
-
-                            $query->where(function($query) use ($subjectIds) {
-                                foreach ($subjectIds as $subjectId) {
-                                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
-                                }
-                            });
-
-                            $student_response = $query->get()->toArray();
-
-           
-                            $students = [];
-
-                            foreach ($student_response as $value) {
-
-                                $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
-                                                                  ->where('student_id', $value['student_id'])
-                                                                  ->first();
-                                                                  
-                                                     
-                                $discount = Discount_model::where('institute_id', $request->institute_id)
-                                                          ->where('student_id', $value['student_id'])
-                                                          ->first();
-                                                        //   print_r($student_fees);exit;
-                            
-                                $total = null;
-                                
-                                if ($student_fees || $discount) {
-                                    $total = $student_fees->total_fees;
-                                
-                                    // Apply discount if available
-                                    if ($discount) {
-                                        if ($discount->discount_by == 'Rupee') {
-                                            $total = $student_fees->total_fees - $discount->discount_amount;
-                                        } elseif ($discount->discount_by == 'Percentage') {
-                                            $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
-                                        }
-                                    }
-                                
-                                    // Check if both total and total payment amount are available and not empty
-                                    if (!empty($total) && !empty($value['total_payment_amount'])) {
-                                        // Debugging output to check the values
-                                       
-                                        // Compare total with the payment amount
-                                        if ($total == $value['total_payment_amount']) {
-                                            $students[] = [
-                                                'student_id' => $value['student_id'],
-                                                'student_name' => $value['firstname'] . ' ' . $value['lastname'],
-                                                'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
-                                                'status' => 'paid'
-                                            ];
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            return $this->response($students, "Data Fetch Successfully");
-                            
-        } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
-        }
-    }
-    public function pending_fees_student(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'batch_id' => 'required|exists:batches,id',
@@ -231,17 +123,14 @@ class FeesController extends Controller
             'medium_id' => 'required|exists:medium,id',
             'standard_id' => 'required|exists:standard,id',
         ]);
-    
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-    
         try {
             $subjectIds = [];
             if (!empty($request->subject_id)) {
                 $subjectIds = explode(',', $request->subject_id);
             }
-    
             $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
                 ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
@@ -268,11 +157,122 @@ class FeesController extends Controller
                     'users.image',
                     'students_details.student_id'
                 );
-    
+
             if (!empty($request->batch_id)) {
                 $query->where('students_details.batch_id', $request->batch_id);
             }
-    
+
+            $query->where(function ($query) use ($subjectIds) {
+                foreach ($subjectIds as $subjectId) {
+                    $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                }
+            });
+
+            $student_response = $query->get()->toArray();
+            // echo "<pre>";print_r($student_response);exit;
+
+
+            $students = [];
+
+            foreach ($student_response as $value) {
+                // print_r($student_response);exit;
+                $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $value['student_id'])
+                    ->first();
+
+
+                $discount = Discount_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $value['student_id'])
+                    ->first();
+                //   print_r($discount);exit;
+
+                $total = null;
+
+                if (!empty($student_fees) || !empty($discount)) {
+                    $total = $student_fees->total_fees;
+
+                    // Apply discount if available
+                    if ($discount) {
+                        if ($discount->discount_by == 'Rupee') {
+                            $total = $student_fees->total_fees - $discount->discount_amount;
+                        } elseif ($discount->discount_by == 'Percentage') {
+                            $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                        }
+                    }
+
+                    // Check if both total and total payment amount are available and not empty
+                    if (!empty($total) && !empty($value['total_payment_amount'])) {
+                        // Debugging output to check the values
+
+                        // Compare total with the payment amount
+                        if ($total == $value['total_payment_amount']) {
+                            $students[] = [
+                                'student_id' => $value['student_id'],
+                                'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                                'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                                'status' => 'paid'
+                            ];
+                        }
+                    }
+                }
+            }
+            
+            return $this->response($students, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function pending_fees_student(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|integer',
+            'batch_id' => 'required|exists:batches,id',
+            'board_id' => 'required|exists:board,id',
+            'medium_id' => 'required|exists:medium,id',
+            'standard_id' => 'required|exists:standard,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $subjectIds = [];
+            if (!empty($request->subject_id)) {
+                $subjectIds = explode(',', $request->subject_id);
+            }
+
+            $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
+                ->select(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'students_details.student_id',
+                    DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+                )
+                ->where('students_details.institute_id', $request->institute_id)
+                ->where('students_details.board_id', $request->board_id)
+                ->where('students_details.medium_id', $request->medium_id)
+                ->where('students_details.standard_id', $request->standard_id)
+                ->where('students_details.status', '1')
+                ->groupBy(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'students_details.student_id'
+                );
+
+            if (!empty($request->batch_id)) {
+                $query->where('students_details.batch_id', $request->batch_id);
+            }
+
             if (!empty($subjectIds)) {
                 $query->where(function ($query) use ($subjectIds) {
                     foreach ($subjectIds as $subjectId) {
@@ -280,33 +280,33 @@ class FeesController extends Controller
                     }
                 });
             }
-    
+
             $student_response = $query->get()->toArray();
-    //  print_r($student_response);exit;
+            //  print_r($student_response);exit;
             $students = [];
-             
+
             foreach ($student_response as $value) {
-              
+
                 // $student_id = $value['student_id'];
                 // echo $request->institute_id;
                 $student_fees = Student_fees_model::where('student_id',  $value['id'])
-                                                ->where('institute_id', $request->institute_id)
-                                                ->first();
-    
+                    ->where('institute_id', $request->institute_id)
+                    ->first();
+
                 // if (empty($student_fees)) {
                 //     return $this->response([], "Fees are not included for the subject", false, 400);
                 // }
-    
+
                 $discount = Discount_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['id'])
                     ->first();
-    
+
                 $dis = !empty($discount) ? $discount->discount_amount : 0;
                 $due_amount = 0;
                 // echo $value['total_payment_amount'];exit;
                 if (!empty($value['total_payment_amount']) || !empty($student_fees->total_fees)) {
                     if ($student_fees->total_fees != $value['total_payment_amount']) {
-                         if (!empty($value['total_payment_amount'])) {
+                        if (!empty($value['total_payment_amount'])) {
                             if ($discount && $discount->discount_by == 'Rupee') {
                                 $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
                             } elseif ($discount && $discount->discount_by == 'Percentage') {
@@ -320,7 +320,7 @@ class FeesController extends Controller
                         }
                     }
                 }
-    
+
                 if ($due_amount != 0) {
                     $students[] = [
                         'student_id' => $value['id'],
@@ -331,22 +331,23 @@ class FeesController extends Controller
                     ];
                 }
             }
-    
+
             return $this->response($students, "Data fetched successfully", true, 200);
         } catch (\Exception $e) {
             return $this->response([], "Error: " . $e->getMessage(), false, 400);
         }
     }
-    
+
     //invoice number mate student_id pass karvu padse
-    public function payment_type(Request $request){
+    public function payment_type(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'board_id' => 'required|integer|exists:board,id',
             'medium_id' => 'required|integer|exists:medium,id',
             'standard_id' => 'required|integer|exists:standard,id',
             'subject_id' => 'required|exists:subject,id',
-            'stream_id' =>'nullable',
+            'stream_id' => 'nullable',
             'student_id' => 'required',
         ]);
         if ($validator->fails()) {
@@ -354,83 +355,85 @@ class FeesController extends Controller
         }
         try {
             $payment_mode = Payment_type_model::whereNull('deleted_at')->get();
-            $data=[];
-            foreach($payment_mode as $value){
-               $data[] = ['id'=>$value->id,'name'=>$value->name];
+            $data = [];
+            foreach ($payment_mode as $value) {
+                $data[] = ['id' => $value->id, 'name' => $value->name];
             }
-           $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->latest()->first();
-            
+            $fees_colletion = Fees_colletion_model::where('student_id', $request->student_id)->latest()->first();
+
             if (!empty($fees_colletion)) {
-                $amount=$fees_colletion->total_amount - $fees_colletion->paid_amount; 
+                $amount = $fees_colletion->total_amount - $fees_colletion->paid_amount;
                 $parts = explode('-', $fees_colletion->invoice_no);
-                
+
                 if (count($parts) === 2) {
                     $number = $parts[1];
-                }        
-                $invoice = $number + 1 ;
+                }
+                $invoice = $number + 1;
             } else {
                 $invoice = 1;
             }
-            
-            $student = User::where('id',$request->student_id)->first();
-            $student_name = $student->firstname .' '.$student->lastname;
+
+            $student = User::where('id', $request->student_id)->first();
+            $student_name = $student->firstname . ' ' . $student->lastname;
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
             $userId = Auth::user()->id;
 
-            $Fee_amount = Fees_model::where('user_id',$userId)
-                                     ->where('institute_id', $request->institute_id)
-                                     ->where('board_id', $request->board_id)
-                                     ->where('medium_id', $request->medium_id)
-                                     ->where('standard_id', $request->standard_id)
-                                     ->where('stream_id', $request->stream_id)
-                                     ->where('subject_id', $request->subject_id)
-                                     ->select('amount')
-                                     ->first();
-                                    //  echo "<pre>";print_r($Fee_amount);exit;
-              
-             $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->get();
-             $paid_amount = 0 ;
-             foreach($fees_colletion as $value){
-                  $paid_amount +=$value->paid_amount;
-                $amount=$value->total_amount - $paid_amount; 
-                if($amount==0 || !empty($amount)){
-                    $total_amount = $amount;
-                }else{
-                    $total_amount =$Fee_amount->amount;
-                }
-             }
-             $fees_colletion=Fees_colletion_model::where('student_id',$request->student_id)->count();
-             if($fees_colletion < 0){
-                $total_amount =$Fee_amount->amount;
-             }
-            $student_histroy=Fees_colletion_model::where('student_id',$request->student_id)->get();
-             
-            $histroy = [];
-            foreach($student_histroy as $value){
-                $histroy[] =[
-                    'paid_amount'=>$value->paid_amount,
-                    'date'=>$value->created_at,
-                    'payment_mode'=>$value->payment_type,
-                    'invoice_no'=>$value->invoice_no,
-                    'transaction_id'=>$value->transaction_id,
+            $Fee_amount = Fees_model::where('user_id', $userId)
+                ->where('institute_id', $request->institute_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->where('stream_id', $request->stream_id)
+                ->where('subject_id', $request->subject_id)
+                ->select('amount')
+                ->first();
+            //  echo "<pre>";print_r($Fee_amount);exit;
 
-                ]; 
+            $fees_colletion = Fees_colletion_model::where('student_id', $request->student_id)->get();
+            $paid_amount = 0;
+            foreach ($fees_colletion as $value) {
+                $paid_amount += $value->paid_amount;
+                $amount = $value->total_amount - $paid_amount;
+                if ($amount == 0 || !empty($amount)) {
+                    $total_amount = $amount;
+                } else {
+                    $total_amount = $Fee_amount->amount;
+                }
             }
-            $data_final = ['payment_type'=>$data,
-                           'invoice_number'=>$invoiceNumber,
-                           'date'=>date('Y-m-d'),
-                           'student_id'=>$request->student_id,
-                           'student_name'=>$student_name,
-                           'total_amount'=>$total_amount,
-                        //    'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
-                           'histroy'=>$histroy
-                          ];
+            $fees_colletion = Fees_colletion_model::where('student_id', $request->student_id)->count();
+            if ($fees_colletion < 0) {
+                $total_amount = $Fee_amount->amount;
+            }
+            $student_histroy = Fees_colletion_model::where('student_id', $request->student_id)->get();
+
+            $histroy = [];
+            foreach ($student_histroy as $value) {
+                $histroy[] = [
+                    'paid_amount' => $value->paid_amount,
+                    'date' => $value->created_at,
+                    'payment_mode' => $value->payment_type,
+                    'invoice_no' => $value->invoice_no,
+                    'transaction_id' => $value->transaction_id,
+
+                ];
+            }
+            $data_final = [
+                'payment_type' => $data,
+                'invoice_number' => $invoiceNumber,
+                'date' => date('Y-m-d'),
+                'student_id' => $request->student_id,
+                'student_name' => $student_name,
+                'total_amount' => $total_amount,
+                //    'paid_amount'=>(!empty($fees_colletion->paid_amount))?$fees_colletion->paid_amount:'',
+                'histroy' => $histroy
+            ];
             return $this->response($data_final, "Successfully Display PaymentType.");
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
     }
-    public function fees_collection(Request $request){
+    public function fees_collection(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',
             'student_id' => 'required|integer',
@@ -441,62 +444,59 @@ class FeesController extends Controller
             'payment_type' => 'required|string',
             'transaction_id' => 'nullable|string'
         ]);
-    
+
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-    
+
         try {
             // Fetch student fees and discount details
             $student_fees = Student_fees_model::where('student_id', $request->student_id)
-                                              ->where('institute_id', $request->institute_id)
-                                              ->first();
-    
+                ->where('institute_id', $request->institute_id)
+                ->first();
+
             $discount = Discount_model::where('institute_id', $request->institute_id)
-                                      ->where('student_id', $request->student_id)
-                                      ->first();
-    
+                ->where('student_id', $request->student_id)
+                ->first();
+
             // Initialize fees variable
             $fees = null;
-    
+
             if ($student_fees) {
-                $discount_amount =0;
-                    if(!empty($discount->discount_amount))
-                    {
-                        $discount_amount = $discount->discount_amount;
-                    }
+                $discount_amount = 0;
+                if (!empty($discount->discount_amount)) {
+                    $discount_amount = $discount->discount_amount;
+                }
                 if ($discount) {
-                    
+
                     if ($discount->discount_by == 'Rupee') {
                         $fees = $student_fees->total_fees - $discount->discount_amount;
                     } elseif ($discount->discount_by == 'Percentage') {
                         $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
                     }
-                    
-                } 
-                    // If no discount, fees remain the total fees
-                    $fees_data=Fees_colletion_model::where('student_id',$request->student_id)->where('institute_id',$request->institute_id)->get();
-                    $paid_amount=0;
-                    if(!empty($fees_data)){
-                    foreach($fees_data as $value)
-                    {
-                        $paid_amount +=$value->payment_amount;
+                }
+                // If no discount, fees remain the total fees
+                $fees_data = Fees_colletion_model::where('student_id', $request->student_id)->where('institute_id', $request->institute_id)->get();
+                $paid_amount = 0;
+                if (!empty($fees_data)) {
+                    foreach ($fees_data as $value) {
+                        $paid_amount += $value->payment_amount;
                     }
                     // echo $paid_amount;exit;
                 }
-                    $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
-                
+                $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
+
                 // echo $fees;echo '=>'.$request->payment_amount;
-    
+
                 if ($fees < $request->payment_amount) {
                     return $this->response([], "Amount is not matched", false, 400);
                 }
                 // exit;
-                
+
             } else {
                 return $this->response([], "Student fees record not found!", false, 400);
             }
-    
+
             // Save the fee collection record
             $fee = new Fees_colletion_model;
             $fee->user_id = Auth::user()->id;
@@ -510,308 +510,319 @@ class FeesController extends Controller
             $fee->payment_type = $request->payment_type;
             $fee->transaction_id = $request->transaction_id ?? '';
             $fee->save();
-    
+
             // Calculate the total paid amount
             $total_paid = Fees_colletion_model::where('student_id', $request->student_id)
-                                              ->where('institute_id', $request->institute_id)
-                                              ->sum('payment_amount');
-    
+                ->where('institute_id', $request->institute_id)
+                ->sum('payment_amount');
+
             // Update the status of the latest fee collection record
             // Fees_colletion_model::where('id', $fee->id)->update([
             //     'status' => ($total_paid >= $student_fees->total_fees) ? 'paid' : 'pending'
             // ]);
-    
+
             return $this->response([], "Fees paid successfully.");
         } catch (\Exception $e) {
             return $this->response([], "Error: " . $e->getMessage(), false, 400);
         }
-        
     }
-    public function display_subject_fees(Request $request){
+    public function display_subject_fees(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
-            
+            'institute_id' => 'required|integer',
+
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $query=Subject_sub::leftjoin('subject','subject.id','=','subject_sub.subject_id')
-                            ->leftjoin('base_table','base_table.id','=','subject.base_table_id')
-                            ->leftjoin('board','board.id','=','base_table.board')
-                            ->leftjoin('medium','medium.id','=','base_table.medium')
-                            ->leftjoin('standard','standard.id','=','base_table.standard')
-                            ->leftjoin('stream','stream.id','=','base_table.stream')
-                            ->where('subject_sub.institute_id',$request->institute_id)
-                            ->select('subject.id','subject_sub.amount','subject.name as subject_name',
-                            'board.id as board_id','board.name as board_name','medium.id as medium_id',
-                            'medium.name as medium_name','standard.id as standard_id',
-                            'standard.name as standard_name','stream.id as stream_id','stream.name as stream_name');
-                            if (!empty($request->board_id)) {
-                                $query->whereIn('base_table.board',explode(',', $request->board_id));
-                            }
-                            if (!empty($request->standard_id)) {
-                                $query->whereIn('base_table.standard',explode(',', $request->standard_id));
-                            }
-                            if (!empty($request->medium_id)) {
-                                $query->whereIn('base_table.medium', explode(',',$request->medium_id));
-                            }
-                            if (!empty($request->stream_id)) {
-                                $query->whereIn('base_table.stream', explode(',', $request->stream_id));
-                            }
-                            if (!empty($request->subject_id)) {
-                             $query->whereIn('subject_sub.subject_id',explode(',', $request->subject_id));
-                            }
-                            if (!empty($request->sort_by)) {
-                                if ($request->sort_by == 'added') {
-                                    $query->whereNotNull('subject_sub.amount')->orderBy('subject_sub.amount', 'asc')->get()->toArray();
-                                } elseif ($request->sort_by == 'none') {
-                                    $query->whereNull('subject_sub.amount')->get()->toArray();
-                                }
-                            }
-                           
-                            $subject = $query->get()->toarray();
-                          
-        $student = [];
-        foreach($subject as $value){
-                      $student[]=  ['subject_id'=>$value['id'],
-                                    'subject_name'=>$value['subject_name'],
-                                    'board_id'=>$value['board_id'],
-                                    'board_name'=>$value['board_name'],
-                                    'standard_id'=>$value['standard_id'],
-                                    'standard_name'=>$value['standard_name'],
-                                    'medium_id'=>$value['medium_id'],
-                                    'medium_name'=>$value['medium_name'],
-                                    'stream_id'=>$value['stream_id'],
-                                    'stream_name'=>$value['stream_name'],
-                                    'amount'=>(!empty($value['amount']))? $value['amount'].'.00' : '00.00',
-                                ];
-                        
-              }
-        return $this->response($student, "Data Fetch Successfully");
+        try {
+            $query = Subject_sub::leftjoin('subject', 'subject.id', '=', 'subject_sub.subject_id')
+                ->leftjoin('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                ->leftjoin('board', 'board.id', '=', 'base_table.board')
+                ->leftjoin('medium', 'medium.id', '=', 'base_table.medium')
+                ->leftjoin('standard', 'standard.id', '=', 'base_table.standard')
+                ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
+                ->where('subject_sub.institute_id', $request->institute_id)
+                ->select(
+                    'subject.id',
+                    'subject_sub.amount',
+                    'subject.name as subject_name',
+                    'board.id as board_id',
+                    'board.name as board_name',
+                    'medium.id as medium_id',
+                    'medium.name as medium_name',
+                    'standard.id as standard_id',
+                    'standard.name as standard_name',
+                    'stream.id as stream_id',
+                    'stream.name as stream_name'
+                );
+            if (!empty($request->board_id)) {
+                $query->whereIn('base_table.board', explode(',', $request->board_id));
+            }
+            if (!empty($request->standard_id)) {
+                $query->whereIn('base_table.standard', explode(',', $request->standard_id));
+            }
+            if (!empty($request->medium_id)) {
+                $query->whereIn('base_table.medium', explode(',', $request->medium_id));
+            }
+            if (!empty($request->stream_id)) {
+                $query->whereIn('base_table.stream', explode(',', $request->stream_id));
+            }
+            if (!empty($request->subject_id)) {
+                $query->whereIn('subject_sub.subject_id', explode(',', $request->subject_id));
+            }
+            if (!empty($request->sort_by)) {
+                if ($request->sort_by == 'added') {
+                    $query->whereNotNull('subject_sub.amount')->orderBy('subject_sub.amount', 'asc')->get()->toArray();
+                } elseif ($request->sort_by == 'none') {
+                    $query->whereNull('subject_sub.amount')->get()->toArray();
+                }
+            }
+
+            $subject = $query->get()->toarray();
+
+            $student = [];
+            foreach ($subject as $value) {
+                $student[] =  [
+                    'subject_id' => $value['id'],
+                    'subject_name' => $value['subject_name'],
+                    'board_id' => $value['board_id'],
+                    'board_name' => $value['board_name'],
+                    'standard_id' => $value['standard_id'],
+                    'standard_name' => $value['standard_name'],
+                    'medium_id' => $value['medium_id'],
+                    'medium_name' => $value['medium_name'],
+                    'stream_id' => $value['stream_id'],
+                    'stream_name' => $value['stream_name'],
+                    'amount' => (!empty($value['amount'])) ? $value['amount'] . '.00' : '00.00',
+                ];
+            }
+            return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
-
-
     }
-    function subject_amount(Request $request){
+    function subject_amount(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
-            'subject_id'=>'required|integer',
-            'amount'=>'required|integer',
+            'institute_id' => 'required|integer',
+            'subject_id' => 'required|integer',
+            'amount' => 'required|integer',
 
-            
+
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
+        try {
             $subject_sub = Subject_sub::where('institute_id', $request->institute_id)->where('subject_id', $request->subject_id);
             $subject_sub->update([
-            'amount'=>$request->amount
+                'amount' => $request->amount
             ]);
             return $this->response([], "Fees Update Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function student_list_for_discount(Request $request){
+    public function student_list_for_discount(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'institute_id'=>'required|integer',
-          ]);
+            'institute_id' => 'required|integer',
+        ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-                $query=Student_detail::join('users','users.id','=','students_details.student_id')
-                      ->join('standard','standard.id','=','students_details.standard_id')
-                      ->leftjoin('stream','stream.id','=','students_details.stream_id')
-                      ->where('students_details.institute_id',$request->institute_id)
-                      ->where('students_details.status', '1')
-                      ->select('users.*','standard.name as standard_name','students_details.standard_id','students_details.stream_id','stream.name as streamname','students_details.subject_id');
-                        if (!empty($request->board_id)) {
-                        $query->whereIn('students_details.board_id',explode(',', $request->board_id));
-                        }
-                        if (!empty($request->standard_id)) {
-                            $query->whereIn('students_details.standard_id',explode(',', $request->standard_id));
-                        }
-                        if (!empty($request->medium_id)) {
-                            $query->whereIn('students_details.medium_id', explode(',',$request->medium_id));
-                        }
-                        if (!empty($request->stream_id)) {
-                            $query->whereIn('students_details.stream_id', explode(',', $request->stream_id));
-                        }
-                        if (!empty($request->subject_id)) {
-                        $query->whereIn('students_details.subject_id',explode(',', $request->subject_id));
-                        }
-                        if(!empty($request->search)){
-                        $searchTerm = '%' . $request->search . '%';
-                                            $query->where(function ($query) use ($searchTerm) {
-                                                $query->where(DB::raw("CONCAT(users.firstname, ' ', users.lastname)"), 'like', $searchTerm);
-                                            });
-                    }
-                    $student_list=$query->get();
-                    // echo "<pre>";print_r($student_list);exit;
+        try {
+            $query = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
+                ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->where('students_details.institute_id', $request->institute_id)
+                ->where('students_details.status', '1')
+                ->select('users.*', 'standard.name as standard_name', 'students_details.standard_id', 'students_details.stream_id', 'stream.name as streamname', 'students_details.subject_id');
+            if (!empty($request->board_id)) {
+                $query->whereIn('students_details.board_id', explode(',', $request->board_id));
+            }
+            if (!empty($request->standard_id)) {
+                $query->whereIn('students_details.standard_id', explode(',', $request->standard_id));
+            }
+            if (!empty($request->medium_id)) {
+                $query->whereIn('students_details.medium_id', explode(',', $request->medium_id));
+            }
+            if (!empty($request->stream_id)) {
+                $query->whereIn('students_details.stream_id', explode(',', $request->stream_id));
+            }
+            if (!empty($request->subject_id)) {
+                $query->whereIn('students_details.subject_id', explode(',', $request->subject_id));
+            }
+            if (!empty($request->search)) {
+                $searchTerm = '%' . $request->search . '%';
+                $query->where(function ($query) use ($searchTerm) {
+                    $query->where(DB::raw("CONCAT(users.firstname, ' ', users.lastname)"), 'like', $searchTerm);
+                });
+            }
+            $student_list = $query->get();
+            // echo "<pre>";print_r($student_list);exit;
 
-                    
-                      $data = [];
-                  $revise_fee='';
-                  $revise_fee ='';
-                  $discount_data='';
-                    foreach($student_list as $value){
 
-                        $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
-                        ->leftJoin('discount', function($join) {
-                            $join->on('discount.student_id', '=', 'students_details.student_id')
-                                 ->on('discount.institute_id', '=', 'students_details.institute_id');
-                        })
-                        ->leftjoin('standard','standard.id','=','students_details.standard_id')
-                         ->where('students_details.student_id',$value->id)
-                        ->where('students_details.institute_id',$request->institute_id)
-                        
-                        ->select('users.*','standard.name as standard_name','discount.discount_amount','discount.discount_by')
-                       
-                        ->first();
-                        $amounts =0;
-                        // print_r($student_list);exit;
-                        // foreach(explode(',',$value->subject_id) as $subject_id){whereIn('subject_id',explode(',', $value->subject_id))->
-                        // print_r(explode(',', $request->institute_id));exit;
-                    //    $subject_ids = $value->subject_id;
-                        $subject_sub = Student_fees_model::where('institute_id', $request->institute_id)
-                        ->where('student_id', $value->id)
-                        //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
-                            ->sum('total_fees');
-                           
-                            // foreach($subject_sub as $values){
-                            //    $amounts +=$values->total_fees;
-                            // }
-                            $amounts = $subject_sub;
-                            
-                        // }
-                       
-                        if(empty($query->discount_by)){
-                            $revise_fee=0;
-                            $discount_data='00.00' ;
-                            
-                        }
-                        if($query->discount_by =='Rupee'){
-                            $revise_fee=$amounts - $query->discount_amount;
-                            $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'.00' : '00.00' ;
-                            
-                        }
-                        if($query->discount_by =='Percentage'){
-                            $discountAmount =  $amounts * ($query->discount_amount / 100);
-                             $revise_fee = $amounts - $discountAmount;
-                             $discount_data=(!empty($query->discount_amount)) ? $query->discount_amount .'%' : '0%' ;
-                        }
-                        $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
-                        ->where('student_id', $value->id)
-                            ->sum('payment_amount');
-                            if(!empty($paid_amount)){
-                                
-                                $revise_fee = $revise_fee - $paid_amount;
-                            }
-                            else{
-                                $revise_fee = $revise_fee;  
-                            }
-                        $data[] =[
-                            'student_id'=>$value->id,
-                            'student_name'=>$value->firstname.' '.$value->lastname,
-                            'profile'=>(!empty($value->image))?asset($value->image):asset('no-image.png'),
-                            'standard_id'=>$value->standard_id,
-                            'standard_name'=>$value->standard_name,
-                            'stream_id'=>$value->stream_id,
-                            'streamname'=>$value->streamname,
-                            'total_fees_amount' => !empty($amounts) ? $amounts . '.00' : '00.00',
-                            'discount' =>$discount_data,
-                            'paid_amount'=>!empty($paid_amount) ? $paid_amount . '.00' : '00.00',
-                            'revise_fee'=>!empty($revise_fee) ? $revise_fee . '.00' : '00.00',
-                            'discount_by'=>$query->discount_by
-                          ];
-                      }
-                      return $this->response($data, "fetch Student list Successfully");
+            $data = [];
+            $revise_fee = '';
+            $revise_fee = '';
+            $discount_data = '';
+            foreach ($student_list as $value) {
+
+                $query = Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
+                    ->leftJoin('discount', function ($join) {
+                        $join->on('discount.student_id', '=', 'students_details.student_id')
+                            ->on('discount.institute_id', '=', 'students_details.institute_id');
+                    })
+                    ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                    ->where('students_details.student_id', $value->id)
+                    ->where('students_details.institute_id', $request->institute_id)
+
+                    ->select('users.*', 'standard.name as standard_name', 'discount.discount_amount', 'discount.discount_by')
+
+                    ->first();
+                $amounts = 0;
+                // print_r($student_list);exit;
+                // foreach(explode(',',$value->subject_id) as $subject_id){whereIn('subject_id',explode(',', $value->subject_id))->
+                // print_r(explode(',', $request->institute_id));exit;
+                //    $subject_ids = $value->subject_id;
+                $subject_sub = Student_fees_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $value->id)
+                    //    ->whereRaw("FIND_IN_SET(subject_id, '$subject_ids')")
+                    ->sum('total_fees');
+
+                // foreach($subject_sub as $values){
+                //    $amounts +=$values->total_fees;
+                // }
+                $amounts = $subject_sub;
+
+                // }
+
+                if (empty($query->discount_by)) {
+                    $revise_fee = 0;
+                    $discount_data = '00.00';
+                }
+                if ($query->discount_by == 'Rupee') {
+                    $revise_fee = $amounts - $query->discount_amount;
+                    $discount_data = (!empty($query->discount_amount)) ? $query->discount_amount . '.00' : '00.00';
+                }
+                if ($query->discount_by == 'Percentage') {
+                    $discountAmount =  $amounts * ($query->discount_amount / 100);
+                    $revise_fee = $amounts - $discountAmount;
+                    $discount_data = (!empty($query->discount_amount)) ? $query->discount_amount . '%' : '0%';
+                }
+                $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $value->id)
+                    ->sum('payment_amount');
+                if (!empty($paid_amount)) {
+
+                    $revise_fee = $revise_fee - $paid_amount;
+                } else {
+                    $revise_fee = $revise_fee;
+                }
+                $data[] = [
+                    'student_id' => $value->id,
+                    'student_name' => $value->firstname . ' ' . $value->lastname,
+                    'profile' => (!empty($value->image)) ? asset($value->image) : asset('no-image.png'),
+                    'standard_id' => $value->standard_id,
+                    'standard_name' => $value->standard_name,
+                    'stream_id' => $value->stream_id,
+                    'streamname' => $value->streamname,
+                    'total_fees_amount' => !empty($amounts) ? $amounts . '.00' : '00.00',
+                    'discount' => $discount_data,
+                    'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
+                    'revise_fee' => !empty($revise_fee) ? $revise_fee . '.00' : '00.00',
+                    'discount_by' => $query->discount_by
+                ];
+            }
+            return $this->response($data, "fetch Student list Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
-     }
-     public function fetch_discount_for_student(Request $request){
+    }
+    public function fetch_discount_for_student(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'student_id'=>'required|integer',
-            'institute_id'=>'required|integer',
-          ]);
+            'student_id' => 'required|integer',
+            'institute_id' => 'required|integer',
+        ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $query=Student_detail::leftjoin('users','users.id','=','students_details.student_id')
-                      ->leftjoin('standard','standard.id','=','students_details.standard_id')
-                      ->leftJoin('subject_sub', function($join) {
-                        $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
-                             ->on('subject_sub.institute_id', '=', 'students_details.institute_id');
-                    })
-                      ->where('students_details.student_id',$request->student_id)
-                      ->where('students_details.institute_id',$request->institute_id)
-                      ->select('users.*','standard.name as standard_name','subject_sub.amount')
-                      ->first();
-                        $data = [ 'student_id'=>$query->id,
-                                  'student_name'=>$query->firstname.' '.$query->lastname,
-                                  'profile'=>(!empty($query->image))?asset($query->image):asset('no-image.png'),
-                                  'standard_name'=>$query->standard_name,
-                                  'total_fees'=>$query->amount.'.00']; 
-                      return $this->response($data, "Fetch Student list Successfully");
+        try {
+            $query = Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
+                ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftJoin('subject_sub', function ($join) {
+                    $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
+                        ->on('subject_sub.institute_id', '=', 'students_details.institute_id');
+                })
+                ->where('students_details.student_id', $request->student_id)
+                ->where('students_details.institute_id', $request->institute_id)
+                ->select('users.*', 'standard.name as standard_name', 'subject_sub.amount')
+                ->first();
+            $data = [
+                'student_id' => $query->id,
+                'student_name' => $query->firstname . ' ' . $query->lastname,
+                'profile' => (!empty($query->image)) ? asset($query->image) : asset('no-image.png'),
+                'standard_name' => $query->standard_name,
+                'total_fees' => $query->amount . '.00'
+            ];
+            return $this->response($data, "Fetch Student list Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
         }
-        catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400 );
-        }
-     }
-     function add_discount(Request $request){
+    }
+    function add_discount(Request $request)
+    {
         $validator = Validator::make($request->all(), [
-            'student_id'=>'required|integer',
-            'institute_id'=>'required|integer',
-            'discount_amount'=>'required',
+            'student_id' => 'required|integer',
+            'institute_id' => 'required|integer',
+            'discount_amount' => 'required',
             'discount_by' => [
                 'required',
                 Rule::in(['Rupee', 'Percentage']),
             ],
-          ]);
+        ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        try{
-            $fees=Student_fees_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->select('total_fees')->first();
+        try {
+            $fees = Student_fees_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->select('total_fees')->first();
             // print_r($fees->total_fees);exit;
-            if ($fees->total_fees==0) {
+            if ($fees->total_fees == 0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
             }
-             if ($fees->total_fees <= $request->discount_amount) {
+            if ($fees->total_fees <= $request->discount_amount) {
                 return $this->response([], "Discount amount is to large!", false, 404);
             }
-            if($request->discount_by =='Percentage'){
-                if($request->discount_amount <=100){
-                    $discount_amount=$request->discount_amount; 
+            if ($request->discount_by == 'Percentage') {
+                if ($request->discount_amount <= 100) {
+                    $discount_amount = $request->discount_amount;
                     //  $discount_amount = $fees->total_fees - $discountAmount;
-                // exit; 
-                }else{
+                    // exit; 
+                } else {
                     return $this->response([], "Enter Discount Amount less 100.", false, 400);
-                  }
                 }
-                if($request->discount_by =='Rupee'){
-                         
-                        $discount_amount=$request->discount_amount; 
-                 }
-       
-            $discount=Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)->count();
-           
-            if($discount == 1){
+            }
+            if ($request->discount_by == 'Rupee') {
+
+                $discount_amount = $request->discount_amount;
+            }
+
+            $discount = Discount_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->count();
+
+            if ($discount == 1) {
                 // echo $fees;exit;
-                
-                    Discount_model::where('institute_id',$request->institute_id)->where('student_id',$request->student_id)
-                    ->update(['financial_year' => date('Y'),
-                              'discount_amount' => $discount_amount,
-                              'discount_by' => $request->discount_by]); 
-                              return $this->response([], "Discount updated successfully");
-            }else{
+
+                Discount_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)
+                    ->update([
+                        'financial_year' => date('Y'),
+                        'discount_amount' => $discount_amount,
+                        'discount_by' => $request->discount_by
+                    ]);
+                return $this->response([], "Discount updated successfully");
+            } else {
                 Discount_model::Create(
                     [
                         'institute_id' => $request->institute_id,
@@ -823,13 +834,12 @@ class FeesController extends Controller
                 );
                 return $this->response([], "Discount added  successfully");
             }
-           
-        
-        }catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400 );
-        }  
-     }
-     public function payment_type_new(Request $request){
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function payment_type_new(Request $request)
+    {
         try {
             // Fetch payment modes
             $payment_modes = Payment_type_model::whereNull('deleted_at')->get();
@@ -837,10 +847,10 @@ class FeesController extends Controller
             foreach ($payment_modes as $value) {
                 $data[] = ['id' => $value->id, 'name' => $value->name];
             }
-    
+
             // Fetch the latest fee collection record for the student
             $fees_collection = Fees_colletion_model::where('student_id', $request->student_id)->latest()->first();
-    
+
             // Initialize invoice number
             $invoice = 1;
             if (!empty($fees_collection)) {
@@ -851,21 +861,21 @@ class FeesController extends Controller
                 }
             }
             $invoiceNumber = 'INV' . $request->student_id . '-' . str_pad($invoice, 6, '0', STR_PAD_LEFT);
-    
+
             // Fetch student information
             $student = User::where('id', $request->student_id)->first();
             $student_name = $student->firstname . ' ' . $student->lastname;
-    
+
             // Fetch student fee and discount information
             $student_fees = Student_fees_model::where('student_id', $request->student_id)
-                                              ->where('institute_id', $request->institute_id)
-                                              ->first();
-                                            //   echo "<pre>";print_r($student_fees);exit;
-    
+                ->where('institute_id', $request->institute_id)
+                ->first();
+            //   echo "<pre>";print_r($student_fees);exit;
+
             $discount = Discount_model::where('student_id', $request->student_id)
-                                      ->where('institute_id', $request->institute_id)
-                                      ->first();
-    
+                ->where('institute_id', $request->institute_id)
+                ->first();
+
             // Calculate revised fee and discount data
             $revise_fee = 0;
             $discount_data = '00.00';
@@ -878,12 +888,12 @@ class FeesController extends Controller
                     $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '%' : '0%';
                 }
             }
-    
+
             // Fetch student payment history
             $student_history = Fees_colletion_model::where('student_id', $request->student_id)
-                                                   ->where('institute_id', $request->institute_id)
-                                                   ->get();
-    
+                ->where('institute_id', $request->institute_id)
+                ->get();
+
             // Prepare history and calculate paid amount
             $history = [];
             $paid_amount = 0;
@@ -899,7 +909,7 @@ class FeesController extends Controller
                     $paid_amount += $value->payment_amount;
                 }
             }
-    
+
             // Prepare the final data structure
             $data_final = [
                 'invoice_number' => $invoiceNumber,
@@ -912,12 +922,10 @@ class FeesController extends Controller
                 'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
                 'history' => $history,
             ];
-    
-            return $this->response($data_final, "Fetch data successfully");      
-              }catch (Exception $e) {
-                return $this->response($e, "Invalid token.", false, 400 );
-            }  
 
-     }
-    
+            return $this->response($data_final, "Fetch data successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }

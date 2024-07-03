@@ -1313,4 +1313,29 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    // function role_change(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_id' => 'required',
+    //         'role_type_id' => 'required',
+    //         'teacher_id' => 'required',
+
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+    //     try {
+    //         $teacherDetail = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id);
+
+    //         if ($teacherDetail) {
+    //             $teacherDetail->update([
+    //                 'role_type' => $request->role_type_id
+    //             ]);
+    //         }
+    //         return $this->response([], "Roletype change successfully");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
 }
