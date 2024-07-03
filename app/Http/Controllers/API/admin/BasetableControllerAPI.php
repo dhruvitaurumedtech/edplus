@@ -141,13 +141,80 @@ class BasetableControllerAPI extends Controller
     }
 
 
+    // public function standard(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_for_id' => 'required',
+    //         'board_id' => 'required',
+    //         //'medium_id' => 'required',
+    //         'class_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         $institute_for_ids = explode(',', $request->institute_for_id);
+    //         $board_ids = explode(',', $request->board_id);
+    //         $medium_ids = explode(',', $request->medium_id);
+    //         //$class_ids = explode(',', $request->class_id);
+
+    //         //$input = "1{1},2{2}";
+    //         $class_mappings = explode(',', $request->class_id);
+    //         //$class_ids_by_medium = [];
+            
+    //         $data = [];  
+    //         foreach ($class_mappings as $mapping) {
+    //             // Extract the class ID and the medium ID within the brackets
+    //             preg_match('/(\d+)\{(\d+)\}/', $mapping, $matches);
+    //             if (count($matches) != 3) {
+    //                 continue; // Skip invalid mappings
+    //             }
+    //             $medium_id = $matches[1];
+    //             $class_id = $matches[2];
+                
+    //             $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+    //             ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+    //             ->join('medium', 'base_table.medium', '=', 'medium.id')
+    //             ->join('board', 'base_table.board', '=', 'board.id')
+    //             ->whereIN('base_table.institute_for', $institute_for_ids)
+    //             ->where('base_table.board', $board_ids)
+    //             ->where('base_table.medium', $medium_id)
+    //             ->where('base_table.institute_for_class', $class_id)
+    //             ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+    //             ->distinct()
+    //             ->get();
+                  
+    //             foreach ($base_standards as $base_standard) {
+    //             $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
+    //             if (!array_key_exists($key, $data)) {
+    //                 $data[$key] = [
+    //                     'class_name' => $base_standard->class_name,
+    //                     'medium_name' => $base_standard->medium_name,
+    //                     'board_name' => $base_standard->board_name,
+    //                     'std_data' => [],
+    //                 ];
+    //             }
+    //             $data[$key]['std_data'][] = [
+    //                 'id' => $base_standard->id,
+    //                 'standard_name' => $base_standard->name,
+    //             ];
+    //         }
+    //     }
+    //         $data = array_values($data);
+    //         return $this->response($data, "Fetch Data Successfully");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Something went Wrong!!", false, 400);
+    //     }
+    // }
+
     public function standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_for_id' => 'required',
-            'board_id' => 'required',
-            //'medium_id' => 'required',
-            'class_id' => 'required',
+            // 'institute_for_id' => 'required',
+            // 'board_id' => 'required',
+            // 'class_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -155,46 +222,29 @@ class BasetableControllerAPI extends Controller
         }
 
         try {
-            $institute_for_ids = explode(',', $request->institute_for_id);
-            $board_ids = explode(',', $request->board_id);
-            $medium_ids = explode(',', $request->medium_id);
-            //$class_ids = explode(',', $request->class_id);
-
-            //$input = "1{1},2{2}";
-            $class_mappings = explode(',', $request->class_id);
-            //$class_ids_by_medium = [];
             
-            $data = [];  
-        foreach ($medium_ids as $medium_mapping) {
-            preg_match('/(\d+)\{(\d+)\}/', $medium_mapping, $mediummatches);
-                if (count($mediummatches) != 3) {
-                    continue; // Skip invalid mappings
-                }
-                $board_ids = $mediummatches[1];
-                //$class_id = $mediummatches[2];
-
-            foreach ($class_mappings as $mapping) {
-                // Extract the class ID and the medium ID within the brackets
-                preg_match('/(\d+)\{(\d+)\}/', $mapping, $matches);
-                if (count($matches) != 3) {
-                    continue; // Skip invalid mappings
-                }
-                $medium_id = $matches[1];
-                $class_id = $matches[2];
+            $data = [];
+            
+            foreach ($request->data as $datas) {
+                // $institute_for_ids = $datas['institute_for_id'];
+                // $board_ids = $datas['board_id'];
+                // $medium_id = $datas['medium_id'];
+                //foreach ($datas['class_id'] as $class_id) {
                 
                 $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
-                ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->where('base_table.board', $board_ids)
-                ->where('base_table.medium', $medium_id)
-                ->where('base_table.institute_for_class', $class_id)
+                ->where('base_table.institute_for', $datas['institute_for_id'])
+                ->where('base_table.board', $datas['board_id'])
+                ->where('base_table.medium', $datas['medium_id'])
+                ->whereIN('base_table.institute_for_class', $datas['class_id'])
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
                   
                 foreach ($base_standards as $base_standard) {
+                   
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
                     $data[$key] = [
@@ -209,9 +259,10 @@ class BasetableControllerAPI extends Controller
                     'standard_name' => $base_standard->name,
                 ];
             }
+        //}
         }
+        
             $data = array_values($data);
-        }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went Wrong!!", false, 400);

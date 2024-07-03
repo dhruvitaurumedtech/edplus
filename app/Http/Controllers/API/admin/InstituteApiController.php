@@ -6260,7 +6260,7 @@ class InstituteApiController extends Controller
         $data=Class_room_model::where('institute_id',$request->institute_id)->get();
         $response =[];
         foreach($data as $value){
-           $response[] =['name'=>$value->name,'capacity'=>$value->capacity];
+           $response[] =['id'=>$value->id,'name'=>$value->name,'capacity'=>$value->capacity];
         } 
         return $this->response($response, "Classroom display successfully");
 
