@@ -63,7 +63,8 @@ class HomeworkController extends Controller
             $response=[];
             if(!empty($data)){
             foreach($data as $value){
-                $response[] =['title'=>$value->title,
+                $response[] =['id'=>$value->id,
+                              'title'=>$value->title,
                               'description'=>$value->description,
                               'date'=>$value->date];
                             }
@@ -77,9 +78,21 @@ class HomeworkController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function delete_homework(Request $request)
     {
-        //
+        $validator = Validator::make($request->all(), [
+            'homework_id' => 'required|exists:home_work,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $exam  = Home_work_model::where('id', $request->homework_id)->delete();
+            return $this->response([], "Successfully Deleted Homework.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }   
     }
 
     /**
