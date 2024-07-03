@@ -165,7 +165,14 @@ class BasetableControllerAPI extends Controller
             //$class_ids_by_medium = [];
             
             $data = [];  
-            
+        foreach ($medium_ids as $medium_mapping) {
+            preg_match('/(\d+)\{(\d+)\}/', $medium_mapping, $mediummatches);
+                if (count($mediummatches) != 3) {
+                    continue; // Skip invalid mappings
+                }
+                $board_ids = $mediummatches[1];
+                //$class_id = $mediummatches[2];
+
             foreach ($class_mappings as $mapping) {
                 // Extract the class ID and the medium ID within the brackets
                 preg_match('/(\d+)\{(\d+)\}/', $mapping, $matches);
@@ -180,14 +187,14 @@ class BasetableControllerAPI extends Controller
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
                 ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->whereIN('base_table.board', $board_ids)
+                ->where('base_table.board', $board_ids)
                 ->where('base_table.medium', $medium_id)
                 ->where('base_table.institute_for_class', $class_id)
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
                   
-            foreach ($base_standards as $base_standard) {
+                foreach ($base_standards as $base_standard) {
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
                     $data[$key] = [
@@ -202,6 +209,7 @@ class BasetableControllerAPI extends Controller
                     'standard_name' => $base_standard->name,
                 ];
             }
+        }
             $data = array_values($data);
         }
             return $this->response($data, "Fetch Data Successfully");
