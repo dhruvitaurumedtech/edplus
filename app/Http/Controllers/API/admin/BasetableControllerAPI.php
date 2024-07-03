@@ -481,14 +481,72 @@ class BasetableControllerAPI extends Controller
     }
 
 
+    // public function get_edit_standard(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_for_id' => 'required',
+    //         'board_id' => 'required',
+    //         'medium_id' => 'required',
+    //         'class_id' => 'required',
+    //         'institute_id' => 'required',
+    //     ]);
+
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+
+    //     try {
+    //         $institute_for_ids = explode(',', $request->institute_for_id);
+    //         $board_ids = explode(',', $request->board_id);
+    //         $medium_ids = explode(',', $request->medium_id);
+    //         $class_ids = explode(',', $request->class_id);
+
+    //         $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+    //             ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+    //             ->join('medium', 'base_table.medium', '=', 'medium.id')
+    //             ->join('board', 'base_table.board', '=', 'board.id')
+    //             ->whereIN('base_table.institute_for', $institute_for_ids)
+    //             ->whereIN('base_table.board', $board_ids)
+    //             ->whereIN('base_table.medium', $medium_ids)
+    //             ->whereIN('base_table.institute_for_class', $class_ids)
+    //             ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+    //             ->distinct()
+    //             ->get();
+    //         $institute_base_standard_id = Standard_sub::where('institute_id', $request->institute_id)->pluck('standard_id')->toArray();
+    //         $data = [];
+    //         foreach ($base_standards as $base_standard) {
+    //             $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
+    //             if (!array_key_exists($key, $data)) {
+    //                 $data[$key] = [
+    //                     'class_name' => $base_standard->class_name,
+    //                     'medium_name' => $base_standard->medium_name,
+    //                     'board_name' => $base_standard->board_name,
+    //                     'std_data' => [],
+    //                 ];
+    //             }
+    //             $isAdded = in_array($base_standard->id, $institute_base_standard_id);
+    //             $data[$key]['std_data'][] = [
+    //                 'id' => $base_standard->id,
+    //                 'standard_name' => $base_standard->name,
+    //                 'is_added' => $isAdded
+    //             ];
+    //         }
+    //         $data = array_values($data);
+
+    //         return $this->response($data, "Fetch Data Successfully");
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Something went Wrong!!", false, 400);
+    //     }
+    // }
+
     public function get_edit_standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_for_id' => 'required',
-            'board_id' => 'required',
-            'medium_id' => 'required',
-            'class_id' => 'required',
-            'institute_id' => 'required',
+            // 'institute_for_id' => 'required',
+            // 'board_id' => 'required',
+            // 'medium_id' => 'required',
+            // 'class_id' => 'required',
+            //'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -496,19 +554,16 @@ class BasetableControllerAPI extends Controller
         }
 
         try {
-            $institute_for_ids = explode(',', $request->institute_for_id);
-            $board_ids = explode(',', $request->board_id);
-            $medium_ids = explode(',', $request->medium_id);
-            $class_ids = explode(',', $request->class_id);
+            foreach ($request->data as $datas) {
 
             $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
-                ->whereIN('base_table.institute_for', $institute_for_ids)
-                ->whereIN('base_table.board', $board_ids)
-                ->whereIN('base_table.medium', $medium_ids)
-                ->whereIN('base_table.institute_for_class', $class_ids)
+                ->where('base_table.institute_for', $datas['institute_for_id'])
+                ->where('base_table.board', $datas['board_id'])
+                ->where('base_table.medium', $datas['medium_id'])
+                ->whereIN('base_table.institute_for_class', $datas['class_id'])
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
@@ -532,7 +587,7 @@ class BasetableControllerAPI extends Controller
                 ];
             }
             $data = array_values($data);
-
+        }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went Wrong!!", false, 400);
