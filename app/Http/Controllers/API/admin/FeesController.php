@@ -169,13 +169,11 @@ class FeesController extends Controller
             });
 
             $student_response = $query->get()->toArray();
-            // echo "<pre>";print_r($student_response);exit;
-
+            // print_r($student_response);exit;
 
             $students = [];
 
             foreach ($student_response as $value) {
-                // print_r($student_response);exit;
                 $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['student_id'])
                     ->first();
@@ -184,14 +182,10 @@ class FeesController extends Controller
                 $discount = Discount_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['student_id'])
                     ->first();
-                //   print_r($discount);exit;
-
+                
                 $total = null;
-
                 if (!empty($student_fees) || !empty($discount)) {
-                    $total = $student_fees->total_fees;
-
-                    // Apply discount if available
+                    $total = (!empty($student_fees->total_fees))?$student_fees->total_fees:0;
                     if ($discount) {
                         if ($discount->discount_by == 'Rupee') {
                             $total = $student_fees->total_fees - $discount->discount_amount;
@@ -199,12 +193,8 @@ class FeesController extends Controller
                             $total = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
                         }
                     }
-
-                    // Check if both total and total payment amount are available and not empty
+                    
                     if (!empty($total) && !empty($value['total_payment_amount'])) {
-                        // Debugging output to check the values
-
-                        // Compare total with the payment amount
                         if ($total == $value['total_payment_amount']) {
                             $students[] = [
                                 'student_id' => $value['student_id'],
@@ -214,6 +204,7 @@ class FeesController extends Controller
                             ];
                         }
                     }
+                    
                 }
             }
             

@@ -360,6 +360,8 @@ class StaffController extends Controller
                 $data[] = [
                     'user_id' => $value->id,
                     'fullname' => $value->firstname . ' ' . $value->lastname,
+                    'email' => $value->email,
+                    'mobile_no' =>$value->mobile,
                     'role_name' => $value->role_name,
                     'photo' => asset('profile/no-image.png')
                 ];
