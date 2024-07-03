@@ -6255,6 +6255,22 @@ class InstituteApiController extends Controller
         } 
         return $this->response($response, "Classroom display successfully");
 
+        
+    }
+    function delete_classRoom(Request $request){
+        $validator = Validator::make($request->all(), [
+            'class_id' => 'required|exists:class_room,id',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $exam  = Class_room_model::where('id', $request->class_id)->delete();
+            return $this->response([], "Successfully Deleted Classroom.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }   
     }
     function create_remainder(Request $request)
     {
@@ -6284,6 +6300,7 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+   
     function create_greeting(Request $request)
     {
         $validator = Validator::make($request->all(), [

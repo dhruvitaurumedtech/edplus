@@ -226,14 +226,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     //classroom
     Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
     Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
-
+    
 });
 
+Route::post('/institute/delete-classroom', [InstituteApiController::class, 'delete_classRoom']);
 
 
    
 
-Route::post('test', [InstituteApiController::class, 'test']);
+    Route::post('test', [InstituteApiController::class, 'test']);
 
 
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
