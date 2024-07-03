@@ -1019,7 +1019,7 @@ class TeacherController extends Controller
             'country_code_name'=>'required',
             //'emergency_country_code' =>'required',
         ]);
-
+        
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::findOrFail($teacher_id);
         
@@ -1032,6 +1032,7 @@ class TeacherController extends Controller
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
         //$user->area = $request['area'];
+        
         if ($request->file('image')) {
             $iconFile = $request->file('image');
             $imagePath = $iconFile->store('profile', 'public');
@@ -1039,6 +1040,7 @@ class TeacherController extends Controller
         }
         $user->save();
         try {
+            
             $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
             if (!empty($userSub)) {
 
@@ -1056,6 +1058,7 @@ class TeacherController extends Controller
                     'about_us' => $request['about_us'],
                 ]);
             }
+            
             $userSub2 = Users_sub_qualification::where('user_id', $teacher_id)->first();
             if (!empty($userSub2)) {
                 $delete_qualification = Users_sub_qualification::where('user_id', $request->teacher_id);
@@ -1076,6 +1079,7 @@ class TeacherController extends Controller
                     ]);
                 }
             }
+            
             $userSub2 = Users_sub_experience::where('user_id', $teacher_id)->first();
             if (!empty($userSub2)) {
                 $delete_experience = Users_sub_experience::where('user_id', $request->teacher_id);
@@ -1094,20 +1098,24 @@ class TeacherController extends Controller
                     ]);
                 }
             } else {
-                $experience = explode(',', $request['institute_name']);
-                $startdate = explode(',', $request['startdate']);
-                $enddate = explode(',', $request['enddate']);
-                for ($i = 0; $i < count($experience); $i++) {
-                    $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
-                    $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
-                    Users_sub_experience::create([
-                        'user_id' => $teacher_id,
-                        'institute_name' => $experience[$i],
-                        'startdate' => $startdates,
-                        'enddate' => $enddates,
-                    ]);
+                if(!empty($request['institute_name'])){
+                    $experience = explode(',', $request['institute_name']);
+                    $startdate = explode(',', $request['startdate']);
+                    $enddate = explode(',', $request['enddate']);
+                    for ($i = 0; $i < count($experience); $i++) {
+                        $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
+                        $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
+                        Users_sub_experience::create([
+                            'user_id' => $teacher_id,
+                            'institute_name' => $experience[$i],
+                            'startdate' => $startdates,
+                            'enddate' => $enddates,
+                        ]);
                 }
+                }
+                
             }
+            
             $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
             // echo "<pre>";print_r($userSub2);exit;
             if (!empty($userSub2)) {

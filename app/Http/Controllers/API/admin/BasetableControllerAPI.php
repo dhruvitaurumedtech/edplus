@@ -157,7 +157,7 @@ class BasetableControllerAPI extends Controller
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
-            //$medium_ids = explode(',', $request->medium_id);
+            $medium_ids = explode(',', $request->medium_id);
             //$class_ids = explode(',', $request->class_id);
 
             //$input = "1{1},2{2}";
