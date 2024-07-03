@@ -212,9 +212,9 @@ class BasetableControllerAPI extends Controller
     public function standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'institute_for_id' => 'required',
-            // 'board_id' => 'required',
-            // 'class_id' => 'required',
+             'institute_for_id.*' => 'required',
+             'board_id.*' => 'required',
+             'class_id.*' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -550,11 +550,11 @@ class BasetableControllerAPI extends Controller
     public function get_edit_standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'institute_for_id' => 'required',
-            // 'board_id' => 'required',
-            // 'medium_id' => 'required',
-            // 'class_id' => 'required',
-            //'institute_id' => 'required',
+             'institute_for_id.*' => 'required',
+             'board_id.*' => 'required',
+             'medium_id.*' => 'required',
+             'class_id.*' => 'required',
+            'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
