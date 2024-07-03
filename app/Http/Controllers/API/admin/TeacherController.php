@@ -1008,7 +1008,7 @@ class TeacherController extends Controller
             'pincode' => 'required|string|max:10',
             //'area' => 'required|string|max:255',
             //'about_us' => 'nullable|string',
-            //'qualification' => 'required|string|max:255',
+            'qualification' => 'required|string|max:255',
             //'institute_name' => 'required|string|max:255',
             //'startdate' => 'required',
             //'enddate' => 'nullable',
