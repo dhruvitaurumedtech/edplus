@@ -244,6 +244,7 @@ class StaffController extends Controller
         try {
             $roleId = $request->role_id;
             $user_has_role = UserHasRole::where('role_id', $roleId)->where('user_id', Auth::id())->first();
+
             DB::beginTransaction();
             DB::table('role_has_permissions')->where('user_has_role_id', $user_has_role->id)->delete();
             $permissions = [];

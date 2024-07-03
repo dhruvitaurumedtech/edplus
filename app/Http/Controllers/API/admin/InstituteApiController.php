@@ -5992,10 +5992,26 @@ class InstituteApiController extends Controller
             // if (count($batch_ids) !== count($subject_ids)) {
             //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
             // }
+            // print_r($role_type);exit;
             $teacher_Explode = explode(',', $request->teacher_detail_id);
             foreach ($teacher_Explode as $index => $teacher_detail_id) {
-                $teacherDetail = Teacher_model::find($teacher_detail_id);
-
+                // echo $teacher_detail_id;
+                $teacherDetail = Teacher_model::where('id',$teacher_detail_id);
+                
+                if ($teacherDetail) {
+                    // Update the existing teacher detail record
+                    $teacherDetail->update([
+                        'board_id' => $board_ids[$index],
+                        'medium_id' => $medium_ids[$index],
+                        'standard_id' => $standard_ids[$index],
+                        'batch_id' => $batch_ids[$index],
+                        'subject_id' => $subject_ids[$index],
+                        'teacher_id' => $request->teacher_id,
+                        'status' => '1',
+                    ]);
+                }
+                $teacherDetail = User::where('id',$request->teacher_id);
+                
                 if ($teacherDetail) {
                     // Update the existing teacher detail record
                     $teacherDetail->update([
@@ -6005,14 +6021,7 @@ class InstituteApiController extends Controller
                         'email' => $request->email,
                         'qualification' => $request->qualification,
                         'employee_type' => $request->employee_type,
-                        'board_id' => $board_ids[$index],
-                        'medium_id' => $medium_ids[$index],
-                        'standard_id' => $standard_ids[$index],
-                        'batch_id' => $batch_ids[$index],
-                        'subject_id' => $subject_ids[$index],
-                        'teacher_id' => $request->teacher_id,
-                        'status' => '1',
-                    ]);
+                           ]);
                 }
             }
             //     $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
@@ -6418,4 +6427,5 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    
 }
