@@ -56,6 +56,7 @@ class TimetableController extends Controller
             'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
+            'repeat'=>'required'
         ]);
 
     if ($validator->fails()) {
@@ -81,8 +82,9 @@ class TimetableController extends Controller
         $start_date = new DateTime($request->start_date);
         $end_date = new DateTime($request->end_date);
         $days = explode(',', $request->repeat);
-
+        
         foreach ($days as $repeat) {
+            
             $repeat = trim(strtolower($repeat)); // Normalize the day name
 
             $current_date = clone $start_date;
@@ -90,7 +92,7 @@ class TimetableController extends Controller
             while ($current_date <= $end_date) {
                 if (strtolower($current_date->format('l')) == $repeat) {
                     $lecture_date = $current_date->format('Y-m-d');
-
+                    
                     $existing = Timetable::where([
                         ['batch_id', $request->batch_id],
                         //['teacher_id', $request->teacher_id],
@@ -99,8 +101,19 @@ class TimetableController extends Controller
                         ['end_time', '>',  $request->start_time],
                     ])->exists();
 
+
                     if ($existing) {
                         return $this->response([], "Lecture already scheduled for this date and time!", false, 400);
+                    }
+
+                    $existing = Timetable::where([
+                        ['teacher_id', $request->teacher_id],
+                        ['lecture_date', $lecture_date],
+                        ['start_time', '<',$request->end_time ],
+                        ['end_time', '>',  $request->start_time],
+                    ])->exists();
+                    if ($existing) {
+                        return $this->response([], "This teacher is already occupy for same date and time on another lecture!", false, 400);
                     }
 
                     $timetable = new Timetable();
