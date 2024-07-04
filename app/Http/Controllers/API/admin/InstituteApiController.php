@@ -6427,5 +6427,31 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function user_list(Request $request){
+
+        try{
+            $excludedRoles = ['1','3','5', '6'];
+
+          
+            $users=UserHasRole::where('user_id',Auth::user()->id)->get();
+            print_r($users);
+            exit;
+            // new table aavse aema thi user_id get karavana che using role_id
+            //  $response =[];
+            // foreach ($users as $user) {
+            //     $response[] = ['id'=>$user->id,
+            //                    'user_name' =>$user->firstname.' '.$user->lastname,
+            //                    'role_name' =>$user->role_name,
+            //                    'email'=>$user->email,
+            //                    'mobile'=>$user->mobile];    
+            // }
+            // return $this->response($response, "Fetch successfully.");
+
+         } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+
+
+    }
     
 }

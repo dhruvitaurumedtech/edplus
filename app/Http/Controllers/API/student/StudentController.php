@@ -990,7 +990,7 @@ class StudentController extends Controller
             $user_id = Auth::id();
             $existingUser = User::where('id', $user_id)->first();
             $institute_id = $request->institute_id;
-            $getstdntdata = Student_detail::where('institute_id', $request->institute_id)->first();
+            $getstdntdata = Student_detail::where('institute_id', $request->institute_id)->where('student_id',$user_id)->first();
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->paginate(10);
@@ -1050,6 +1050,7 @@ class StudentController extends Controller
             $announcement = [];
             $examlist = [];
             $announcQY = announcements_model::where('institute_id', $institute_id)
+                ->where('standard_id', $getstdntdata->standard_id)
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
                 ->orderByDesc('created_at')

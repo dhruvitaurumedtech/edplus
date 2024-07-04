@@ -752,6 +752,7 @@ class FeesController extends Controller
                 ->where('students_details.institute_id', $request->institute_id)
                 ->select('users.*', 'standard.name as standard_name', 'subject_sub.amount')
                 ->first();
+                // print_r($query);exit;
             $data = [
                 'student_id' => $query->id,
                 'student_name' => $query->firstname . ' ' . $query->lastname,

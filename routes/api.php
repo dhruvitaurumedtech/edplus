@@ -223,18 +223,22 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/add-homework', [HomeworkController::class, 'add_homework']);
     Route::post('/student/view-homework', [HomeworkController::class, 'view_homework']);
     Route::post('/student/delete-homework', [HomeworkController::class, 'delete_homework']);
+    Route::post('/student/open-homework', [HomeworkController::class, 'open_homework']);
 
     //classroom
     Route::post('/institute/add-classroom', [InstituteApiController::class, 'Add_classRoom']);
     Route::post('/institute/view-classroom', [InstituteApiController::class, 'view_classRoom']);
     Route::post('/institute/delete-classroom', [InstituteApiController::class, 'delete_classRoom']);
+    Route::post('/institute/delete-classroom', [InstituteApiController::class, 'delete_classRoom']);
+
+    Route::post('/institute/user-list', [InstituteApiController::class, 'user_list']);
 
 });
 
 
    
 
-    Route::post('test', [InstituteApiController::class, 'test']);
+    // Route::post('test', [InstituteApiController::class, 'test']);
 
 
 // Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');

@@ -11,6 +11,6 @@ class Home_work_model extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'home_work';
     protected $fillable = [
-         'id', 'batch_id', 'subject_id', 'date', 'title', 'description',
+         'id', 'batch_id', 'subject_id', 'date', 'title', 'description','created_by'
     ];
 }

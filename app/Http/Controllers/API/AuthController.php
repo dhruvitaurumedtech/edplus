@@ -203,11 +203,11 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
-        $user = User::where('email', $request->email)
-        ->where('status', '1')
-        ->first();
-
+        
+        
+         $user = User::where('email', $request->email)
+                    ->where('status', '1')
+                    ->first();
         if (!$user) {
             return $this->response([], "User not found", false, 400);
         }
