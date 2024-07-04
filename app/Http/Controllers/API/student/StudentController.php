@@ -1030,7 +1030,8 @@ class StudentController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
-                ->paginate(2);
+                //->paginate(2);
+                ->get();
          
                 // print_r($todayslect);exit;
             foreach ($todayslect as $todayslecDT) {
@@ -2757,6 +2758,11 @@ class StudentController extends Controller
 
                 $highestMarks = Marks_model::where('exam_id', $request->exam_id)->max('mark');
 
+                $attdence =  Attendance_model::where('institute_id', $stdetails->institute_id)
+                ->where('student_id', $student_id)
+                ->where('subject_id',$stdetails->subject_id)
+                ->where('date',$stdetails->exam_date)
+                ->first();
 
                 if (!empty($resulttQY)) {
                     $result[] = array(
@@ -2765,13 +2771,14 @@ class StudentController extends Controller
                         'total_marks' => $resulttQY->total_mark,
                         'achiveddmarks_marks' => $resulttQY->mark,
                         'date' => $resulttQY->exam_date,
-                        'class_highest' => $highestMarks
+                        'class_highest' => $highestMarks,
+                        'attendance' =>(!empty($attdence)) ? $attdence->attendance : null,
                     );
                 }
             }
             return $this->response($result, "Result Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!", false, 400);
         }
     }
 

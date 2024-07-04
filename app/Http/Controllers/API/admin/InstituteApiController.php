@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
+use App\Models\Attendance_model;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Parents;
 use App\Models\Remainder_model;
@@ -3851,8 +3852,16 @@ class InstituteApiController extends Controller
 
             $studentsDET = [];
             foreach ($studentDT as $stddt) {
+                
+                $attdence =  Attendance_model::where('institute_id', $institute_id)
+                ->where('student_id', $stddt->student_id)
+                ->where('subject_id',$examdt->subject_id)
+                ->where('date',$examdt->exam_date)
+                ->first();
+
                 $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
-                $marksofstd = Marks_model::where('student_id', $stddt->student_id)->where('exam_id', $request->exam_id)->first();
+                $marksofstd = Marks_model::where('student_id', $stddt->student_id)
+                ->where('exam_id', $request->exam_id)->first();
                 $studentsDET[] = array(
                     'student_id' => $stddt->student_id,
                     'exam_id' => $request->exam_id,
@@ -3862,12 +3871,14 @@ class InstituteApiController extends Controller
                     'lastname' => $stddt->lastname,
                     'total_mark' => $examdt->total_mark,
                     'standard' => $stddt->standardname,
-                    'subject' => $subjectqy->name
+                    'subject' => $subjectqy->name,
+                    'attendance'=>(!empty($attdence)) ? $attdence->attendance : null,
                 );
             }
             return $this->response($studentsDET, "Successfully fetch Data.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
