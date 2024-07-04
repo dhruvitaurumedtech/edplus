@@ -93,7 +93,7 @@ class TimetableController extends Controller
 
                     $existing = Timetable::where([
                         ['batch_id', $request->batch_id],
-                        ['teacher_id', $request->teacher_id],
+                        //['teacher_id', $request->teacher_id],
                         ['lecture_date', $lecture_date],
                         ['start_time', '<',$request->end_time ],
                         ['end_time', '>',  $request->start_time],
