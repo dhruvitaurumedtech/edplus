@@ -1030,7 +1030,7 @@ class StudentController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
-                ->get();
+                ->paginate(2);
          
                 // print_r($todayslect);exit;
             foreach ($todayslect as $todayslecDT) {
