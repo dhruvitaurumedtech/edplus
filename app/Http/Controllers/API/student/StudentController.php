@@ -1012,14 +1012,14 @@ class StudentController extends Controller
            
             $today = date('Y-m-d');
             $todays_lecture = [];
-          
+            // $subject_ids = explode(",", $getstdntdata->subject_id);
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->where('time_table.batch_id', $getstdntdata->batch_id)
-                //->whereRaw("FIND_IN_SET(?, time_table.subject_id)", [$getstdntdata->subject_id])
-                ->whereIN('time_table.subject_id',explode(",",$getstdntdata->subject_id))
+                ->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
+                // ->whereIn('time_table.subject_id',$subject_ids)
                 ->where('time_table.lecture_date', $today)
                 ->select(
                     'subject.name as subject',
@@ -1030,7 +1030,6 @@ class StudentController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
-                //->paginate(2);
                 ->get();
          
                 // print_r($todayslect);exit;
