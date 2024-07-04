@@ -2944,7 +2944,8 @@ class StudentController extends Controller
                 ->where('students_details.standard_id', $request->standard_id)
                 ->where('students_details.status', '1')
                 ->whereNotNull('students_details.batch_id')
-                ->whereNull('students_details.deleted_at');
+                ->whereNull('students_details.deleted_at')
+                ->whereNull('users.deleted_at');
 
             if (!empty($request->search)) {
                 $query->where(function ($query) use ($request) {
