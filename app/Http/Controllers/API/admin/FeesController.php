@@ -742,23 +742,41 @@ class FeesController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $query = Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
-                ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                ->leftJoin('subject_sub', function ($join) {
-                    $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
-                        ->on('subject_sub.institute_id', '=', 'students_details.institute_id');
-                })
-                ->where('students_details.student_id', $request->student_id)
-                ->where('students_details.institute_id', $request->institute_id)
-                ->select('users.*', 'standard.name as standard_name', 'subject_sub.amount')
-                ->first();
+             $student_detail=  Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
+                              ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                              ->select('users.*', 'standard.name as standard_name','students_details.subject_id')
+                              ->where('students_details.student_id', $request->student_id)
+                              ->where('students_details.institute_id', $request->institute_id)
+                              ->first();
+            // print_r($student_detail);exit;
+            $subject_sum =   Subject_sub::where('institute_id',$request->institute_id)->whereIn('subject_id',explode(",",$student_detail->subject_id))->get();
+             $total = 0;
+            foreach($subject_sum as $value){
+                  $total +=$value->amount;
+            }
+            // $query = Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
+            //                         ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
+            //                         ->leftJoin('subject_sub', function ($join) {
+            //                             $join->on('subject_sub.subject_id', '=', 'students_details.subject_id')
+            //                                 ->on('subject_sub.institute_id', '=', 'students_details.institute_id');
+            //                         })
+            //                         ->where('students_details.student_id', $request->student_id)
+            //                         ->where('students_details.institute_id', $request->institute_id)
+            //                         ->select('users.*', 'standard.name as standard_name', 'subject_sub.amount')
+            //                         ->get()
+            //                         ->toarray();
                 // print_r($query);exit;
+                //  $total =0;
+                // foreach($query as $value){
+                //     $total +=$value->amount;
+                // }
+            //     print_r($total);exit;
             $data = [
-                'student_id' => $query->id,
-                'student_name' => $query->firstname . ' ' . $query->lastname,
-                'profile' => (!empty($query->image)) ? asset($query->image) : asset('no-image.png'),
-                'standard_name' => $query->standard_name,
-                'total_fees' => $query->amount . '.00'
+                'student_id' => $student_detail->id,
+                'student_name' => $student_detail->firstname . ' ' . $student_detail->lastname,
+                'profile' => (!empty($student_detail->image)) ? asset($student_detail->image) : asset('no-image.png'),
+                'standard_name' => $student_detail->standard_name,
+                'total_fees' => $total. '.00'
             ];
             return $this->response($data, "Fetch Student list Successfully");
         } catch (Exception $e) {
