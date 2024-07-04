@@ -990,7 +990,10 @@ class StudentController extends Controller
             $user_id = Auth::id();
             $existingUser = User::where('id', $user_id)->first();
             $institute_id = $request->institute_id;
-            $getstdntdata = Student_detail::where('institute_id', $request->institute_id)->where('student_id',$user_id)->first();
+            $getstdntdata = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id',$user_id)
+            ->whereNull('deleted_at')
+            ->first();
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
                 ->paginate(10);
@@ -1096,6 +1099,7 @@ class StudentController extends Controller
             $subdta = Student_detail::where('student_id', $user_id)
                 ->where('institute_id', $institute_id)
                 ->whereNull('deleted_at')->select('students_details.*')->first();
+                
             if (!empty($subdta)) {
                 $subjecqy = Subject_model::whereIN('id', explode(",", $subdta->subject_id))->get();
                 foreach ($subjecqy as $subjcdt) {
