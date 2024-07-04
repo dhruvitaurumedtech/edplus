@@ -50,6 +50,7 @@ use App\Models\RoleHasPermission;
 use App\Models\Staff_detail_Model;
 use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
+use App\Models\Timetable;
 use App\Models\UserHasRole;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -6424,8 +6425,17 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $subjects = Batches_model::where('id', $request->batch_id)->where('user_id', auth()->user()->id)->first();
-            $subject_list = Subject_model::whereIn('id', explode(',', $subjects->subjects))->get();
+            $subjects = Batches_model::where('id', $request->batch_id)
+            ->where('user_id', auth()->user()->id)->first();
+            $subjectids = explode(',', $subjects->subjects);
+            
+            if($request->date){
+                $subjectids = Timetable::where('lecture_date',$request->date)
+                ->where('batch_id',$request->batch_id)
+                ->pluck('subject_id');
+            }
+            
+            $subject_list = Subject_model::whereIn('id', $subjectids)->get();
             $data = [];
             foreach ($subject_list as $value) {
                 $data[] = [
