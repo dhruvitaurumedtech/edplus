@@ -212,9 +212,9 @@ class BasetableControllerAPI extends Controller
     public function standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'institute_for_id' => 'required',
-            // 'board_id' => 'required',
-            // 'class_id' => 'required',
+             'institute_for_id.*' => 'required',
+             'board_id.*' => 'required',
+             'class_id.*' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -461,9 +461,17 @@ class BasetableControllerAPI extends Controller
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
             $medium_ids = explode(',', $request->medium_id);
-            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
+            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)
+            ->whereIn('board', $board_ids)
+            ->whereIn('medium', $medium_ids)
+            ->distinct()->pluck('institute_for_class');
+
             $base_class =  Class_model::whereIn('id', $getClassId)->get();
-            $intitute_base_class_id = Class_sub::where('institute_id', $request->institute_id)->pluck('class_id')->toArray();
+            $intitute_base_class_id = Class_sub::
+            where('institute_id', $request->institute_id)
+            ->where('board_id', $board_ids)
+            ->where('medium_id', $medium_ids)
+            ->pluck('class_id')->toArray();
             $data = [];
             foreach ($base_class as $baseclass) {
                 $isAdded = in_array($baseclass->id, $intitute_base_class_id);
@@ -542,11 +550,11 @@ class BasetableControllerAPI extends Controller
     public function get_edit_standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            // 'institute_for_id' => 'required',
-            // 'board_id' => 'required',
-            // 'medium_id' => 'required',
-            // 'class_id' => 'required',
-            //'institute_id' => 'required',
+             'institute_for_id.*' => 'required',
+             'board_id.*' => 'required',
+             'medium_id.*' => 'required',
+             'class_id.*' => 'required',
+            'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
