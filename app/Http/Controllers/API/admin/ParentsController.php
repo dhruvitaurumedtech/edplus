@@ -420,7 +420,8 @@ class ParentsController extends Controller
                     'institute_detail.logo',
                     'institute_detail.address'
                 )
-                
+                ->whereNull('students_details.deleted_at')
+                ->where('students_details.status','1')
                 ->groupBy('institute_detail.id', 'institute_detail.institute_name', 'institute_detail.logo', 'institute_detail.address', 'students_details.institute_id')
                 ->get();
                 $insts=[];
