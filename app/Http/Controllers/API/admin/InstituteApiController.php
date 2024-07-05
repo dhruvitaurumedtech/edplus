@@ -2484,7 +2484,7 @@ class InstituteApiController extends Controller
                 ->where('standard_sub.institute_id', $institute_id)
                 ->where('standard_sub.board_id',  $request->board_id)
                 ->where('standard_sub.medium_id', $request->medium_id)
-                ->orderBy('standard.name', 'asc')
+                ->orderByRaw('CAST(standard.name AS UNSIGNED), standard.name')
                 ->get();
             // print_r($standard_list);exit;    
 
