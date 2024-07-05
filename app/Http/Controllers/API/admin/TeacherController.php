@@ -556,7 +556,8 @@ class TeacherController extends Controller
                     'time_table.lecture_date',
                     'users.image',
                 )
-                ->paginate(2);
+                //->paginate(2);
+                ->get();
 
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
