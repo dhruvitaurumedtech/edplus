@@ -55,6 +55,7 @@ class ParentsController extends Controller
                         'parents.student_id',
                         'students_details.subject_id'
                     )
+                    ->whereNull('students_details.deleted_at')
                     ->get();
                 
                 foreach ($chilsdata as $chilDT) {
