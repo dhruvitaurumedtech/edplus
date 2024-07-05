@@ -172,6 +172,12 @@ class ParentsController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+            $totalattendlec = [];
+            $cumnth = date('Y-m');
+            $cmtoday = date('Y-m-d');
+            $date = new \DateTime($cmtoday);
+            $date->modify('+1 day');
+            $nextDayStr = $date->format('Y-m-d');
 
             $user_id = Auth::id();
             $fees = [];
@@ -280,7 +286,7 @@ class ParentsController extends Controller
                     $tdasy = date('Y-m-d');
                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                    ->where('exam.exam_date','>',$tdasy)
+                    ->where('exam.exam_date','>',$nextDayStr)
                     ->where('exam.institute_id', $getstdntdata->institute_id)
                     ->where('exam.board_id', $getstdntdata->board_id)
                     ->where('exam.medium_id', $getstdntdata->medium_id)
@@ -334,12 +340,7 @@ class ParentsController extends Controller
         }
 
         //attendance
-        $totalattendlec = [];
-        $cumnth = date('Y-m');
-        $cmtoday = date('Y-m-d');
-        $date = new \DateTime($cmtoday);
-        $date->modify('+1 day');
-        $nextDayStr = $date->format('Y-m-d');
+        
 
             $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
             ->where('student_id', $user_id)

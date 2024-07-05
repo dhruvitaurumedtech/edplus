@@ -987,6 +987,12 @@ class StudentController extends Controller
         }
 
         try {
+            $cumnth = date('Y-m');
+            $cmtoday = date('Y-m-d');
+            $date = new \DateTime($cmtoday);
+            $date->modify('+1 day');
+            $nextDayStr = $date->format('Y-m-d');
+
             $user_id = Auth::id();
             $existingUser = User::where('id', $user_id)->first();
             $institute_id = $request->institute_id;
@@ -1131,7 +1137,7 @@ class StudentController extends Controller
                     //     return $query->where('exam.stream_id', $stream_id);
                     // })
                     ->whereIn('exam.subject_id', $subjectIds)
-                    ->where('exam.exam_date', '>', $tdasy)
+                    ->where('exam.exam_date', '>', $nextDayStr)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     //->limit(3)
@@ -1151,11 +1157,7 @@ class StudentController extends Controller
             }
 
             $totalattendlec = [];
-            $cumnth = date('Y-m');
-            $cmtoday = date('Y-m-d');
-            $date = new \DateTime($cmtoday);
-            $date->modify('+1 day');
-            $nextDayStr = $date->format('Y-m-d');
+            
 
 
             $totalattlec = Attendance_model::where('institute_id', $institute_id)
