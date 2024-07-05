@@ -12,6 +12,7 @@ use App\Models\Roles;
 use App\Models\Staff_detail_Model;
 use App\Models\User;
 use App\Models\UserHasRole;
+use App\Models\UserRoleMapping;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -69,6 +70,38 @@ class StaffController extends Controller
             $role->role_name = $request->role_name;
             $role->save();
             return $this->response([], "Role Updated");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function change_role(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'institute_id' => 'required|exists:institute_detail,id',
+            'role_id' => 'required|exists:roles,id'
+        ]); 
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $role = UserRoleMapping::where('user_id', $request->user_id)->where('institute_id', $request->institute_id)->first(); 
+            if(!is_null($role))
+            {
+                $role->role_id =  $request->role_id;
+                $role->save();
+            }
+            else{
+            $role = new UserRoleMapping();
+            $role->user_id = $request->user_id;
+            $role->institute_id = $request->institute_id;
+            $role->role_id = $request->role_id;
+            $role->created_at = Carbon::now();
+            $role->updated_at = Carbon::now()   ;
+            $role->save();
+            }
+            return $this->response([], "Role Changed Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
@@ -190,9 +223,17 @@ class StaffController extends Controller
                 $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
                     ->get(['feature_id', 'action_id']);
             } else {
+                
+
                 $user = Auth::user();
-                $institute = Institute_detail::where('id', $request->institute_id)->first();
-                $user_has_role = UserHasRole::where('role_id', $user->role_type)->where('user_id', $institute->user_id)->first();
+                $institute = Institute_detail::where('id', $request->institute_id)->first(); 
+                $temp_role_id = $user->role_type; 
+                $user_role_mapping=UserRoleMapping::where('user_id', $user->id)->where('institute_id', $request->institute_id)->first();
+                if(!is_null($user_role_mapping))
+                {
+                    $temp_role_id = $user_role_mapping->role_id;
+                }
+                $user_has_role = UserHasRole::where('role_id', $temp_role_id)->where('user_id', $institute->user_id)->first();
                 $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
                     ->get(['feature_id', 'action_id']);
             }
