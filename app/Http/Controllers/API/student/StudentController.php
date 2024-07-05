@@ -1034,6 +1034,7 @@ class StudentController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
+                ->orderBy('time_table.start_time', 'asc')
                 ->get();
          
                 // print_r($todayslect);exit;
@@ -3070,6 +3071,7 @@ class StudentController extends Controller
                         'time_table.end_time',
                         'time_table.lecture_date'
                     )
+                    ->orderBy('time_table.start_time', 'asc')
                     ->get();
 
                 foreach ($todayslect as $todayslecDT) {

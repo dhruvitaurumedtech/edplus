@@ -556,6 +556,7 @@ class TeacherController extends Controller
                     'time_table.lecture_date',
                     'users.image',
                 )
+                ->orderBy('time_table.start_time', 'asc')
                 //->paginate(2);
                 ->get();
 
@@ -741,6 +742,7 @@ class TeacherController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
+                ->orderBy('time_table.start_time', 'asc')
                 ->get();
 
             foreach ($todaysletech as $todaysDT) {
