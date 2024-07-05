@@ -3446,25 +3446,25 @@ class InstituteApiController extends Controller
 
                         $studentdetailadd = Student_detail::create($studentdetail);
 
-                        $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
-                            ->whereIn('subject_id', explode(',', $request->subject_id))
-                            ->select('amount')
-                            ->get();
-                        // echo "hi";exit;
+                        // $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
+                        //     ->whereIn('subject_id', explode(',', $request->subject_id))
+                        //     ->select('amount')
+                        //     ->get();
+                        // // echo "hi";exit;
 
-                        $amount = 0;
-                        foreach ($subject_amount as $value) {
+                        // $amount = 0;
+                        // foreach ($subject_amount as $value) {
 
-                            $amount += $value->amount;
-                        }
-                        //echo $amount;exit;
-                        Student_fees_model::create([
-                            'user_id' => $user_id,
-                            'institute_id' => $request->institute_id,
-                            'student_id' => $student_id,
-                            'subject_id' => $request->subject_id,
-                            'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
-                        ]);
+                        //     $amount += $value->amount;
+                        // }
+                        // //echo $amount;exit;
+                        // Student_fees_model::create([
+                        //     'user_id' => $user_id,
+                        //     'institute_id' => $request->institute_id,
+                        //     'student_id' => $student_id,
+                        //     'subject_id' => $request->subject_id,
+                        //     'total_fees' => (!empty($amount)) ? (float)$amount : 0.00,
+                        // ]);
 
                         $parets = Parents::where('student_id', $student_id)->where('verify', '0')->get();
 
