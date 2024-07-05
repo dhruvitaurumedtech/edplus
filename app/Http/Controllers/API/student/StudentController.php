@@ -1093,7 +1093,7 @@ class StudentController extends Controller
                     'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
                     'total_marks' => intval($resultDDt->total_mark),
                     'achiveddmarks_marks' => $resultDDt->mark,
-                    'date' => $resultDDt->exam_date,
+                    'date' => date('d-m-Y',strtotime($resultDDt->exam_date)),
                     'class_highest' => $highestMarks
                 );
             }
