@@ -554,6 +554,8 @@ class TeacherController extends Controller
                     'time_table.start_time',
                     'time_table.end_time',
                     'time_table.lecture_date',
+                    'time_table.batch_id',
+                    'batches.batch_name',
                     'users.image',
                 )
                 ->orderBy('time_table.start_time', 'asc')
@@ -565,6 +567,8 @@ class TeacherController extends Controller
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
+                    'batch_id'=>$todayslecDT->batch_id,
+                    'batch_name'=>$todayslecDT->batch_name,
                     'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
