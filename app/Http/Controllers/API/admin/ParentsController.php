@@ -397,6 +397,8 @@ class ParentsController extends Controller
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
             ->where('parents.parent_id', $parent_id)
+            ->whereNull('students_details.deleted_at')
+            ->where('students_details.status','1')
               ->select('users.*')
               ->get();
               $uniqueStudents = $student->unique('id')->values();
@@ -418,6 +420,7 @@ class ParentsController extends Controller
                     'institute_detail.logo',
                     'institute_detail.address'
                 )
+                
                 ->groupBy('institute_detail.id', 'institute_detail.institute_name', 'institute_detail.logo', 'institute_detail.address', 'students_details.institute_id')
                 ->get();
                 $insts=[];
