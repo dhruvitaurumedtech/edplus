@@ -287,6 +287,7 @@ class TimetableController extends Controller
                 ->select('subject.name as subject', 'users.firstname',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
                     'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
+                ->orderBy('time_table.start_time', 'asc')
                 ->get();
     
             $groupedData = [];
