@@ -244,7 +244,8 @@ class ParentsController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
-                ->paginate(2);
+                //->paginate(2);
+                ->get();
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
