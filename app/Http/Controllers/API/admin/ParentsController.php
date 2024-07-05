@@ -317,8 +317,10 @@ class ParentsController extends Controller
             ->orderByDesc('marks.created_at')
             //->limit(3) I remove this on Parin's request
             ->get();
-        $highestMarks = $resultQY->max('mark');
+        //$highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
+            $highestMarks = Marks_model::where('exam_id', $resultDDt->exam_id)
+                    ->max('mark');
             $result[] = array(
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
