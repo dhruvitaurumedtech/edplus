@@ -3262,6 +3262,7 @@ class InstituteApiController extends Controller
                             ->whereIn('subject_id', explode(',', $request->subject_id))
                             ->select('amount')
                             ->get();
+                        // print_r($subject_amount);exit;    
 
                         $amount = 0;
                         foreach ($subject_amount as $value) {
@@ -3271,7 +3272,7 @@ class InstituteApiController extends Controller
                         //echo $amount;exit;
                         $studentFee = Student_fees_model::where('student_id', $student_id);
                         if ($studentFee) {
-                            $studentFee->update([
+                            $studentFee->create([
                                 'user_id' => $user_id,
                                 'institute_id' => $request->institute_id,
                                 'student_id' => $student_id,
