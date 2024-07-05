@@ -354,7 +354,8 @@ class ParentsController extends Controller
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->where('lecture_date', '<', $nextDayStr)
-                ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
+                //->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->count();    
 
             $totalattendlec = array(
