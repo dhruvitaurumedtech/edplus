@@ -305,7 +305,7 @@ class ParentsController extends Controller
                         'subject' => $examsDT->subject,
                         'standard' => $examsDT->standard,
                         'date' => $examsDT->exam_date,
-                        'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                        'time' => $this->convertTo12HourFormat($examsDT->start_time) . ' to ' . $this->convertTo12HourFormat($examsDT->end_time),
                     );
                 }
 
