@@ -1183,7 +1183,6 @@ class StudentController extends Controller
             $totalattendlec = [
                 'total_lectures' => $totalLectures,
                 'attend_lectures' => $totalattlec,
-                //'miss_lectures' => $totllect - $totalattlec
                 'miss_lectures' => $totalmissattlec
             ];
             $studentdata = [
