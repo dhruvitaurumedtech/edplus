@@ -520,7 +520,9 @@ class StudentController extends Controller
 
             $parents = json_decode($request->parents, true);
             foreach ($parents as $parentData) {
-                $emilfin = user::where('email', $parentData['email'])->first();
+                $emilfin = user::where('email', $parentData['email'])
+                            ->where('role_type',5)
+                            ->first();
                 $tomail = $parentData['email'];
                 if ($parentData['firstname'] == '') {
                     return $this->response([], 'firstname Requied field are missing', false, 400);

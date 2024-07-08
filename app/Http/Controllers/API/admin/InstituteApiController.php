@@ -21,6 +21,7 @@ use App\Models\Standard_model;
 use App\Models\Standard_sub;
 use App\Models\Stream_sub;
 use App\Models\Stream_model;
+use App\Models\UserRoleMapping;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Student_detail;
@@ -6452,29 +6453,49 @@ class InstituteApiController extends Controller
         }
     }
     public function user_list(Request $request){
+           // print_r(Auth::user());exit;
+            // echo Auth()->user()->id;exit;
+            try {
+                   $institute_id=institute_detail::where('user_id',Auth()->user()->id)->pluck('id')->first();
+                   $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
+                                    ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
+                                    ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                                    ->select('users.*','roles.role_name')
+                                    ->where(function ($query) use ($institute_id) {
+                                        $query->where('staff_detail.institute_id', $institute_id)
+                                            ->orWhere('teacher_detail.institute_id', $institute_id);
+                                    })
+                                    ->whereNotIn('users.role_type', [1, 3, 5, 6])
+                                    ->distinct('users.id')
+                                    ->get();
+                   $userRoleMappings = UserRoleMapping::join('users','users.id','=','user_role_mapping.user_id')
+                                                       ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                                                       ->where('user_role_mapping.institute_id', $institute_id)
+                                                       ->select('users.*','roles.role_name')
+                                                       ->whereNotIn('role_id', ['1', '3', '5', '6'])->get();
+                   
+                    $mergedUsers = $user_list->merge($userRoleMappings);
+                    $response=[];
+                    foreach($mergedUsers as $value){
+                       $response[]=['id'=>$value->id,
+                                    'username'=>$value->firstname.' '.$value->lastname,
+                                    'email'=>$value->email,
+                                    'mobile'=>$value->mobile,
+                                    'role_type'=>$value->role_name,
+                                    'image'=>(!empty($value->image))?asset($value->image): asset('no-image.png')];
+                    }
+                    
 
-        try{
-            $excludedRoles = ['1','3','5', '6'];
-
-          
-            $users=UserHasRole::where('user_id',Auth::user()->id)->get();
-            print_r($users);
-            exit;
-            // new table aavse aema thi user_id get karavana che using role_id
-            //  $response =[];
-            // foreach ($users as $user) {
-            //     $response[] = ['id'=>$user->id,
-            //                    'user_name' =>$user->firstname.' '.$user->lastname,
-            //                    'role_name' =>$user->role_name,
-            //                    'email'=>$user->email,
-            //                    'mobile'=>$user->mobile];    
-            // }
-            // return $this->response($response, "Fetch successfully.");
-
-         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
-        }
-
+                    return $this->response($response, "Fetch successfully.");
+                
+            } catch (Exception $e) {
+                return $this->response($e, "Invalid token.", false, 400);
+            }
+        
+            // print_r($users);
+            
+   
+      
 
     }
     
