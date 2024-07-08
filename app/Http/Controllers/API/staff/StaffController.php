@@ -209,25 +209,26 @@ class StaffController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
+   
             $actions = Action::select('id', 'name')->get();
             $modules = Module::where('type', 2)->with(['Features' => function ($query) {
                 $query->select('id', 'module_id', 'feature_name');
             }])->select('id', 'module_name')->where('status', 1)->get();
-            
             $permissionsIds = collect();
             if (empty($request->institute_id)) {
                 $user = Auth::user();
                 $user_has_role = UserHasRole::where('role_id', $user->role_type)->first();
                 $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
                     ->get(['feature_id', 'action_id']);
-            } else {
+   
+                } else {
                 
-
+   
                 $user = Auth::user();
                 $institute = Institute_detail::where('id', $request->institute_id)->first(); 
                 $temp_role_id = $user->role_type; 
+                // echo $user->id;echo $request->institute_id;exit;
                 $user_role_mapping=UserRoleMapping::where('user_id', $user->id)->where('institute_id', $request->institute_id)->first();
                 if(!is_null($user_role_mapping))
                 {
