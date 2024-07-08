@@ -236,6 +236,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/delete-classroom', [InstituteApiController::class, 'delete_classRoom']);
 
     Route::post('/institute/user-list', [InstituteApiController::class, 'user_list']);
+    Route::post('/institute/role-list', [InstituteApiController::class, 'role_list']);
 
 });
 
