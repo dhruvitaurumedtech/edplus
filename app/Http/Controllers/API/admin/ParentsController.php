@@ -231,24 +231,26 @@ class ParentsController extends Controller
             $today = date('Y-m-d');
             $todays_lecture = [];
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                ->where('time_table.batch_id', $getstdntdata->batch_id)
-                ->whereRaw("FIND_IN_SET(?, time_table.subject_id)", [$getstdntdata->subject_id])
-                ->where('time_table.lecture_date', $today)
-                ->select(
-                    'subject.name as subject',
-                    'users.firstname',
-                    'users.lastname',
-                    'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date'
-                )
-                ->orderBy('time_table.start_time', 'asc')
-                //->paginate(2);
-                ->get();
+            ->join('users', 'users.id', '=', 'time_table.teacher_id')
+            ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+            ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            ->where('time_table.batch_id', $getstdntdata->batch_id)
+            ->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
+            // ->whereIn('time_table.subject_id',$subject_ids)
+            ->where('time_table.lecture_date', $today)
+            ->select(
+                'subject.name as subject',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'lecture_type.name as lecture_type_name',
+                'time_table.start_time',
+                'time_table.end_time',
+                'time_table.lecture_date'
+            )
+            ->orderBy('time_table.start_time', 'asc')
+            ->get();
+          
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,

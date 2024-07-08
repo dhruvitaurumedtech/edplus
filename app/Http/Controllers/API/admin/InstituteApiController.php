@@ -2473,7 +2473,7 @@ class InstituteApiController extends Controller
         }
         try {
             $institute_id = $request->institute_id;
-            
+
             if (empty($institute_id)) {
                 $user_id = Auth::id();
                 $institute_id = Institute_detail::where('user_id', $user_id)->first();
@@ -3857,16 +3857,16 @@ class InstituteApiController extends Controller
 
             $studentsDET = [];
             foreach ($studentDT as $stddt) {
-                
+
                 $attdence =  Attendance_model::where('institute_id', $institute_id)
-                ->where('student_id', $stddt->student_id)
-                ->where('subject_id',$examdt->subject_id)
-                ->where('date',$examdt->exam_date)
-                ->first();
+                    ->where('student_id', $stddt->student_id)
+                    ->where('subject_id', $examdt->subject_id)
+                    ->where('date', $examdt->exam_date)
+                    ->first();
 
                 $subjectqy = Subject_model::where('id', $examdt->subject_id)->first();
                 $marksofstd = Marks_model::where('student_id', $stddt->student_id)
-                ->where('exam_id', $request->exam_id)->first();
+                    ->where('exam_id', $request->exam_id)->first();
                 $studentsDET[] = array(
                     'student_id' => $stddt->student_id,
                     'exam_id' => $request->exam_id,
@@ -3877,12 +3877,12 @@ class InstituteApiController extends Controller
                     'total_mark' => $examdt->total_mark,
                     'standard' => $stddt->standardname,
                     'subject' => $subjectqy->name,
-                    'attendance'=>(!empty($attdence)) ? $attdence->attendance : null,
+                    'attendance' => (!empty($attdence)) ? $attdence->attendance : null,
                 );
             }
             return $this->response($studentsDET, "Successfully fetch Data.");
         } catch (Exception $e) {
-            
+
             return $this->response([], "Something went wrong.", false, 400);
         }
     }
@@ -6012,8 +6012,8 @@ class InstituteApiController extends Controller
             $teacher_Explode = explode(',', $request->teacher_detail_id);
             foreach ($teacher_Explode as $index => $teacher_detail_id) {
                 // echo $teacher_detail_id;
-                $teacherDetail = Teacher_model::where('id',$teacher_detail_id);
-                
+                $teacherDetail = Teacher_model::where('id', $teacher_detail_id);
+
                 if ($teacherDetail) {
                     // Update the existing teacher detail record
                     $teacherDetail->update([
@@ -6026,8 +6026,8 @@ class InstituteApiController extends Controller
                         'status' => '1',
                     ]);
                 }
-                $teacherDetail = User::where('id',$request->teacher_id);
-                
+                $teacherDetail = User::where('id', $request->teacher_id);
+
                 if ($teacherDetail) {
                     // Update the existing teacher detail record
                     $teacherDetail->update([
@@ -6037,7 +6037,7 @@ class InstituteApiController extends Controller
                         'email' => $request->email,
                         'qualification' => $request->qualification,
                         'employee_type' => $request->employee_type,
-                           ]);
+                    ]);
                 }
             }
             //     $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
@@ -6246,7 +6246,7 @@ class InstituteApiController extends Controller
 
                 if (!$class) {
                     return $this->response([], "Class with id {$request->edit_id} not found.", false, 400);
-                    continue; 
+                    continue;
                 }
 
                 $class->institute_id = $institute_id;
@@ -6255,34 +6255,33 @@ class InstituteApiController extends Controller
 
                 $class->save();
             }
-            if(!empty($request->edit_id)) {
+            if (!empty($request->edit_id)) {
                 return $this->response([], "Class updated successfully:");
-            
-            }else{
+            } else {
                 return $this->response([], "Class saved successfully:");
             }
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function view_classRoom(Request $request){
+    public function view_classRoom(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            
+
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $data=Class_room_model::where('institute_id',$request->institute_id)->get();
-        $response =[];
-        foreach($data as $value){
-           $response[] =['id'=>$value->id,'name'=>$value->name,'capacity'=>$value->capacity];
-        } 
+        $data = Class_room_model::where('institute_id', $request->institute_id)->get();
+        $response = [];
+        foreach ($data as $value) {
+            $response[] = ['id' => $value->id, 'name' => $value->name, 'capacity' => $value->capacity];
+        }
         return $this->response($response, "Classroom display successfully");
-
-        
     }
-    function delete_classRoom(Request $request){
+    function delete_classRoom(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'class_id' => 'required|exists:class_room,id',
         ]);
@@ -6295,7 +6294,7 @@ class InstituteApiController extends Controller
             return $this->response([], "Successfully Deleted Classroom.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
-        }   
+        }
     }
     function create_remainder(Request $request)
     {
@@ -6325,7 +6324,7 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-   
+
     function create_greeting(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -6430,15 +6429,16 @@ class InstituteApiController extends Controller
         }
         try {
             $subjects = Batches_model::where('id', $request->batch_id)
-            ->where('user_id', auth()->user()->id)->first();
+                ->orwhere('user_id', auth()->user()->id)->first();
+                // echo "<pre>";print_r($subjects);exit;
             $subjectids = explode(',', $subjects->subjects);
-            
-            if($request->date){
-                $subjectids = Timetable::where('lecture_date',$request->date)
-                ->where('batch_id',$request->batch_id)
-                ->pluck('subject_id');
+
+            if ($request->date) {
+                $subjectids = Timetable::where('lecture_date', $request->date)
+                    ->where('batch_id', $request->batch_id)
+                    ->pluck('subject_id');
             }
-            
+
             $subject_list = Subject_model::whereIn('id', $subjectids)->get();
             $data = [];
             foreach ($subject_list as $value) {
@@ -6452,51 +6452,101 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function user_list(Request $request){
-           // print_r(Auth::user());exit;
-            // echo Auth()->user()->id;exit;
-            try {
-                   $institute_id=institute_detail::where('user_id',Auth()->user()->id)->pluck('id')->first();
-                   $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
-                                    ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
-                                    ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
-                                    ->select('users.*','roles.role_name')
-                                    ->where(function ($query) use ($institute_id) {
-                                        $query->where('staff_detail.institute_id', $institute_id)
-                                            ->orWhere('teacher_detail.institute_id', $institute_id);
-                                    })
-                                    ->whereNotIn('users.role_type', [1, 3, 5, 6])
-                                    ->distinct('users.id')
-                                    ->get();
-                   $userRoleMappings = UserRoleMapping::join('users','users.id','=','user_role_mapping.user_id')
-                                                       ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
-                                                       ->where('user_role_mapping.institute_id', $institute_id)
-                                                       ->select('users.*','roles.role_name')
-                                                       ->whereNotIn('role_id', ['1', '3', '5', '6'])->get();
-                   
-                    $mergedUsers = $user_list->merge($userRoleMappings);
-                    $response=[];
-                    foreach($mergedUsers as $value){
-                       $response[]=['id'=>$value->id,
-                                    'username'=>$value->firstname.' '.$value->lastname,
-                                    'email'=>$value->email,
-                                    'mobile'=>$value->mobile,
-                                    'role_type'=>$value->role_name,
-                                    'image'=>(!empty($value->image))?asset($value->image): asset('no-image.png')];
-                    }
-                    
+    public function user_list(Request $request)
+    {
+        // print_r(Auth::user());exit;
+        // echo Auth()->user()->id;exit;
+        try {
+            $searchTerm = $request->input('search');
 
-                    return $this->response($response, "Fetch successfully.");
-                
-            } catch (Exception $e) {
-                return $this->response($e, "Invalid token.", false, 400);
+            $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+
+            // Query to fetch users based on institute_id and role_type conditions
+            $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
+                ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
+                ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                ->select('users.*', 'roles.role_name')
+                ->where(function ($query) use ($institute_id) {
+                    $query->where('staff_detail.institute_id', $institute_id)
+                        ->orWhere('teacher_detail.institute_id', $institute_id);
+                })
+                ->whereNotIn('users.role_type', [1, 3, 5, 6])
+                ->distinct('users.id');
+
+            if (!empty($searchTerm)) {
+                $searchParts = explode(' ', $searchTerm);
+
+                if (count($searchParts) == 2) {
+                    $firstname = $searchParts[0];
+                    $lastname = $searchParts[1];
+
+                    $user_list->where(function ($query) use ($firstname, $lastname) {
+                        $query->where('users.firstname', 'like', '%' . $firstname . '%')
+                            ->where('users.lastname', 'like', '%' . $lastname . '%');
+                    });
+                } else {
+                    // If there's only one part, search in either firstname or lastname
+                    $user_list->where(function ($query) use ($searchTerm) {
+                        $query->where('users.firstname', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%');
+                    });
+                }
             }
-        
-            // print_r($users);
-            
-   
-      
+
+            $user_list = $user_list->get();
+            $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
+                ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                ->where('user_role_mapping.institute_id', $institute_id)
+                ->whereNotIn('role_id', [1, 3, 5, 6])
+                ->select('users.*', 'roles.role_name');
+
+            if (!empty($searchTerm)) {
+                $searchParts = explode(' ', $searchTerm);
+
+                if (count($searchParts) == 2) {
+                    $firstname = $searchParts[0];
+                    $lastname = $searchParts[1];
+
+                    $userRoleMappings->where(function ($query) use ($firstname, $lastname) {
+                        $query->where('users.firstname', 'like', '%' . $firstname . '%')
+                            ->where('users.lastname', 'like', '%' . $lastname . '%');
+                    });
+                } else {
+                    // If there's only one part, search in either firstname or lastname
+                    $userRoleMappings->where(function ($query) use ($searchTerm) {
+                        $query->where('users.firstname', 'like', '%' . $searchTerm . '%')
+                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%');
+                    });
+                }
+            }
+
+            $userRoleMappings = $userRoleMappings->get();
+
+            $mergedUsers = $user_list->merge($userRoleMappings);
+
+            $response = [];
+            foreach ($mergedUsers as $value) {
+                $response[] = [
+                    'id' => $value->id,
+                    'username' => $value->firstname . ' ' . $value->lastname,
+                    'email' => $value->email,
+                    'mobile' => $value->mobile,
+                    'role_type' => $value->role_name,
+                    'image' => (!empty($value->image)) ? asset($value->image) : asset('no-image.png')
+                ];
+            }
+
+
+
+            return $this->response($response, "Fetch successfully.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+
+        // print_r($users);
+
+
+
 
     }
-    
 }
