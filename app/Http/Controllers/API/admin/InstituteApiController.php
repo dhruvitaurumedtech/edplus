@@ -6544,9 +6544,25 @@ class InstituteApiController extends Controller
         }
 
         // print_r($users);
+     
 
 
 
-
+    }
+    function role_list(Request $request){
+        try{
+            $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+            $role_list=institute_detail::join('user_has_roles','user_has_roles.user_id','=','institute_detail.user_id')
+                             ->join('roles','roles.created_by','=','institute_detail.user_id') 
+                             ->select('roles.*')
+                             ->where('institute_detail.id',$institute_id)
+                             ->distinct('roles.id')
+                             ->whereNotIn('role_name', ['institute','superadmin'])
+                             ->get();  
+                           
+           return $this->response($role_list, "Fetch successfully.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
     }
 }
