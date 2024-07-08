@@ -55,6 +55,8 @@ class ParentsController extends Controller
                         'parents.student_id',
                         'students_details.subject_id'
                     )
+                    ->whereNull('students_details.deleted_at')
+                    ->where('students_details.status','1')
                     ->get();
                 
                 foreach ($chilsdata as $chilDT) {
@@ -244,7 +246,9 @@ class ParentsController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
-                ->paginate(2);
+                ->orderBy('time_table.start_time', 'asc')
+                //->paginate(2);
+                ->get();
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
@@ -274,9 +278,12 @@ class ParentsController extends Controller
             $examlist = [];
                     $subjectIds = explode(',', $getstdntdata->subject_id);
                     $tdasy = date('Y-m-d');
+                    $pdate = new \DateTime($tdasy);
+                    $pdate->modify('-1 day');
+                    $prDayStr = $pdate->format('Y-m-d');
                     $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
-                    ->where('exam.exam_date','>',$tdasy)
+                    ->where('exam.exam_date','>',$prDayStr)
                     ->where('exam.institute_id', $getstdntdata->institute_id)
                     ->where('exam.board_id', $getstdntdata->board_id)
                     ->where('exam.medium_id', $getstdntdata->medium_id)
@@ -301,7 +308,7 @@ class ParentsController extends Controller
                         'subject' => $examsDT->subject,
                         'standard' => $examsDT->standard,
                         'date' => $examsDT->exam_date,
-                        'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                        'time' => $this->convertTo12HourFormat($examsDT->start_time) . ' to ' . $this->convertTo12HourFormat($examsDT->end_time),
                     );
                 }
 
@@ -315,8 +322,10 @@ class ParentsController extends Controller
             ->orderByDesc('marks.created_at')
             //->limit(3) I remove this on Parin's request
             ->get();
-        $highestMarks = $resultQY->max('mark');
+        //$highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
+            $highestMarks = Marks_model::where('exam_id', $resultDDt->exam_id)
+                    ->max('mark');
             $result[] = array(
                 'subject' => $resultDDt->subject,
                 'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
@@ -352,7 +361,8 @@ class ParentsController extends Controller
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->where('lecture_date', '<', $nextDayStr)
-                ->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
+                //->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->count();    
 
             $totalattendlec = array(
@@ -390,6 +400,8 @@ class ParentsController extends Controller
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
             ->where('parents.parent_id', $parent_id)
+            ->whereNull('students_details.deleted_at')
+            ->where('students_details.status','1')
               ->select('users.*')
               ->get();
               $uniqueStudents = $student->unique('id')->values();
@@ -411,6 +423,8 @@ class ParentsController extends Controller
                     'institute_detail.logo',
                     'institute_detail.address'
                 )
+                ->whereNull('students_details.deleted_at')
+                ->where('students_details.status','1')
                 ->groupBy('institute_detail.id', 'institute_detail.institute_name', 'institute_detail.logo', 'institute_detail.address', 'students_details.institute_id')
                 ->get();
                 $insts=[];

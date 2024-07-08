@@ -1036,6 +1036,7 @@ class StudentController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
+                ->orderBy('time_table.start_time', 'asc')
                 ->get();
          
                 // print_r($todayslect);exit;
@@ -1119,6 +1120,9 @@ class StudentController extends Controller
                 // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $tdasy = date('Y-m-d');
+                $pdate = new \DateTime($tdasy);
+                $pdate->modify('-1 day');
+                $prDayStr = $pdate->format('Y-m-d');
                 $exams = Exam_Model::join('subject', 'subject.id', '=', 'exam.subject_id')
                     ->join('standard', 'standard.id', '=', 'exam.standard_id')
                     ->where('exam.institute_id', $stdetail->institute_id)
@@ -1132,7 +1136,7 @@ class StudentController extends Controller
                     //     return $query->where('exam.stream_id', $stream_id);
                     // })
                     ->whereIn('exam.subject_id', $subjectIds)
-                    ->where('exam.exam_date', '>', $tdasy)
+                    ->where('exam.exam_date', '>', $prDayStr)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     //->limit(3)
@@ -1146,7 +1150,7 @@ class StudentController extends Controller
                         'subject' => $examsDT->subject,
                         'standard' => $examsDT->standard,
                         'date' => $examsDT->exam_date,
-                        'time' => $examsDT->start_time . ' to ' . $examsDT->end_time,
+                        'time' => $this->convertTo12HourFormat($examsDT->start_time) . ' to ' . $this->convertTo12HourFormat($examsDT->end_time),
                     );
                 }
             }
@@ -3072,6 +3076,7 @@ class StudentController extends Controller
                         'time_table.end_time',
                         'time_table.lecture_date'
                     )
+                    ->orderBy('time_table.start_time', 'asc')
                     ->get();
 
                 foreach ($todayslect as $todayslecDT) {

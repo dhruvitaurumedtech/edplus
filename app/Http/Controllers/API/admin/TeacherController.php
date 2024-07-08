@@ -554,15 +554,21 @@ class TeacherController extends Controller
                     'time_table.start_time',
                     'time_table.end_time',
                     'time_table.lecture_date',
+                    'time_table.batch_id',
+                    'batches.batch_name',
                     'users.image',
                 )
-                ->paginate(2);
+                ->orderBy('time_table.start_time', 'asc')
+                //->paginate(2);
+                ->get();
 
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
+                    'batch_id'=>$todayslecDT->batch_id,
+                    'batch_name'=>$todayslecDT->batch_name,
                     'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
@@ -740,6 +746,7 @@ class TeacherController extends Controller
                     'time_table.end_time',
                     'time_table.lecture_date'
                 )
+                ->orderBy('time_table.start_time', 'asc')
                 ->get();
 
             foreach ($todaysletech as $todaysDT) {
