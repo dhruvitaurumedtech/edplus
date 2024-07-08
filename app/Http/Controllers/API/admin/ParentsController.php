@@ -262,7 +262,7 @@ class ParentsController extends Controller
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
-                    'lecture_date' => $todayslecDT->lecture_date,
+                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
