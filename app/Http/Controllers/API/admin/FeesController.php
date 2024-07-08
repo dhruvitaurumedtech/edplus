@@ -932,7 +932,7 @@ class FeesController extends Controller
                     $paid_amount += $value->payment_amount;
                 }
             }
-
+             $remaing_maount =$student_fees->total_fees - $paid_amount;
             // Prepare the final data structure
             $data_final = [
                 'invoice_number' => $invoiceNumber,
@@ -943,6 +943,7 @@ class FeesController extends Controller
                 'student_fees' => !empty($student_fees->total_fees) ? $student_fees->total_fees . '.00' : '00.00',
                 'discount' => $discount_data,
                 'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
+                'remaing_amount'=>!empty($remaing_maount) ? $remaing_maount . '.00' : '00.00',
                 'history' => $history,
             ];
 
