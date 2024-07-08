@@ -294,20 +294,33 @@ class FeesController extends Controller
 
                 $dis = !empty($discount) ? $discount->discount_amount : 0;
                 $due_amount = 0;
+                
                 // echo $value['total_payment_amount'];exit;
                 if (!empty($value['total_payment_amount']) || !empty($student_fees->total_fees)) {
                     if ($student_fees->total_fees != $value['total_payment_amount']) {
+                        // echo $value['total_payment_amount'];exit;
                         if (!empty($value['total_payment_amount'])) {
+                            
                             if ($discount && $discount->discount_by == 'Rupee') {
                                 $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
                             } elseif ($discount && $discount->discount_by == 'Percentage') {
                                 $revise_fees = $student_fees->total_fees * ($discount->discount_amount / 100);
                                 $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $revise_fees;
+                                
                             } else {
                                 $due_amount = $student_fees->total_fees - $value['total_payment_amount'];
                             }
                         } else {
-                            $due_amount = $student_fees->total_fees - $dis;
+                            // $due_amount = $student_fees->total_fees - $dis;
+                            if ($discount && $discount->discount_by == 'Rupee') {
+                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
+                            } elseif ($discount && $discount->discount_by == 'Percentage') {
+                                $revise_fees = $student_fees->total_fees * ($discount->discount_amount / 100);
+                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $revise_fees;
+                                
+                            } else {
+                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'];
+                            }
                         }
                     }
                 }
