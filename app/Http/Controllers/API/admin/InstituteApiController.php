@@ -6470,9 +6470,9 @@ class InstituteApiController extends Controller
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
                 })
-                ->whereNotIn('users.role_type', [1, 3, 5, 6])
+                ->whereNotIn('roles.role_name', ['superadmin','institute'])
                 ->distinct('users.id');
-
+             
             if (!empty($searchTerm)) {
                 $searchParts = explode(' ', $searchTerm);
 
@@ -6497,7 +6497,7 @@ class InstituteApiController extends Controller
             $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
                 ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
                 ->where('user_role_mapping.institute_id', $institute_id)
-                ->whereNotIn('role_id', [1, 3, 5, 6])
+                ->whereNotIn('roles.role_name', ['superadmin','institute'])
                 ->select('users.*', 'roles.role_name');
 
             if (!empty($searchTerm)) {
