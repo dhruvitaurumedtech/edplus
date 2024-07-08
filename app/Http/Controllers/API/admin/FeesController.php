@@ -911,6 +911,7 @@ class FeesController extends Controller
                     $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '%' : '0%';
                 }
             }
+            // echo $revise_fee;exit;
 
             // Fetch student payment history
             $student_history = Fees_colletion_model::where('student_id', $request->student_id)
@@ -932,7 +933,7 @@ class FeesController extends Controller
                     $paid_amount += $value->payment_amount;
                 }
             }
-             $remaing_maount =$student_fees->total_fees - $paid_amount;
+             $remaing_maount =$student_fees->total_fees - $paid_amount - $revise_fee ;
             // Prepare the final data structure
             $data_final = [
                 'invoice_number' => $invoiceNumber,
