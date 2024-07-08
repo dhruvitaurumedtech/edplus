@@ -36,9 +36,8 @@ class ProductAndInventoryController extends Controller
 
     public function inventory_status(Request $request){
         try {
-            $product = [];
-            $product = new Products_status();
-            return $this->response($product, "Inventory Status.");
+            $products = Products_status::select('id', 'name')->get();
+            return $this->response($products, "Inventory Status.");
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         } 
@@ -48,13 +47,14 @@ class ProductAndInventoryController extends Controller
         $validator = Validator::make($request->all(), [
             'status' => 'required|exists:products_inventory_status,id',
             'product_id' => 'required|exists:products,id',
+            'quantity' =>'required'
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
             $product = new Products_inventory();
-            $product->product_id = $request->name;
+            $product->product_id = $request->product_id; 
             $product->status = $request->status;
             $product->quantity = $request->quantity;
             $product->save();
@@ -62,6 +62,23 @@ class ProductAndInventoryController extends Controller
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         }
+    }
+
+    public function product_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $products = Products::where('institute_id',$request->institute_id)
+            ->where('status','1')
+            ->select('id', 'name')->get();
+            return $this->response($products, "Products List.");
+        }catch (Exception $e) {
+            return $this->response($e, "Something went wrong!.", false, 400);
+        } 
     }
 
 }

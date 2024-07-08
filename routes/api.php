@@ -215,6 +215,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-product', [ProductAndInventoryController::class, 'create_product']);
     Route::post('/institute/inventory-status', [ProductAndInventoryController::class, 'inventory_status']);
     Route::post('/institute/add-inventory', [ProductAndInventoryController::class, 'add_inventory']);
+    Route::post('/institute/product-list', [ProductAndInventoryController::class, 'product_list']);
 
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
