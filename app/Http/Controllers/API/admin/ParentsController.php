@@ -347,13 +347,14 @@ class ParentsController extends Controller
         $nextDayStr = $date->format('Y-m-d');
 
             $totalattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
-            ->where('student_id', $user_id)
+            ->where('student_id', $getstdntdata->student_id)
             ->where('created_at', 'like', '%' . $cumnth . '%')
             ->where('created_at', '<', $nextDayStr)
             ->where('attendance', 'P')->count();
-
+            
+            
             $totalmissattlec = Attendance_model::where('institute_id', $getstdntdata->institute_id)
-                ->where('student_id', $user_id)
+                ->where('student_id', $getstdntdata->student_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
                 ->where('attendance', 'A')
@@ -363,10 +364,9 @@ class ParentsController extends Controller
             $totllect = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
                 ->where('batch_id', $getstdntdata->batch_id)
                 ->where('lecture_date', '<', $nextDayStr)
-                //->whereRaw("FIND_IN_SET(?, subject_id)", [$getstdntdata->subject_id])
                 ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->count();    
-
+            
             $totalattendlec = array(
                 'total_lectures' => $totllect,
                 'attend_lectures' => $totalattlec,
