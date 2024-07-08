@@ -28,7 +28,7 @@ use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\staff\StaffController;
 use App\Http\Controllers\API\student\StudentAttendance;
 use App\Http\Controllers\PdfController;
-use App\Http\Controllers\ProductAndInventoryController;
+use App\Http\Controllers\API\ProductAndInventoryController;
 use App\Models\Student_detail;
 
 
@@ -213,6 +213,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
     Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
     Route::post('/institute/add-product', [ProductAndInventoryController::class, 'create_product']);
+    Route::post('/institute/inventory-status', [ProductAndInventoryController::class, 'inventory_status']);
+    Route::post('/institute/add-inventory', [ProductAndInventoryController::class, 'add_inventory']);
 
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
