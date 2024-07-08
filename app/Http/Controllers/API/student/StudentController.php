@@ -2148,8 +2148,11 @@ class StudentController extends Controller
                 )->first();
 
 
-            $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
-                ->where('parents.student_id', $student_id)->get();
+                $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
+                ->where('parents.student_id', $student_id)
+                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 'users.email', 'users.country_code', 'users.country_code_name', 'users.mobile', 'parents.relation')
+                ->distinct()
+                ->get();
             $parents_dt = [];
             foreach ($parentsQY as $parentsDT) {
                 $parents_dt[] = array(
