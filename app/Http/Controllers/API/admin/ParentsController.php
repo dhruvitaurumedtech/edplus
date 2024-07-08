@@ -16,6 +16,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -159,6 +160,11 @@ class ParentsController extends Controller
 
 
     
+    private  function convertTo12HourFormat($time24)
+    {
+        $time = Carbon::createFromFormat('H:i:s', $time24);
+        return $time->format('g:i:s A');
+    }
 
     //pending work in below
     public function parents_child_homescreen(Request $request)
@@ -262,7 +268,7 @@ class ParentsController extends Controller
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
                 );
             }
-
+            
             //announcement
             $announcement = [];
             $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
