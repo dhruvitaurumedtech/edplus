@@ -3853,6 +3853,7 @@ class InstituteApiController extends Controller
                 // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                 ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
                 ->whereNull('students_details.deleted_at')
+                ->whereNull('users.deleted_at')
 
 
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
