@@ -6485,13 +6485,19 @@ class InstituteApiController extends Controller
 
                     $user_list->where(function ($query) use ($firstname, $lastname) {
                         $query->where('users.firstname', 'like', '%' . $firstname . '%')
-                            ->where('users.lastname', 'like', '%' . $lastname . '%');
+                            ->where('users.lastname', 'like', '%' . $lastname . '%')
+                        ->orWhere(function ($query) use ($firstname) {
+                            $query->where('roles.role_name', 'like', '%' . $firstname . '%');
+                        });
                     });
                 } else {
                     // If there's only one part, search in either firstname or lastname
                     $user_list->where(function ($query) use ($searchTerm) {
                         $query->where('users.firstname', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%');
+                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%')
+                            ->orWhere(function ($query) use ($searchTerm) {
+                                $query->where('roles.role_name', 'like', '%' . $searchTerm . '%');
+                            });
                     });
                 }
             }
@@ -6512,13 +6518,19 @@ class InstituteApiController extends Controller
 
                     $userRoleMappings->where(function ($query) use ($firstname, $lastname) {
                         $query->where('users.firstname', 'like', '%' . $firstname . '%')
-                            ->where('users.lastname', 'like', '%' . $lastname . '%');
+                            ->where('users.lastname', 'like', '%' . $lastname . '%')
+                            ->orWhere(function ($query) use ($firstname) {
+                                $query->where('roles.role_name', 'like', '%' . $firstname . '%');
+                            });
                     });
                 } else {
                     // If there's only one part, search in either firstname or lastname
                     $userRoleMappings->where(function ($query) use ($searchTerm) {
                         $query->where('users.firstname', 'like', '%' . $searchTerm . '%')
-                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%');
+                            ->orWhere('users.lastname', 'like', '%' . $searchTerm . '%')
+                            ->orWhere(function ($query) use ($searchTerm) {
+                                $query->where('roles.role_name', 'like', '%' . $searchTerm . '%');
+                            });
                     });
                 }
             }
