@@ -6472,7 +6472,7 @@ class InstituteApiController extends Controller
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
                 })
-                ->whereNotIn('roles.role_name', ['superadmin','institute'])
+                ->whereNotIn('roles.role_name', ['superadmin','institute','sub_admin'])
                 ->distinct('users.id');
              
             if (!empty($searchTerm)) {
@@ -6497,15 +6497,11 @@ class InstituteApiController extends Controller
 
             $user_list = $user_list->get();
             $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
-                    ->leftJoin('roles', function($join) {
-                        $join->on('roles.id', '=', 'user_role_mapping.role_id')
-                            ->orOn('roles.id', '=', 'users.role_type');
-                    })
+                ->leftJoin('roles', 'roles.id', '=', 'user_role_mapping.role_id')
                 ->where('user_role_mapping.institute_id', $institute_id)
-                ->whereNotIn('roles.role_name', ['superadmin','institute'])
+                ->whereNotIn('roles.role_name', ['superadmin','institute','sub_admin'])
                 ->select('users.*', 'roles.role_name');
 
-           
             if (!empty($searchTerm)) {
                 $searchParts = explode(' ', $searchTerm);
 
