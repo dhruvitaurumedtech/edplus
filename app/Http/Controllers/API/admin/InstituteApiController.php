@@ -6431,17 +6431,13 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $subjects = Batches_model::where('id', $request->batch_id)
-                ->where('user_id', auth()->user()->id)->first();
-                // echo "<pre>";print_r($subjects);exit;
+            $subjects = Batches_model::where('id', $request->batch_id)->first();
             $subjectids = explode(',', $subjects->subjects);
-
             if ($request->date) {
                 $subjectids = Timetable::where('lecture_date', $request->date)
                     ->where('batch_id', $request->batch_id)
                     ->pluck('subject_id');
             }
-
             $subject_list = Subject_model::whereIn('id', $subjectids)->get();
             $data = [];
             foreach ($subject_list as $value) {
