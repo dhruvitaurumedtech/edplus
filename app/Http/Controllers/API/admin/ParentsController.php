@@ -273,6 +273,7 @@ class ParentsController extends Controller
             $announcement = [];
             $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
                 ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->orderByDesc('created_at')
                 ->get();
             foreach ($announcQY as $announcDT) {
                 $announcement[] = array(
