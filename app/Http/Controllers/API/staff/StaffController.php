@@ -431,4 +431,29 @@ class StaffController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
+    function staff_view_profile(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $userlist=user::where('id', $request->user_id)->get();
+            $response=[];
+            foreach($userlist as $value){
+                $response[] = [
+                       'id'=>$value->id,
+                       'username'=>$value->firstname.' '.$value->lastname,
+                       'email'=>$value->email,
+                       'mobile'=>$value->mobile,
+                       'dob'=>$value->dob,
+                       'image'=>(!empty($value->image)) ? asset($value->image) : asset('no-image.png')
+                ];
+            }
+            return $this->response($response, "Successfully fetch profile.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
 }
