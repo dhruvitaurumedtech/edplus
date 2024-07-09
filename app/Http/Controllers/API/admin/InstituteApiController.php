@@ -3852,6 +3852,8 @@ class InstituteApiController extends Controller
                 ->where('students_details.stream_id', $stream)
                 // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                 ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
+                ->whereNull('students_details.deleted_at')
+
 
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
