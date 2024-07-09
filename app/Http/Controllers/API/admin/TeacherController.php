@@ -86,10 +86,16 @@ class TeacherController extends Controller
             foreach ($searchhistory as $value) {
                 // Check if the title already exists in the $searchhistory_list array
                 $existingTitles = array_column($searchhistory_list, 'title');
+                $instdl = Institute_detail::where('id',$value->institute_id)
+                    ->select('institute_name','logo','address')
+                    ->first();
                 if (!in_array($value->title, $existingTitles)) {
                     $searchhistory_list[] = [
                         'id' => $value->id,
-                        'institute_id' => $value->institute_id,
+                        'institute_id' => (int) $value->institute_id,
+                        'institute_name'=>$instdl ? $instdl->institute_name : '',
+                        'address'=>$instdl ? $instdl->address : '',
+                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('no-image.png'),
                         'user_id' => $value->user_id,
                         'title' => $value->title,
                     ];
