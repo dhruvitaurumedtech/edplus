@@ -252,6 +252,7 @@ class FeesController extends Controller
                 ->where('students_details.medium_id', $request->medium_id)
                 ->where('students_details.standard_id', $request->standard_id)
                 ->where('students_details.status', '1')
+                ->whereNull('students_details.deleted_at')
                 ->groupBy(
                     'users.id',
                     'users.firstname',
