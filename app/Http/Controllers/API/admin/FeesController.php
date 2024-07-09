@@ -645,6 +645,8 @@ class FeesController extends Controller
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at')
+                ->whereNull('users.deleted_at')
+                    
                 ->select('users.*', 'standard.name as standard_name', 'students_details.standard_id', 'students_details.stream_id', 'stream.name as streamname', 'students_details.subject_id');
             if (!empty($request->board_id)) {
                 $query->whereIn('students_details.board_id', explode(',', $request->board_id));
@@ -686,6 +688,7 @@ class FeesController extends Controller
                     ->where('students_details.student_id', $value->id)
                     ->where('students_details.institute_id', $request->institute_id)
                     ->whereNull('students_details.deleted_at')
+                    ->whereNull('users.deleted_at')
                     ->select('users.*', 'standard.name as standard_name', 'discount.discount_amount', 'discount.discount_by')
 
                     ->first();
