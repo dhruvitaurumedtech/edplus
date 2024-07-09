@@ -6431,7 +6431,7 @@ class InstituteApiController extends Controller
         }
         try {
             $subjects = Batches_model::where('id', $request->batch_id)
-                ->orwhere('user_id', auth()->user()->id)->first();
+                ->where('user_id', auth()->user()->id)->first();
                 // echo "<pre>";print_r($subjects);exit;
             $subjectids = explode(',', $subjects->subjects);
 
