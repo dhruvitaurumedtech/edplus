@@ -644,6 +644,7 @@ class FeesController extends Controller
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.status', '1')
+                ->whereNull('students_details.deleted_at')
                 ->select('users.*', 'standard.name as standard_name', 'students_details.standard_id', 'students_details.stream_id', 'stream.name as streamname', 'students_details.subject_id');
             if (!empty($request->board_id)) {
                 $query->whereIn('students_details.board_id', explode(',', $request->board_id));
