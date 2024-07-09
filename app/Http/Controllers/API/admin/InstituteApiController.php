@@ -6497,7 +6497,7 @@ class InstituteApiController extends Controller
 
             $user_list = $user_list->get();
             $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
-                ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                ->leftJoin('roles', 'roles.id', '=', 'user_role_mapping.role_id')
                 ->where('user_role_mapping.institute_id', $institute_id)
                 ->whereNotIn('roles.role_name', ['superadmin','institute'])
                 ->select('users.*', 'roles.role_name');
