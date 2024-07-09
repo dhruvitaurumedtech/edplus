@@ -76,8 +76,9 @@ class ProductAndInventoryController extends Controller
             ->where('status','1')
             ->select('id', 'name')
             ->get();
-            $addinventory = Products_inventory::where('status','1');
-            $assigninventory = Products_inventory::where('status','2');
+            // $addinventory = Products_inventory::where('status','1');
+            // $assigninventory = Products_inventory::where('status','2');
+            // $availableqty = $addinventory - $assigninventory;
             return $this->response($products, "Products List.");
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
