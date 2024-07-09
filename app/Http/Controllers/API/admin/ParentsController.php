@@ -163,7 +163,7 @@ class ParentsController extends Controller
     private  function convertTo12HourFormat($time24)
     {
         $time = Carbon::createFromFormat('H:i:s', $time24);
-        return $time->format('g:i A');
+        return $time->format('g:i:s A');
     }
 
     //pending work in below
