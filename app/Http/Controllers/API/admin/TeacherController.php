@@ -725,7 +725,7 @@ class TeacherController extends Controller
 
         $validator = Validator::make($request->all(), [
             'date' => 'required',
-            'batch_id' => 'required',
+            'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -733,15 +733,16 @@ class TeacherController extends Controller
         }
 
         try {
-
             $teacher_id = Auth::id();
             $lectures = [];
+            $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todaysletech = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('time_table.batch_id', $request->batch_id)
+                //->where('time_table.batch_id', $request->batch_id)
+                ->whereIN('time_table.batch_id', $batchids)
                 ->where('time_table.lecture_date', $request->date)
                 ->where('time_table.teacher_id', $teacher_id)
                 ->select(
