@@ -763,6 +763,7 @@ class FeesController extends Controller
                               ->select('users.*', 'standard.name as standard_name','students_details.subject_id')
                               ->where('students_details.student_id', $request->student_id)
                               ->where('students_details.institute_id', $request->institute_id)
+                              ->whereNull('students_details.deleted_at')
                               ->first();
             // print_r($student_detail);exit;
             $subject_sum =   Subject_sub::where('institute_id',$request->institute_id)->whereIn('subject_id',explode(",",$student_detail->subject_id))->get();
