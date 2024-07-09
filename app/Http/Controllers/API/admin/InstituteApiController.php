@@ -3852,6 +3852,8 @@ class InstituteApiController extends Controller
                 ->where('students_details.stream_id', $stream)
                 // ->whereRaw("FIND_IN_SET($examdt->subject_id, students_details.subject_id)")
                 ->WhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$examdt->subject_id])
+                ->whereNull('students_details.deleted_at')
+
 
                 ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardname')->get();
 
@@ -6470,9 +6472,9 @@ class InstituteApiController extends Controller
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
                 })
-                ->whereNotIn('users.role_type', [1, 3, 5, 6])
+                ->whereNotIn('roles.role_name', ['superadmin','institute'])
                 ->distinct('users.id');
-
+             
             if (!empty($searchTerm)) {
                 $searchParts = explode(' ', $searchTerm);
 
@@ -6495,11 +6497,15 @@ class InstituteApiController extends Controller
 
             $user_list = $user_list->get();
             $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
-                ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+                    ->leftJoin('roles', function($join) {
+                        $join->on('roles.id', '=', 'user_role_mapping.role_id')
+                            ->orOn('roles.id', '=', 'users.role_type');
+                    })
                 ->where('user_role_mapping.institute_id', $institute_id)
-                ->whereNotIn('role_id', [1, 3, 5, 6])
+                ->whereNotIn('roles.role_name', ['superadmin','institute'])
                 ->select('users.*', 'roles.role_name');
 
+           
             if (!empty($searchTerm)) {
                 $searchParts = explode(' ', $searchTerm);
 
