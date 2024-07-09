@@ -685,7 +685,7 @@ class FeesController extends Controller
                     ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
                     ->where('students_details.student_id', $value->id)
                     ->where('students_details.institute_id', $request->institute_id)
-
+                    ->whereNull('students_details.deleted_at')
                     ->select('users.*', 'standard.name as standard_name', 'discount.discount_amount', 'discount.discount_by')
 
                     ->first();
