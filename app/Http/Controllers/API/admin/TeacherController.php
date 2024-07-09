@@ -751,7 +751,9 @@ class TeacherController extends Controller
                     'lecture_type.name as lecture_type_name',
                     'time_table.start_time',
                     'time_table.end_time',
-                    'time_table.lecture_date'
+                    'time_table.lecture_date',
+                    'batches.id as batch_id',
+                    'batches.batch_name',
                 )
                 ->orderBy('time_table.start_time', 'asc')
                 ->get();
@@ -762,6 +764,8 @@ class TeacherController extends Controller
                     'standard' => $todaysDT->standard,
                     'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
+                    'batch_id' => $todaysDT->batch_id,
+                    'batch_name'=>$todaysDT->batch_name,
                     'start_time' => $todaysDT->start_time,
                     'end_time' => $todaysDT->end_time,
                 );
