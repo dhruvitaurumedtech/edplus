@@ -6496,11 +6496,19 @@ class InstituteApiController extends Controller
             }
 
             $user_list = $user_list->get();
+            // $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
+            //     ->leftJoin('roles', 'roles.id', '=', 'user_role_mapping.role_id')
+            //     ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
+            //     ->where('user_role_mapping.institute_id', $institute_id)
+            //     ->whereNotIn('roles.role_name', ['superadmin','institute'])
+            //     ->select('users.*', 'roles.role_name');
+
             $userRoleMappings = UserRoleMapping::join('users', 'users.id', '=', 'user_role_mapping.user_id')
-                ->leftJoin('roles', 'roles.id', '=', 'user_role_mapping.role_id')
-                ->where('user_role_mapping.institute_id', $institute_id)
-                ->whereNotIn('roles.role_name', ['superadmin','institute'])
-                ->select('users.*', 'roles.role_name');
+                    ->leftJoin('roles as user_roles', 'user_roles.id', '=', 'user_role_mapping.role_id')
+                    ->leftJoin('roles as users_roles', 'users_roles.id', '=', 'users.role_type')
+                    ->where('user_role_mapping.institute_id', $institute_id)
+                    ->whereNotIn('user_roles.role_name', ['superadmin', 'institute'])
+                    ->select('users.*', 'user_roles.role_name as user_role');
 
             if (!empty($searchTerm)) {
                 $searchParts = explode(' ', $searchTerm);
