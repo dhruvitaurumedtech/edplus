@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Class_room_model;
 use App\Models\General_timetable_model;
+use App\Models\Timetable;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -260,6 +261,13 @@ class General_timetableController extends Controller
 
 
             return $this->response($data, 'Fetch Successfully.');
+        } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    function view_general_timetable(Request $request){
+        try{
+            Timetable::where('');
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
