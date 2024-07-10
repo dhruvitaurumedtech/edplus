@@ -11,6 +11,6 @@ class TimeTableBase extends Model
     use HasFactory,SoftDeletes;
     protected $table = 'time_table_base';
     protected $fillable = [
-        'subject_id','batch_id','teacher_id','lecture_type','start_date','end_date','start_time','end_time','repeat'
+        'subject_id','batch_id','class_room_id','teacher_id','lecture_type','start_date','end_date','start_time','end_time','repeat'
     ];
 }

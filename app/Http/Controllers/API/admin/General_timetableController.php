@@ -276,13 +276,13 @@ class General_timetableController extends Controller
 
     function view_general_timetable(Request $request){
         
-        // $validator = validator::make($request->all(), [
-        //     'batch_id' => 'required',
-        // ]);
+        $validator = validator::make($request->all(), [
+            'date' => 'required',
+        ]);
     
-        // if ($validator->fails()) {
-        //     return $this->response([], $validator->errors()->first(), false, 400);
-        // }
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         $insid = Institute_detail::where('user_id',Auth::id())->first();
         try {
             $timtDT = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
@@ -292,6 +292,7 @@ class General_timetableController extends Controller
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
                 ->where('batches.institute_id', $insid->id)
+                ->where('time_table.lecture_date', $request->date)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
                     'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
@@ -301,14 +302,14 @@ class General_timetableController extends Controller
             $groupedData = [];
     
             foreach ($timtDT as $timtable) {
-                $date = $timtable->lecture_date;
-                if (!isset($groupedData[$date])) {
-                    $groupedData[$date] = [
-                        'date' => $date,
+                $class_room = $timtable->class_room;
+                if (!isset($groupedData[$class_room])) {
+                    $groupedData[$class_room] = [
+                        'class_room' => $class_room,
                         'sub_data' => []
                     ];
                 }
-                $groupedData[$date]['sub_data'][] = [
+                $groupedData[$class_room]['sub_data'][] = [
                     'id' => $timtable->id,
                     'day' => $timtable->repeat,
                     'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
