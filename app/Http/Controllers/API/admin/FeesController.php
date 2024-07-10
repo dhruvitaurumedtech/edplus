@@ -469,25 +469,27 @@ class FeesController extends Controller
             $student_fees = Student_fees_model::where('student_id', $request->student_id)
                 ->where('institute_id', $request->institute_id)
                 ->first();
+                // print_r($student_fees);exit;
 
             $discount = Discount_model::where('institute_id', $request->institute_id)
                 ->where('student_id', $request->student_id)
                 ->first();
 
-            // Initialize fees variable
+            
             $fees = null;
 
             if ($student_fees) {
                 $discount_amount = 0;
-                if (!empty($discount->discount_amount)) {
-                    $discount_amount = $discount->discount_amount;
-                }
+                // if (!empty($discount->discount_amount)) {
+                //     $discount_amount = $discount->discount_amount;
+                // }
                 if ($discount) {
-
                     if ($discount->discount_by == 'Rupee') {
                         $fees = $student_fees->total_fees - $discount->discount_amount;
+                        $discount_amount = $discount->discount_amount;
                     } elseif ($discount->discount_by == 'Percentage') {
-                        $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                       $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                       $discount_amount=$student_fees->total_fees * ($discount->discount_amount / 100);
                     }
                 }
                 // If no discount, fees remain the total fees
@@ -499,10 +501,7 @@ class FeesController extends Controller
                     }
                     // echo $paid_amount;exit;
                 }
-                $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
-
-                // echo $fees;echo '=>'.$request->payment_amount;
-
+                echo $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
                 if ($fees < $request->payment_amount) {
                     return $this->response([], "Amount is not matched", false, 400);
                 }
