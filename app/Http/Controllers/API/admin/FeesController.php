@@ -136,14 +136,14 @@ class FeesController extends Controller
                 ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
+                // ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
                 ->select(
                     'users.id',
                     'users.firstname',
                     'users.lastname',
                     'users.image',
                     'students_details.student_id',
-                    DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+                    // DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
                 )
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.board_id', $request->board_id)
@@ -174,6 +174,14 @@ class FeesController extends Controller
             $students = [];
 
             foreach ($student_response as $value) {
+
+                $fees_detail = Fees_colletion_model::where('student_id', $value['student_id'])
+                        ->where('institute_id', $request->institute_id)
+                        ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
+                        ->first();
+
+                    // Access the total payment amount
+                     $total_payment_amount = $fees_detail->total_payment_amount;
                 $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['student_id'])
                     ->first();
@@ -194,8 +202,8 @@ class FeesController extends Controller
                         }
                     }
                     
-                    if (!empty($total) && !empty($value['total_payment_amount'])) {
-                        if ($total == $value['total_payment_amount']) {
+                    if (!empty($total) && !empty($total_payment_amount)) {
+                        if ($total == $total_payment_amount) {
                             $students[] = [
                                 'student_id' => $value['student_id'],
                                 'student_name' => $value['firstname'] . ' ' . $value['lastname'],
@@ -469,25 +477,27 @@ class FeesController extends Controller
             $student_fees = Student_fees_model::where('student_id', $request->student_id)
                 ->where('institute_id', $request->institute_id)
                 ->first();
+                // print_r($student_fees);exit;
 
             $discount = Discount_model::where('institute_id', $request->institute_id)
                 ->where('student_id', $request->student_id)
                 ->first();
 
-            // Initialize fees variable
+            
             $fees = null;
 
             if ($student_fees) {
                 $discount_amount = 0;
-                if (!empty($discount->discount_amount)) {
-                    $discount_amount = $discount->discount_amount;
-                }
+                // if (!empty($discount->discount_amount)) {
+                //     $discount_amount = $discount->discount_amount;
+                // }
                 if ($discount) {
-
                     if ($discount->discount_by == 'Rupee') {
                         $fees = $student_fees->total_fees - $discount->discount_amount;
+                        $discount_amount = $discount->discount_amount;
                     } elseif ($discount->discount_by == 'Percentage') {
-                        $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                       $fees = $student_fees->total_fees - ($student_fees->total_fees * ($discount->discount_amount / 100));
+                       $discount_amount=$student_fees->total_fees * ($discount->discount_amount / 100);
                     }
                 }
                 // If no discount, fees remain the total fees
@@ -499,15 +509,11 @@ class FeesController extends Controller
                     }
                     // echo $paid_amount;exit;
                 }
-                $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
-
-                // echo $fees;echo '=>'.$request->payment_amount;
-
+                 $fees = $student_fees->total_fees - $paid_amount - $discount_amount;
                 if ($fees < $request->payment_amount) {
                     return $this->response([], "Amount is not matched", false, 400);
                 }
-                // exit;
-
+                
             } else {
                 return $this->response([], "Student fees record not found!", false, 400);
             }
