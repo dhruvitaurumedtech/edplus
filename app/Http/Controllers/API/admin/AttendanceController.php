@@ -93,6 +93,7 @@ class AttendanceController extends Controller
 
                 $attendance = Attendance_model::where('institute_id', $request->institute_id)
                             ->where('student_id', $student_id)
+                            ->where('subject_id', $request->subject_id)
                             ->where('date', $attendanceDate)
                             ->count();
             
