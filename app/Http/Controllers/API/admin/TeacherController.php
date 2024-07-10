@@ -546,12 +546,15 @@ class TeacherController extends Controller
 
             $user_id = Auth::id();
             $today = date('Y-m-d');
+            
+            $batchesid = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('time_table.teacher_id', $user_id)
+                ->where('time_table.batch_id', $batchesid)
                 ->where('time_table.lecture_date', $today)
                 ->select(
                     'subject.name as subject',
