@@ -5499,6 +5499,7 @@ class InstituteApiController extends Controller
         }
 
         try {
+
             $batch = new Batches_model();
             $batch->user_id  = Auth::id();
             $batch->institute_id  = $request->institute_id;
@@ -6459,7 +6460,6 @@ class InstituteApiController extends Controller
             $searchTerm = $request->input('search');
 
             $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
-
             // Query to fetch users based on institute_id and role_type conditions
             $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
                 ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
