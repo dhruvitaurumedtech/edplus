@@ -238,7 +238,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/user-list', [InstituteApiController::class, 'user_list']);
     Route::post('/institute/role-list', [InstituteApiController::class, 'role_list']);
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
-    Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view-general-timetable']);
+    Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
 });
 
 

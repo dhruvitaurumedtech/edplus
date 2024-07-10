@@ -5,9 +5,12 @@ namespace App\Http\Controllers\API\admin;
 use App\Http\Controllers\Controller;
 use App\Models\Class_room_model;
 use App\Models\General_timetable_model;
+use App\Models\Institute_detail;
 use App\Models\Timetable;
 use App\Traits\ApiTrait;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 class General_timetableController extends Controller
@@ -265,11 +268,71 @@ class General_timetableController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
+    private  function convertTo12HourFormat($time24) {
+        $time = Carbon::createFromFormat('H:i:s', $time24);
+        return $time->format('g:i:s A');
+    }
+
     function view_general_timetable(Request $request){
-        try{
-            Timetable::where('');
-        } catch (\Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+        
+        // $validator = validator::make($request->all(), [
+        //     'batch_id' => 'required',
+        // ]);
+    
+        // if ($validator->fails()) {
+        //     return $this->response([], $validator->errors()->first(), false, 400);
+        // }
+        $insid = Institute_detail::where('user_id',Auth::id())->first();
+        try {
+            $timtDT = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
+                ->join('users', 'users.id', '=', 'time_table.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
+                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
+                ->where('batches.institute_id', $insid->id)
+                ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
+                    'users.lastname', 'lecture_type.name as lecture_type_name',
+                    'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
+                ->orderBy('time_table.start_time', 'asc')
+                ->get();
+    
+            $groupedData = [];
+    
+            foreach ($timtDT as $timtable) {
+                $date = $timtable->lecture_date;
+                if (!isset($groupedData[$date])) {
+                    $groupedData[$date] = [
+                        'date' => $date,
+                        'sub_data' => []
+                    ];
+                }
+                $groupedData[$date]['sub_data'][] = [
+                    'id' => $timtable->id,
+                    'day' => $timtable->repeat,
+                    'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
+                    'end_time' => $this->convertTo12HourFormat($timtable->end_time),
+                    'subject_id' => $timtable->subject_id,
+                    'subject' => $timtable->subject,
+                    'lecture_type_id' => $timtable->lecture_type,
+                    'lecture_type' => $timtable->lecture_type_name,
+                    'standard_id' => $timtable->standard_id,
+                    'standard' => $timtable->standard,
+                    'batch_id' => $timtable->batch_id,
+                    'batch_name' => $timtable->batch_name,
+                    'class_room'=>$timtable->class_room,
+                    'teacher_id' => $timtable->teacher_id,
+                    'teacher' => $timtable->firstname . ' ' . $timtable->lastname
+                ];
+            }
+    
+            $data = array_values($groupedData);
+    
+            return $this->response($data, 'Data Fetch Successfully');
+    
+        } catch (Exception $e) {
+            return $this->response([], "Something went wrong!!", false, 400);
         }
     }
 }
