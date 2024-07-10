@@ -3074,6 +3074,7 @@ class StudentController extends Controller
                         'subject.name as subject',
                         'users.firstname',
                         'users.lastname',
+                        'users.image',
                         'lecture_type.name as lecture_type_name',
                         'time_table.start_time',
                         'time_table.end_time',
@@ -3086,6 +3087,7 @@ class StudentController extends Controller
                     $lectures[] = array(
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
                         'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
