@@ -136,14 +136,14 @@ class FeesController extends Controller
                 ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
                 ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
+                // ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
                 ->select(
                     'users.id',
                     'users.firstname',
                     'users.lastname',
                     'users.image',
                     'students_details.student_id',
-                    DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+                    // DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
                 )
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.board_id', $request->board_id)
@@ -174,6 +174,14 @@ class FeesController extends Controller
             $students = [];
 
             foreach ($student_response as $value) {
+
+                $fees_detail = Fees_colletion_model::where('student_id', $value['student_id'])
+                        ->where('institute_id', $request->institute_id)
+                        ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
+                        ->first();
+
+                    // Access the total payment amount
+                     $total_payment_amount = $fees_detail->total_payment_amount;
                 $student_fees = Student_fees_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['student_id'])
                     ->first();
@@ -194,8 +202,8 @@ class FeesController extends Controller
                         }
                     }
                     
-                    if (!empty($total) && !empty($value['total_payment_amount'])) {
-                        if ($total == $value['total_payment_amount']) {
+                    if (!empty($total) && !empty($total_payment_amount)) {
+                        if ($total == $total_payment_amount) {
                             $students[] = [
                                 'student_id' => $value['student_id'],
                                 'student_name' => $value['firstname'] . ' ' . $value['lastname'],
