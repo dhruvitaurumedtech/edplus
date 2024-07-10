@@ -725,7 +725,7 @@ class TeacherController extends Controller
 
         $validator = Validator::make($request->all(), [
             'date' => 'required',
-            'batch_id' => 'required',
+            'institute_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -733,15 +733,16 @@ class TeacherController extends Controller
         }
 
         try {
-
             $teacher_id = Auth::id();
             $lectures = [];
+            $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todaysletech = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('time_table.batch_id', $request->batch_id)
+                //->where('time_table.batch_id', $request->batch_id)
+                ->whereIN('time_table.batch_id', $batchids)
                 ->where('time_table.lecture_date', $request->date)
                 ->where('time_table.teacher_id', $teacher_id)
                 ->select(
@@ -750,7 +751,9 @@ class TeacherController extends Controller
                     'lecture_type.name as lecture_type_name',
                     'time_table.start_time',
                     'time_table.end_time',
-                    'time_table.lecture_date'
+                    'time_table.lecture_date',
+                    'batches.id as batch_id',
+                    'batches.batch_name',
                 )
                 ->orderBy('time_table.start_time', 'asc')
                 ->get();
@@ -761,6 +764,8 @@ class TeacherController extends Controller
                     'standard' => $todaysDT->standard,
                     'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
+                    'batch_id' => $todaysDT->batch_id,
+                    'batch_name'=>$todaysDT->batch_name,
                     'start_time' => $todaysDT->start_time,
                     'end_time' => $todaysDT->end_time,
                 );
