@@ -232,35 +232,37 @@ class FeesController extends Controller
             if (!empty($request->subject_id)) {
                 $subjectIds = explode(',', $request->subject_id);
             }
-
             $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
-                ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
-                ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                ->leftJoin('stream', 'stream.id', '=', 'students_details.stream_id')
-                ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
-                ->leftJoin('fees_colletion', 'fees_colletion.student_id', '=', 'students_details.student_id')
-                ->select(
-                    'users.id',
-                    'users.firstname',
-                    'users.lastname',
-                    'users.image',
-                    'students_details.student_id',
-                    DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
-                )
-                ->where('students_details.institute_id', $request->institute_id)
-                ->where('students_details.board_id', $request->board_id)
-                ->where('students_details.medium_id', $request->medium_id)
-                ->where('students_details.standard_id', $request->standard_id)
-                ->where('students_details.status', '1')
-                ->whereNull('users.deleted_at')
-                ->whereNull('students_details.deleted_at')
-                ->groupBy(
-                    'users.id',
-                    'users.firstname',
-                    'users.lastname',
-                    'users.image',
-                    'students_details.student_id'
-                );
+            ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+            ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+            ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+            // ->leftJoin('fees_colletion', function($join) {
+            //     $join->on('students_details.student_id', '=', 'fees_colletion.student_id')
+            //          ->orOn('students_details.institute_id', '=', 'fees_colletion.institute_id');
+            // })
+            ->select(
+                'users.id',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'students_details.student_id'
+                // DB::raw('SUM(fees_colletion.payment_amount) as total_payment_amount')
+            )
+            ->where('students_details.institute_id', $request->institute_id)
+            // ->where('fees_colletion.institute_id', $request->institute_id)
+            ->where('students_details.board_id', $request->board_id)
+            ->where('students_details.medium_id', $request->medium_id)
+            ->where('students_details.standard_id', $request->standard_id)
+            ->where('students_details.status', '1')
+            ->whereNull('users.deleted_at')
+            ->whereNull('students_details.deleted_at')
+            ->groupBy(
+                'users.id',
+                'users.firstname',
+                'users.lastname',
+                'users.image',
+                'students_details.student_id'
+            );
 
             if (!empty($request->batch_id)) {
                 $query->where('students_details.batch_id', $request->batch_id);
@@ -275,11 +277,17 @@ class FeesController extends Controller
             }
 
             $student_response = $query->get()->toArray();
-            //  print_r($student_response);exit;
             $students = [];
 
             foreach ($student_response as $value) {
 
+                $fees_detail = Fees_colletion_model::where('student_id', $value['student_id'])
+                        ->where('institute_id', $request->institute_id)
+                        ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
+                        ->first();
+
+                    // Access the total payment amount
+                     $total_payment_amount = $fees_detail->total_payment_amount;
                 // $student_id = $value['student_id'];
                 // echo $request->institute_id;
                 $student_fees = Student_fees_model::where('student_id',  $value['id'])
@@ -298,30 +306,31 @@ class FeesController extends Controller
                 $due_amount = 0;
                 
                 // echo $value['total_payment_amount'];exit;
-                if (!empty($value['total_payment_amount']) || !empty($student_fees->total_fees)) {
-                    if ($student_fees->total_fees != $value['total_payment_amount']) {
-                        // echo $value['total_payment_amount'];exit;
-                        if (!empty($value['total_payment_amount'])) {
+                if (!empty($total_payment_amount) || !empty($student_fees->total_fees)) {
+                    if ($student_fees->total_fees != $total_payment_amount) {
+                        // echo $total_payment_amount;exit;
+                        if (!empty($total_payment_amount)) {
                             
                             if ($discount && $discount->discount_by == 'Rupee') {
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
+                                $due_amount = $student_fees->total_fees - $total_payment_amount - $dis;
                             } elseif ($discount && $discount->discount_by == 'Percentage') {
                                 $revise_fees = $student_fees->total_fees * ($discount->discount_amount / 100);
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $revise_fees;
+                            //   echo $total_payment_amount;exit;
+                                $due_amount = $student_fees->total_fees - $total_payment_amount - $revise_fees;
                                 
                             } else {
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'];
+                                $due_amount = $student_fees->total_fees - $total_payment_amount;
                             }
                         } else {
                             // $due_amount = $student_fees->total_fees - $dis;
                             if ($discount && $discount->discount_by == 'Rupee') {
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $dis;
+                                $due_amount = $student_fees->total_fees - $total_payment_amount - $dis;
                             } elseif ($discount && $discount->discount_by == 'Percentage') {
                                 $revise_fees = $student_fees->total_fees * ($discount->discount_amount / 100);
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'] - $revise_fees;
-                                
+                                $due_amount = $student_fees->total_fees - $total_payment_amount - $revise_fees;
+                               
                             } else {
-                                $due_amount = $student_fees->total_fees - $value['total_payment_amount'];
+                                $due_amount = $student_fees->total_fees - $total_payment_amount;
                             }
                         }
                     }
