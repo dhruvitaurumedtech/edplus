@@ -742,11 +742,13 @@ class TeacherController extends Controller
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 //->where('time_table.batch_id', $request->batch_id)
+                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
                 ->whereIN('time_table.batch_id', $batchids)
                 ->where('time_table.lecture_date', $request->date)
                 ->where('time_table.teacher_id', $teacher_id)
                 ->select(
                     'subject.name as subject',
+                    'class_room.name as class_room',
                     'users.image',
                     'standard.name as standard',
                     'lecture_type.name as lecture_type_name',
@@ -768,6 +770,7 @@ class TeacherController extends Controller
                     'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
                     'batch_name'=>$todaysDT->batch_name,
+                    'class_room'=>$todaysDT->class_room,
                     'start_time' => $todaysDT->start_time,
                     'end_time' => $todaysDT->end_time,
                 );

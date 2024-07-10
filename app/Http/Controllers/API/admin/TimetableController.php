@@ -68,6 +68,7 @@ class TimetableController extends Controller
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
         $timetablebase->batch_id = $request->batch_id;
+        $timetablebase->class_room_id = $request->class_room_id;
         $timetablebase->teacher_id = $request->teacher_id;
         $timetablebase->lecture_type = $request->lecture_type;
         $timetablebase->start_date = $request->start_date;
@@ -120,6 +121,7 @@ class TimetableController extends Controller
                     $timetable->time_table_base_id = $lastInsertedId;
                     $timetable->subject_id = $request->subject_id;
                     $timetable->batch_id = $request->batch_id;
+                    $timetable->class_room_id = $request->class_room_id;
                     $timetable->teacher_id = $request->teacher_id;
                     $timetable->lecture_type = $request->lecture_type;
                     $timetable->start_date = $request->start_date;
@@ -283,8 +285,9 @@ class TimetableController extends Controller
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
                 ->where('time_table.batch_id', $request->batch_id)
-                ->select('subject.name as subject', 'users.firstname',
+                ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
                     'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
                 ->orderBy('time_table.start_time', 'asc')
@@ -313,6 +316,7 @@ class TimetableController extends Controller
                     'standard' => $timtable->standard,
                     'batch_id' => $timtable->batch_id,
                     'batch_name' => $timtable->batch_name,
+                    'class_room'=>$timtable->class_room,
                     'teacher_id' => $timtable->teacher_id,
                     'teacher' => $timtable->firstname . ' ' . $timtable->lastname
                 ];
