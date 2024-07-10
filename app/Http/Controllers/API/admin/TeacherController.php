@@ -520,7 +520,7 @@ class TeacherController extends Controller
             //banner
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
-                ->Where('user_id', $teacher_id)
+                //->Where('user_id', $teacher_id)
                 ->paginate(10);
 
             if ($bannerss->isEmpty()) {
