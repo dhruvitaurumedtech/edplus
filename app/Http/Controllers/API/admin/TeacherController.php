@@ -747,6 +747,7 @@ class TeacherController extends Controller
                 ->where('time_table.teacher_id', $teacher_id)
                 ->select(
                     'subject.name as subject',
+                    'users.image',
                     'standard.name as standard',
                     'lecture_type.name as lecture_type_name',
                     'time_table.start_time',
@@ -764,6 +765,7 @@ class TeacherController extends Controller
                     'standard' => $todaysDT->standard,
                     'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
+                    'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
                     'batch_name'=>$todaysDT->batch_name,
                     'start_time' => $todaysDT->start_time,
@@ -1058,14 +1060,12 @@ class TeacherController extends Controller
         }
         $user->save();
         try {
-            
             $userSub = Users_sub_model::where('user_id', $teacher_id)->first();
             if (!empty($userSub)) {
 
                 $userSub->update([
                     'phone_no' => $request['phone_no'],
                     'about_us' => $request['about_us'],
-
                 ]);
             } else {
 
@@ -1182,7 +1182,6 @@ class TeacherController extends Controller
             }
             return $this->response([], "Successfully Update data.");
         } catch (Exception $e) {
-            
             return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
