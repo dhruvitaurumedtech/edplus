@@ -582,7 +582,7 @@ class TeacherController extends Controller
                 );
             }
 
-            $announcQY = announcements_model::where('institute_id', $institute_id)->Where('role_type', 4)->get();
+            $announcQY = announcements_model::where('institute_id', $institute_id)->Where('role_type', 4)->orderByDesc('created_at')->get();
             // ->whereRaw("FIND_IN_SET('4', role_type)")
 
             foreach ($announcQY as $announcDT) {
