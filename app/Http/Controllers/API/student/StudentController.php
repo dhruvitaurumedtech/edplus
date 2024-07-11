@@ -1076,6 +1076,7 @@ class StudentController extends Controller
                 ->join('subject', 'subject.id', '=', 'exam.subject_id')
                 ->where('marks.student_id', $user_id)
                 ->where('exam.institute_id', $institute_id)
+                ->whereIN('exam.subject_id', explode(",",$getstdntdata->subject_id))
                 ->select(
                     'marks.*',
                     'subject.name as subject',
