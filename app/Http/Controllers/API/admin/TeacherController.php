@@ -596,33 +596,35 @@ class TeacherController extends Controller
                 );
             }
             $teacher_data = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-    ->join('board', 'board.id', '=', 'teacher_detail.board_id')
-    ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-    ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-    ->where('teacher_detail.teacher_id', $teacher_id)
-    ->where('teacher_detail.institute_id', $institute_id)
-    ->whereNotNull('teacher_detail.batch_id')
-    ->where('standard.id', 12)  // Explicitly filter for standard 12
-    ->groupBy(
-        'teacher_detail.standard_id',
-        'board.name',
-        'standard.id',
-        'standard.name',
-        'medium.name',
-        'batches.id',
-        'batches.batch_name'
-    )
-    ->select(
-        'standard.id as standard_id',
-        'batches.id as batch_id',
-        'standard.name as standard_name',
-        DB::raw('MAX(board.name) as board_name'),
-        DB::raw('MAX(medium.name) as medium_name'),
-        DB::raw('MAX(batches.batch_name) as batch_name')
-    )
-    ->get()
-    ->toArray();
+                ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.institute_id', $institute_id)
+                ->whereNotNull('teacher_detail.batch_id')
+                //->whereNull('teacher_detail.deleted_at')
+                // ->groupBy('standard.id')
+                ->groupBy(
+                    'teacher_detail.standard_id',
+                    'board.name',
+                    'standard.id',
+                    'standard.name',
+                    'medium.name',
+                    'batches.id',
+                    'batches.batch_name'
+                )
 
+                ->select(
+                    // 'board.name as board_name',
+                    'standard.id as standard_id',
+                    'batches.id as batch_id',
+                    'standard.name as standard_name',
+                    DB::raw('MAX(board.name) as board_name'),
+                    DB::raw('MAX(medium.name) as medium_name'),
+                    DB::raw('MAX(batches.batch_name) as batch_name')
+                )
+                ->get()
+                ->toArray();
 
             $teacher_response = [];
             foreach ($teacher_data as $value) {
