@@ -601,6 +601,7 @@ class TeacherController extends Controller
                 ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->where('teacher_detail.teacher_id', $teacher_id)
                 ->where('teacher_detail.institute_id', $institute_id)
+                ->whereNotNull('teacher_detail.batch_id')
                 //->whereNull('teacher_detail.deleted_at')
                 // ->groupBy('standard.id')
                 ->groupBy(
