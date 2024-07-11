@@ -29,7 +29,7 @@
         }
         @endphp
 
-        @foreach ($menu as $value)
+        <!-- @foreach ($menu as $value)
         <div class="dashboard-nav-dropdown {{ isActiveMenu($value) }}">
             <a href="{{ isset($value['url']) && Route::has($value['url']) ? url($value['url']) : '#' }}" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ isActiveLink($value['url']) }}">
                 <i class="fas fa-graduation-cap"></i>&nbsp;{{ $value['menu_name'] }}
@@ -44,8 +44,116 @@
             </div>
             @endif
         </div>
-        @endforeach
-
+        @endforeach -->
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Admin
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('admin') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Admin
+                </a>
+               </div>
+        </div>
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Institute
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('institute-admin') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Institutes Admins
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('institute-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; List institute
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('institute-for-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Institute_for
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('board-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Board
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('class-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Class
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('medium-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Medium
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('standard-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Standard
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('stream-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Stream
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('subject-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Subject
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('do-business-with-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Do_business_with
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Banner
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Banner-size
+                </a>
+                <a href="{{ url('banner-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; banner
+                </a>
+                
+            </div>
+        </div>
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Category
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Video Category
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Announcement
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('announcement-create-new') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; announcement
+                </a>
+            </div>
+        </div>
+        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+                <i class="fas fa-graduation-cap"></i>&nbsp; Video Time Limit
+            </a>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('video-time-limit') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Video Time Limit
+                </a>
+            </div>
+        </div>
         <div class="dashboard-nav-dropdown" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
                 <i class="fas fa-graduation-cap"></i>&nbsp; Access Control
