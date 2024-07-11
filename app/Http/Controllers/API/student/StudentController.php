@@ -1118,7 +1118,10 @@ class StudentController extends Controller
                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
                 }
 
-                $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+                $stdetail = Student_detail::where('institute_id', $institute_id)
+                ->where('student_id', $user_id)
+                ->whereNull('deleted_at')
+                ->first();
                 // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $tdasy = date('Y-m-d');
