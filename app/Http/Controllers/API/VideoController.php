@@ -103,7 +103,7 @@ class VideoController extends Controller
                 if ($request->parent_category_id == '1') {
                     // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                    $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileName);
+                    $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/videos", $fileName);
                      //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
@@ -115,8 +115,8 @@ class VideoController extends Controller
                     if (implode(',', $extensions) == 'pdf') {
                         // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                         $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                        $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileName);
-
+                        $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/pdfs", $fileName);
+                          
                         //s3 bucket
                         // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                         // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/pdfs", $request->file('topic_video_pdf'), $filename);
