@@ -91,13 +91,9 @@
 
                     <td>
                       <div class="d-flex">
-                        @canButton('edit', 'Stream')
                         <input type="submit" class="btn text-white btn-rmv2 stream_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        @endCanButton
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Stream')
                         <input type="submit" class="btn btn-danger stream_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp

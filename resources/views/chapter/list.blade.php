@@ -81,14 +81,10 @@
                     <td>
                       <div class="d-flex align-items-center">
                         <div class="d-flex">
-                          @canButton('edit', 'Chapter')
                           <a href="{{url('chapter/edit/'.$value->id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
-                          @endCanButton
-                        
+                         
                           &nbsp;&nbsp;
-                          @canButton('delete', 'Chapter')
                           <input type="submit" class="btn btn-danger chapter_delete" data-user-id="{{$value->id}}" value="Delete">
-                          @endCanButton
                         </div>
                       </div>
                     </td>

@@ -107,14 +107,10 @@
                     <td>
                       <div class="d-flex">
 
-                        @canButton('edit', 'Institute_for')
                         <input type="button" class="btn text-white btn-rmv2 institute_for_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        @endCanButton
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Institute_for')
                         <input type="submit" class="btn btn-danger institute_for_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                        @endCanButton
-                      </div>
+                       </div>
                   </tr>
                   @php $i++ @endphp
                   @endforeach
