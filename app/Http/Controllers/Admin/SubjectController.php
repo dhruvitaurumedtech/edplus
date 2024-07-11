@@ -36,7 +36,7 @@ class SubjectController extends Controller
 
         $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
             ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
-            ->where('base_table.status', 'active')->get();
+            ->get();
 
 
 
@@ -235,6 +235,7 @@ class SubjectController extends Controller
         // $exists = $query->count();
 
         // if ($exists <= 0) {
+        // echo"<pre>";print_r($request->all());exit;
         $subject_model = Base_table::where('id', $request->id)
             ->update([
                 'institute_for' => $request->institute_for,
@@ -260,6 +261,7 @@ class SubjectController extends Controller
             }
             $subject_id = $request->subject_id;
             $subject_id_value = isset($subject_id[$i]) ? $subject_id[$i] : null;
+            
             Subject_model::updateOrCreate(
                 ['id' => $subject_id_value],
                 [

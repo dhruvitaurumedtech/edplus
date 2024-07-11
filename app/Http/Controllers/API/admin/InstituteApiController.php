@@ -6009,31 +6009,24 @@ class InstituteApiController extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $standard_ids = explode(',', $request->standard_id);
 
-            // if (count($batch_ids) !== count($subject_ids)) {
-            //     return $this->response([], 'Mismatch between batch IDs and subject IDs', false, 400);
-            // }
-            // print_r($role_type);exit;
             $teacher_Explode = explode(',', $request->teacher_detail_id);
             foreach ($teacher_Explode as $index => $teacher_detail_id) {
-                // echo $teacher_detail_id;
                 $teacherDetail = Teacher_model::where('id', $teacher_detail_id);
-
+                
                 if ($teacherDetail) {
-                    // Update the existing teacher detail record
                     $teacherDetail->update([
                         'board_id' => $board_ids[$index],
                         'medium_id' => $medium_ids[$index],
                         'standard_id' => $standard_ids[$index],
-                        'batch_id' => $batch_ids[$index],
+                        'batch_id' => isset($batch_ids[$index]) ? $batch_ids[$index] : null,
                         'subject_id' => $subject_ids[$index],
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
                     ]);
                 }
+                // print_r($request->all());exit;
                 $teacherDetail = User::where('id', $request->teacher_id);
-
                 if ($teacherDetail) {
-                    // Update the existing teacher detail record
                     $teacherDetail->update([
                         'firstname' => $request->firstname,
                         'lastname' => $request->lastname,
@@ -6043,61 +6036,8 @@ class InstituteApiController extends Controller
                         'employee_type' => $request->employee_type,
                     ]);
                 }
+                
             }
-            //     $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->get();
-
-            //     foreach ($subject as $value) {
-            // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-            //     ->select('*')->get()->toarray();
-            // foreach (explode(',', $request->batch_id) as $batchId) {
-            //     Batch_assign_teacher_model::firstOrCreate([
-            //         'teacher_id' => $request->teacher_id,
-            //         'batch_id' => $batchId,
-            //     ]);
-            // }
-            // $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
-            // foreach ($base_table_response as $value2) {
-            // if (is_array($request->subject_id)) {
-            //     $subject = implode(',', $request->subject_id);
-            // } else {
-            //     $subject = $request->subject_id;
-            // }
-
-            // $teacher_detail = Teacher_model::where('teacher_id', $request->teacher_id)
-            //     ->where('institute_id', $request->institute_id);
-            // $teacher_detail->update([
-            //     'institute_id' => $request->institute_id,
-            //     'teacher_id' => $request->teacher_id,
-            //     'institute_for_id' => $value2['institute_for'],
-            //     'board_id' => $value2['board'],
-            //     'medium_id' => $value2['medium'],
-            //     'class_id' => $value2['institute_for_class'],
-            //     'standard_id' => $value2['standard'],
-            //     'stream_id' => $value2['stream'],
-            //     'subject_id' => $subject,
-            //     'status' => '1',
-            // ]);
-            // $teacherDetail = Teacher_model::where('teacher_id', $request->teacher_id)
-            //     ->where('institute_id', $request->institute_id);
-            //     // ->first(); // Use first() to get a single model instance
-
-            //     // if ($teacherDetail) {
-            //         foreach(explode(',',$request->subject_id) as $subject_id) {
-            //             $teacherDetail->update([
-            //                 'institute_id' => $request->institute_id,
-            //                 'teacher_id' => $request->teacher_id,
-            //                 'institute_for_id' => $value2['institute_for'],
-            //                 'board_id' => $value2['board'],
-            //                 'medium_id' => $value2['medium'],
-            //                 'class_id' => $value2['institute_for_class'],
-            //                 'standard_id' => $value2['standard'],
-            //                 'stream_id' => $value2['stream'],
-            //                 'subject_id' => $subject_id,
-            //                 'status' => '1',
-            //             ]);
-            //         }
-
-
             User::where('id', $request->teacher_id)->update([
                 'firstname' => $request->firstname,
                 'lastname' => $request->lastname,
@@ -6107,7 +6047,7 @@ class InstituteApiController extends Controller
                 'employee_type' => $request->employee_type,
                 'qualification' => $request->qualification,
             ]);
-            $serverKey = env('SERVER_KEY');
+             $serverKey = env('SERVER_KEY');
 
             $url = "https://fcm.googleapis.com/fcm/send";
             $users = User::where('id', $request->teacher_id)->pluck('device_key');
@@ -6442,7 +6382,7 @@ class InstituteApiController extends Controller
                     ->where('batch_id', $request->batch_id)
                     ->pluck('subject_id');
             }
-            $subject_list = Subject_model::whereIn('id', $subjectids)->get();
+            $subject_list = Subject_model::whereIn('id', $subjectids)->where('status','active')->get();
             $data = [];
             foreach ($subject_list as $value) {
                 $data[] = [
