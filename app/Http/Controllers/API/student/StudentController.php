@@ -1169,12 +1169,14 @@ class StudentController extends Controller
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->where('attendance', 'P')->count();
 
             $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->where('attendance', 'A')->count();
 
             //    echo $getstdntdata->subject_id;exit;
