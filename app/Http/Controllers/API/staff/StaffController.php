@@ -301,7 +301,6 @@ class StaffController extends Controller
                     ];
                 }
             }
-
             DB::table('role_has_permissions')->insert($permissions);
             DB::commit();
             return $this->response([], "Permissions updated successfully.", true, 200);

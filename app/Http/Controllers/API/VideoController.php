@@ -52,18 +52,24 @@ class VideoController extends Controller
         $institute_name=Institute_detail::where('id',$request->input('institute_id'))->first();
         $base_table = Base_table::where('id',$request->base_table_id)->first();
         $ins_name=$institute_name->institute_name;
+        $ins_name_without_spaces = str_replace(' ', '', $ins_name);
         $board = board::where('id',$base_table->board)->first();
         $board_name = $board->name;
+        $board_name_without_spaces = str_replace(' ', '', $board_name);
         $medium = Medium_model::where('id',$base_table->medium)->first();
         $medium_name = $medium->name;
+        $medium_name_without_spaces = str_replace(' ', '', $medium_name);
         $class = Class_model::where('id',$base_table->institute_for_class)->first();
         $class_name = $class->name;
+        $class_name_without_spaces = str_replace(' ', '', $class_name);
         $standard = Standard_model::where('id',$base_table->standard)->first();
         $standard_name = $standard->name;
+        $standard_name_without_spaces = str_replace(' ', '', $standard_name);
         $subject = Subject_model::where('id',$request->subject_id)->first();
         $subject_name = $subject->name;
+        $subject_name_without_spaces = str_replace(' ', '', $subject_name);
          
-        $dynamicPath = "$ins_name/$board_name/$medium_name/$class_name/$standard_name/$subject_name";
+        $dynamicPath = "$ins_name_without_spaces/$board_name_without_spaces/$medium_name_without_spaces/$class_name_without_spaces/$standard_name_without_spaces/$subject_name_without_spaces";
         if (!Storage::exists("public/$dynamicPath")) {
             Storage::makeDirectory("public/$dynamicPath", 0775, true);
         }
@@ -97,7 +103,7 @@ class VideoController extends Controller
                 if ($request->parent_category_id == '1') {
                     // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                    $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileName);
+                    $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/videos", $fileName);
                      //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
@@ -109,8 +115,8 @@ class VideoController extends Controller
                     if (implode(',', $extensions) == 'pdf') {
                         // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                         $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                        $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileName);
-
+                        $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/pdfs", $fileName);
+                          
                         //s3 bucket
                         // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                         // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/pdfs", $request->file('topic_video_pdf'), $filename);
