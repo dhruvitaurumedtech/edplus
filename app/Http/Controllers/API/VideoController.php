@@ -104,7 +104,7 @@ class VideoController extends Controller
                     // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
                     $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/videos", $fileName);
-                     //s3 bucket
+                    //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
 
