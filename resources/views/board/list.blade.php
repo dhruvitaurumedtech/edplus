@@ -74,10 +74,6 @@
                   <i class="fas fa-search"></i>
                 </div>
               </form>
-              <!-- @canButton('add', 'Board')
-              <a href="{{url('board-create')}}" class="btn btn-success" style="float: right;">Create Board </a>
-              @endCanButton -->
-              <!-- /.card-header -->
               <table class="table table-js table-bordered table-responsive mt-4">
                 <thead>
                   <tr>
@@ -106,13 +102,9 @@
                     </td>
                     <td>
                       <div class="d-flex">
-                        @canButton('edit', 'Board')
                         <input type="submit" class="btn text-white btn-rmv2 board_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        @endCanButton
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Board')
                         <input type="submit" class="btn btn-danger board_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp

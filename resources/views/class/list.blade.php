@@ -98,13 +98,9 @@
 
                     <td>
                       <div class="d-flex">
-                        @canButton('edit', 'Class')
                         <input type="submit" class="btn text-white btn-rmv2 class_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        @endCanButton
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Class')
                         <input type="submit" class="btn btn-danger class_deletebutton" data-user-id="{{ $value->id }}" value="Delete">
-                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp

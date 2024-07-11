@@ -65,20 +65,16 @@
                     <td>{{$value->role_name}}</td>
                     <td>
                       <div class="d-flex">
-                        @canButton('edit', 'Role')
                         <input type="submit" class="btn text-white btn-rmv2 role_editButton" data-role-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
-                        @endCanButton
                         <form method="get" action="{{url('permission')}}">
                           @csrf
                           <input type="hidden" value="{{ $value->id }}" name="id">
                           <input type="submit" class="btn btn-success" value="Permission">
                         </form>
                         &nbsp;&nbsp;
-                        @canButton('delete', 'Role')
                         @if($value->id !='1')
                         <input type="submit" class="btn btn-danger role_deletebutton" data-role-id="{{ $value->id }}" value="Delete">
                         @endif
-                        @endCanButton
                       </div>
                   </tr>
                   @php $i++ @endphp

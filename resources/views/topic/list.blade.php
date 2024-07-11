@@ -24,9 +24,7 @@
             <h4 class="card-title">Chapter</h4>
             <div class="inner-list-search">
               <input type="search" class="form-control myInput" name="search" placeholder="Search">
-              @canButton('add', 'List institute')
               <a href="{{url('create/topic')}}" class="btn text-white btn-rmv2" style="float: right;">Create Topic</a>
-              @endCanButton
             </div>
             <table class="table table-js table-bordered table-responsive">
               <thead>
@@ -55,15 +53,9 @@
                     {{$value->chapter_name}}
                   </td>
                   <td>
-                    @canButton('edit', 'Topic')
                     <input type="submit" class="btn text-white blue-button editButton" data-user-id="{{ $sbvalue->id }}" value="Edit">&nbsp;&nbsp;
-                    @endCanButton
-                    @canButton('view', 'Topic')
                     <input type="submit" class="btn btn-primary viewButton" data-subject-id="{{ $value->subject_id }}" data-base-id="{{ $value->base_id }}" data-chapter-id="{{$value->chapter_id}}" value="View">&nbsp;&nbsp;
-                    @endCanButton
-                    @canButton('delete', 'Topic')
                     <input type="submit" class="btn btn-danger deletebutton" data-user-id="{{ $sbvalue->id }}" value="Delete">
-                    @endCanButton
                   </td>
                 </tr>
                 @php $i++ @endphp

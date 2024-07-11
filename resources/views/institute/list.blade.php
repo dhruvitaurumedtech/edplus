@@ -29,10 +29,8 @@
               </h4>
               <div class="inner-list-search">
                 <input type="search" class="form-control myInput" name="search" placeholder="Search">
-                @canButton('add', 'Role')
                 <a href="{{url('create/admin')}}" class="btn text-white btn-rmv2" style="float: right;">Create Institute Admin</a>
-                @endCanButton
-
+               
               </div>
               <table class="table table-js table-bordered institute-table mt-4">
                 <thead>
