@@ -522,7 +522,7 @@ class TeacherController extends Controller
                 ->Where('institute_id', $institute_id)
                 //->Where('user_id', $teacher_id)
                 ->paginate(10);
-
+    
             if ($bannerss->isEmpty()) {
                 $banners = Banner_model::where('status', 'active')
                     ->Where('user_id', '1')
@@ -546,15 +546,15 @@ class TeacherController extends Controller
 
             $user_id = Auth::id();
             $today = date('Y-m-d');
-            
-            $batchesid = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
+                       
+            $batchesid = Batches_model::where('institute_id',$request->institute_id)->pluck('id')->toarray();
             $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('time_table.teacher_id', $user_id)
-                ->where('time_table.batch_id', $batchesid)
+                ->whereIn('time_table.batch_id', $batchesid)
                 ->where('time_table.lecture_date', $today)
                 ->select(
                     'subject.name as subject',
@@ -570,7 +570,7 @@ class TeacherController extends Controller
                 ->orderBy('time_table.start_time', 'asc')
                 //->paginate(2);
                 ->get();
-
+           
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
