@@ -110,7 +110,7 @@
 
       <nav class="mt-2">
         <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
-          @php $menu = getDynamicMenu() @endphp
+          <!-- @php $menu = getDynamicMenu() @endphp
 
           @foreach($menu as $value)
           <li class="nav-item {{ isActiveMenu($value) }}">
@@ -143,7 +143,7 @@
           function isActiveLink($url) {
           return request()->is($url) ? 'active' : '';
           }
-          @endphp
+          @endphp -->
 
 
 
