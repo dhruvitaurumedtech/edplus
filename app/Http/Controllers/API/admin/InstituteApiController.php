@@ -6433,6 +6433,9 @@ class InstituteApiController extends Controller
         }
         try {
             $subjects = Batches_model::where('id', $request->batch_id)->first();
+            if(empty($subjects)){
+                return $this->response([], "Fetch successfully.");
+            }
             $subjectids = explode(',', $subjects->subjects);
             if ($request->date) {
                 $subjectids = Timetable::where('lecture_date', $request->date)
