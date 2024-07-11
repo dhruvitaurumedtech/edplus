@@ -118,7 +118,8 @@ class StudentController extends Controller
             }
 
             //requested institute
-            $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
+            $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+            ->where('students_details.status', '!=', '1')
                 ->where('students_details.student_id', $user_id)
                 ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
                 ->orderByDesc('institute_detail.created_at')
@@ -3070,6 +3071,7 @@ class StudentController extends Controller
                     ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                     ->where('time_table.batch_id', $stdntdata->batch_id)
                     ->where('time_table.lecture_date', $request->date)
+                    ->whereIN('time_table.subject_id', explode(",",$stdntdata->subject_id))
                     ->select(
                         'subject.name as subject',
                         'users.firstname',
