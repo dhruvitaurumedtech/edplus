@@ -104,6 +104,7 @@ class VideoController extends Controller
                     // $path = $request->file('topic_video_pdf')->store("public/$dynamicPath", 'public');
                     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
                     $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/videos", $fileName);
+                    $pathvideo=Storage::url("$dynamicPath/videos/$fileName");
                      //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
@@ -143,7 +144,7 @@ class VideoController extends Controller
             $videoupld->topic_description = $request->input('topic_description');
             $videoupld->topic_name = $request->input('topic_name');
             $videoupld->video_category_id = $request->input('category_id');
-            $videoupld->topic_video = isset($path) ? asset($path) : null;//Storage::disk('s3')->url($path)
+            $videoupld->topic_video = isset($pathvideo) ? asset($pathvideo) : null;//Storage::disk('s3')->url($path)
             $videoupld->created_by = ($request->user_id)? $request->user_id:'';
             $videoupld->save();   
             // $topic = Topic_model::create([
