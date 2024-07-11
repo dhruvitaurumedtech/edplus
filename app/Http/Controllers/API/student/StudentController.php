@@ -118,7 +118,8 @@ class StudentController extends Controller
             }
 
             //requested institute
-            $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')->where('students_details.status', '!=', '1')
+            $requestnstitute = Student_detail::join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+            ->where('students_details.status', '!=', '1')
                 ->where('students_details.student_id', $user_id)
                 ->select('institute_detail.*', 'students_details.status as sstatus', 'students_details.student_id')
                 ->orderByDesc('institute_detail.created_at')
@@ -1117,7 +1118,10 @@ class StudentController extends Controller
                     $subjects[] = array('id' => $subjcdt->id, 'name' => $subjcdt->name, 'image' => $img);
                 }
 
-                $stdetail = Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first();
+                $stdetail = Student_detail::where('institute_id', $institute_id)
+                ->where('student_id', $user_id)
+                ->whereNull('deleted_at')
+                ->first();
                 // echo $stdetail;exit;
                 $subjectIds = explode(',', $stdetail->subject_id);
                 $tdasy = date('Y-m-d');
@@ -1168,12 +1172,14 @@ class StudentController extends Controller
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->where('attendance', 'P')->count();
 
             $totalmissattlec = Attendance_model::where('institute_id', $institute_id)
                 ->where('student_id', $user_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
+                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))
                 ->where('attendance', 'A')->count();
 
             //    echo $getstdntdata->subject_id;exit;
@@ -3070,6 +3076,7 @@ class StudentController extends Controller
                     ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                     ->where('time_table.batch_id', $stdntdata->batch_id)
                     ->where('time_table.lecture_date', $request->date)
+                    ->whereIN('time_table.subject_id', explode(",",$stdntdata->subject_id))
                     ->select(
                         'subject.name as subject',
                         'users.firstname',
