@@ -997,7 +997,7 @@ class TeacherController extends Controller
                     'institute_id' => $user_list->institute_id,
                     'first_name' => $user_list->firstname,
                     'last_name' => $user_list->lastname,
-                    'date_of_birth' => date('d-m-Y', strtotime($user_list->dob)),
+                    'date_of_birth' => !empty($user_list->dob) ? date('d-m-Y', strtotime($user_list->dob)) : '',
                     'address' => $user_list->address,
                     'email' => $user_list->email,
                     'employee_type'=> $user_list->employee_type,
