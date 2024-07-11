@@ -76,10 +76,21 @@ class ProductAndInventoryController extends Controller
             ->where('status','1')
             ->select('id', 'name')
             ->get();
-            // $addinventory = Products_inventory::where('status','1');
-            // $assigninventory = Products_inventory::where('status','2');
-            // $availableqty = $addinventory - $assigninventory;
-            return $this->response($products, "Products List.");
+            $productsList = [];
+            foreach($products as $prdt){
+                $addinventory = Products_inventory::where('status','1')
+                ->where('product_id',$prdt->id)->sum('quantity');
+                
+                $assigninventory = Products_inventory::where('status','2')
+                ->where('product_id',$prdt->id)->sum('quantity');
+                $availableqty = $addinventory - $assigninventory;
+
+                $productsList[] = ['id'=>$prdt->id,
+                'name'=>$prdt->name,
+                'available'=>$availableqty];
+            }
+            
+            return $this->response($productsList, "Products List.");
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         } 

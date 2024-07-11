@@ -328,6 +328,7 @@ class ParentsController extends Controller
             ->join('subject', 'subject.id', '=', 'exam.subject_id')
             ->where('marks.student_id', $request->child_id)
             ->where('exam.institute_id', $getstdntdata->institute_id)
+            ->whereIN('exam.subject_id', explode(",",$getstdntdata->subject_id))
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
             ->orderByDesc('marks.created_at')
             //->limit(3) I remove this on Parin's request
@@ -358,6 +359,7 @@ class ParentsController extends Controller
             ->where('student_id', $getstdntdata->student_id)
             ->where('created_at', 'like', '%' . $cumnth . '%')
             ->where('created_at', '<', $nextDayStr)
+            ->whereIN('subject_id', explode(",",$getstdntdata->subject_id))
             ->where('attendance', 'P')->count();
             
             
@@ -365,6 +367,7 @@ class ParentsController extends Controller
                 ->where('student_id', $getstdntdata->student_id)
                 ->where('created_at', 'like', '%' . $cumnth . '%')
                 ->where('created_at', '<', $nextDayStr)
+                ->whereIN('subject_id', explode(",",$getstdntdata->subject_id))
                 ->where('attendance', 'A')
                 ->count();
 

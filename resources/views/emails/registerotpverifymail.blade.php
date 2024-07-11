@@ -29,7 +29,7 @@ Hey {{$name}},
 
 <p>Verification Code: {{$token}}</p>
 
-<p>Please enter this code in the verification section of your account settings to activate your account. If you didn’t sign up for [Your Platform], you can ignore this email.</p>
+<p>Please enter this code in the verification section of your account settings to activate your account. If you didn’t sign up for Edwide, you can ignore this email.</p>
 
 <p>Thank you for choosing EdWide!</p>
 
