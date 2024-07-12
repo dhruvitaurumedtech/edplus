@@ -312,8 +312,8 @@ class General_timetableController extends Controller
                 $groupedData[$class_room]['sub_data'][] = [
                     'id' => $timtable->id,
                     'day' => $timtable->repeat,
-                    'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
-                    'end_time' => $this->convertTo12HourFormat($timtable->end_time),
+                    'start_time' =>$timtable->lecture_date.' '. $this->convertTo12HourFormat($timtable->start_time),
+                    'end_time' => $timtable->lecture_date.' '.$this->convertTo12HourFormat($timtable->end_time),
                     'subject_id' => $timtable->subject_id,
                     'subject' => $timtable->subject,
                     'lecture_type_id' => $timtable->lecture_type,
