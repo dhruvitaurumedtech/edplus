@@ -280,7 +280,16 @@ class AuthController extends Controller
 
             return $this->response($data, "Login successful");
         } else {
-            return $this->response([], "Invalid Username Or Password!", false, 400);
+            // return $this->response([], "Invalid Username Or Password!", false, 400);
+            $user = User::where('email', $request->email)->first();
+    
+            if (!$user) {
+                // Email does not exist
+                return $this->response([], "Invalid Email", false, 400);
+            } else {
+                // Email exists but password is incorrect
+                return $this->response([], "Invalid Password", false, 400);
+            }
         }
     }
 
