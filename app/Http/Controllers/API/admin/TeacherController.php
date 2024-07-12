@@ -595,8 +595,9 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            $teacher_data = Teacher_model::join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-                ->Join('board', 'board.id', '=', 'teacher_detail.board_id')
+            //  join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+                
+            $teacher_data = Teacher_model::Join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->where('teacher_detail.teacher_id', $teacher_id)
@@ -610,33 +611,46 @@ class TeacherController extends Controller
                     'standard.id',
                     'standard.name',
                     'medium.name',
-                    'batches.id',
-                    'batches.batch_name'
+                    'teacher_detail.batch_id',
+                    // 'batches.id',
+                    // 'batches.batch_name'
                 )
 
                 ->select(
                     // 'board.name as board_name',
                     'standard.id as standard_id',
-                    'batches.id as batch_id',
+                    // 'batches.id as batch_id',
+                    'teacher_detail.batch_id',
+                   
                     'standard.name as standard_name',
                     DB::raw('MAX(board.name) as board_name'),
-                    DB::raw('MAX(medium.name) as medium_name'),
-                    DB::raw('MAX(batches.batch_name) as batch_name')
+                    DB::raw('MAX(medium.name) as medium_name')
+                    // DB::raw('MAX(batches.batch_name) as batch_name'
+                    // )
                 )
                 ->get()
                 ->toArray();
+                // print_r($teacher_data);exit;
+                 
+                   
 
             $teacher_response = [];
             foreach ($teacher_data as $value) {
-                $teacher_response[] = [
-                    'board' => $value['board_name'],
-                    'standard_id' => $value['standard_id'],
-                    'standard' => $value['standard_name'],
-                    'medium' => $value['medium_name'],
-                    'batch_id' =>$value['batch_id'],
-                    'batch' => $value['batch_name']
 
-                ];
+                $batchIds = explode(',', $value['batch_id']);
+                $batches_Data = Batches_model::whereIn('id', $batchIds)->groupBy('id')->get();
+                    
+
+                foreach ($batches_Data as $batch) {
+                    $teacher_response[] = [
+                        'board' => $value['board_name'],
+                        'standard_id' => $value['standard_id'],
+                        'standard' => $value['standard_name'],
+                        'medium' => $value['medium_name'],
+                        'batch_id' => $batch->id,
+                        'batch' => $batch->batch_name
+                    ];
+                }
             }
             $studentdata = array(
                 'banners_data' => $banners_data,
