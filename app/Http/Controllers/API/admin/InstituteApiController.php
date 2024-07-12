@@ -6128,20 +6128,20 @@ class InstituteApiController extends Controller
         try {
             $teacher_detail = json_decode($request->teacher_detail, true);
             foreach($teacher_detail as $teacherDT){
-                $teacherDetail = Teacher_model::where('teacher_id', $teacherDT['teacher_detail_id']);
+                $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
                 if ($teacherDetail) {
                     $teacherDetail->update([
                         'board_id' => $teacherDT['board_id'],
                         'medium_id' => $teacherDT['medium_id'],
                         'standard_id' => $teacherDT['standard_id'],
-                        'batch_id' => isset($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                        'batch_id' => !empty($teacherDT['batch_id']) ? implode(",",$teacherDT['batch_id']) : null,
                         'subject_id' => $teacherDT['subject_id'],
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
                     ]);
                 }
                 // print_r($request->all());exit;
-                $teacherDetail = User::where('id', $request->teacher_id);
+                $teacherDetail = User::where('id', $request->teacher_id)->first();
                 if ($teacherDetail) {
                     $teacherDetail->update([
                         'firstname' => $request->firstname,
