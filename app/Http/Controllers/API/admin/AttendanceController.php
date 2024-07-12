@@ -96,10 +96,12 @@ class AttendanceController extends Controller
                             ->where('subject_id', $request->subject_id)
                             ->where('date', $attendanceDate)
                             ->count();
+                       
             
                 if ($attendance != 0) {
                     Attendance_model::where('institute_id', $request->institute_id)
                                     ->where('student_id', $student_id)
+                                    ->where('subject_id', $request->subject_id)
                                     ->where('date', $attendanceDate)
                                     ->update([
                                         'user_id' => auth()->user()->id,
