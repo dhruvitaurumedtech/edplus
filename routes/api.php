@@ -106,7 +106,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks')->middleware('check.permission:5,4');
     Route::post('/institute/institute-details', [InstituteApiController::class, 'institute_details'])->name('institute_details');
     Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
-    Route::post('/institute/approve-teacher', [InstituteApiController::class, 'approve_teacher2'])->middleware('check.permission:14,1');
+    Route::post('/institute/approve-teacher', [InstituteApiController::class, 'approve_teacher'])->middleware('check.permission:14,1');
 
     //new API
     Route::post('/institute/base-institute-for', [BasetableControllerAPI::class, 'institute_for']);

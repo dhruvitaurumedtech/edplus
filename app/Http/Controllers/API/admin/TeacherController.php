@@ -662,6 +662,7 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            $batchId = $request->batch_id;
             $teacher_details = DB::table('teacher_detail')
                 ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
                 ->join('board', 'board.id', '=', 'teacher_detail.board_id')
@@ -670,14 +671,17 @@ class TeacherController extends Controller
                 ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.standard_id', $request->standard_id)
-                ->where('teacher_detail.batch_id', $request->batch_id)
+                //->where('teacher_detail.batch_id', $request->batch_id)
+                ->where(function ($query) use ($batchId) {
+                    $query->whereRaw("FIND_IN_SET(?, teacher_detail.batch_id)", [$batchId]);
+                })
                 ->select('board.id as board_id',
                     'board.name as board_name',
                     'standard.id as standard_id',
                     'standard.name as standard_name',
                     'medium.id as medium_id',
                     'medium.name as medium_name',
-                    'teacher_detail.batch_id',
+                    'batches.id as batch_id',
                     'batches.batch_name',
                     'subject.id as subject_id',
                     'subject.name as subject_name',
