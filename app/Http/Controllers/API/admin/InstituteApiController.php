@@ -6098,6 +6098,125 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    
+    public function approve_teacher2(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required',
+            'institute_id' => 'required',
+            'firstname' => 'required|string',
+            'lastname' => 'required|string',
+            'email' => 'required|email',
+            'mobile' => 'required',
+            'country_code' => 'required',
+            'qualification' => 'required|string',
+            'employee_type' => 'required',
+            'teacher_detail' => 'required',
+            'teacher_detail.*.board_id' => 'required',
+            'teacher_detail.*.medium_id' => 'required',
+            'teacher_detail.*.standard_id' => 'required',
+            'teacher_detail.*.stream_id' => 'nullable',
+            'teacher_detail.*.batch_id' => 'required',
+            'teacher_detail.*.subject_id' => 'required',
+            'teacher_detail.*.teacher_detail_id' => 'required',
+        ]);
+        
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $teacher_detail = json_decode($request->teacher_detail, true);
+            foreach($teacher_detail as $teacherDT){
+                $teacherDetail = Teacher_model::where('teacher_id', $teacherDT['teacher_detail_id']);
+                if ($teacherDetail) {
+                    $teacherDetail->update([
+                        'board_id' => $teacherDT['board_id'],
+                        'medium_id' => $teacherDT['medium_id'],
+                        'standard_id' => $teacherDT['standard_id'],
+                        'batch_id' => isset($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                        'subject_id' => $teacherDT['subject_id'],
+                        'teacher_id' => $request->teacher_id,
+                        'status' => '1',
+                    ]);
+                }
+                // print_r($request->all());exit;
+                $teacherDetail = User::where('id', $request->teacher_id);
+                if ($teacherDetail) {
+                    $teacherDetail->update([
+                        'firstname' => $request->firstname,
+                        'lastname' => $request->lastname,
+                        'mobile' => $request->mobile,
+                        'country_code' => $request->country_code,
+                        'email' => $request->email,
+                        'qualification' => $request->qualification,
+                        'employee_type' => $request->employee_type,
+                    ]);
+                }
+            }
+
+            User::where('id', $request->teacher_id)->update([
+                'firstname' => $request->firstname,
+                'lastname' => $request->lastname,
+                // 'address' => $request->address,
+                'email' => $request->email,
+                'country_code' => $request->country_code,
+                'mobile' => $request->mobile,
+                'employee_type' => $request->employee_type,
+                'qualification' => $request->qualification,
+            ]);
+             $serverKey = env('SERVER_KEY');
+
+            $url = "https://fcm.googleapis.com/fcm/send";
+            $users = User::where('id', $request->teacher_id)->pluck('device_key');
+
+            $notificationTitle = "Your Request Approved successfully!!";
+            $notificationBody = "Your Teacher Request Approved successfully!!";
+
+            $data = [
+                'registration_ids' => $users,
+                'notification' => [
+                    'title' => $notificationTitle,
+                    'body' => $notificationBody,
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                ],
+            ];
+
+            if ($users->isNotEmpty()) {
+                $json = json_encode($data);
+
+                $headers = [
+                    'Content-Type: application/json',
+                    'Authorization: key=' . $serverKey
+                ];
+
+                $ch = curl_init();
+                curl_setopt_array($ch, [
+                    CURLOPT_URL => $url,
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'POST',
+                    CURLOPT_POSTFIELDS => $json,
+                    CURLOPT_HTTPHEADER => $headers,
+                ]);
+
+                $result = curl_exec($ch);
+
+                if ($result === FALSE) {
+                }
+
+                curl_close($ch);
+            }
+            return $this->response([], "Teacher Assign successfully");
+        } catch (\Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+
     public function fetch_teacher_list(Request $request)
     {
         $validator = Validator::make($request->all(), [
