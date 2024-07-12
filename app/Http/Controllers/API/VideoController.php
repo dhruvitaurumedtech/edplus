@@ -107,8 +107,7 @@ class VideoController extends Controller
                     //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
-
-
+                    
 
 
                 } elseif ($request->parent_category_id == '3') {

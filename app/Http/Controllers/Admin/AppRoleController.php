@@ -131,6 +131,7 @@ class AppRoleController extends Controller
 
         // Insert new permissions
         $permissions = $request->input('permissions');
+        // print_r($permissions);exit;
         $data = [];
 
         foreach ($permissions as $permission) {
