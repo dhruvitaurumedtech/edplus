@@ -715,7 +715,8 @@ class TeacherController extends Controller
                 'subject_list' => []
             ];
             foreach ($teacher_details as $detail) {
-                $batchesDT = Batches_model::where('id',$detail->batch_id)->first();
+                
+                $batchesDT = Batches_model::where('id',$batchId)->first();
                 $result['board_id'] = $detail->board_id;
                 $result['board_name'] = $detail->board_name;
                 $result['standard_id'] = $detail->standard_id;
