@@ -664,7 +664,7 @@ class TeacherController extends Controller
         try {
             $batchId = $request->batch_id;
             $teacher_details = DB::table('teacher_detail')
-                ->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
+                //->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
                 ->join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
@@ -681,8 +681,8 @@ class TeacherController extends Controller
                     'standard.name as standard_name',
                     'medium.id as medium_id',
                     'medium.name as medium_name',
-                    'batches.id as batch_id',
-                    'batches.batch_name',
+                    // 'batches.id as batch_id',
+                    // 'batches.batch_name',
                     'subject.id as subject_id',
                     'subject.name as subject_name',
                     'subject.image as subject_image')
@@ -701,14 +701,15 @@ class TeacherController extends Controller
                 'subject_list' => []
             ];
             foreach ($teacher_details as $detail) {
+                $batchesDT = Batches_model::where('id',$detail->batch_id)->first();
                 $result['board_id'] = $detail->board_id;
                 $result['board_name'] = $detail->board_name;
                 $result['standard_id'] = $detail->standard_id;
                 $result['standard_name'] = $detail->standard_name;
                 $result['medium_id'] = $detail->medium_id;
                 $result['medium_name'] = $detail->medium_name;
-                $result['batch_id'] = $detail->batch_id;
-                $result['batch_name'] = $detail->batch_name;
+                $result['batch_id'] = $batchesDT->id;
+                $result['batch_name'] = $batchesDT->batch_name;
 
                 $result['subject_list'][] = [
                     'id' => $detail->subject_id,
