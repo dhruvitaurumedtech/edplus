@@ -2523,7 +2523,6 @@ class InstituteApiController extends Controller
                     ->leftjoin('stream', 'stream.id', '=', 'batches.stream_id')
                     ->where('batches.institute_id', $institute_id)
                     ->where('batches.standard_id', $standard_value->id)
-                    //->where('batches.user_id', $user_id)
                     ->select('batches.*', 'board.name as board', 'medium.name as medium', 'stream.name as stream')->get();
                 $batchesDT = [];
                 foreach ($batchqY as $batDT) {
@@ -6178,7 +6177,7 @@ class InstituteApiController extends Controller
                 'notification' => [
                     'title' => $notificationTitle,
                     'body' => $notificationBody,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', 
                 ],
             ];
 
