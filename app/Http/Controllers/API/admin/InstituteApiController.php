@@ -5979,124 +5979,124 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function approve_teacher(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'teacher_detail_id' => 'required',
-            'firstname' => 'required',
-            'lastname' => 'required',
-            'mobile' => 'required',
-            'email' => 'required',
-            'qualification' => 'required',
-            'employee_type' => 'required',
-            'board_id' => 'required',
-            'medium_id' => 'required',
-            'standard_id' => 'required',
-            'batch_id' => 'required',
-            // 'stream_id' => 'required',
-            'subject_id' => 'required',
-            'teacher_id' => 'required',
-        ]);
+    // public function approve_teacher(Request $request)
+    // {
+    //     $validator = Validator::make($request->all(), [
+    //         'teacher_detail_id' => 'required',
+    //         'firstname' => 'required',
+    //         'lastname' => 'required',
+    //         'mobile' => 'required',
+    //         'email' => 'required',
+    //         'qualification' => 'required',
+    //         'employee_type' => 'required',
+    //         'board_id' => 'required',
+    //         'medium_id' => 'required',
+    //         'standard_id' => 'required',
+    //         'batch_id' => 'required',
+    //         // 'stream_id' => 'required',
+    //         'subject_id' => 'required',
+    //         'teacher_id' => 'required',
+    //     ]);
 
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
-        try {
-            $batch_ids = explode(',', $request->batch_id);
-            $subject_ids = explode(',', $request->subject_id);
-            $board_ids = explode(',', $request->board_id);
-            $medium_ids = explode(',', $request->medium_id);
-            $standard_ids = explode(',', $request->standard_id);
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
+    //     try {
+    //         $batch_ids = explode(',', $request->batch_id);
+    //         $subject_ids = explode(',', $request->subject_id);
+    //         $board_ids = explode(',', $request->board_id);
+    //         $medium_ids = explode(',', $request->medium_id);
+    //         $standard_ids = explode(',', $request->standard_id);
 
-            $teacher_Explode = explode(',', $request->teacher_detail_id);
-            foreach ($teacher_Explode as $index => $teacher_detail_id) {
-                $teacherDetail = Teacher_model::where('id', $teacher_detail_id);
+    //         $teacher_Explode = explode(',', $request->teacher_detail_id);
+    //         foreach ($teacher_Explode as $index => $teacher_detail_id) {
+    //             $teacherDetail = Teacher_model::where('id', $teacher_detail_id);
                 
-                if ($teacherDetail) {
-                    $teacherDetail->update([
-                        'board_id' => $board_ids[$index],
-                        'medium_id' => $medium_ids[$index],
-                        'standard_id' => $standard_ids[$index],
-                        'batch_id' => isset($batch_ids[$index]) ? $batch_ids[$index] : null,
-                        'subject_id' => $subject_ids[$index],
-                        'teacher_id' => $request->teacher_id,
-                        'status' => '1',
-                    ]);
-                }
-                // print_r($request->all());exit;
-                $teacherDetail = User::where('id', $request->teacher_id);
-                if ($teacherDetail) {
-                    $teacherDetail->update([
-                        'firstname' => $request->firstname,
-                        'lastname' => $request->lastname,
-                        'mobile' => $request->mobile,
-                        'email' => $request->email,
-                        'qualification' => $request->qualification,
-                        'employee_type' => $request->employee_type,
-                    ]);
-                }
+    //             if ($teacherDetail) {
+    //                 $teacherDetail->update([
+    //                     'board_id' => $board_ids[$index],
+    //                     'medium_id' => $medium_ids[$index],
+    //                     'standard_id' => $standard_ids[$index],
+    //                     'batch_id' => isset($batch_ids[$index]) ? $batch_ids[$index] : null,
+    //                     'subject_id' => $subject_ids[$index],
+    //                     'teacher_id' => $request->teacher_id,
+    //                     'status' => '1',
+    //                 ]);
+    //             }
+    //             // print_r($request->all());exit;
+    //             $teacherDetail = User::where('id', $request->teacher_id);
+    //             if ($teacherDetail) {
+    //                 $teacherDetail->update([
+    //                     'firstname' => $request->firstname,
+    //                     'lastname' => $request->lastname,
+    //                     'mobile' => $request->mobile,
+    //                     'email' => $request->email,
+    //                     'qualification' => $request->qualification,
+    //                     'employee_type' => $request->employee_type,
+    //                 ]);
+    //             }
                 
-            }
-            User::where('id', $request->teacher_id)->update([
-                'firstname' => $request->firstname,
-                'lastname' => $request->lastname,
-                // 'address' => $request->address,
-                'email' => $request->email,
-                'mobile' => $request->mobile,
-                'employee_type' => $request->employee_type,
-                'qualification' => $request->qualification,
-            ]);
-             $serverKey = env('SERVER_KEY');
+    //         }
+    //         User::where('id', $request->teacher_id)->update([
+    //             'firstname' => $request->firstname,
+    //             'lastname' => $request->lastname,
+    //             // 'address' => $request->address,
+    //             'email' => $request->email,
+    //             'mobile' => $request->mobile,
+    //             'employee_type' => $request->employee_type,
+    //             'qualification' => $request->qualification,
+    //         ]);
+    //          $serverKey = env('SERVER_KEY');
 
-            $url = "https://fcm.googleapis.com/fcm/send";
-            $users = User::where('id', $request->teacher_id)->pluck('device_key');
+    //         $url = "https://fcm.googleapis.com/fcm/send";
+    //         $users = User::where('id', $request->teacher_id)->pluck('device_key');
 
-            $notificationTitle = "Your Request Approved successfully!!";
-            $notificationBody = "Your Teacher Request Approved successfully!!";
+    //         $notificationTitle = "Your Request Approved successfully!!";
+    //         $notificationBody = "Your Teacher Request Approved successfully!!";
 
-            $data = [
-                'registration_ids' => $users,
-                'notification' => [
-                    'title' => $notificationTitle,
-                    'body' => $notificationBody,
-                    'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
-                ],
-            ];
+    //         $data = [
+    //             'registration_ids' => $users,
+    //             'notification' => [
+    //                 'title' => $notificationTitle,
+    //                 'body' => $notificationBody,
+    //                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK', // Adjust this if needed
+    //             ],
+    //         ];
 
-            if ($users->isNotEmpty()) {
-                $json = json_encode($data);
+    //         if ($users->isNotEmpty()) {
+    //             $json = json_encode($data);
 
-                $headers = [
-                    'Content-Type: application/json',
-                    'Authorization: key=' . $serverKey
-                ];
+    //             $headers = [
+    //                 'Content-Type: application/json',
+    //                 'Authorization: key=' . $serverKey
+    //             ];
 
-                $ch = curl_init();
-                curl_setopt_array($ch, [
-                    CURLOPT_URL => $url,
-                    CURLOPT_RETURNTRANSFER => true,
-                    CURLOPT_ENCODING => '',
-                    CURLOPT_MAXREDIRS => 10,
-                    CURLOPT_TIMEOUT => 0,
-                    CURLOPT_FOLLOWLOCATION => true,
-                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                    CURLOPT_CUSTOMREQUEST => 'POST',
-                    CURLOPT_POSTFIELDS => $json,
-                    CURLOPT_HTTPHEADER => $headers,
-                ]);
+    //             $ch = curl_init();
+    //             curl_setopt_array($ch, [
+    //                 CURLOPT_URL => $url,
+    //                 CURLOPT_RETURNTRANSFER => true,
+    //                 CURLOPT_ENCODING => '',
+    //                 CURLOPT_MAXREDIRS => 10,
+    //                 CURLOPT_TIMEOUT => 0,
+    //                 CURLOPT_FOLLOWLOCATION => true,
+    //                 CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    //                 CURLOPT_CUSTOMREQUEST => 'POST',
+    //                 CURLOPT_POSTFIELDS => $json,
+    //                 CURLOPT_HTTPHEADER => $headers,
+    //             ]);
 
-                $result = curl_exec($ch);
+    //             $result = curl_exec($ch);
 
-                if ($result === FALSE) {
-                }
+    //             if ($result === FALSE) {
+    //             }
 
-                curl_close($ch);
-            }
-            return $this->response([], "Teacher Assign successfully");
-        } catch (\Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
-        }
-    }
+    //             curl_close($ch);
+    //         }
+    //         return $this->response([], "Teacher Assign successfully");
+    //     } catch (\Exception $e) {
+    //         return $this->response($e, "Invalid token.", false, 400);
+    //     }
+    // }
     
     public function approve_teacher2(Request $request)
     {
@@ -6133,7 +6133,7 @@ class InstituteApiController extends Controller
                         'board_id' => $teacherDT['board_id'],
                         'medium_id' => $teacherDT['medium_id'],
                         'standard_id' => $teacherDT['standard_id'],
-                        'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                        'batch_id' => !empty($teacherDT['batch_id']) ? implode(",",$teacherDT['batch_id']) : null,
                         'subject_id' => $teacherDT['subject_id'],
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
