@@ -20,6 +20,7 @@ class BannerController extends Controller
             ->whereNull('banner.deleted_at')
             ->where('banner.user_id', Auth::user()->id)
             ->paginate(10);
+    // echo "<pre>";print_r($banner_list);exit;
         // $institute_list = Institute_detail::get();
         // $banner_list = Banner_model::where('user_id', Auth::user()->id)->paginate(10);
         return view('banner/list', compact('banner_list', 'institute_list'));
@@ -63,8 +64,9 @@ class BannerController extends Controller
                 ]);
             }
         }
-
+     
         if (auth::user()->role_type == '1') {
+           
             foreach ($bannerImages as $imagePath) {
 
                 $banner_id = Banner_model::create([
@@ -72,6 +74,7 @@ class BannerController extends Controller
                     'banner_image' => $imagePath,
                     'status' => $request->input('status'),
                 ]);
+               
             }
         }
 
