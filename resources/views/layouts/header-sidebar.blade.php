@@ -76,6 +76,11 @@
                 </a>
             </div>
             <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
+                <a href="{{ url('add-lists') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Chapter
+                </a>
+            </div>
+            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
                 <a href="{{ url('do-business-with-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Do_business_with
                 </a>
