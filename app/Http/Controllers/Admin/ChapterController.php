@@ -180,7 +180,16 @@ class ChapterController extends Controller
             ->where('base_table_id', $request->input('standard_id'))
             ->exists();
         if ($exists > 0) {
-           
+            foreach ($request->chapter_name as $i => $chapterName) {
+                $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
+
+                if ($request->hasFile('chapter_image')) {
+                    $chapter_imageFile = $request->file('chapter_image')[$i];
+                    $imagePath = $chapter_imageFile->store('chapter', 'public');
+                    $chapter->chapter_image = $imagePath;
+                }
+                $chapter->save();
+            }
             return redirect()->route('chapter.list')->with('success', 'Already Exists!');
         } else {
             
