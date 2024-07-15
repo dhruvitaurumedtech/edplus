@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::table('common_announcement', function (Blueprint $table) {
             $table->text('announcement')->change();
+            $table->text('institute_id')->change();
+            $table->text('teacher_id')->change();
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('common_announcement', function (Blueprint $table) {
-            $table->string('start_academic_year')->change();
+            $table->string('announcement')->change();
+            $table->string('institute_id')->change();
+            $table->string('teacher_id')->change();
         });
     }
 };
