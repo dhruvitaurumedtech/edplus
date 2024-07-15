@@ -22,7 +22,7 @@
                 <h3>Banner create</h3>
                 <form method="post" action="{{ url('banner/save') }}" enctype="multipart/form-data">
                   @csrf
-                  @if(auth::user()->role_type == '3')
+                  @if(auth()->user()->role_type == '3')
                   <label for="exampleInputEmail1">Select Institute : </label>
                   <select name="institute_id" class="form-control">
                     <option value="">Select option</option>
@@ -86,7 +86,7 @@
                         <th>
                           <Sr class="No">No</Sr>
                         </th>
-                        @if(auth::user()->role_type == '3')
+                        @if(auth()->user()->role_type == '3')
                         <th>
                           <Sr class="No">Institute Name</Sr>
                         </th>
@@ -104,7 +104,7 @@
                       @foreach($banner_list as $value)
                       <tr>
                         <td>{{$i}}</td>
-                        @if(auth::user()->role_type == '3')
+                        @if(auth()->user()->role_type == '3')
                         <td>{{$value->institute_name}}</td>
                         <td>{{$value->url}}</td>
                         @endif
