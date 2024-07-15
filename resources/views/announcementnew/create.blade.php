@@ -17,13 +17,13 @@
                     <li><a href="javascript:void(0)">/</a></li>
                     <li><a href="javascript:void(0)">Institute</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="{{url('class-list')}}" class="active-link-dir">class</a></li>
+                    <li><a href="{{url('announcement-create-new')}}" class="active-link-dir">Announcement</a></li>
                 </ul>
             </div>
             @include('layouts/alert')
             <div class="dashboard-content side-content">
                 <div class="row">
-                    <div class="col-md-6">
+                    <div class="col-md-12 mt-4" >
                         <div class="institute-form">
                             <h3 class="card-title">Create Announcement </h3>
                             <form method="post" action="{{ url('announcement/publish') }}" enctype="multipart/form-data">
@@ -88,7 +88,8 @@
                             </form>
                         </div>
                     </div>
-                    <div class="col-md-6">
+                
+                    <div class="col-md-12 mt-4">
                         <div class="institute-form">
                             <h3 class="card-title">Announcement List</h3>
                             <form action="#">
