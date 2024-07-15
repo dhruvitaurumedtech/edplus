@@ -6133,7 +6133,7 @@ class InstituteApiController extends Controller
                         'board_id' => $teacherDT['board_id'],
                         'medium_id' => $teacherDT['medium_id'],
                         'standard_id' => $teacherDT['standard_id'],
-                        'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                        'batch_id' => !empty($teacherDT['batch_id']) ? implode(",",$teacherDT['batch_id']) : null,
                         'subject_id' => $teacherDT['subject_id'],
                         'teacher_id' => $request->teacher_id,
                         'status' => '1',
