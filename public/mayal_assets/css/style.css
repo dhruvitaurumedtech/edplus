@@ -1382,7 +1382,7 @@ h1,
     transform-origin: 50% 0;
     transform: scale(1, 0);
     transition: transform 0.15s ease-in-out 0.15s;
-    max-height: 66vh;
+    max-height: 280px;
     overflow-y: scroll;
 }
 
