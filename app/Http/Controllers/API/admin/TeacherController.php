@@ -639,7 +639,8 @@ class TeacherController extends Controller
 
                 $batchIds = explode(',', $value['batch_id']);
                 $batches_Data = Batches_model::whereIn('id', $batchIds)
-                //->groupBy('id')
+                // ->select('id','batch_name')
+                // ->groupBy('id', 'batch_name')
                 ->get();
                     
 
