@@ -543,6 +543,8 @@ class StudentController extends Controller
                 else {
                     if (!empty($emilfin)) {
                         $parent_id = $emilfin->id;
+                    }elseif($emilfin->role_type != 5){
+                        return $this->response([], "Someone else has already used this email.", false, 400);
                     } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
