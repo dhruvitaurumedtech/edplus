@@ -2323,7 +2323,7 @@ class StudentController extends Controller
 
             $user->save();
            
-            if (!empty($request->parents) || $request->parents!="null") {
+            if ($request->parents!='null') {
                 
                 $parents = json_decode($request->parents, true);
 
