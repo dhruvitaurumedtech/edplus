@@ -460,7 +460,7 @@ class ParentsController extends Controller
                             'phone'=>$parent->mobile,
                             'profile'=>(!empty($parent->image))?asset($parent->image):asset('profile/no-image.png'),
                             'address'=>$parent->address,
-                            'country_code'=>!empty($parent->country_code)?$parent->country_code:'+91',
+                            'country_code'=>(!empty($parent->country_code))?$parent->country_code:'+91',
                             'country_code_name'=>$parent->country_code_name,
                             'state'=>$parent->state,
                             'city'=>$parent->city,

@@ -2187,7 +2187,7 @@ class StudentController extends Controller
                 'unique_id' => $studentUser->unique_id . '',
                 'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
                 'email' => $studentUser->email,
-                'country_code' => $studentUser->country_code,
+                'country_code' => (!empty($studentUser->country_code))?$studentUser->country_code:'+91',
                 'country_code_name'=>$studentUser->country_code_name,
                 'mobile' => $studentUser->mobile . '',
                 'image' => $img . '',
