@@ -2165,9 +2165,14 @@ class StudentController extends Controller
                 ->distinct()
                 ->get();
             $parents_dt = [];
+            
+
             foreach ($parentsQY as $parentsDT) {
+                $fullName = $parentsDT->firstname . ' ' . $parentsDT->lastname;
+                $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
+
                 $parents_dt[] = array(
-                    'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
+                    'name' => $cleanFullName,
                     'email' => $parentsDT->email,
                     'country_code' => $parentsDT->country_code,
                     'country_code_name'=>$parentsDT->country_code_name,
@@ -2212,7 +2217,10 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
+    function removeDuplicateWords($str) {
+        $words = array_unique(preg_split('/\s+/', $str));
+        return implode(' ', $words);
+    }
     // public function student_edit_profile(Request $request)
     // {
     //     $validator = \Validator::make($request->all(), [
