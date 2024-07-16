@@ -95,7 +95,7 @@ class TeacherController extends Controller
                         'institute_id' => (int) $value->institute_id,
                         'institute_name'=>$instdl ? $instdl->institute_name : '',
                         'address'=>$instdl ? $instdl->address : '',
-                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('no-image.png'),
+                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('profile/no-image.png'),
                         'user_id' => $value->user_id,
                         'title' => $value->title,
                     ];
@@ -485,7 +485,7 @@ class TeacherController extends Controller
                 'facebook_link'=>$institutedeta->facebook_link,
                 'whatsaap_link'=>$institutedeta->whatsaap_link,
                 'youtube_link'=>$institutedeta->youtube_link,
-                'logo' => (!empty($institutedeta->logo))?asset($institutedeta->logo):asset('no-image.png'),
+                'logo' => (!empty($institutedeta->logo))?asset($institutedeta->logo):asset('profile/no-image.png'),
                 'cover_photo' => (!empty($institutedeta->cover_photo))?asset($institutedeta->cover_photo):asset('cover_photo/cover_image.png'),
                 'boards' => $boards,
                 'students' => $stdcount,
@@ -573,7 +573,7 @@ class TeacherController extends Controller
            
             foreach ($todayslect as $todayslecDT) {
                 $todays_lecture[] = array(
-                    'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
+                    'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
                     'batch_id'=>$todayslecDT->batch_id,
@@ -794,7 +794,7 @@ class TeacherController extends Controller
                     'standard' => $todaysDT->standard,
                     'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
-                    'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('no-image.png'),
+                    'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('profile/no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
                     'batch_name'=>$todaysDT->batch_name,
                     'class_room'=>$todaysDT->class_room,
@@ -1236,7 +1236,7 @@ class TeacherController extends Controller
             if ($userdetl->image) {
                 $img = $userdetl->image;
             } else {
-                $img = asset('no-image.PNG');
+                $img = asset('profile/no-image.png');
             }
 
             $standardids = Teacher_model::where('teacher_id', $teacher_id)

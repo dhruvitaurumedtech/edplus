@@ -447,7 +447,7 @@ class StaffController extends Controller
                        'email'=>$value->email,
                        'mobile'=>$value->mobile,
                        'dob'=>$value->dob,
-                       'image'=>(!empty($value->image)) ? asset($value->image) : asset('no-image.png')
+                       'image'=>(!empty($value->image)) ? asset($value->image) : asset('profile/no-image.png')
                 ];
             }
             return $this->response($response, "Successfully fetch profile.");

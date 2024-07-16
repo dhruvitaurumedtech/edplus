@@ -72,7 +72,7 @@ class ParentsController extends Controller
                     'child_id' => $chilDT->student_id,
                     'firstname' => $chilDT->firstname,
                     'lastname' => $chilDT->lastname,
-                    'image' => (!empty($chilDT->image)) ? asset($chilDT->image) : asset('no-image.png'),
+                    'image' => (!empty($chilDT->image)) ? asset($chilDT->image) : asset('profile/no-image.png'),
                     'institute_id' => $chilDT->institute_id,
                     'institute_name' => $chilDT->institute_name,
                     'subjects' => $subjDTs
@@ -227,7 +227,7 @@ class ParentsController extends Controller
                     'child_id' => $getstdntdata->student_id,
                     'firstname' => $getstdntdata->firstname,
                     'lastname' => $getstdntdata->lastname,
-                    'image'=> (!empty($getstdntdata->image)) ? asset($getstdntdata->image) : asset('no-image.png'),
+                    'image'=> (!empty($getstdntdata->image)) ? asset($getstdntdata->image) : asset('profile/no-image.png'),
                     'institute_id' => intval($getstdntdata->institute_id),
                     'institute_name' => $getstdntdata->institute_name,
                     'subjects' => $subjDTs
@@ -261,7 +261,7 @@ class ParentsController extends Controller
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                    'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
+                    'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
@@ -443,7 +443,7 @@ class ParentsController extends Controller
                 $insts=[];
                 foreach($student2 as $insdat){
                     $insts[] = ['institute_name'=>$insdat->institute_name,
-                    'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('no-image.png'),
+                    'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('profile/no-image.png'),
                     'institute_address'=>$insdat->address,];
                 }
                 $data2[] = ['child_id'=>$value_student->id,
@@ -458,7 +458,7 @@ class ParentsController extends Controller
                             'last_name'=>$parent->lastname,
                             'email'=>$parent->email,
                             'phone'=>$parent->mobile,
-                            'profile'=>(!empty($parent->image))?asset($parent->image):asset('no-image.png'),
+                            'profile'=>(!empty($parent->image))?asset($parent->image):asset('profile/no-image.png'),
                             'address'=>$parent->address,
                             'country_code'=>$parent->country_code,
                             'country_code_name'=>$parent->country_code_name,
