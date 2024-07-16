@@ -184,7 +184,7 @@ class AuthController extends Controller
                 'institute_id' => $institute_id,
                 //'token' => $token,
             ];
-            return $this->response($data, "Registration Successfully !");
+            return $this->response($data, "OTP is sent to you mail!");
         } catch (Exception $e) {
             return $this->response($e, "Something want Wrong!!", false, 400);
         }
