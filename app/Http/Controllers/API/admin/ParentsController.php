@@ -481,9 +481,9 @@ class ParentsController extends Controller
             'lastname' => 'required|string',
             'mobile' => 'required|string',
             'address' => 'required|string',
-            'state' => 'required|string',
-            'city' => 'required|string',
-            'pincode' => 'required|string',
+            // 'state' => 'required|string',
+            // 'city' => 'required|string',
+            // 'pincode' => 'required|string',
             'country_code' => 'required',
             'country_code_name'=>'required',
         ]);
@@ -500,9 +500,9 @@ class ParentsController extends Controller
             $user->country_code_name = $request->country_code_name;
             $user->mobile = $request->mobile;
             $user->address = $request->address;
-            $user->state = $request->state;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
+            $user->state = !empty($request->state)?$request->state:'';
+            $user->city = !empty($request->city)?$request->city:'';
+            $user->pincode = !empty($request->pincode)?$request->pincode:'';
             if ($request->file('image')) {
                 $iconFile = $request->file('image');
                 $imagePath = $iconFile->store('profile', 'public');
