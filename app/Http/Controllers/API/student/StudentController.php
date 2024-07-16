@@ -2288,10 +2288,10 @@ class StudentController extends Controller
             'address' => 'required|string',
             'dob' => 'required|date|date_format:d-m-Y',
             'school_name' => 'required|string',
-            'country' => 'required|string',
-            'state' => 'required|string',
-            'city' => 'required|string',
-            'pincode' => 'required|string',
+            // 'country' => 'required|string',
+            // 'state' => 'required|string',
+            // 'city' => 'required|string',
+            // 'pincode' => 'required|string',
             'country_code' => 'required|string',
             'country_code_name' => 'required',
         ]);
@@ -2310,10 +2310,10 @@ class StudentController extends Controller
             $user->address = $request->address;
             $user->dob = $request->dob;
             $user->school_name = $request->school_name;
-            $user->country = $request->country;
-            $user->state = $request->state;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
+            $user->country = !empty($request->country)?$request->country:'';
+            $user->state = !empty($request->state)?$request->state:'';
+            $user->city = !empty($request->city)?$request->city:'';
+            $user->pincode = !empty($request->pincode)?$request->pincode:'';
             $user->area = $request->area;
             if ($request->file('image')) {
                 $iconFile = $request->file('image');
