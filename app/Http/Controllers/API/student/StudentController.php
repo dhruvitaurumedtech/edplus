@@ -519,11 +519,10 @@ class StudentController extends Controller
         }
 
         try {
-
             $parents = json_decode($request->parents, true);
             foreach ($parents as $parentData) {
                 $emilfin = user::where('email', $parentData['email'])
-                            ->where('role_type',5)
+                            //->where('role_type',5)
                             ->first();
                 $tomail = $parentData['email'];
                 if ($parentData['firstname'] == '') {
@@ -541,10 +540,10 @@ class StudentController extends Controller
                 //     return $this->response([], 'email is already exist', false, 400);
                 // } 
                 else {
-                    if (!empty($emilfin)) {
-                        $parent_id = $emilfin->id;
-                    }elseif($emilfin->role_type != 5){
+                    if ($emilfin->role_type != 5) {
                         return $this->response([], "Someone else has already used this email.", false, 400);
+                    }elseif($emilfin){
+                        $parent_id = $emilfin->id;
                     } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
@@ -584,6 +583,7 @@ class StudentController extends Controller
             }
             return $this->response([], 'Parent details uploaded successfully');
         } catch (\Exception $e) {
+            return $e;
             return $this->response([], "Invalid token.", false, 400);
         }
     }
