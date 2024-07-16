@@ -2292,14 +2292,14 @@ class StudentController extends Controller
             'state' => 'required|string',
             'city' => 'required|string',
             'pincode' => 'required|string',
-            'country_code' => 'required',
+            'country_code' => 'required|string',
             'country_code_name' => 'required',
         ]);
 
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
+         
         try {
             $user = Auth::user();
             $user->firstname = $request->firstname;
@@ -2322,9 +2322,13 @@ class StudentController extends Controller
             }
 
             $user->save();
-            if (!empty($request->parents)) {
+           
+            if (!empty($request->parents) &&  $request->parents!='null') {
+                
                 $parents = json_decode($request->parents, true);
+
                 foreach ($parents as $parentData) {
+                    
                     // $emilfin = user::where('email', $parentData['email'])->first();
                     if ($parentData['firstname'] == '') {
                         return $this->response([], 'firstname Requied field are missing', false, 400);
