@@ -91,7 +91,7 @@ class StudentController extends Controller
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address' => $value->address,
-                    'logo' => (!empty($value->logo))?url($value->logo):asset('no-image.png'),
+                    'logo' => (!empty($value->logo))?url($value->logo):asset('profile/no-image.png'),
                 );
             }
 
@@ -110,7 +110,7 @@ class StudentController extends Controller
                         'institute_id' => (int) $value->institute_id,
                         'institute_name'=>$instdl ? $instdl->institute_name : '',
                         'address'=>$instdl ? $instdl->address : '',
-                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('no-image.png'),
+                        'logo' => (!empty($instdl->logo))?asset($instdl->logo):asset('profile/no-image.png'),
                         'user_id' => $value->user_id,
                         'title' => $value->title,
                     ];
@@ -175,7 +175,7 @@ class StudentController extends Controller
             if ($studentUser->image) {
                 $img = $studentUser->image;
             } else {
-                $img = asset('no-image.png');
+                $img = asset('profile/no-image.png');
             }
             $data = [
                 'profile_image' => $img,
@@ -960,7 +960,7 @@ class StudentController extends Controller
                 'facebook_link' => $institutedeta->facebook_link,
                 'whatsaap_link' => $institutedeta->whatsaap_link,
                 'youtube_link' => $institutedeta->youtube_link,
-                'logo' => (!empty($institutedeta->logo)) ? asset($institutedeta->logo) : asset('no-image.png'),
+                'logo' => (!empty($institutedeta->logo)) ? asset($institutedeta->logo) : asset('profile/no-image.png'),
                 'cover_photo' => (!empty($institutedeta->cover_photo)) ? asset($institutedeta->cover_photo) : asset('cover_photo/cover_image.png'),
                 'boards' => $boards,
                 'students' => $stdcount,
@@ -1047,7 +1047,7 @@ class StudentController extends Controller
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                    'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
+                    'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),  //$todayslecDT->start_time,
@@ -2177,7 +2177,7 @@ class StudentController extends Controller
             if ($studentUser->image) {
                 $img = $studentUser->image;
             } else {
-                $img = asset('no-image.png');
+                $img = asset('profile/no-image.png');
             }
 
             $userdetail = array(
@@ -3026,7 +3026,7 @@ class StudentController extends Controller
                         'student_id' => $value['id'],
                         'student_name' => $value['firstname'] . ' ' . $value['lastname'],
                         'attendance' => $attendances,
-                        'photo' => !empty($value['image']) ? url($value['image']) : url('no-image.png'),
+                        'photo' => !empty($value['image']) ? url($value['image']) : url('profile/no-image.png'),
                         'board_name' => $value['board_name'] . '',
                         'medium_name' => $value['medium_name'] . '',
                     ];
@@ -3095,7 +3095,7 @@ class StudentController extends Controller
                     $lectures[] = array(
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
-                        'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('no-image.png'),
+                        'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                         'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),

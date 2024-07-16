@@ -3292,7 +3292,7 @@ class InstituteApiController extends Controller
                         $subcts = Subject_model::whereIN('id', explode(",", $response->subject_id))->get();
                         $sujids = [];
                         foreach ($subcts as $subnames) {
-                            $sujids[] = ['subname' => $subnames->name, 'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('no-image.png'),];
+                            $sujids[] = ['subname' => $subnames->name, 'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('profile/no-image.png'),];
                         }
 
                         $reject_list = Student_detail::find($response->id);
@@ -5133,7 +5133,7 @@ class InstituteApiController extends Controller
                     'facebook_link' => $value['facebook_link'] . '',
                     'whatsaap_link' => $value['whatsaap_link'] . '',
                     'youtube_link' => $value['youtube_link'] . '',
-                    'logo' => (!empty($value['logo'])) ? url($value['logo']) : asset('no-image.png'),
+                    'logo' => (!empty($value['logo'])) ? url($value['logo']) : asset('profile/no-image.png'),
                     'cover_photo' => ($value['cover_photo'] ? url($value['cover_photo']) : url('cover_photo/cover_image.png')),
                     'country' => $value['country'] . '',
                     'state' => $value['state'] . '',
@@ -6607,7 +6607,7 @@ class InstituteApiController extends Controller
                     'email' => $value->email,
                     'mobile' => $value->mobile,
                     'role_type' => $value->role_name,
-                    'image' => (!empty($value->image)) ? asset($value->image) : asset('no-image.png')
+                    'image' => (!empty($value->image)) ? asset($value->image) : asset('profile/no-image.png')
                 ];
             }
 

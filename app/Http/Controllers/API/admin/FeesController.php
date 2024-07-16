@@ -749,7 +749,7 @@ class FeesController extends Controller
                 $data[] = [
                     'student_id' => $value->id,
                     'student_name' => $value->firstname . ' ' . $value->lastname,
-                    'profile' => (!empty($value->image)) ? asset($value->image) : asset('no-image.png'),
+                    'profile' => (!empty($value->image)) ? asset($value->image) : asset('profile/no-image.png'),
                     'standard_id' => $value->standard_id,
                     'standard_name' => $value->standard_name,
                     'stream_id' => $value->stream_id,
@@ -809,7 +809,7 @@ class FeesController extends Controller
             $data = [
                 'student_id' => $student_detail->id,
                 'student_name' => $student_detail->firstname . ' ' . $student_detail->lastname,
-                'profile' => (!empty($student_detail->image)) ? asset($student_detail->image) : asset('no-image.png'),
+                'profile' => (!empty($student_detail->image)) ? asset($student_detail->image) : asset('profile/no-image.png'),
                 'standard_name' => $student_detail->standard_name,
                 'total_fees' => $total. '.00'
             ];
