@@ -306,6 +306,7 @@ class TimetableController extends Controller
                 $groupedData[$date]['sub_data'][] = [
                     'id' => $timtable->id,
                     'day' => $timtable->repeat,
+                    'date' => $timtable->lecture_date,
                     'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
                     'end_time' => $this->convertTo12HourFormat($timtable->end_time),
                     'subject_id' => $timtable->subject_id,
