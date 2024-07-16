@@ -2290,7 +2290,7 @@ class StudentController extends Controller
             'state' => 'required|string',
             'city' => 'required|string',
             'pincode' => 'required|string',
-            'country_code' => 'required',
+            'country_code' => 'required|string|trim',
             'country_code_name' => 'required',
         ]);
 
