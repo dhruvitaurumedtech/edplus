@@ -303,13 +303,14 @@ class General_timetableController extends Controller
     
             foreach ($timtDT as $timtable) {
                 $class_room = $timtable->class_room;
-                if (!isset($groupedData[$class_room])) {
-                    $groupedData[$class_room] = [
-                        'class_room' => $class_room,
-                        'sub_data' => []
-                    ];
-                }
-                $groupedData[$class_room]['sub_data'][] = [
+                // if (!isset($groupedData[$class_room])) {
+                //     $groupedData[$class_room] = [
+                //         'class_room' => $class_room,
+                //         'sub_data' => []
+                //     ];
+                // }
+                // $groupedData[$class_room]['sub_data'][] = [
+                    $groupedData[] = [
                     'id' => $timtable->id,
                     'day' => $timtable->repeat,
                     'start_time' =>$timtable->lecture_date.' '. $this->convertTo12HourFormat($timtable->start_time),
