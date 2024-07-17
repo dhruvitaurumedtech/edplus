@@ -6224,7 +6224,7 @@ class InstituteApiController extends Controller
 
                 curl_close($ch);
             }
-            return $this->response([], "Teacher Assign successfully");
+            return $this->response([], "Teacher Add successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }

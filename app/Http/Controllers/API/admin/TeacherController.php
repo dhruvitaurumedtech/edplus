@@ -384,7 +384,7 @@ class TeacherController extends Controller
 
                 curl_close($ch);
             }
-            return $this->response([], "Teacher added successfully");
+            return $this->response([], "Request added successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
