@@ -540,11 +540,8 @@ class StudentController extends Controller
                 //     return $this->response([], 'email is already exist', false, 400);
                 // } 
                 else {
-                    if ($emilfin && $emilfin->role_type != 5) {
-                        return $this->response([], "Someone else has already used this email.", false, 400);
-                    }elseif($emilfin && $emilfin->role_type == 5){
-                        $parent_id = $emilfin->id;
-                        $updateuser = User::where('id',$parent_id)->update([
+                    if($request->upid){
+                        $updateuser = User::where('id',$request->upid)->update([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
                             'email' => $parentData['email'],
@@ -554,6 +551,10 @@ class StudentController extends Controller
                             'role_type' => '5',
                             'status' => '1'
                         ]);
+                    }elseif ($emilfin && $emilfin->role_type != 5) {
+                        return $this->response([], "Someone else has already used this email.", false, 400);
+                    }elseif($emilfin && $emilfin->role_type == 5){
+                        $parent_id = $emilfin->id;
                     } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
@@ -2171,7 +2172,9 @@ class StudentController extends Controller
 
                 $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                 ->where('parents.student_id', $student_id)
-                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 'users.email', 'users.country_code', 'users.country_code_name', 'users.mobile', 'parents.relation')
+                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 
+                'users.email', 'users.country_code', 'users.country_code_name',
+                 'users.mobile', 'parents.relation')
                 ->distinct()
                 ->get();
             $parents_dt = [];
@@ -2182,6 +2185,7 @@ class StudentController extends Controller
                 $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
 
                 $parents_dt[] = array(
+                    'id'=>$parentsDT->parent_id,
                     'name' => $cleanFullName,
                     'email' => $parentsDT->email,
                     'country_code' => $parentsDT->country_code,
