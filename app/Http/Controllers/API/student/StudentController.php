@@ -544,6 +544,16 @@ class StudentController extends Controller
                         return $this->response([], "Someone else has already used this email.", false, 400);
                     }elseif($emilfin && $emilfin->role_type == 5){
                         $parent_id = $emilfin->id;
+                        $updateuser = User::where('id',$parent_id)->update([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'country_code' => $parentData['country_code'],
+                            'country_code_name' => $parentData['country_code_name'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5',
+                            'status' => '1'
+                        ]);
                     } else {
                         $user = User::create([
                             'firstname' => $parentData['firstname'],
@@ -559,14 +569,14 @@ class StudentController extends Controller
                         $parent_id = $user->id;
                     }
 
-                    if (!empty($parent_id)) {
+                    if (!empty($parent_id) && $user) {
                         $parnsad = Parents::create([
                             'student_id' =>  auth()->id(),
                             'parent_id' => $parent_id,
                             'relation' => $parentData['relation'],
                             'verify' => '0',
                         ]);
-                        if (empty($parnsad->id)) {
+                        if (empty($parnsad->id) && $user) {
                             User::where('id', $parent_id)->delete();
                             return $this->response([], 'Data not added Successfuly.');
                         }
