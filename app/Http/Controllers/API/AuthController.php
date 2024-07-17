@@ -33,6 +33,7 @@ class AuthController extends Controller
     {
         try {
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
+            print_r($user);exit;
             if (!$user) {
                 return $this->response([], "UnAuthorized User", false, 400);
             }
@@ -64,8 +65,8 @@ class AuthController extends Controller
             }
             if (!$user) {
                 $user = new User();
-                $user->firstname = $ssoUser->user['name'];
-                $user->lastname = $ssoUser->user['given_name'];
+                $user->firstname = $ssoUser->user['firstname'];
+                $user->lastname = $ssoUser->user['lastname'];
                 $user->email = $ssoUser->user['email'];
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
