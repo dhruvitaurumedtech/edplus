@@ -63,9 +63,20 @@ class AuthController extends Controller
                 }
             }
             if (!$user) {
+
+                $name = $ssoUser->user['name'];
+
+                // Explode the full name into an array based on spaces
+                $nameParts = explode(' ', $name);
+                
+                // Assign firstname and lastname based on array parts
+                $firstname = $nameParts[0]; // First element is the first name
+                $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
+
+
                 $user = new User();
-                $user->firstname = $ssoUser->user['name'];
-                $user->lastname = $ssoUser->user['given_name'];
+                $user->firstname = $firstname;
+                $user->lastname = $lastname;
                 $user->email = $ssoUser->user['email'];
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;

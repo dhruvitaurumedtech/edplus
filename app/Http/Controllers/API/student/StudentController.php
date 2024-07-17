@@ -2165,9 +2165,14 @@ class StudentController extends Controller
                 ->distinct()
                 ->get();
             $parents_dt = [];
+            
+
             foreach ($parentsQY as $parentsDT) {
+                $fullName = $parentsDT->firstname . ' ' . $parentsDT->lastname;
+                $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
+
                 $parents_dt[] = array(
-                    'name' => $parentsDT->firstname . ' ' . $parentsDT->lastname,
+                    'name' => $cleanFullName,
                     'email' => $parentsDT->email,
                     'country_code' => $parentsDT->country_code,
                     'country_code_name'=>$parentsDT->country_code_name,
@@ -2187,7 +2192,7 @@ class StudentController extends Controller
                 'unique_id' => $studentUser->unique_id . '',
                 'name' => $studentUser->firstname . ' ' . $studentUser->lastname,
                 'email' => $studentUser->email,
-                'country_code' => $studentUser->country_code,
+                'country_code' => (!empty($studentUser->country_code))?$studentUser->country_code:'+91',
                 'country_code_name'=>$studentUser->country_code_name,
                 'mobile' => $studentUser->mobile . '',
                 'image' => $img . '',
@@ -2212,7 +2217,10 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
+    function removeDuplicateWords($str) {
+        $words = array_unique(preg_split('/\s+/', $str));
+        return implode(' ', $words);
+    }
     // public function student_edit_profile(Request $request)
     // {
     //     $validator = \Validator::make($request->all(), [
@@ -2288,10 +2296,10 @@ class StudentController extends Controller
             'address' => 'required|string',
             'dob' => 'required|date|date_format:d-m-Y',
             'school_name' => 'required|string',
-            'country' => 'required|string',
-            'state' => 'required|string',
-            'city' => 'required|string',
-            'pincode' => 'required|string',
+            // 'country' => 'required|string',
+            // 'state' => 'required|string',
+            // 'city' => 'required|string',
+            // 'pincode' => 'required|string',
             'country_code' => 'required|string',
             'country_code_name' => 'required',
         ]);
@@ -2310,10 +2318,10 @@ class StudentController extends Controller
             $user->address = $request->address;
             $user->dob = $request->dob;
             $user->school_name = $request->school_name;
-            $user->country = $request->country;
-            $user->state = $request->state;
-            $user->city = $request->city;
-            $user->pincode = $request->pincode;
+            $user->country = !empty($request->country)?$request->country:'';
+            $user->state = !empty($request->state)?$request->state:'';
+            $user->city = !empty($request->city)?$request->city:'';
+            $user->pincode = !empty($request->pincode)?$request->pincode:'';
             $user->area = $request->area;
             if ($request->file('image')) {
                 $iconFile = $request->file('image');
@@ -2323,7 +2331,7 @@ class StudentController extends Controller
 
             $user->save();
            
-            if (!empty($request->parents) &&  $request->parents!='null') {
+            if ($request->parents!='null' && !empty($request->parents)) {
                 
                 $parents = json_decode($request->parents, true);
 
