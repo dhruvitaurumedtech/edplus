@@ -56,7 +56,8 @@ class TimetableController extends Controller
             'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
-            'repeat'=>'required'
+            'repeat'=>'required',
+            'class_room_id'=>'required'
         ]);
 
     if ($validator->fails()) {
@@ -115,6 +116,16 @@ class TimetableController extends Controller
                     ])->exists();
                     if ($existing) {
                         return $this->response([], "This teacher is already occupy for same date and time on another lecture!", false, 400);
+                    }
+
+                    $existing = Timetable::where([
+                        ['class_room_id', $request->class_room_id],
+                        ['lecture_date', $lecture_date],
+                        ['start_time', '<',$request->end_time ],
+                        ['end_time', '>',  $request->start_time],
+                    ])->exists();
+                    if ($existing) {
+                        return $this->response([], "This Classroom  is already occupy for same date and time on another lecture!", false, 400);
                     }
 
                     $timetable = new Timetable();

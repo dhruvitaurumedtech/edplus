@@ -704,7 +704,7 @@ class TeacherController extends Controller
                     'subject.name as subject_name',
                     'subject.image as subject_image')
                 ->get();
-
+                
             $teacher_data = [];
             $result = [
                 'board_id' => null,
@@ -735,12 +735,10 @@ class TeacherController extends Controller
                     'image' => !empty($detail->subject_image) ? url($detail->subject_image) : ''
                 ];
             }
-
             $result['subject_list'] = array_map(
                 "unserialize",
                 array_unique(array_map("serialize", $result['subject_list']))
             );
-            
             return $this->response($result, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
