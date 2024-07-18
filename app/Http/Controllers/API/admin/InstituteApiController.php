@@ -5911,7 +5911,7 @@ class InstituteApiController extends Controller
                         'user_id' => Auth::id(),
                         'institute_id' => $request->institute_id,
                         'subject_id' => $subjids,
-                        'amount'=>$subject_amount[$subjids]
+                        'amount'=>$subject_amount[$subjids] ?? 0,
                     ]);
                 }
             }
