@@ -4514,6 +4514,7 @@ class InstituteApiController extends Controller
                 ->when($batch_id, function ($query, $batch_id) {
                     $query->where('batch_id', $batch_id);
                 })
+                
                 ->when($subject_id, function ($query, $subject_id) {
                     $query->where('subject_id', $subject_id);
                 })
