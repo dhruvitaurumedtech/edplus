@@ -570,25 +570,32 @@ class StudentController extends Controller
                         $parent_id = $user->id;
                     }
 
-                    if (!empty($parent_id) && $user) {
-                        $parnsad = Parents::create([
-                            'student_id' =>  auth()->id(),
-                            'parent_id' => $parent_id,
-                            'relation' => $parentData['relation'],
-                            'verify' => '0',
-                        ]);
-                        if (empty($parnsad->id) && $user) {
-                            User::where('id', $parent_id)->delete();
-                            return $this->response([], 'Data not added Successfuly.');
+                    if (!empty($parent_id)) {
+                        $prexis = Parents::where('student_id',auth()->id())
+                        ->where('parent_id',$parent_id)
+                        ->whereNull('institute_id')
+                        ->where('verify','0')
+                        ->first();
+                        if(empty($prexis)){
+                            $parnsad = Parents::create([
+                                'student_id' =>  auth()->id(),
+                                'parent_id' => $parent_id,
+                                'relation' => $parentData['relation'],
+                                'verify' => '0',
+                            ]);
+                            if (empty($parnsad->id)) {
+                                User::where('id', $parent_id)->delete();
+                                return $this->response([], 'Data not added Successfuly.');
+                            }
                         }
                     } else {
                         return $this->response([], 'Data not added Successfuly', false, 500);
                     }
-                    $data = [
-                        'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
-                        'email' => $tomail,
-                        'id' => $parnsad->id
-                    ];
+                    // $data = [
+                    //     'name' => $parentData['firstname'] . ' ' . $parentData['lastname'],
+                    //     'email' => $tomail,
+                    //     'id' => $parnsad->id
+                    // ];
                     //Mail::to($tomail)->send(new WelcomeMail($data));
                 }
             }
