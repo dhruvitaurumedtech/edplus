@@ -558,6 +558,13 @@ class StudentController extends Controller
                         }
                         User::where('id', $parentData['upid'])->update($updateData);
 
+                        $parnsad = Parents::where('student_id',auth()->id())
+                        ->where('parent_id',$parentData['upid'])
+                        ->where('verify','0')
+                        ->update([
+                            'relation' => $parentData['relation'],
+                        ]);
+
                     }else{
                         if ($emilfin && $emilfin->role_type != 5) {
                             return $this->response([], "Someone else has already used this email.", false, 400);
