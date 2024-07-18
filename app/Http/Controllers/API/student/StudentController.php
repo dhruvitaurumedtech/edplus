@@ -541,7 +541,7 @@ class StudentController extends Controller
                 // } 
                 else {
                     if($request->upid){
-                        $updateuser = User::where('id',$request->upid)->update([
+                        $updateuser = User::where('id',$parentData['upid'])->update([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
                             'email' => $parentData['email'],
