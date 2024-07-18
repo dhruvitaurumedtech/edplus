@@ -6561,12 +6561,12 @@ class InstituteApiController extends Controller
                 ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
                 ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
                 ->select('users.*', 'roles.role_name')
+                ->where('teacher_detail.status',1)
                 ->where(function ($query) use ($institute_id) {
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
                 })
                 ->whereNotIn('roles.role_name', ['superadmin','institute','sub_admin','parent','student'])
-                ->where('teacher_detail.status',1)
                 ->distinct('users.id');
              
             if (!empty($searchTerm)) {
