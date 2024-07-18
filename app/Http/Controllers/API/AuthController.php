@@ -33,12 +33,14 @@ class AuthController extends Controller
     {
         try {
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
+            
             if (!$user) {
                 return $this->response([], "UnAuthorized User", false, 400);
             }
             return $this->handleUser($user, "google", $request);
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            // print_r($e);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 

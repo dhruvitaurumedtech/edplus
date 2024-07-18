@@ -5391,7 +5391,9 @@ class InstituteApiController extends Controller
                 $logo_image = $request->file('logo');
                 $imagePath = $logo_image->store('logo', 'public');
             }
+            
             if ($imagePath !== null) {
+                // print_r($imagePath);exit;
                 $institutedt->logo = $imagePath;
             }
             $imagePath2 = null;
