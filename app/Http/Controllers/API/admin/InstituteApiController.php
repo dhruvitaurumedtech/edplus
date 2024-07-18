@@ -6260,7 +6260,7 @@ class InstituteApiController extends Controller
             $teacher_data = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->where('teacher_detail.status', '1')
-                ->select('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification')
+                ->select('users.id', 'users.firstname', 'users.lastname','users.image', 'teacher_detail.teacher_id', 'users.qualification')
                 ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification');
 
             if (!empty($request->subject_id)) {
@@ -6295,6 +6295,7 @@ class InstituteApiController extends Controller
                     $teacher_image=User::where('id',$value['teacher_id'])->first();
                     $response[] = [
                         'teacher_id' => $value['teacher_id'],
+                        'teacher_image'=>!empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
                         'standard' => $standard_array,
