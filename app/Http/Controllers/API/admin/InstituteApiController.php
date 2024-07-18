@@ -4511,10 +4511,14 @@ class InstituteApiController extends Controller
                 ->when($standard_id, function ($query, $standard_id) {
                     $query->where('standard_id', $standard_id);
                 })
-                ->when($batch_id, function ($query, $batch_id) {
-                    $query->orwhereRaw("FIND_IN_SET($batch_id, batch_id)");
+                ->when($batch_id, function ($query) use ($batch_id) {
+                    $batch_ids = explode(',', $batch_id);
+                    $query->where(function ($query) use ($batch_ids) {
+                        foreach ($batch_ids as $id) {
+                            $query->orWhereRaw("FIND_IN_SET(?, batch_id)", [$id]);
+                        }
+                    });
                 })
-                
                 ->when($subject_id, function ($query, $subject_id) {
                     $query->where('subject_id', $subject_id);
                 })
