@@ -5896,25 +5896,34 @@ class InstituteApiController extends Controller
             // $subsub = Subject_sub::where('user_id', Auth::id())
             //     ->where('institute_id', $request->institute_id)
             //     ->delete();
-            
-            $subject_amount=Subject_sub::where('institute_id', $request->institute_id)->whereIN('subject_id',$subjcts)->pluck('amount', 'subject_id');
-            
             $subsub = Subject_sub::where('institute_id', $request->institute_id)
-                ->whereIN('subject_id',$subjcts)
-                ->delete();
-            if ($subsub) {
+                ->whereIN('subject_id',$subjcts)->get()->toarray();
+            
+            $subsubSubjectIds = array_column($subsub, 'subject_id');
+            $subjectsids = explode(",", $request->subject_id);
+            
+            $difference = array_diff($subsubSubjectIds, $subjectsids);
+            $difference2 = array_diff($subjectsids,$subsubSubjectIds);
+            $result = array_merge($difference, $difference2);
 
-                $subjectsids = explode(",", $request->subject_id);
+            foreach($result as $subid){
 
-                foreach ($subjectsids as $subjids) {
-                    $subcts = Subject_sub::create([
+                $subsubget = Subject_sub::where('institute_id', $request->institute_id)
+                ->where('subject_id',$subid)->first();
+                
+                if($subsubget){
+                    Subject_sub::where('institute_id', $request->institute_id)
+                    ->where('subject_id',$subid)
+                    ->delete();
+                }else{
+                    Subject_sub::create([
                         'user_id' => Auth::id(),
                         'institute_id' => $request->institute_id,
-                        'subject_id' => $subjids,
-                        'amount'=>$subject_amount[$subjids] ?? 0,
+                        'subject_id' => $subid,
                     ]);
                 }
-            }
+            }   
+           
             return $this->response([], "Updated Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
