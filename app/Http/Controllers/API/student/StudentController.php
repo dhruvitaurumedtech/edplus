@@ -540,7 +540,18 @@ class StudentController extends Controller
                 //     return $this->response([], 'email is already exist', false, 400);
                 // } 
                 else {
-                    if ($emilfin && $emilfin->role_type != 5) {
+                    if($request->upid){
+                        $updateuser = User::where('id',$request->upid)->update([
+                            'firstname' => $parentData['firstname'],
+                            'lastname' => $parentData['lastname'],
+                            'email' => $parentData['email'],
+                            'country_code' => $parentData['country_code'],
+                            'country_code_name' => $parentData['country_code_name'],
+                            'mobile' => $parentData['mobile'],
+                            'role_type' => '5',
+                            'status' => '1'
+                        ]);
+                    }elseif ($emilfin && $emilfin->role_type != 5) {
                         return $this->response([], "Someone else has already used this email.", false, 400);
                     }elseif($emilfin && $emilfin->role_type == 5){
                         $parent_id = $emilfin->id;
@@ -559,14 +570,14 @@ class StudentController extends Controller
                         $parent_id = $user->id;
                     }
 
-                    if (!empty($parent_id)) {
+                    if (!empty($parent_id) && $user) {
                         $parnsad = Parents::create([
                             'student_id' =>  auth()->id(),
                             'parent_id' => $parent_id,
                             'relation' => $parentData['relation'],
                             'verify' => '0',
                         ]);
-                        if (empty($parnsad->id)) {
+                        if (empty($parnsad->id) && $user) {
                             User::where('id', $parent_id)->delete();
                             return $this->response([], 'Data not added Successfuly.');
                         }
@@ -2161,7 +2172,9 @@ class StudentController extends Controller
 
                 $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
                 ->where('parents.student_id', $student_id)
-                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 'users.email', 'users.country_code', 'users.country_code_name', 'users.mobile', 'parents.relation')
+                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 
+                'users.email', 'users.country_code', 'users.country_code_name',
+                 'users.mobile', 'parents.relation')
                 ->distinct()
                 ->get();
             $parents_dt = [];
@@ -2172,6 +2185,7 @@ class StudentController extends Controller
                 $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
 
                 $parents_dt[] = array(
+                    'id'=>$parentsDT->parent_id,
                     'name' => $cleanFullName,
                     'email' => $parentsDT->email,
                     'country_code' => $parentsDT->country_code,

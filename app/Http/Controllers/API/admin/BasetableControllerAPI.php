@@ -562,8 +562,8 @@ class BasetableControllerAPI extends Controller
         }
 
         try {
+            $data = [];
             foreach ($request->data as $datas) {
-
             $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
@@ -575,8 +575,9 @@ class BasetableControllerAPI extends Controller
                 ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
+                
             $institute_base_standard_id = Standard_sub::where('institute_id', $request->institute_id)->pluck('standard_id')->toArray();
-            $data = [];
+            
             foreach ($base_standards as $base_standard) {
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
@@ -593,6 +594,7 @@ class BasetableControllerAPI extends Controller
                     'standard_name' => $base_standard->name,
                     'is_added' => $isAdded
                 ];
+                
             }
             $data = array_values($data);
         }

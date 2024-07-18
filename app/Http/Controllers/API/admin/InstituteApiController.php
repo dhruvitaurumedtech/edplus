@@ -5886,8 +5886,19 @@ class InstituteApiController extends Controller
         }
 
         try {
-            $subsub = Subject_sub::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
+            $baseids = Base_table::where('board',$request->board_id)
+            ->where('medium',$request->medium)
+            ->where('standard',$request->standard_id)
+            ->first();
+            
+            $subjcts = Subject_model::where('base_table_id',$baseids->id)->pluck('id');
+            
+            // $subsub = Subject_sub::where('user_id', Auth::id())
+            //     ->where('institute_id', $request->institute_id)
+            //     ->delete();
+
+            $subsub = Subject_sub::where('institute_id', $request->institute_id)
+                ->whereIN('subject_id',$subjcts)
                 ->delete();
             if ($subsub) {
 
@@ -6215,7 +6226,7 @@ class InstituteApiController extends Controller
 
                 curl_close($ch);
             }
-            return $this->response([], "Teacher Assign successfully");
+            return $this->response([], "Teacher Add successfully");
         } catch (\Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
