@@ -278,12 +278,14 @@ class General_timetableController extends Controller
         
         $validator = validator::make($request->all(), [
             'date' => 'required',
+            'institute_id'=>'required',
         ]);
     
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        $insid = Institute_detail::where('user_id',Auth::id())->first();
+        //$insid = Institute_detail::where('user_id',Auth::id())->first();
+        
         try {
             $timtDT = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
@@ -291,7 +293,7 @@ class General_timetableController extends Controller
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
-                ->where('batches.institute_id', $insid->id)
+                ->where('batches.institute_id', $request->institute_id)
                 ->where('time_table.lecture_date', $request->date)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
@@ -328,7 +330,7 @@ class General_timetableController extends Controller
                     'teacher' => $timtable->firstname . ' ' . $timtable->lastname
                 ];
             }
-    
+            
             $data = array_values($groupedData);
     
             return $this->response($data, 'Data Fetch Successfully');
