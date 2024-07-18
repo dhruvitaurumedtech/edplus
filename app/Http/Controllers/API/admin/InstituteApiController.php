@@ -6566,6 +6566,7 @@ class InstituteApiController extends Controller
                         ->orWhere('teacher_detail.institute_id', $institute_id);
                 })
                 ->whereNotIn('roles.role_name', ['superadmin','institute','sub_admin','parent','student'])
+                ->where('teacher_detail.status',1)
                 ->distinct('users.id');
              
             if (!empty($searchTerm)) {

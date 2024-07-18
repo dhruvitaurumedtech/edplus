@@ -1,5 +1,9 @@
 <?php
 
+header('Access-Control-Allow-Headers: Access-Control-Allow-Origin, Content-Type');
+header('Access-Control-Allow-Origin: *');
+header('Content-Type: application/json, charset=utf-8');
+
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
