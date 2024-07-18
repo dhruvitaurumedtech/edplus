@@ -4512,7 +4512,7 @@ class InstituteApiController extends Controller
                     $query->where('standard_id', $standard_id);
                 })
                 ->when($batch_id, function ($query, $batch_id) {
-                    $query->where('batch_id', $batch_id);
+                    $query->orwhereRaw("FIND_IN_SET($batch_id, batch_id)");
                 })
                 
                 ->when($subject_id, function ($query, $subject_id) {
@@ -4520,8 +4520,7 @@ class InstituteApiController extends Controller
                 })
                 ->orderByDesc('created_at')
                 ->get();
-            // print_r($announcements);exit;
-
+             
             if ($announcements->isEmpty()) {
                 return $this->response([], "Data not found.", false, 400);
             }
