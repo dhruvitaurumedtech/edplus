@@ -835,22 +835,39 @@ class FeesController extends Controller
         try {
             $fees = Student_fees_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->select('total_fees')->first();
             // print_r($fees->total_fees);exit;
-            if ($fees->total_fees == 0) {
+            $discount_get = Discount_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->get();
+            $sum = 0;
+            foreach($discount_get as $value2){
+                $sum +=$value2->discount_amount;
+            }
+            
+            if($fees->total_fees == 0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
             }
-            if ($fees->total_fees <= $request->discount_amount) {
+            if($fees->total_fees <= $request->discount_amount) {
                 return $this->response([], "Discount amount is to large!", false, 404);
             }
-            if ($request->discount_by == 'Percentage') {
+            if($request->discount_by == 'Percentage') {
                 if ($request->discount_amount <= 100) {
-                    $discount_amount = $request->discount_amount;
+                    
+                    
+                    $final_amount = $fees->total_fees - $sum;
+                    if($final_amount <= $request->discount_amount)
+                    {
+                        return $this->response([], "Discount amount is to large!", false, 404);
+                        
+                    }else{
+                        $discount_amount = $request->discount_amount;
+                    }
+                    
+
                     //  $discount_amount = $fees->total_fees - $discountAmount;
                     // exit; 
                 } else {
                     return $this->response([], "Enter Discount Amount less 100.", false, 400);
                 }
             }
-            if ($request->discount_by == 'Rupee') {
+            if($request->discount_by == 'Rupee') {
 
                 $discount_amount = $request->discount_amount;
             }
