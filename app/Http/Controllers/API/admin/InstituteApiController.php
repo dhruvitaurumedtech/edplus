@@ -4511,10 +4511,14 @@ class InstituteApiController extends Controller
                 ->when($standard_id, function ($query, $standard_id) {
                     $query->where('standard_id', $standard_id);
                 })
-                ->when($batch_id, function ($query, $batch_id) {
-                    $query->orwhereRaw("FIND_IN_SET($batch_id, batch_id)");
+                ->when($batch_id, function ($query) use ($batch_id) {
+                    $batch_ids = explode(',', $batch_id);
+                    $query->where(function ($query) use ($batch_ids) {
+                        foreach ($batch_ids as $id) {
+                            $query->orWhereRaw("FIND_IN_SET(?, batch_id)", [$id]);
+                        }
+                    });
                 })
-                
                 ->when($subject_id, function ($query, $subject_id) {
                     $query->where('subject_id', $subject_id);
                 })
@@ -6288,14 +6292,16 @@ class InstituteApiController extends Controller
                     foreach ($standard_list as $standard_value) {
                         $standard_array[] = ['standard' => $standard_value['standard_name']];
                     }
-
+                    $teacher_image=User::where('id',$value['teacher_id'])->first();
                     $response[] = [
                         'teacher_id' => $value['teacher_id'],
                         'teacher_image'=>!empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
-                        'standard' => $standard_array
+                        'standard' => $standard_array,
+                        'teacher_image' => (!empty($teacher_image->image)) ? asset($teacher_image->image) : asset('profile/no-image.png'),
                     ];
+                    
                 }
             }
 
