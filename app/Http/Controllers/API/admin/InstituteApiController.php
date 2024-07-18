@@ -6562,7 +6562,6 @@ class InstituteApiController extends Controller
                 ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
                 ->select('users.*', 'roles.role_name')
                 ->where('teacher_detail.status',1)
-                ->where('users.status',1)
                 ->where(function ($query) use ($institute_id) {
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
