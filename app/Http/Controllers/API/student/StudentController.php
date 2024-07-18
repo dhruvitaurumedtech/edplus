@@ -540,8 +540,8 @@ class StudentController extends Controller
                 //     return $this->response([], 'email is already exist', false, 400);
                 // } 
                 else {
-                    if($request->upid){
-                        $updateuser = User::where('id',$parentData['upid'])->update([
+                    if($parentData['upid']){
+                        User::where('id',$parentData['upid'])->update([
                             'firstname' => $parentData['firstname'],
                             'lastname' => $parentData['lastname'],
                             'email' => $parentData['email'],
@@ -551,24 +551,26 @@ class StudentController extends Controller
                             'role_type' => '5',
                             'status' => '1'
                         ]);
-                    }elseif ($emilfin && $emilfin->role_type != 5) {
-                        return $this->response([], "Someone else has already used this email.", false, 400);
-                    }elseif($emilfin && $emilfin->role_type == 5){
-                        $parent_id = $emilfin->id;
-                    } else {
-                        $user = User::create([
-                            'firstname' => $parentData['firstname'],
-                            'lastname' => $parentData['lastname'],
-                            'email' => $parentData['email'],
-                            'country_code' => $parentData['country_code'],
-                            'country_code_name' => $parentData['country_code_name'],
-                            'mobile' => $parentData['mobile'],
-                            'role_type' => '5',
-                            'status' => '1'
-                        ]);
-
-                        $parent_id = $user->id;
-                    }
+                    }else{
+                        if ($emilfin && $emilfin->role_type != 5) {
+                            return $this->response([], "Someone else has already used this email.", false, 400);
+                        }elseif($emilfin && $emilfin->role_type == 5){
+                            $parent_id = $emilfin->id;
+                        } else {
+                            $user = User::create([
+                                'firstname' => $parentData['firstname'],
+                                'lastname' => $parentData['lastname'],
+                                'email' => $parentData['email'],
+                                'country_code' => $parentData['country_code'],
+                                'country_code_name' => $parentData['country_code_name'],
+                                'mobile' => $parentData['mobile'],
+                                'role_type' => '5',
+                                'status' => '1'
+                            ]);
+    
+                            $parent_id = $user->id;
+                        }
+                    }                   
 
                     if (!empty($parent_id)) {
                         $prexis = Parents::where('student_id',auth()->id())
