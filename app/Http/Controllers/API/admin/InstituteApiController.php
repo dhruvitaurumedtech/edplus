@@ -6292,13 +6292,15 @@ class InstituteApiController extends Controller
                     foreach ($standard_list as $standard_value) {
                         $standard_array[] = ['standard' => $standard_value['standard_name']];
                     }
-
+                    $teacher_image=User::where('id',$value['teacher_id'])->first();
                     $response[] = [
                         'teacher_id' => $value['teacher_id'],
                         'name' => $value['firstname'] . ' ' . $value['lastname'],
                         'qualification' => $value['qualification'],
-                        'standard' => $standard_array
+                        'standard' => $standard_array,
+                        'teacher_image' => (!empty($teacher_image->image)) ? asset($teacher_image->image) : asset('profile/no-image.png'),
                     ];
+                    
                 }
             }
 
