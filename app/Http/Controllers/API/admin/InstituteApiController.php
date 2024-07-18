@@ -3545,7 +3545,7 @@ class InstituteApiController extends Controller
                             curl_close($ch);
                         }
                         //
-                        return $this->response([], 'Successfully Insert Student.');
+                        return $this->response([], 'Request sent Successfully!');
                     } else {
                         return $this->response([], 'Not Inserted.', false, 400);
                     }
