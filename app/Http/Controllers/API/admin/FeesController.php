@@ -835,11 +835,6 @@ class FeesController extends Controller
         try {
             $fees = Student_fees_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->select('total_fees')->first();
             // print_r($fees->total_fees);exit;
-            $discount_get = Discount_model::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->get();
-            $sum = 0;
-            foreach($discount_get as $value2){
-                $sum +=$value2->discount_amount;
-            }
             
             if($fees->total_fees == 0) {
                 return $this->response([], "Fees is zero; cannot apply discount!", false, 404);
@@ -849,17 +844,24 @@ class FeesController extends Controller
             }
             if($request->discount_by == 'Percentage') {
                 if ($request->discount_amount <= 100) {
-                    
-                    
-                    $final_amount = $fees->total_fees - $sum;
-                    if($final_amount <= $request->discount_amount)
-                    {
-                        return $this->response([], "Discount amount is to large!", false, 404);
-                        
-                    }else{
-                        $discount_amount = $request->discount_amount;
-                    }
-                    
+ 
+                    $paid_amount = Fees_colletion_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $request->student_id)
+                    ->sum('payment_amount');
+                        if (!empty($paid_amount)) {
+                            $remaing_fees = $fees->total_fees - $paid_amount;
+                            if($remaing_fees<=$request->discount_amount){
+                                return $this->response([], "Discount amount is to large!", false, 404);
+                            }else
+                            {
+                                $discount_amount = $request->discount_amount;
+
+                            } 
+                        } else{
+                            $discount_amount = $request->discount_amount;
+
+                        }
+
 
                     //  $discount_amount = $fees->total_fees - $discountAmount;
                     // exit; 
