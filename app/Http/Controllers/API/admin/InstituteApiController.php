@@ -5390,7 +5390,9 @@ class InstituteApiController extends Controller
                 $logo_image = $request->file('logo');
                 $imagePath = $logo_image->store('logo', 'public');
             }
+            
             if ($imagePath !== null) {
+                // print_r($imagePath);exit;
                 $institutedt->logo = $imagePath;
             }
             $imagePath2 = null;
@@ -5893,7 +5895,9 @@ class InstituteApiController extends Controller
             // $subsub = Subject_sub::where('user_id', Auth::id())
             //     ->where('institute_id', $request->institute_id)
             //     ->delete();
-
+            
+            $subject_amount=Subject_sub::where('institute_id', $request->institute_id)->whereIN('subject_id',$subjcts)->pluck('amount', 'subject_id');
+            
             $subsub = Subject_sub::where('institute_id', $request->institute_id)
                 ->whereIN('subject_id',$subjcts)
                 ->delete();
@@ -5905,7 +5909,8 @@ class InstituteApiController extends Controller
                     $subcts = Subject_sub::create([
                         'user_id' => Auth::id(),
                         'institute_id' => $request->institute_id,
-                        'subject_id' => $subjids
+                        'subject_id' => $subjids,
+                        'amount'=>$subject_amount[$subjids] ?? 0,
                     ]);
                 }
             }
