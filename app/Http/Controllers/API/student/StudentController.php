@@ -1232,7 +1232,7 @@ class StudentController extends Controller
             $totalattendlec = [
                 'total_lectures' => $totalLectures,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => $totalmissattlec
+                'miss_lectures' => max(0, $totalLectures - $totalattlec) //$totalmissattlec
             ];
             $studentdata = [
                 'banners_data' => $banners_data,
