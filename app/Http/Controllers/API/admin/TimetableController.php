@@ -65,6 +65,14 @@ class TimetableController extends Controller
     }
 
     try {
+        
+        $startTime = Carbon::createFromFormat('H:i:s', $request->start_time);
+        $endTime = Carbon::createFromFormat('H:i:s', $request->end_time);
+        
+        if ($startTime->diffInMinutes($endTime, false) < 30) {
+            return $this->response([], "Minimum lecture time should be 30 min.", false, 400);
+        }
+        
         //DB::beginTransaction();
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
