@@ -274,8 +274,10 @@ class ParentsController extends Controller
             $announcQY = announcements_model::where('institute_id', $getstdntdata->institute_id)
             ->where('standard_id', $getstdntdata->standard_id)
             ->WhereRaw("FIND_IN_SET($getstdntdata->batch_id, batch_id)")
-                ->whereRaw("FIND_IN_SET('6', role_type)")
-                ->whereRaw("FIND_IN_SET('5', role_type)")
+            ->where(function($query) {
+                $query->whereRaw("FIND_IN_SET('6', role_type)")
+                      ->orWhereRaw("FIND_IN_SET('5', role_type)");
+            })
                 ->whereNull('deleted_at')
                 ->orderByDesc('created_at')
                 ->get();
