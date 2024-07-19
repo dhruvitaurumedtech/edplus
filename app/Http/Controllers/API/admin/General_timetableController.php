@@ -291,13 +291,16 @@ class General_timetableController extends Controller
                 ->join('users', 'users.id', '=', 'time_table.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
                 ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+                ->join('board', 'board.id', '=', 'batches.board_id')
+                ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
                 ->where('batches.institute_id', $request->institute_id)
                 ->where('time_table.lecture_date', $request->date)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
-                    'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
+                    'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'time_table.*', 
+                    'standard.name as standard','board.name as board','medium.name as medium')
                 ->orderBy('time_table.start_time', 'asc')
                 ->get();
     
@@ -321,6 +324,10 @@ class General_timetableController extends Controller
                     'subject' => $timtable->subject,
                     'lecture_type_id' => $timtable->lecture_type,
                     'lecture_type' => $timtable->lecture_type_name,
+                    'board_id'=>$timtable->board_id,
+                    'board'=>$timtable->board,
+                    'medium_id'=>$timtable->medium_id,
+                    'medium'=>$timtable->medium,
                     'standard_id' => $timtable->standard_id,
                     'standard' => $timtable->standard,
                     'batch_id' => $timtable->batch_id,
