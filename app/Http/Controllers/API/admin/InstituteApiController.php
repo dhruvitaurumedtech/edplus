@@ -4522,6 +4522,7 @@ class InstituteApiController extends Controller
                 ->when($subject_id, function ($query, $subject_id) {
                     $query->where('subject_id', $subject_id);
                 })
+                ->whereNull('deleted_at')
                 ->orderByDesc('created_at')
                 ->get();
              
