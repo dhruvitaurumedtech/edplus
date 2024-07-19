@@ -385,7 +385,7 @@ class ParentsController extends Controller
             $totalattendlec = array(
                 'total_lectures' => $totllect,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => $totalmissattlec 
+                'miss_lectures' => max(0, $totllect - $totalattlec) //$totalmissattlec 
             );
         $data = [
             'banners_data'=>$banners_data,
