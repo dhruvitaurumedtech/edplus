@@ -635,6 +635,7 @@ class TeacherController extends Controller
                    
 
             $teacher_response = [];
+            $processed_batches = [];
             foreach ($teacher_data as $value) {
 
                 $batchIds = explode(',', $value['batch_id']);
@@ -642,9 +643,10 @@ class TeacherController extends Controller
                 // ->select('id','batch_name')
                 // ->groupBy('id', 'batch_name')
                 ->get();
-                    
 
                 foreach ($batches_Data as $batch) {
+                    $unique_key = $value['standard_id'] . '_' . $batch->id;
+                    if (!isset($processed_batches[$unique_key])) {
                     $teacher_response[] = [
                         'board' => $value['board_name'],
                         'standard_id' => $value['standard_id'],
@@ -653,7 +655,9 @@ class TeacherController extends Controller
                         'batch_id' => $batch->id,
                         'batch' => $batch->batch_name
                     ];
+                    $processed_batches[$unique_key] = true;
                 }
+            }
             }
             $studentdata = array(
                 'banners_data' => $banners_data,
