@@ -4161,7 +4161,7 @@ class InstituteApiController extends Controller
                     $teachersId = Teacher_model::where('institute_id', $announcement->institute_id)
                         ->where('board_id', $announcement->board_id)
                         ->where('medium_id', $announcement->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         // ->where('subject_id', $announcement->subject_id)
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('teacher_id');
@@ -4173,7 +4173,7 @@ class InstituteApiController extends Controller
                     $studentId = Student_detail::where('institute_id', $announcement->institute_id)
                         ->where('board_id', $announcement->board_id)
                         ->where('medium_id', $announcement->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         // ->where('subject_id', $announcement->subject_id)
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('student_id');
@@ -4186,7 +4186,7 @@ class InstituteApiController extends Controller
                     $studentId = Student_detail::where('institute_id', $request->institute_id)
                         ->where('board_id', $request->board_id)
                         ->where('medium_id', $request->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('student_id');
                     // print_r($studentId);exit;
