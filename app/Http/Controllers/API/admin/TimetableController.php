@@ -328,6 +328,7 @@ class TimetableController extends Controller
                     'standard' => $timtable->standard,
                     'batch_id' => $timtable->batch_id,
                     'batch_name' => $timtable->batch_name,
+                    'class_room_id'=>$timtable->class_room_id,
                     'class_room'=>$timtable->class_room,
                     'teacher_id' => $timtable->teacher_id,
                     'teacher' => $timtable->firstname . ' ' . $timtable->lastname
