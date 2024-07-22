@@ -1896,7 +1896,7 @@ class StudentController extends Controller
                         ->groupBy('topic.video_category_id');
                 })
                 ->get();
-
+         
             $response = [];
             foreach ($category as $catvd) {
                 $topics = Topic_model::join('subject', 'subject.id', '=', 'topic.subject_id')
@@ -1909,82 +1909,74 @@ class StudentController extends Controller
                     ->where('topic.video_category_id', $catvd->id)
                     ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                     ->orderByDesc('topic.created_at')
-                    ->get();
+                    ->get()->toarray();
+                    if(!empty($topics))  {
+                     
+                        $topicsArray = [];
+                        foreach ($topics as $topval) {
+                            if (Auth::user()->role_type == 6) {
 
-                $topicsArray = [];
-                foreach ($topics as $topval) {
-                    // $status = Auth::user()->role_type == 6 ? VideoAssignToBatch::where('batch_id', Student_detail::where('institute_id', $institute_id)->where('student_id', $user_id)->first()->batch_id)
-                    //     ->where('video_id', $topval->id)
-                    //     ->where('standard_id', $topval->standard_id)
-                    //     ->where('chapter_id', $topval->chapter_id)
-                    //     ->where('subject_id', $topval->subject_id)
-                    //     ->exists() : false;
+                                $batch_list = [];
+                            }
+                            if (Auth::user()->role_type == 4) {
 
-
-                    // // $batch_response = [];
-
-                    // if (!$status) {
-
-                    //     $batch_list = Batches_model::where('institute_id', $institute_id)
-                    //         ->where('user_id', $user_id)
-                    //         ->whereRaw("FIND_IN_SET($subject_id,subjects)")
-                    //         ->select('id', 'batch_name')
-                    //         ->get();
-
-                    //     $batch_response = $batch_list->map(function ($batch) {
-                    //         return [
-                    //             'batch_id' => $batch->id,
-                    //             'batch_name' => $batch->batch_name,
-                    //             'assign_status'=>($batch->assign_status==1)?true:false,  
-
-                    //         ];
-                    //     })->toArray();
-                    // }
-                    if (Auth::user()->role_type == 6) {
-
-                        $batch_list = [];
-                    }
-                    if (Auth::user()->role_type == 3) {
-
-                        $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
-                            ->where('video_assignbatch.video_id', $topval->id)
-                            ->where('video_assignbatch.standard_id', $topval->standard_id)
-                            ->where('video_assignbatch.chapter_id', $topval->chapter_id)
-                            ->where('video_assignbatch.subject_id', $topval->subject_id)
-                            ->Select('batches.*', 'video_assignbatch.assign_status')
-                            ->get();
-                        $batch_list = [];
-                        foreach ($reponse_video as $value) {
-                            $batch_list[] = [
-                                'batch_id' => $value->id,
-                                'batch_name' => $value->batch_name,
-                                'status' => ($value->assign_status == 1) ? true : false,
+                                $batch_list = [];
+                            }
+                            if (Auth::user()->role_type == 3) {
+                               
+                                $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
+                                    ->where('video_assignbatch.video_id', $topval['id'])
+                                    ->where('video_assignbatch.standard_id', $topval['standard_id'])
+                                    ->where('video_assignbatch.chapter_id', $topval['chapter_id'])
+                                    ->where('video_assignbatch.subject_id', $topval['subject_id'])
+                                    ->Select('batches.*', 'video_assignbatch.assign_status')
+                                    ->get();
+                                    
+                        
+                                    $batch_list = [];
+                                    $allTrue = true;
+                                foreach ($reponse_video as $value) {
+                                    $status = ($value->assign_status == 1) ? true : false;
+                                    $batch_list[] = [
+                                        'batch_id' => $value->id,
+                                        'batch_name' => $value->batch_name,
+                                        'status' => ($value->assign_status == 1) ? true : false,
+                                    ];
+                                    if (!$status) {
+                                            $allTrue = false; // If any status is false, set $allTrue to false
+                                        }
+                                }
+                                if(empty($batch_list)){
+                                 $final_status = false;
+                                }else{
+                                 $final_status = $allTrue ? true : false;
+                           
+                                }
+                            }
+                            $topicsArray[] = [
+                                "id" => $topval['id'],
+                                "topic_no" => $topval['topic_no'],
+                                "topic_name" => $topval['topic_name'] . '',
+                                "topic_video" => asset($topval['topic_video']),
+                                "subject_id" => $topval['subject_id'],
+                                "subject_name" => $topval['sname'],
+                                "chapter_id" => $topval['chapter_id'],
+                                "chapter_name" => $topval['chname'],
+                                "status" => $final_status,
+                                "batch_list" => $batch_list,
                             ];
                         }
-                        // echo "<pre>";print_r($reponse_video);exit;   
-                    }
-                    $topicsArray[] = [
-                        "id" => $topval->id,
-                        "topic_no" => $topval->topic_no,
-                        "topic_name" => $topval->topic_name . '',
-                        "topic_video" => asset($topval->topic_video),
-                        "subject_id" => $topval->subject_id,
-                        "subject_name" => $topval->sname,
-                        "chapter_id" => $topval->chapter_id,
-                        "chapter_name" => $topval->chname,
-                        // "status" => ($topval->status==0)?false:True,
-                        "batch_list" => $batch_list,
-                    ];
+                
+                        $response[] = [
+                            'id' => $catvd->id,
+                            'category_name' => $catvd->name,
+                            'parent_category_id' => $catvd->vid,
+                            'parent_category_name' => $catvd->vname,
+                            'topics' => $topicsArray
+                        ];
                 }
-
-                $response[] = [
-                    'id' => $catvd->id,
-                    'category_name' => $catvd->name,
-                    'parent_category_id' => $catvd->vid,
-                    'parent_category_name' => $catvd->vname,
-                    'topics' => $topicsArray
-                ];
             }
+            
 
             return $this->response($response, "Successfully fetch data.");
         } catch (Exception $e) {

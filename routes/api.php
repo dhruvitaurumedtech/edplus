@@ -1,9 +1,5 @@
 <?php
 
-header('Access-Control-Allow-Headers: Access-Control-Allow-Origin, Content-Type');
-header('Access-Control-Allow-Origin: *');
-header('Content-Type: application/json, charset=utf-8');
-
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
@@ -67,6 +63,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-request-list', [InstituteApiController::class, 'get_request_list'])->name('request_list.get')->middleware('check.permission:11,4');
     Route::post('/institute/get-reject-request', [InstituteApiController::class, 'get_reject_request'])->name('reject.get_reject_request')->middleware('check.permission:12,1');
     Route::post('/institute/get-reject-request-list', [InstituteApiController::class, 'get_reject_request_list'])->name('reject.request_list.get')->middleware('check.permission:11,4');
+    Route::post('/institute/student-reject-convert', [InstituteApiController::class, 'get_accept_request_convert'])->name('reject.request_list.get')->middleware('check.permission:11,4');
     Route::post('/institute/fetch_student_detail', [InstituteApiController::class, 'fetch_student_detail'])->name('fetch_student_detail')->middleware('check.permission:11,4');
     Route::post('/institute/add-exam', [ExamController::class, 'add_exam'])->name('add_exam')->middleware('check.permission:2,1');
     Route::post('/institute/get-exam', [ExamController::class, 'get_exam'])->name('get_exam')->middleware('check.permission:2,4');
@@ -174,6 +171,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/join-with-teacher', [TeacherController::class, 'join_with_teacher']);
     Route::post('/teacher/get-teacher-request-list', [TeacherController::class, 'get_teacher_request_list'])->middleware('check.permission:13,4');
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request'])->middleware('check.permission:14,4');
+    Route::post('/teacher/teacher-reject-convert', [TeacherController::class, 'teacher_accept_request'])->middleware('check.permission:14,4');
+
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list'])->middleware('check.permission:13,4');
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);

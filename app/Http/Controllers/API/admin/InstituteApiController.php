@@ -2669,6 +2669,20 @@ class InstituteApiController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
+    public function get_accept_request_convert(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'student_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '0']);
+           
+            return $this->response([], "Successfully Request Convert.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
 
     // public function get_reject_request_list(Request $request)
     // {
@@ -2734,14 +2748,17 @@ class InstituteApiController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '2']);
+            $i=Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->pluck('reject');
+            $reject = $i + 1; 
+            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' =>'2','reject_count'=>$reject]);
+            
             $serverKey = env('SERVER_KEY');
 
             $url = "https://fcm.googleapis.com/fcm/send";
             $users = User::where('id', $request->student_id)->pluck('device_key');
 
-            $notificationTitle = "Your Request Rejected successfully!!";
-            $notificationBody = "Your Teacher Request Rejected successfully!!";
+            $notificationTitle = "Your Request Rejected!!";
+            $notificationBody = "Your Teacher Request Rejected!!";
 
             $data = [
                 'registration_ids' => $users,
@@ -3195,6 +3212,7 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
 
+
         try {
             // DB::beginTransaction();
             $institute_id = $request->institute_id;
@@ -3213,6 +3231,7 @@ class InstituteApiController extends Controller
             $batch_id = $request->batch_id;
             $studentdtls = Student_detail::where('student_id', $student_id)
                 ->where('institute_id', $institute_id)->first();
+            
             $insdelQY = Standard_sub::where('board_id', $request->board_id)
                 ->where('medium_id', $request->medium_id)
                 ->where('standard_id', $request->standard_id)
@@ -4167,7 +4186,7 @@ class InstituteApiController extends Controller
                         ->pluck('teacher_id');
                     $combinedIds = array_merge($combinedIds, $teachersId->toArray());
                 }
-
+            
                 // Check for role type 5
                 if (in_array('5', $roleTypes)) {
                     $studentId = Student_detail::where('institute_id', $announcement->institute_id)
@@ -4199,7 +4218,7 @@ class InstituteApiController extends Controller
                 $users = User::whereIn('id', $combinedIds)->where('device_key', '!=', null)->get();
                 $url = "https://fcm.googleapis.com/fcm/send";
                 $registrationIds = $users->pluck('device_key')->toArray();
-
+               
                 $notificationTitle = $announcement->title;
                 $notificationBody = $announcement->detail;
 
@@ -4488,7 +4507,7 @@ class InstituteApiController extends Controller
         }
 
         try {
-            $user_id = $request->user_id;
+            // $user_id = $request->user_id;
             $institute_id = $request->institute_id;
             $board_id = $request->board_id;
             $standard_id = $request->standard_id;
@@ -4497,8 +4516,9 @@ class InstituteApiController extends Controller
             $searchData = $request->searchData;
 
 
-            $announcements = announcements_model::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
+            
+                //   where('user_id', $user_id)
+                $announcements = announcements_model::where('institute_id', $institute_id)
                 ->when($searchData, function ($query, $searchData) {
                     $query->where(function ($query) use ($searchData) {
                         $query->where('title', 'like', '%' . $searchData . '%')
@@ -5389,8 +5409,8 @@ class InstituteApiController extends Controller
             $institutedt->facebook_link = $request->facebook_link;
             $institutedt->whatsaap_link = $request->whatsaap_link;
             $institutedt->youtube_link = $request->youtube_link;
-            $institutedt->start_academic_year = $request->start_academic_year;
-            $institutedt->end_academic_year = $request->end_academic_year;
+            $institutedt->start_academic_year = date('Y-m-d',strtotime($request->start_academic_year));
+            $institutedt->end_academic_year = date('Y-m-d',strtotime($request->end_academic_year));
             $imagePath = null;
             if ($request->hasFile('logo')) {
                 $logo_image = $request->file('logo');
@@ -6161,6 +6181,7 @@ class InstituteApiController extends Controller
             $teacher_detail = json_decode($request->teacher_detail, true);
             foreach($teacher_detail as $teacherDT){
                 $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
+                
                 if ($teacherDetail) {
                     $teacherDetail->update([
                         'board_id' => $teacherDT['board_id'],

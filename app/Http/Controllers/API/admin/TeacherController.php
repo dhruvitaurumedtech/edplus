@@ -851,7 +851,9 @@ class TeacherController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
+            $i=Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->pluck('reject_count');
+            $reject =$i+1;
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2','reject_count'=>$reject]);
             $serverKey = env('SERVER_KEY');
 
 
@@ -859,7 +861,7 @@ class TeacherController extends Controller
             $users = User::where('id', $request->teacher_id)->pluck('device_key');
 
             $notificationTitle = "Your Request Rejected";
-            $notificationBody = "Your Teacher Request Rejected successfully!!";
+            $notificationBody = "Your Teacher Request Rejected!!";
 
             $data = [
                 'registration_ids' => $users,
@@ -900,6 +902,19 @@ class TeacherController extends Controller
                 curl_close($ch);
             }
             return $this->response([], "Successfully Reject Request.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
+    public function teacher_accept_request(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'teacher_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '0']);
+            return $this->response([], "Successfully Request Convert.");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
