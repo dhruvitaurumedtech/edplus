@@ -2748,14 +2748,17 @@ class InstituteApiController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '2']);
+            $i=Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->pluck('reject');
+            $reject = $i + 1; 
+            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' =>'2','reject_count'=>$reject]);
+            
             $serverKey = env('SERVER_KEY');
 
             $url = "https://fcm.googleapis.com/fcm/send";
             $users = User::where('id', $request->student_id)->pluck('device_key');
 
-            $notificationTitle = "Your Request Rejected successfully!!";
-            $notificationBody = "Your Teacher Request Rejected successfully!!";
+            $notificationTitle = "Your Request Rejected!!";
+            $notificationBody = "Your Teacher Request Rejected!!";
 
             $data = [
                 'registration_ids' => $users,
@@ -3209,6 +3212,7 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
 
+
         try {
             // DB::beginTransaction();
             $institute_id = $request->institute_id;
@@ -3227,6 +3231,9 @@ class InstituteApiController extends Controller
             $batch_id = $request->batch_id;
             $studentdtls = Student_detail::where('student_id', $student_id)
                 ->where('institute_id', $institute_id)->first();
+                if($studentdtls->reject_count==2){
+                    return $this->response([], "Two time reject request account is blocked!!", false, 400);
+                }
             $insdelQY = Standard_sub::where('board_id', $request->board_id)
                 ->where('medium_id', $request->medium_id)
                 ->where('standard_id', $request->standard_id)
@@ -6176,6 +6183,9 @@ class InstituteApiController extends Controller
             $teacher_detail = json_decode($request->teacher_detail, true);
             foreach($teacher_detail as $teacherDT){
                 $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
+                if($teacherDT['reject_count']==2){
+                    return $this->response([], "Two time reject account blocked!!", false, 400);
+                }
                 if ($teacherDetail) {
                     $teacherDetail->update([
                         'board_id' => $teacherDT['board_id'],
