@@ -4161,7 +4161,7 @@ class InstituteApiController extends Controller
                     $teachersId = Teacher_model::where('institute_id', $announcement->institute_id)
                         ->where('board_id', $announcement->board_id)
                         ->where('medium_id', $announcement->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         // ->where('subject_id', $announcement->subject_id)
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('teacher_id');
@@ -4173,7 +4173,7 @@ class InstituteApiController extends Controller
                     $studentId = Student_detail::where('institute_id', $announcement->institute_id)
                         ->where('board_id', $announcement->board_id)
                         ->where('medium_id', $announcement->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         // ->where('subject_id', $announcement->subject_id)
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('student_id');
@@ -4186,7 +4186,7 @@ class InstituteApiController extends Controller
                     $studentId = Student_detail::where('institute_id', $request->institute_id)
                         ->where('board_id', $request->board_id)
                         ->where('medium_id', $request->medium_id)
-                        ->where('status', 1)
+                        ->where('status', '1')
                         ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
                         ->pluck('student_id');
                     // print_r($studentId);exit;
@@ -4522,6 +4522,7 @@ class InstituteApiController extends Controller
                 ->when($subject_id, function ($query, $subject_id) {
                     $query->where('subject_id', $subject_id);
                 })
+                ->whereNull('deleted_at')
                 ->orderByDesc('created_at')
                 ->get();
              
@@ -6261,7 +6262,7 @@ class InstituteApiController extends Controller
                 ->where('teacher_detail.institute_id', $request->institute_id)
                 ->where('teacher_detail.status', '1')
                 ->select('users.id', 'users.firstname', 'users.lastname','users.image', 'teacher_detail.teacher_id', 'users.qualification')
-                ->groupBy('users.id', 'users.firstname', 'users.lastname', 'teacher_detail.teacher_id', 'users.qualification');
+                ->groupBy('users.id', 'users.firstname', 'users.lastname','users.image', 'teacher_detail.teacher_id', 'users.qualification');
 
             if (!empty($request->subject_id)) {
                 $teacher_data->where(function ($query) use ($request) {
@@ -6561,7 +6562,7 @@ class InstituteApiController extends Controller
                 ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
                 ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
                 ->select('users.*', 'roles.role_name')
-                ->where('teacher_detail.status',1)
+                ->where('teacher_detail.status','1')
                 ->where(function ($query) use ($institute_id) {
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);

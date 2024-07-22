@@ -65,6 +65,14 @@ class TimetableController extends Controller
     }
 
     try {
+        
+        $startTime = Carbon::createFromFormat('H:i:s', $request->start_time);
+        $endTime = Carbon::createFromFormat('H:i:s', $request->end_time);
+        
+        if ($startTime->diffInMinutes($endTime, false) < 30) {
+            return $this->response([], "Minimum lecture time should be 30 min.", false, 400);
+        }
+        
         //DB::beginTransaction();
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
@@ -328,6 +336,7 @@ class TimetableController extends Controller
                     'standard' => $timtable->standard,
                     'batch_id' => $timtable->batch_id,
                     'batch_name' => $timtable->batch_name,
+                    'class_room_id'=>$timtable->class_room_id,
                     'class_room'=>$timtable->class_room,
                     'teacher_id' => $timtable->teacher_id,
                     'teacher' => $timtable->firstname . ' ' . $timtable->lastname

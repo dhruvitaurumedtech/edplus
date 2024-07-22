@@ -88,9 +88,15 @@ class AuthController extends Controller
                 $user->save();
             }
             $user = User::find($user->id);
+            $tomail = $ssoUser->user['email'];
+            Mail::send('emails.welcomemailtogooglelogin', ['name'=>$firstname], function ($message) use ($tomail) {
+                $message->to($tomail);
+                $message->subject('Verification Code');
+              });
+
             return $this->login_res($user);
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went Wrong!!", false, 400);
         }
     }
 

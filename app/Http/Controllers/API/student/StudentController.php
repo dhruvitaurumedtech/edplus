@@ -558,6 +558,13 @@ class StudentController extends Controller
                         }
                         User::where('id', $parentData['upid'])->update($updateData);
 
+                        $parnsad = Parents::where('student_id',auth()->id())
+                        ->where('parent_id',$parentData['upid'])
+                        ->where('verify','0')
+                        ->update([
+                            'relation' => $parentData['relation'],
+                        ]);
+
                     }else{
                         if ($emilfin && $emilfin->role_type != 5) {
                             return $this->response([], "Someone else has already used this email.", false, 400);
@@ -1027,6 +1034,7 @@ class StudentController extends Controller
             $institute_id = $request->institute_id;
             $getstdntdata = Student_detail::where('institute_id', $request->institute_id)
             ->where('student_id',$user_id)
+            ->where('status', '=', '1')
             ->whereNull('deleted_at')
             ->first();
             $bannerss = Banner_model::where('status', 'active')
@@ -1092,10 +1100,12 @@ class StudentController extends Controller
             $examlist = [];
             $announcQY = announcements_model::where('institute_id', $institute_id)
                 ->where('standard_id', $getstdntdata->standard_id)
-                ->where('batch_id', $getstdntdata->batch_id)
+                ->WhereRaw("FIND_IN_SET($getstdntdata->batch_id, batch_id)")
                 ->whereRaw("FIND_IN_SET('6', role_type)")
+                ->whereNull('deleted_at')
                 ->orderByDesc('created_at')
                 ->get();
+                
             foreach ($announcQY as $announcDT) {
                 $announcement[] = array(
                     'title' => $announcDT->title,
@@ -1222,7 +1232,7 @@ class StudentController extends Controller
             $totalattendlec = [
                 'total_lectures' => $totalLectures,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => $totalmissattlec
+                'miss_lectures' => max(0, $totalLectures - $totalattlec) //$totalmissattlec
             ];
             $studentdata = [
                 'banners_data' => $banners_data,
@@ -2153,7 +2163,10 @@ class StudentController extends Controller
                 
             foreach ($joininstitute as $value) {
                 $substdnt = Student_detail::where('student_id', $student_id)
-                    ->where('institute_id', $value->id)->first();
+                    ->where('institute_id', $value->id)
+                    ->where('status', '=', '1')
+                    ->whereNull('deleted_at')
+                    ->first();
                 if ($substdnt) {
                     $subids = explode(',', $substdnt->subject_id);
                     $subjectids = Subject_model::whereIn('id', $subids)->get();
@@ -3113,7 +3126,10 @@ class StudentController extends Controller
             }
 
             $stdntdata = Student_detail::where('student_id', $studentID)
-                ->where('institute_id', $request->institute_id)->first();
+                ->where('institute_id', $request->institute_id)
+                ->where('status', '=', '1')
+                ->whereNull('deleted_at')
+                ->first();
 
             $lectures = [];
             if ($stdntdata) {
@@ -3203,7 +3219,6 @@ class StudentController extends Controller
 
     public function announcementlist(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
         ]);
@@ -3219,11 +3234,17 @@ class StudentController extends Controller
             }
             $announcement = [];
             $getstdntdata = Student_detail::where('student_id', $student_id)
-                ->where('institute_id', $request->institute_id)->first();
+                ->where('institute_id', $request->institute_id)
+                ->where('status', '=', '1')
+                ->whereNull('deleted_at')
+                ->first();
             if (!empty($getstdntdata)) {
                 $announcQY = announcements_model::where('institute_id', $request->institute_id)
                     ->where('batch_id', $getstdntdata->batch_id)
                     ->whereRaw("FIND_IN_SET('6', role_type)")
+                    ->when($request->child_id ,function($query){
+                        $query->orwhereRaw("FIND_IN_SET('5', role_type)");
+                    })
                     ->orderByDesc('created_at')
                     ->get();
 
