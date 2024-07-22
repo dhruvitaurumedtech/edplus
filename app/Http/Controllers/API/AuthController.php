@@ -317,15 +317,9 @@ class AuthController extends Controller
     public function logout(Request $request)
     {
         try {
-            $user = User::where('id', Auth::user()->id)->first();
-            if(!isset($user)){
-                $user = new User();
-                $user->device_key = '';
-                $user->save();
-             }
-            
             $user = Auth::user();
             $user->token = '';
+            $user->device_key = '';
             $user->save();
             Auth::logout();
             return $this->response([], "Successfully logged out");
