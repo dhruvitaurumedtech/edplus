@@ -4488,7 +4488,7 @@ class InstituteApiController extends Controller
         }
 
         try {
-            $user_id = $request->user_id;
+            // $user_id = $request->user_id;
             $institute_id = $request->institute_id;
             $board_id = $request->board_id;
             $standard_id = $request->standard_id;
@@ -4497,8 +4497,9 @@ class InstituteApiController extends Controller
             $searchData = $request->searchData;
 
 
-            $announcements = announcements_model::where('user_id', $user_id)
-                ->where('institute_id', $institute_id)
+            
+                //   where('user_id', $user_id)
+                $announcements = announcements_model::where('institute_id', $institute_id)
                 ->when($searchData, function ($query, $searchData) {
                     $query->where(function ($query) use ($searchData) {
                         $query->where('title', 'like', '%' . $searchData . '%')
