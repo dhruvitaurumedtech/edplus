@@ -4167,7 +4167,7 @@ class InstituteApiController extends Controller
                         ->pluck('teacher_id');
                     $combinedIds = array_merge($combinedIds, $teachersId->toArray());
                 }
-
+            
                 // Check for role type 5
                 if (in_array('5', $roleTypes)) {
                     $studentId = Student_detail::where('institute_id', $announcement->institute_id)
@@ -4199,7 +4199,7 @@ class InstituteApiController extends Controller
                 $users = User::whereIn('id', $combinedIds)->where('device_key', '!=', null)->get();
                 $url = "https://fcm.googleapis.com/fcm/send";
                 $registrationIds = $users->pluck('device_key')->toArray();
-
+               
                 $notificationTitle = $announcement->title;
                 $notificationBody = $announcement->detail;
 
