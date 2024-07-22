@@ -81,6 +81,7 @@ class AttendanceController extends Controller
             'batch_id' => 'required|integer',
             'subject_id' => 'required|integer',
             'status' => 'required|in:P,A',
+            'date' => ['required', 'date', 'before_or_equal:today'],
         ]);
 
         if ($validator->fails()) {
