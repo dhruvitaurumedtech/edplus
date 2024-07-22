@@ -904,6 +904,19 @@ class TeacherController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
+    public function teacher_accept_request(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'teacher_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '0']);
+            return $this->response([], "Successfully Request Convert.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
     public function get_teacher_reject_request_list(Request $request)
     {
         $validator = Validator::make($request->all(), [

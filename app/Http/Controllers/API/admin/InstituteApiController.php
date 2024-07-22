@@ -2669,6 +2669,20 @@ class InstituteApiController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
+    public function get_accept_request_convert(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'student_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+        try {
+            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' => '0']);
+           
+            return $this->response([], "Successfully Request Convert.");
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
 
     // public function get_reject_request_list(Request $request)
     // {
