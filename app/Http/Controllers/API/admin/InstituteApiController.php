@@ -5390,8 +5390,8 @@ class InstituteApiController extends Controller
             $institutedt->facebook_link = $request->facebook_link;
             $institutedt->whatsaap_link = $request->whatsaap_link;
             $institutedt->youtube_link = $request->youtube_link;
-            $institutedt->start_academic_year = $request->start_academic_year;
-            $institutedt->end_academic_year = $request->end_academic_year;
+            $institutedt->start_academic_year = date('Y-m-d',strtotime($request->start_academic_year));
+            $institutedt->end_academic_year = date('Y-m-d',strtotime($request->end_academic_year));
             $imagePath = null;
             if ($request->hasFile('logo')) {
                 $logo_image = $request->file('logo');
