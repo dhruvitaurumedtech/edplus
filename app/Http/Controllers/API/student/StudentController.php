@@ -1934,12 +1934,23 @@ class StudentController extends Controller
                                     
                         
                                     $batch_list = [];
+                                    $allTrue = true;
                                 foreach ($reponse_video as $value) {
+                                    $status = ($value->assign_status == 1) ? true : false;
                                     $batch_list[] = [
                                         'batch_id' => $value->id,
                                         'batch_name' => $value->batch_name,
                                         'status' => ($value->assign_status == 1) ? true : false,
                                     ];
+                                    if (!$status) {
+                                            $allTrue = false; // If any status is false, set $allTrue to false
+                                        }
+                                }
+                                if(empty($batch_list)){
+                                 $final_status = false;
+                                }else{
+                                 $final_status = $allTrue ? true : false;
+                           
                                 }
                             }
                             $topicsArray[] = [
@@ -1951,7 +1962,7 @@ class StudentController extends Controller
                                 "subject_name" => $topval['sname'],
                                 "chapter_id" => $topval['chapter_id'],
                                 "chapter_name" => $topval['chname'],
-                                // "status" => ($topval->status==0)?false:True,
+                                "status" => $final_status,
                                 "batch_list" => $batch_list,
                             ];
                         }
