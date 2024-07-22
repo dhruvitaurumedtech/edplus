@@ -3231,9 +3231,7 @@ class InstituteApiController extends Controller
             $batch_id = $request->batch_id;
             $studentdtls = Student_detail::where('student_id', $student_id)
                 ->where('institute_id', $institute_id)->first();
-                if($studentdtls->reject_count==3){
-                    return $this->response([], "Two time reject request account is blocked!!", false, 400);
-                }
+            
             $insdelQY = Standard_sub::where('board_id', $request->board_id)
                 ->where('medium_id', $request->medium_id)
                 ->where('standard_id', $request->standard_id)
@@ -6183,9 +6181,7 @@ class InstituteApiController extends Controller
             $teacher_detail = json_decode($request->teacher_detail, true);
             foreach($teacher_detail as $teacherDT){
                 $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
-                if($teacherDT['reject_count']==3){
-                    return $this->response([], "Two time reject account blocked!!", false, 400);
-                }
+                
                 if ($teacherDetail) {
                     $teacherDetail->update([
                         'board_id' => $teacherDT['board_id'],
