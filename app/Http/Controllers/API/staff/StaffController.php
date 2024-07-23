@@ -261,7 +261,7 @@ class StaffController extends Controller
                 }
             }
             $cacheKey = "user_permissions_{$user->id}";
-            Cache::put($cacheKey, $modules, now()->addHours(8));
+            Cache::put($cacheKey, $modules, now()->addHours(720));
             return $this->response($modules, "Permissions retrieved successfully.", true, 200);
         } catch (Exception $e) {
             return $this->response([], "An error occurred.", false, 400);

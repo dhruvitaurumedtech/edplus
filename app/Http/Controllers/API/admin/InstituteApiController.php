@@ -4920,8 +4920,9 @@ class InstituteApiController extends Controller
         }
 
         try {
-            $boardIds = Institute_board_sub::where('user_id', auth()->user()->id)
-                ->where('institute_id', $request->institute_id)
+            // where('user_id', auth()->user()->id)
+            //     ->
+            $boardIds = Institute_board_sub::where('institute_id', $request->institute_id)
                 ->pluck('board_id')
                 ->unique()
                 ->toArray();
@@ -4934,7 +4935,7 @@ class InstituteApiController extends Controller
 
             foreach ($boardList as $board) {
                 $mediumIds = DB::table('medium_sub')
-                    ->where('user_id', auth()->user()->id)
+                    // ->where('user_id', auth()->user()->id)
                     ->where('board_id', $board->id)
                     ->where('institute_id', $request->institute_id)
                     ->pluck('medium_id')
@@ -4945,7 +4946,7 @@ class InstituteApiController extends Controller
 
                 foreach ($mediumList as $medium) {
                     $standards = Standard_sub::join('standard', 'standard.id', '=', 'standard_sub.standard_id')
-                        ->where('standard_sub.user_id', auth()->user()->id)
+                        // ->where('standard_sub.user_id', auth()->user()->id)
                         ->where('standard_sub.institute_id', $request->institute_id)
                         ->where('standard_sub.board_id', $board->id)
                         ->where('standard_sub.medium_id', $medium->id)
