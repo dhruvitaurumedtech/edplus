@@ -1921,7 +1921,34 @@ class StudentController extends Controller
                             }
                             if (Auth::user()->role_type == 4) {
 
-                                $batch_list = [];
+                                $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
+                                    ->where('video_assignbatch.video_id', $topval['id'])
+                                    ->where('video_assignbatch.standard_id', $topval['standard_id'])
+                                    ->where('video_assignbatch.chapter_id', $topval['chapter_id'])
+                                    ->where('video_assignbatch.subject_id', $topval['subject_id'])
+                                    ->Select('batches.*', 'video_assignbatch.assign_status')
+                                    ->get();
+                                    
+                        
+                                    $batch_list = [];
+                                    $allTrue = true;
+                                foreach ($reponse_video as $value) {
+                                    $status = ($value->assign_status == 1) ? true : false;
+                                    $batch_list[] = [
+                                        'batch_id' => $value->id,
+                                        'batch_name' => $value->batch_name,
+                                        'status' => ($value->assign_status == 1) ? true : false,
+                                    ];
+                                    if (!$status) {
+                                            $allTrue = false; // If any status is false, set $allTrue to false
+                                        }
+                                }
+                                if(empty($batch_list)){
+                                 $final_status = false;
+                                }else{
+                                 $final_status = $allTrue ? true : false;
+                           
+                                }
                             }
                             if (Auth::user()->role_type == 3) {
                                

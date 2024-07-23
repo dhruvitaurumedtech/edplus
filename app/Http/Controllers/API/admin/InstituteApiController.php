@@ -2234,10 +2234,11 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $user_id = Auth::id();
+            $user_id = $request->user_id;
             $perPage = $request->input('per_page', 10);
             // Fetch institute_id if empty
-            $institute_id = $request->institute_id ?: Institute_detail::where('user_id', $user_id)->value('id');
+            $institute_id = $request->institute_id;
+            //?: Institute_detail::where('user_id', $user_id)->value('id')
 
             // Fetch unique board ids
             // where('user_id', $user_id)
@@ -2312,7 +2313,7 @@ class InstituteApiController extends Controller
 
             $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
                 $query
-                    // ->where('user_id', $user_id)
+                    ->where('user_id', $user_id)
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
@@ -4526,7 +4527,7 @@ class InstituteApiController extends Controller
                     });
                 })
                 ->when($board_id, function ($query, $board_id) {
-                    $query->orwhere('board_id', $board_id);
+                    $query->where('board_id', $board_id);
                 })
                 ->when($standard_id, function ($query, $standard_id) {
                     $query->where('standard_id', $standard_id);
@@ -6549,6 +6550,7 @@ class InstituteApiController extends Controller
         }
         try {
             $subjects = Batches_model::where('id', $request->batch_id)->first();
+            // print_r($subjects);exit;
             if(empty($subjects)){
                 return $this->response([], "Fetch successfully.");
             }
@@ -6577,8 +6579,9 @@ class InstituteApiController extends Controller
         // echo Auth()->user()->id;exit;
         try {
             $searchTerm = $request->input('search');
-
-            $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+            $institute_id = $request->institute_id;
+            // $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+            // print_r($institute_id);exit;
             // Query to fetch users based on institute_id and role_type conditions
             $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
                 ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
