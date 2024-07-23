@@ -25,15 +25,16 @@ use Illuminate\Validation\Rule;
 
 class StudentsController extends Controller
 {
-    public function list_student(Request $request, $id): View
+    public function list_student(Request $request, $institute_id): View
     {
-        $id = Auth::id();
-        $institute_id =  $id;
+    //    echo  $id = Auth::id();
+        // $institute_id =  $id;
 
         $student = User::leftjoin('students_details', 'users.id', '=', 'students_details.student_id')
             ->where('users.role_type', [6])
             ->where('students_details.institute_id', $institute_id)
             ->select('users.*', 'students_details.status')->orderBy('users.id', 'desc')->paginate(10);
+        // echo "<pre>";print_r($student);exit;    
 
         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id', $institute_id)->select('institute_for.*')->get();
         $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id', $institute_id)->select('board.*')->get();
