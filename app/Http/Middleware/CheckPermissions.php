@@ -19,6 +19,7 @@ class CheckPermissions
      */
     public function handle($request, Closure $next, $featureId, $actionId)
     {
+      
         $user = Auth::user();
         $cacheKey = "user_permissions_{$user->id}";
         if (Cache::has($cacheKey)) {
