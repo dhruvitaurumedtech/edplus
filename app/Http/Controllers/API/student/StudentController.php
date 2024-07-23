@@ -566,6 +566,7 @@ class StudentController extends Controller
                         ]);
 
                     }else{
+                        
                         if ($emilfin && $emilfin->role_type != 5) {
                             return $this->response([], "Someone else has already used this email.", false, 400);
                         }elseif($emilfin && $emilfin->role_type == 5){

@@ -4526,7 +4526,7 @@ class InstituteApiController extends Controller
                     });
                 })
                 ->when($board_id, function ($query, $board_id) {
-                    $query->where('board_id', $board_id);
+                    $query->orwhere('board_id', $board_id);
                 })
                 ->when($standard_id, function ($query, $standard_id) {
                     $query->where('standard_id', $standard_id);
