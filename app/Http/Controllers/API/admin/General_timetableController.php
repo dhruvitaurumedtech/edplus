@@ -301,7 +301,8 @@ class General_timetableController extends Controller
                     'users.lastname', 'lecture_type.name as lecture_type_name',
                     'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'time_table.*', 
                     'standard.name as standard','board.name as board','medium.name as medium')
-                ->orderBy('time_table.start_time', 'asc')
+                //->orderBy('time_table.start_time', 'asc')
+                ->orderBy('class_room.name', 'asc')
                 ->get();
     
             $groupedData = [];
