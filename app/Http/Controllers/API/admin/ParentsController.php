@@ -39,13 +39,12 @@ class ParentsController extends Controller
                     'url' => $banner->url ?? ''
                 ];
             })->toArray();
-            
             $childs = [];
             $chilsdata = Parents::join('users', 'users.id', '=', 'parents.student_id')
                     ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                     ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                     ->where('parents.parent_id', Auth::id())
-                    ->where('parents.verify', '1')
+                    ->where('parents.verify', '0')
                     ->distinct()
                     ->select(
                         'users.firstname',
@@ -419,6 +418,7 @@ class ParentsController extends Controller
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
             ->where('parents.parent_id', $parent_id)
+            // ->where('parents.verify', '1')
             ->whereNull('students_details.deleted_at')
             ->where('students_details.status','1')
               ->select('users.*')
