@@ -44,7 +44,7 @@ class ParentsController extends Controller
                     ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
                     ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                     ->where('parents.parent_id', Auth::id())
-                    ->where('parents.verify', '0')
+                    ->where('parents.verify', '1')
                     ->distinct()
                     ->select(
                         'users.firstname',
