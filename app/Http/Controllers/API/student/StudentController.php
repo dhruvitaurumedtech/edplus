@@ -1551,7 +1551,8 @@ class StudentController extends Controller
             $chapers = [];
             $cptquy = Chapter::where('subject_id', $request->subject_id)->get();
             foreach ($cptquy as $chval) {
-                $subasid = Subject_model::where('id', $chval->subject_id)->select('base_table_id')->first();
+                $subasid = Subject_model::where('id', $chval->subject_id)
+                ->select('base_table_id')->first();
                 $chapers[] = array(
                     "id" => $chval->id,
                     "base_table_id" => $subasid->base_table_id,
