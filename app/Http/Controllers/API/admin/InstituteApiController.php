@@ -4203,14 +4203,20 @@ class InstituteApiController extends Controller
 
                 // Check for role type 6
                 if (in_array('6', $roleTypes)) {
-                    $studentId = Student_detail::where('institute_id', $request->institute_id)
+                    $subjectIds = explode(',', $request->subject_id);
+                        $studentId = Student_detail::where('institute_id', $request->institute_id)
                         ->where('board_id', $request->board_id)
                         ->where('medium_id', $request->medium_id)
                         ->where('status', '1')
-                        ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
+                        // ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
+                        ->where(function($query) use ($subjectIds) {
+                            foreach ($subjectIds as $subjectId) {
+                                $query->orWhereRaw("FIND_IN_SET(?, subject_id)", [$subjectId]);
+                            }
+                        })
                         ->pluck('student_id');
-                    // print_r($studentId);exit;
-
+                    
+                
                     // ->where('subject_id', $request->subject_id)->pluck('student_id');
                     // echo $request->subject_id;exit;
                     $combinedIds = array_merge($combinedIds, $studentId->toArray());
