@@ -257,6 +257,7 @@ class AuthController extends Controller
         }
 
         if (Auth::attempt($request->only('email', 'password'))) {
+            
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
             $user->token = $token;

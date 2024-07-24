@@ -48,7 +48,8 @@
             <p>Email : {{$email}}</p>
             <p>Password : {{$password}}</p>
         @endif
-        
+        <br>
+        <a href="https://play.google.com/store/apps/details?id=com.aurum.edwide">https://play.google.com/store/apps/details?id=com.aurum.edwide</a>
     </form>
 
 </body>
