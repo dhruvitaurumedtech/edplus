@@ -851,9 +851,8 @@ class TeacherController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $i=Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->pluck('reject_count');
-            $reject =$i+1;
-            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2','reject_count'=>$reject]);
+           
+            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
             $serverKey = env('SERVER_KEY');
 
 
