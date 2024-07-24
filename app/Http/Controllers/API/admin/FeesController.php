@@ -995,6 +995,7 @@ class FeesController extends Controller
             // Fetch student payment history
             $student_history = Fees_colletion_model::where('student_id', $request->student_id)
                 ->where('institute_id', $request->institute_id)
+                ->orderBy('created_at', 'desc') 
                 ->get();
 
             // Prepare history and calculate paid amount
