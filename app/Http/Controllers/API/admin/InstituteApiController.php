@@ -2234,10 +2234,11 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $user_id = Auth::id();
+            $user_id = $request->user_id;
             $perPage = $request->input('per_page', 10);
             // Fetch institute_id if empty
-            $institute_id = $request->institute_id ?: Institute_detail::where('user_id', $user_id)->value('id');
+            $institute_id = $request->institute_id;
+            //?: Institute_detail::where('user_id', $user_id)->value('id')
 
             // Fetch unique board ids
             // where('user_id', $user_id)
@@ -2312,7 +2313,7 @@ class InstituteApiController extends Controller
 
             $banner_list = Banner_model::where(function ($query) use ($user_id, $institute_id) {
                 $query
-                    // ->where('user_id', $user_id)
+                    ->where('user_id', $user_id)
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
@@ -4207,14 +4208,20 @@ class InstituteApiController extends Controller
 
                 // Check for role type 6
                 if (in_array('6', $roleTypes)) {
-                    $studentId = Student_detail::where('institute_id', $request->institute_id)
+                    $subjectIds = explode(',', $request->subject_id);
+                        $studentId = Student_detail::where('institute_id', $request->institute_id)
                         ->where('board_id', $request->board_id)
                         ->where('medium_id', $request->medium_id)
                         ->where('status', '1')
-                        ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
+                        // ->WhereRaw("FIND_IN_SET(?, subject_id)", [$request->subject_id])
+                        ->where(function($query) use ($subjectIds) {
+                            foreach ($subjectIds as $subjectId) {
+                                $query->orWhereRaw("FIND_IN_SET(?, subject_id)", [$subjectId]);
+                            }
+                        })
                         ->pluck('student_id');
-                    // print_r($studentId);exit;
-
+                    
+                
                     // ->where('subject_id', $request->subject_id)->pluck('student_id');
                     // echo $request->subject_id;exit;
                     $combinedIds = array_merge($combinedIds, $studentId->toArray());
@@ -6554,6 +6561,7 @@ class InstituteApiController extends Controller
         }
         try {
             $subjects = Batches_model::where('id', $request->batch_id)->first();
+            // print_r($subjects);exit;
             if(empty($subjects)){
                 return $this->response([], "Fetch successfully.");
             }
@@ -6582,8 +6590,9 @@ class InstituteApiController extends Controller
         // echo Auth()->user()->id;exit;
         try {
             $searchTerm = $request->input('search');
-
-            $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+            $institute_id = $request->institute_id;
+            // $institute_id = institute_Detail::where('user_id', Auth()->user()->id)->pluck('id')->first();
+            // print_r($institute_id);exit;
             // Query to fetch users based on institute_id and role_type conditions
             $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
                 ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')

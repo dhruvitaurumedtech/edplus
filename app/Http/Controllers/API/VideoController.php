@@ -373,7 +373,7 @@ class VideoController extends Controller
     public function videoassign(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'batch_id' => 'required|exists:batches,id',
+            'batch_id' => 'exists:batches,id',
             'standard_id' => 'required',
             'chapter_id' => 'required',
             'subject_id' => 'required',

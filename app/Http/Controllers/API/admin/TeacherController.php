@@ -120,7 +120,7 @@ class TeacherController extends Controller
                     $join->on('teacher_detail.id', '=', 'sub.max_id');
                 })
                 ->join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
-                ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')
+                ->select('institute_detail.*', 'teacher_detail.status as sstatus')
                 ->paginate($perPage);
 
 
