@@ -1128,7 +1128,7 @@ class StudentController extends Controller
                     'exam.exam_date',
                     'exam.exam_title',
                 )
-                ->orderByDesc('marks.created_at')
+                ->orderBy('marks.id', 'desc')
                 //->limit(3)
                 ->get();
 
@@ -1188,6 +1188,7 @@ class StudentController extends Controller
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
                     //->limit(3)
+                    ->orderBy('exam.id', 'desc')
                     ->get();
 
                 foreach ($exams as $examsDT) {
