@@ -19,6 +19,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
+use Carbon\Carbon;
+
+
 
 
 class FeesController extends Controller
@@ -532,6 +535,9 @@ class FeesController extends Controller
             $fee->payment_amount = $request->payment_amount;
             $fee->payment_type = $request->payment_type;
             $fee->transaction_id = $request->transaction_id ?? '';
+            $fee->created_at = Carbon::now();
+            $fee->updated_at = Carbon::now();
+
             $fee->save();
 
             // Calculate the total paid amount
