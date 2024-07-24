@@ -429,7 +429,27 @@ class VideoController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
+    public function video_batchlist(Request $request){
+        $validator = Validator::make($request->all(), [
+            'standard_id' => 'required',
+            'chapter_id' => 'required',
+            'subject_id' => 'required',
+             ]);
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400); 
+        try {
+        $batch_list = VideoAssignToBatch::where('standard_id', $request->standard_id)
+                    ->where('subject_id', $request->subject_id)
+                    ->where('chapter_id', $request->chapter_id)
+                    ->whereNull('deleted_at')
+                    ->pluck('batch_id')
+                    ->toArray();
+                    return $this->response($batch_list, "Successfully display Batchlist");            
+        }
+        catch (Exception $e) {
+            return $this->response($e, "Something want wrong.", false, 400);
+        }
+                
+    }
 
 
     // public function videoassign1(Request $request)
