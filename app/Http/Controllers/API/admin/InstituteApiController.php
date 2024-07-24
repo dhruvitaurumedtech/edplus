@@ -2749,9 +2749,14 @@ class InstituteApiController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $i=Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->pluck('reject');
-            $reject = $i + 1; 
-            $response = Student_detail::where('institute_id', $request->institute_id)->where('student_id', $request->student_id)->update(['status' =>'2','reject_count'=>$reject]);
+            
+            $i1=Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)->pluck('reject_count');
+            
+            $reject = $i1 + 1; 
+            $response = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)
+            ->update(['status' =>'2','reject_count'=>$reject]);
             
             $serverKey = env('SERVER_KEY');
 
