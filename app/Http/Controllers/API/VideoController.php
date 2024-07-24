@@ -383,14 +383,7 @@ class VideoController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
             $batch_ids = explode(",", $request->batch_id);
-            foreach ($batch_ids as $batch_id_value) {
-                $record = VideoAssignToBatch::where('batch_id', $batch_id_value)
-                    ->where('subject_id', $request->subject_id)
-                    ->where('video_id', $request->video_id)
-                    ->count();
-                if ($record == 1) {
-                    return $this->response([], 'Already Assign Video This Batch!', false, 400);
-                }
+            foreach ($batch_ids as $batch_id_value) { 
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $request->subject_id)
                     ->count();
@@ -398,15 +391,38 @@ class VideoController extends Controller
                     return $this->response([], 'Four records with the same Batch and Subject already exist', false, 400);
                 }
             }
-            foreach ($batch_ids as $value) {
-                $VideoAssignToBatch = VideoAssignToBatch::create([
-                    'video_id' => $request->video_id,
-                    'batch_id' => $value,
-                    'standard_id' => $request->standard_id,
-                    'chapter_id' => $request->chapter_id,
-                    'subject_id' => $request->subject_id,
-                    'assign_status' => $request->assign_status,
-                ]);
+
+            $existingBatches = VideoAssignToBatch::where('standard_id', $request->standard_id)
+                    ->where('subject_id', $request->subject_id)
+                    ->where('chapter_id', $request->chapter_id) 
+                    // ->where('user_id', $request->user_id)
+                    ->where('assign_status', 1)
+                    ->pluck('batch_id')->toArray(); 
+ 
+           $removed_id= array_diff($existingBatches,$batch_ids);
+           $add_id= array_diff($batch_ids,$existingBatches); 
+           if(!empty($removed_id))
+           {
+           
+                foreach ($add_id as $value) {
+                    $VideoAssignToBatch = VideoAssignToBatch::create([
+                        'video_id' => $request->video_id,
+                        'batch_id' => $value,
+                        'standard_id' => $request->standard_id,
+                        'chapter_id' => $request->chapter_id,
+                        'subject_id' => $request->subject_id,
+                        'assign_status' => $request->assign_status,
+                    ]);
+                }
+            }
+            if(!empty($removed_id))
+            { 
+            VideoAssignToBatch::where('standard_id', $request->standard_id)
+                    ->where('subject_id', $request->subject_id)
+                    ->where('chapter_id', $request->chapter_id) 
+                    //->where('user_id', $request->user_id)
+                    ->where('assign_status', 1)
+                    ->wherein('batch_id', $removed_id)->delete(); 
             }
             return $this->response([], "Video Assign Batch Successfully");
         } catch (Exception $e) {
