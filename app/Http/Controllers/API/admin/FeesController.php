@@ -1007,7 +1007,7 @@ class FeesController extends Controller
             foreach ($student_history as $value) {
                 $history[] = [
                     'paid_amount' => $value->payment_amount,
-                    'date' => $value->created_at,
+                    'date' => $value->created_at->timezone('Asia/Kolkata')->toDateTimeString(),
                     'payment_mode' => $value->payment_type,
                     'invoice_no' => $value->invoice_no,
                     'transaction_id' => $value->transaction_id,
