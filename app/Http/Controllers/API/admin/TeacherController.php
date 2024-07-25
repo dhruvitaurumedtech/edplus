@@ -256,6 +256,16 @@ class TeacherController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            $teacher_id = explode(',',$request->teacher_detail_id);
+            foreach($teacher_id as $tid){
+                if(!empty($tid))
+                   {
+                    $teacher = Teacher_model::find($tid);
+                        if ($teacher) {
+                            $teacher->forceDelete();
+                        }
+                   } 
+            }
             $subids = explode(",",$request->subject_id);
             $valueCounts = array_count_values($subids);
             $repeatedValues = array_filter($valueCounts, function($count) {
