@@ -9,12 +9,15 @@ use App\Models\Base_table;
 use App\Models\Batch_assign_teacher_model;
 use App\Models\Batches_model;
 use App\Models\board;
+use App\Models\Class_model;
 use App\Models\Common_announcement;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
+use App\Models\Institute_for_model;
 use App\Models\Medium_model;
 use App\Models\Search_history;
 use App\Models\Standard_model;
+use App\Models\Stream_model;
 use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
@@ -1065,6 +1068,183 @@ class TeacherController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
+
+    public function fetch_teacher_detail_foredit(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $institute_id = $request->institute_id;
+            $teacher_id = $request->teacher_id;
+
+            $instituteDTS = Institute_detail::where('id', $institute_id)->first();
+            $user_id = $instituteDTS->user_id;
+
+            $institute_for = Institute_for_model::join('teacher_detail','institute_for.id','=','teacher_detail.institute_for_id')
+                ->where('teacher_detail.institute_id', $institute_id)
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status', '0')
+                ->select('institute_for.*')
+                ->distinct()->get();
+                
+            $institute_fors = [];
+            foreach ($institute_for as $inst_forsd) {
+                $board = Board::
+                // join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
+                //         $join->on('board.id', '=', 'board_sub.board_id')
+                //         ->where('board_sub.institute_id', $institute_id)
+                //         ->where('board_sub.user_id', $user_id)
+                //         ->where('board_sub.institute_for_id', $inst_forsd->id);
+                // })
+                join('teacher_detail', function ($join) use ($institute_id,$teacher_id) {
+                        $join->on('board.id','=','teacher_detail.board_id')
+                        ->where('teacher_detail.institute_id', $institute_id)
+                        ->where('teacher_detail.teacher_id', $teacher_id)
+                        ->where('teacher_detail.status', '0');
+                })
+                    
+                    ->whereNull('board.deleted_at')
+                    ->select('board.*')
+                    ->distinct()
+                    ->get();
+
+
+
+                $boards = [];
+                
+                foreach ($board as $boardsdt) {
+                    $medium = Medium_model::join('teacher_detail','medium.id','=','teacher_detail.medium_id')
+                        ->where('teacher_detail.institute_id', $institute_id)
+                        ->where('teacher_detail.teacher_id', $teacher_id)
+                        ->where('teacher_detail.status', '0')
+                        ->where('teacher_detail.institute_for_id', $inst_forsd->id)
+                        ->where('teacher_detail.board_id', $boardsdt->id)
+                        ->select('medium.*')
+                        ->distinct()->get();
+                    $mediums = [];
+                    foreach ($medium as $mediumdt) {
+                        $class = Class_model::join('teacher_detail','class.id','=','teacher_detail.class_id')
+                            ->where('teacher_detail.institute_id', $institute_id)
+                            ->where('teacher_detail.teacher_id', $teacher_id)
+                            ->where('teacher_detail.status', '0')
+                            ->where('teacher_detail.institute_for_id', $inst_forsd->id)
+                            ->where('teacher_detail.board_id', $boardsdt->id)
+                            ->where('teacher_detail.medium_id', $mediumdt->id)
+                            ->select('class.*')
+                            ->distinct()->get();
+                        $classs = [];
+                        foreach ($class as $classdt) {
+
+                            $standard = Standard_model::join('teacher_detail','standard.id','=','teacher_detail.standard_id')
+                                ->where('teacher_detail.institute_id', $institute_id)
+                                ->where('teacher_detail.teacher_id', $teacher_id)
+                                ->where('teacher_detail.status', '0')
+                                ->where('teacher_detail.institute_for_id', $inst_forsd->id)
+                                ->where('teacher_detail.board_id', $boardsdt->id)
+                                ->where('teacher_detail.medium_id', $mediumdt->id)
+                                ->where('teacher_detail.class_id', $classdt->id)
+                                ->select('standard.*')
+                                ->distinct()->get();
+
+                            $standards = [];
+                            foreach ($standard as $standarddt) {
+                                //stream 
+                                $stream = Stream_model::join('teacher_detail','stream.id','=','teacher_detail.stream_id')
+                                    ->where('teacher_detail.institute_id', $institute_id)
+                                    ->where('teacher_detail.teacher_id', $teacher_id)
+                                    ->where('teacher_detail.status', '0')
+                                    ->where('teacher_detail.institute_for_id', $inst_forsd->id)
+                                    ->where('teacher_detail.board_id', $boardsdt->id)
+                                    ->where('teacher_detail.medium_id', $mediumdt->id)
+                                    ->where('teacher_detail.class_id', $classdt->id)
+                                    ->select('stream.*')
+                                    ->distinct()->get();
+                                $streams = [];
+                                foreach ($stream as $streamdt) {
+                                    $streams[] = array(
+                                        'id' => $streamdt->id,
+                                        'name' => $streamdt->name
+                                    );
+                                }
+
+                                $batableids = Base_table::where('institute_for', $inst_forsd->id)
+                                    ->where('board', $boardsdt->id)
+                                    ->where('medium', $mediumdt->id)
+                                    ->where('medium', $mediumdt->id)
+                                    ->where('institute_for_class', $classdt->id)
+                                    ->where('standard', $standarddt->id)->pluck('id')
+                                    ->toArray();
+
+                                $subject = Subject_model::join('teacher_detail','subject.id','=','teacher_detail.subject_id')
+                                    //->where('subject_sub.institute_id', $institute_id)
+                                    ->where('teacher_detail.institute_id', $institute_id)
+                                    ->where('teacher_detail.teacher_id', $teacher_id)
+                                    ->where('teacher_detail.status', '0')
+                                    //->where('subject_sub.user_id', $user_id)
+                                    ->whereIN('subject.base_table_id', $batableids)
+                                    ->select('subject.*')
+                                    ->distinct()->get();
+                                $subjects = [];
+
+                                foreach ($subject as $subjectdt) {
+
+                                    $subjects[] = array(
+                                        'id' => $subjectdt->id,
+                                        'name' => $subjectdt->name
+                                    );
+                                }
+
+                                $standards[] = array(
+                                    'id' => $standarddt->id,
+                                    'name' => $standarddt->name,
+                                    'stream' => $streams,
+                                    'subject_id' => $subjects
+                                );
+                            }
+
+                            $classs[] = array(
+                                'id' => $classdt->id,
+                                'name' => $classdt->name,
+                                'standard' => $standards
+                            );
+                        }
+
+                        $mediums[] = array(
+                            'id' => $mediumdt->id,
+                            'name' => $mediumdt->name, 'class' => $classs
+                        );
+                    }
+
+                    $boards[] = array(
+                        'id' => $boardsdt->id,
+                        'name' => $boardsdt->name,
+                        'medium' => $mediums
+                    );
+                }
+                $institute_fors[] = array(
+                    'id' => $inst_forsd->id,
+                    'name' => $inst_forsd->name,
+                    'boards' => $boards
+                );
+            }
+            // echo "<pre>";print_r($standards);exit;
+            $alldata = array(
+                'institute_fors' => $institute_fors,
+            );
+
+            return $this->response($alldata, 'Successfully fetch Data.');
+        } catch (Exception $e) {
+            return $this->response([], "Invalid token.", false, 400);
+        }
+    }
+
     public function edit_profile(Request $request)
     {
         $teacher_id = $request->teacher_id;

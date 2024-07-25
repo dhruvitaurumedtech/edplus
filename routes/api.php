@@ -179,6 +179,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list'])->middleware('check.permission:13,4');
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
+    Route::post('/teacher/fetch_teacher_detail-foredit', [TeacherController::class, 'fetch_teacher_detail_foredit']);
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
 
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
