@@ -26,7 +26,11 @@ class Check24Hours extends Command
      * Execute the console command.
      */
     public function handle()
-    { 
-        VideoAssignToBatch::where('created_at', '<', Carbon::now()->subHours(24)->toDateTimeString())->delete();  
+    {
+        // Get the current time minus 24 hours
+        $cutoffTime = Carbon::now()->subHours(24)->toDateTimeString();
+
+        // Delete records older than 24 hours
+        VideoAssignToBatch::where('created_at', '<', $cutoffTime)->delete();
     }
 }
