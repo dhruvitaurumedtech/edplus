@@ -4039,6 +4039,10 @@ class InstituteApiController extends Controller
         }
 
         try {
+            $total_marks=Exam_Model::where('id',$request->exam_id)->first();
+            if($total_marks->total_mark <  $request->mark){
+                return $this->response([], "Enter marks less than total marks!", false, 400);
+            }
             $addesmarks = Marks_model::where('student_id', $request->student_id)->where('exam_id', $request->exam_id)->first();
             if ($addesmarks) {
                 $admarks = Marks_model::where('id', $addesmarks->id)->update([
