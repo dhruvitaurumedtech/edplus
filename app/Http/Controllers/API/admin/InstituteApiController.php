@@ -3283,6 +3283,7 @@ class InstituteApiController extends Controller
                             'country_code' => $request->country_code,
                             'country_code_name' => $request->country_code_name,
                             'mobile' => $request->mobile_no,
+                            'status' => '1',
                         ]);
                         $subject_amount = Subject_sub::where('institute_id', $request->institute_id)
                             ->whereIn('subject_id', explode(',', $request->subject_id))
