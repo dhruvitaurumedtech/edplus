@@ -1909,16 +1909,14 @@ class StudentController extends Controller
                     })
                     ->where('topic.subject_id', $subject_id)
                     ->where('topic.institute_id', $institute_id)
-                    ->where('topic.video_category_id', $catvd->id)
+                    ->where('topic.video_category_id', $catvd->id) 
                     ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                     ->orderByDesc('topic.created_at')
                     ->get()->toarray();
                     if(!empty($topics))  {
-                     
                         $topicsArray = [];
                         foreach ($topics as $topval) {
-                            if (Auth::user()->role_type == 6) {
-
+                            //if (Auth::user()->role_type == 6) {
                                 $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
                                     ->where('video_assignbatch.video_id', $topval['id'])
                                     ->where('video_assignbatch.standard_id', $topval['standard_id'])
@@ -1947,69 +1945,8 @@ class StudentController extends Controller
                                  $final_status = $allTrue ? true : false;
                            
                                 }
-                            }
-                            if (Auth::user()->role_type == 4) {
-
-                                $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
-                                    ->where('video_assignbatch.video_id', $topval['id'])
-                                    ->where('video_assignbatch.standard_id', $topval['standard_id'])
-                                    ->where('video_assignbatch.chapter_id', $topval['chapter_id'])
-                                    ->where('video_assignbatch.subject_id', $topval['subject_id'])
-                                    ->Select('batches.*', 'video_assignbatch.assign_status')
-                                    ->get();
-                                    
-                        
-                                    $batch_list = [];
-                                    $allTrue = true;
-                                foreach ($reponse_video as $value) {
-                                    $status = ($value->assign_status == 1) ? true : false;
-                                    $batch_list[] = [
-                                        'batch_id' => $value->id,
-                                        'batch_name' => $value->batch_name,
-                                        'status' => ($value->assign_status == 1) ? true : false,
-                                    ];
-                                    if (!$status) {
-                                            $allTrue = false; // If any status is false, set $allTrue to false
-                                        }
-                                }
-                                if(empty($batch_list)){
-                                 $final_status = false;
-                                }else{
-                                 $final_status = $allTrue ? true : false;
-                           
-                                }
-                            }
-                            if (Auth::user()->role_type == 3) {
-                               
-                                $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
-                                    ->where('video_assignbatch.video_id', $topval['id'])
-                                    ->where('video_assignbatch.standard_id', $topval['standard_id'])
-                                    ->where('video_assignbatch.chapter_id', $topval['chapter_id'])
-                                    ->where('video_assignbatch.subject_id', $topval['subject_id'])
-                                    ->Select('batches.*', 'video_assignbatch.assign_status')
-                                    ->get();
-                                    
-                        
-                                    $batch_list = [];
-                                    $allTrue = true;
-                                foreach ($reponse_video as $value) {
-                                    $status = ($value->assign_status == 1) ? true : false;
-                                    $batch_list[] = [
-                                        'batch_id' => $value->id,
-                                        'batch_name' => $value->batch_name,
-                                        'status' => ($value->assign_status == 1) ? true : false,
-                                    ];
-                                    if (!$status) {
-                                            $allTrue = false; // If any status is false, set $allTrue to false
-                                        }
-                                }
-                                if(empty($batch_list)){
-                                 $final_status = false;
-                                }else{
-                                 $final_status = $allTrue ? true : false;
-                           
-                                }
-                            }
+                            //}
+                            
                             $topicsArray[] = [
                                 "id" => $topval['id'],
                                 "topic_no" => $topval['topic_no'],
