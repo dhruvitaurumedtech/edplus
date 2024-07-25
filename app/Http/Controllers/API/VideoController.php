@@ -371,8 +371,7 @@ class VideoController extends Controller
 
     public function videoassign(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'batch_id' => 'exists:batches,id',
+        $validator = Validator::make($request->all(), [ 
             'standard_id' => 'required',
             'chapter_id' => 'required',
             'subject_id' => 'required',
@@ -381,7 +380,10 @@ class VideoController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $batch_ids = explode(",", $request->batch_id);
+            $batch_ids=[];
+
+            if($request->batch_id)
+            $batch_ids= explode(",", $request->batch_id);
             foreach ($batch_ids as $batch_id_value) { 
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $request->subject_id)
@@ -400,10 +402,10 @@ class VideoController extends Controller
  
            $removed_id= array_diff($existingBatches,$batch_ids);
            $add_id= array_diff($batch_ids,$existingBatches); 
-           if(!empty($removed_id))
+           if(!empty($add_id))
            {
            
-                foreach ($add_id as $value) {
+                foreach ($add_id as $value) { 
                     $VideoAssignToBatch = VideoAssignToBatch::create([
                         'video_id' => $request->video_id,
                         'batch_id' => $value,
