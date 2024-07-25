@@ -56,6 +56,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
     Route::post('/auth/logout', [AuthController::class, 'logout']);
     Route::post('/institute/videoAssign', [VideoController::class, 'videoassign'])->middleware('check.permission:10,1');
+    Route::post('/institute/video_batchlist', [VideoController::class, 'video_batchlist'])->middleware('check.permission:10,1');
+
     Route::post('/institute/category-list', [VideoController::class, 'video_category']);
     Route::post('/institute/video-category-list', [InstituteApiController::class, 'category_list'])->name('video_category.get');
     Route::post('/institute/get-homescreen-first', [InstituteApiController::class, 'get_homescreen_first']);
@@ -244,10 +246,12 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/role-list', [InstituteApiController::class, 'role_list']);
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
+
 });
 
 
    
+    Route::post('/institute/testing', [InstituteApiController::class, 'testing']);
 
     // Route::post('test', [InstituteApiController::class, 'test']);
 

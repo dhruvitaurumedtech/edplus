@@ -25,6 +25,7 @@ use App\Models\UserRoleMapping;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Student_detail;
+use App\Models\VideoAssignToBatch;
 use App\Models\User;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
@@ -492,7 +493,7 @@ class InstituteApiController extends Controller
             'institute_name' => 'required|string',
             'address' => 'required|string',
             'contact_no' => 'required|integer|min:10',
-            'email' => 'required|email|unique:institute_detail,email',
+            'email' => 'required|email',
             'logo' => 'required',
             'country' => 'required',
             'state' => 'required',
@@ -4039,6 +4040,10 @@ class InstituteApiController extends Controller
         }
 
         try {
+            $total_marks=Exam_Model::where('id',$request->exam_id)->first();
+            if($total_marks->total_mark <  $request->mark){
+                return $this->response([], "Enter marks less than total marks!", false, 400);
+            }
             $addesmarks = Marks_model::where('student_id', $request->student_id)->where('exam_id', $request->exam_id)->first();
             if ($addesmarks) {
                 $admarks = Marks_model::where('id', $addesmarks->id)->update([
@@ -4666,17 +4671,16 @@ class InstituteApiController extends Controller
     {
         try {
             $rolesDT = [];
-            $suad = [4, 5, 6];
-            $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
-            $staff = Staff_detail_Model::where('user_id', $request->user_id)->first();
-            if (!empty($teacher)) {
+            // $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
+            $staff = UserRoleMapping::where('user_id', $request->user_id)->first();
+            // print_r($staff);exit;
+            if (!empty($staff)) {
+                $suad2 = ['teacher','student', 'parent'];
+                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
+            } 
+            if (empty($staff)) {
                 $suad2 = ['student', 'parent'];
                 $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-            } elseif (!empty($staff)) {
-                $suad2 = ['student', 'parent'];
-                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-            } else {
-                $roleqry = Role::whereNull('deleted_at')->whereIN('id', $suad)->get();
             }
             foreach ($roleqry as $roldel) {
                 $rolesDT[] = array(
@@ -6707,5 +6711,16 @@ class InstituteApiController extends Controller
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
+    }
+    function testing(Request $request){
+       $all_assign_video= VideoAssignToBatch::get();
+       foreach($all_assign_video as $value){
+        $now = Carbon::now();
+        $createdAt = Carbon::parse($value->created_at);
+        if ($now->diffInHours($createdAt) >= 24) {
+            VideoAssignToBatch::where('id',$value->id)->delete();
+        } 
+       }
+
     }
 }
