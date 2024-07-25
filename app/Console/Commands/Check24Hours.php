@@ -26,14 +26,7 @@ class Check24Hours extends Command
      * Execute the console command.
      */
     public function handle()
-    {
-        $all_assign_video= VideoAssignToBatch::get();
-        foreach($all_assign_video as $value){
-         $now = Carbon::now();
-         $createdAt = Carbon::parse($value->created_at);
-         if ($now->diffInHours($createdAt) >= 24) {
-             VideoAssignToBatch::where('id',$value->id)->delete();
-         } 
-        }
+    { 
+        VideoAssignToBatch::where('created_at', '<', Carbon::now()->subHours(24)->toDateTimeString())->delete();  
     }
 }
