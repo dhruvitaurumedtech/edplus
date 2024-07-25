@@ -348,8 +348,7 @@ class VideoController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $categories = Dobusinesswith_sub::where('user_id', Auth::id())
-                ->where('institute_id', $request->institute_id)
+            $categories = Dobusinesswith_sub::where('institute_id', $request->institute_id)
                 ->whereHas('business', function ($query) {
                     $query->where('status', 'active');
                 })
