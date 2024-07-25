@@ -4666,17 +4666,16 @@ class InstituteApiController extends Controller
     {
         try {
             $rolesDT = [];
-            $suad = [4, 5, 6];
-            $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
-            $staff = Staff_detail_Model::where('user_id', $request->user_id)->first();
-            if (!empty($teacher)) {
+            // $teacher = Teacher_model::where('teacher_id', $request->user_id)->first();
+            $staff = UserRoleMapping::where('user_id', $request->user_id)->first();
+            // print_r($staff);exit;
+            if (!empty($staff)) {
+                $suad2 = ['teacher','student', 'parent'];
+                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
+            } 
+            if (empty($staff)) {
                 $suad2 = ['student', 'parent'];
                 $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-            } elseif (!empty($staff)) {
-                $suad2 = ['student', 'parent'];
-                $roleqry = Role::whereNull('deleted_at')->whereIN('role_name', $suad2)->get();
-            } else {
-                $roleqry = Role::whereNull('deleted_at')->whereIN('id', $suad)->get();
             }
             foreach ($roleqry as $roldel) {
                 $rolesDT[] = array(
