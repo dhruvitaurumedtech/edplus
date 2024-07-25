@@ -389,6 +389,7 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+
     public function institute_detail(Request $request)
     {
         
@@ -1381,6 +1382,24 @@ class TeacherController extends Controller
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
+    }
+
+    function remove_request(Request $request){
+        $validator = Validator::make($request->all(),[
+            'teacher_detail_id' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try{
+          Teacher_model::where('id',$request->teacher_detail_id)->delete();
+          return $this->response([], "deleted");
+        }catch(Exception $e){
+            return $this->response($e, "Somthing went wrong", false, 400);
+        }
+
     }
     // function role_change(Request $request)
     // {

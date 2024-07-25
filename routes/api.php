@@ -166,13 +166,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/teacher/homescreen-teacher', [TeacherController::class, 'homescreen_teacher']);
     Route::post('/teacher/institute-detail-teacher', [TeacherController::class, 'institute_detail']);
     Route::post('/teacher/add-teacher', [TeacherController::class, 'add_teacher']);
+    
     Route::post('/teacher/second_homescreen', [TeacherController::class, 'second_homescreen']);
     Route::post('/teacher/timetable-list-teacher', [TeacherController::class, 'timetable_list_teacher'])->middleware('check.permission:6,4');
     Route::post('/teacher/join-with-teacher', [TeacherController::class, 'join_with_teacher']);
     Route::post('/teacher/get-teacher-request-list', [TeacherController::class, 'get_teacher_request_list'])->middleware('check.permission:13,4');
     Route::post('/teacher/teacher-reject-request', [TeacherController::class, 'teacher_reject_request'])->middleware('check.permission:14,4');
     Route::post('/teacher/teacher-reject-convert', [TeacherController::class, 'teacher_accept_request'])->middleware('check.permission:14,4');
-
+    Route::post('/teacher/teacher-delete-request-data', [TeacherController::class, 'remove_request']);
+    
     Route::post('/teacher/get-teacher-reject-request-list', [TeacherController::class, 'get_teacher_reject_request_list'])->middleware('check.permission:13,4');
     Route::post('/teacher/fetch_teacher_detail', [TeacherController::class, 'fetch_teacher_detail']);
     Route::post('/teacher/edit-profile', [TeacherController::class, 'edit_profile']);
