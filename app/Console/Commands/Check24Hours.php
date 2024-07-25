@@ -13,7 +13,7 @@ class Check24Hours extends Command
      *
      * @var string
      */
-    protected $signature = 'app:check24-hours';
+    protected $signature = 'check:24hours';
 
     /**
      * The console command description.

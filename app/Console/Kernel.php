@@ -14,8 +14,8 @@ class Kernel extends ConsoleKernel
     {
         // $schedule->command('inspire')->hourly();
         $schedule->command('app:remainder-cron-job')->everyMinute();
-        $schedule->command('reminders:send-birthdays')->everyMinute();
-        $schedule->command('check:24hours')->everyThirtyMinutes();
+        $schedule->command('app:send-reminders')->everyMinute();
+        $schedule->command('check:24hours')->everyMinute();
     
     }
 
