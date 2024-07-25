@@ -25,6 +25,7 @@ use App\Models\UserRoleMapping;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Student_detail;
+use App\Models\VideoAssignToBatch;
 use App\Models\User;
 use App\Models\Insutitute_detail;
 use Illuminate\Http\Request;
@@ -492,7 +493,7 @@ class InstituteApiController extends Controller
             'institute_name' => 'required|string',
             'address' => 'required|string',
             'contact_no' => 'required|integer|min:10',
-            'email' => 'required|email|unique:institute_detail,email',
+            'email' => 'required|email',
             'logo' => 'required',
             'country' => 'required',
             'state' => 'required',
@@ -6710,5 +6711,16 @@ class InstituteApiController extends Controller
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
         }
+    }
+    function testing(Request $request){
+       $all_assign_video= VideoAssignToBatch::get();
+       foreach($all_assign_video as $value){
+        $now = Carbon::now();
+        $createdAt = Carbon::parse($value->created_at);
+        if ($now->diffInHours($createdAt) >= 24) {
+            VideoAssignToBatch::where('id',$value->id)->delete();
+        } 
+       }
+
     }
 }
