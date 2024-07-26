@@ -6369,9 +6369,20 @@ class InstituteApiController extends Controller
                 'error' => 'The number of names and capacities must match.',
             ], 400);
         }
-
+        
         try {
             foreach ($names as $index => $name) {
+                $uniqueRules = [
+                    'name' => 'required|string|unique:class_room,name' . ($request->edit_id ? ",{$request->edit_id}" : '')
+                ];
+    
+                $nameValidator = Validator::make(['name' => $name], $uniqueRules);
+    
+                if ($nameValidator->fails()) {
+                    return response()->json([
+                        'error' => 'The name already exists.',
+                    ], 400);
+                }
                 $capacity = $capacities[$index];
                 if (empty($request->edit_id)) {
                     $class = new Class_room_model();
