@@ -432,6 +432,7 @@ class VideoController extends Controller
     }
     public function video_batchlist(Request $request){
         $validator = Validator::make($request->all(), [
+            'video_id'=>'required',
             'standard_id' => 'required',
             'chapter_id' => 'required',
             'subject_id' => 'required',
@@ -441,6 +442,7 @@ class VideoController extends Controller
         $batch_list = VideoAssignToBatch::where('standard_id', $request->standard_id)
                     ->where('subject_id', $request->subject_id)
                     ->where('chapter_id', $request->chapter_id)
+                    ->where('video_id', $request->video_id)
                     ->whereNull('deleted_at')
                     ->where('assign_status','1')
                     ->pluck('batch_id')
