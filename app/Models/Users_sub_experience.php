@@ -11,5 +11,5 @@ class Users_sub_experience extends Model
     use HasFactory, SoftDeletes;
     protected $table = 'users_sub_experience';
     protected $fillable = [
-        'user_id','institute_name', 'startdate', 'enddate' ];
+        'user_id','institute_name', 'experience'];
 }
