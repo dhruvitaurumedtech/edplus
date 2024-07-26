@@ -146,7 +146,8 @@ class AuthController extends Controller
             'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)
+        ->where('status', '1')->first();
 
         if (isset($user)) {
             return $this->response([], 'This email already exists.', false, 400);
@@ -176,7 +177,6 @@ class AuthController extends Controller
                 ->where('users.email', $user->email)
                 ->select('institute_detail.id')
                 ->first();
-               
             if (!empty($userdata->id)) {
                 $institute_id = $userdata->id;
             } else {
@@ -186,11 +186,12 @@ class AuthController extends Controller
             $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
                         
             User::where('email',$request->email)->update(['otp_num'=>$token]);
-            
+
             Mail::send('emails.registerotpverifymail', ['token' => $token,'name'=>$request->firstname], function ($message) use ($request) {
               $message->to($request->email);
               $message->subject('Verification Code');
             });
+            
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
@@ -203,7 +204,6 @@ class AuthController extends Controller
                 'institute_id' => $institute_id,
                 //'token' => $token,
             ];
-           
             return $this->response($data, "OTP is sent to you mail!");
         } catch (Exception $e) {
             dd($e);
