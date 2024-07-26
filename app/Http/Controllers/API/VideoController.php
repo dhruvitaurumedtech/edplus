@@ -442,6 +442,7 @@ class VideoController extends Controller
                     ->where('subject_id', $request->subject_id)
                     ->where('chapter_id', $request->chapter_id)
                     ->whereNull('deleted_at')
+                    ->where('assign_status','1')
                     ->pluck('batch_id')
                     ->toArray();
                     return $this->response($batch_list, "Successfully display Batchlist");            
