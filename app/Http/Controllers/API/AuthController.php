@@ -224,7 +224,13 @@ class AuthController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        
+        $user = User::where('email', $request->email)
+                    ->where('status', '0')
+                    ->first();
+        if ($user) {
+            return $this->response(['status'=>0], "Please verify OTP", false, 400);
+        }
+
         
          $user = User::where('email', $request->email)
                     ->where('status', '1')
