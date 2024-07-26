@@ -1952,6 +1952,7 @@ class StudentController extends Controller
                                 "topic_no" => $topval['topic_no'],
                                 "topic_name" => $topval['topic_name'] . '',
                                 "topic_video" => asset($topval['topic_video']),
+                                "topic_description"=>$topval['topic_description'],
                                 "subject_id" => $topval['subject_id'],
                                 "subject_name" => $topval['sname'],
                                 "chapter_id" => $topval['chapter_id'],
