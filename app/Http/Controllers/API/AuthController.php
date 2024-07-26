@@ -146,14 +146,14 @@ class AuthController extends Controller
             'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-        $user = User::where('email', $request->email)
-        ->where('status', '1')->first();
+        $user = User::where('email', $request->email)->first();
 
         if (isset($user)) {
             return $this->response([], 'This email already exists.', false, 400);
         }
         try {
             $user = User::where('email', $request->email)->first();
+            // print_r($user);exit;
             if(!isset($user)){
                 $user = new User();
                 $user->firstname = $request->firstname;
