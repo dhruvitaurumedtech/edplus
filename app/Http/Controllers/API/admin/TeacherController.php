@@ -1338,33 +1338,26 @@ class TeacherController extends Controller
             $userSub2 = Users_sub_experience::where('user_id', $teacher_id)->first();
             if (!empty($userSub2)) {
                 $delete_experience = Users_sub_experience::where('user_id', $request->teacher_id);
-                $delete_experience->delete();
+                $delete_experience->forcedelete();
                 $experience = explode(',', $request['institute_name']);
-                $startdate = explode(',', $request['startdate']);
-                $enddate = explode(',', $request['enddate']);
+                $experiences = explode(',', $request['experience']);
+                
                 for ($i = 0; $i < count($experience); $i++) {
-                    $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
-                    $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
                     Users_sub_experience::create([
                         'user_id' => $teacher_id,
                         'institute_name' => $experience[$i],
-                        'startdate' => $startdates,
-                        'enddate' => $enddates,
+                        'experience' => $experiences[$i],
                     ]);
                 }
             } else {
                 if(!empty($request['institute_name'])){
                     $experience = explode(',', $request['institute_name']);
-                    $startdate = explode(',', $request['startdate']);
-                    $enddate = explode(',', $request['enddate']);
+                    $experiences = explode(',', $request['experience']);
                     for ($i = 0; $i < count($experience); $i++) {
-                        $startdates = (!empty($startdate[$i])) ? DateTime::createFromFormat('d/m/Y', $startdate[$i])->format('Y-m-d') : '';
-                        $enddates = (!empty($enddate[$i])) ? DateTime::createFromFormat('d/m/Y', $enddate[$i])->format('Y-m-d') : '';
                         Users_sub_experience::create([
                             'user_id' => $teacher_id,
                             'institute_name' => $experience[$i],
-                            'startdate' => $startdates,
-                            'enddate' => $enddates,
+                            'experience' => $experiences[$i],
                         ]);
                 }
                 }
@@ -1418,7 +1411,7 @@ class TeacherController extends Controller
                 
             }
             return $this->response([], "Successfully Update data.");
-        } catch (Exception $e) {
+        } catch (Exception $e) { 
             return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
@@ -1497,8 +1490,7 @@ class TeacherController extends Controller
           foreach($experiences as $expdata){
             $experience[] = ['id'=>$expdata->id,
             'institute_name'=>$expdata->institute_name,
-            'startdate'=>$expdata->startdate,
-            'enddate'=>$expdata->enddate];
+            'experience'=>$expdata->experience];
           }
           //print_r($teacher_id);exit;
           $emergency = Users_sub_emergency::where('user_id',$teacher_id)->get();
