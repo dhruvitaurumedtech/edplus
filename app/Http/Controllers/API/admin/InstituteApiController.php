@@ -2763,6 +2763,12 @@ class InstituteApiController extends Controller
                     ->where('student_id', $request->student_id)
                     ->increment('reject_count', 1);
             }
+            $totalrcount = Student_detail::where('institute_id', $request->institute_id)
+                    ->where('student_id', $request->student_id)
+                    ->select('reject_count')->first();
+            if($totalrcount->reject_count >= 2){
+                return $this->response([], "You already remove this student.");
+            }else{    
             
             $serverKey = env('SERVER_KEY');
 
@@ -2811,8 +2817,9 @@ class InstituteApiController extends Controller
                 curl_close($ch);
             }
             return $this->response([], "Successfully Reject Request.");
+        }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Somthing went wrong.", false, 400);
         }
     }
 
@@ -2912,6 +2919,7 @@ class InstituteApiController extends Controller
                     'stream_id' => $user_list->stream_id,
                     'subject_list' => $subjectslist,
                     'reject_count'=>$user_list->reject_count
+
                 ];
                 return $this->response($response_data, "Successfully Fetch data.");
             } else {
