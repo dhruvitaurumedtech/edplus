@@ -659,7 +659,7 @@ document.querySelectorAll('.business_editButton').forEach(function (button) {
         })
             .then(response => {
                 var reponse_data = response.data.Dobusinesswith_Model;
-
+                console.log(response);
                 $('#id').val(reponse_data.id);
                 $('#name').val(reponse_data.name);
                 $('#category').val(reponse_data.category_id);
