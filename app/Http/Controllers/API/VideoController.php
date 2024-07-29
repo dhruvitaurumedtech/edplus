@@ -396,11 +396,11 @@ class VideoController extends Controller
             $existingBatches = VideoAssignToBatch::where('standard_id', $request->standard_id)
                     ->where('subject_id', $request->subject_id)
                     ->where('chapter_id', $request->chapter_id) 
-                    // ->where('user_id', $request->user_id)
+                    ->whereIN('batch_id', explode(",",$request->batch_id))
                     ->where('assign_status', 1)
+                    ->whereNull('deleted_at')
                     ->pluck('batch_id')->toArray(); 
- 
-           $removed_id= array_diff($existingBatches,$batch_ids);
+                
            $add_id= array_diff($batch_ids,$existingBatches); 
            if(!empty($add_id))
            {
@@ -416,14 +416,14 @@ class VideoController extends Controller
                     ]);
                 }
             }
-            if(!empty($removed_id))
+            if(!empty($existingBatches))
             { 
             VideoAssignToBatch::where('standard_id', $request->standard_id)
                     ->where('subject_id', $request->subject_id)
                     ->where('chapter_id', $request->chapter_id) 
                     //->where('user_id', $request->user_id)
                     ->where('assign_status', 1)
-                    ->wherein('batch_id', $removed_id)->delete(); 
+                    ->wherein('batch_id', $existingBatches)->forcedelete(); 
             }
             return $this->response([], "Video Assign Batch Successfully");
         } catch (Exception $e) {
