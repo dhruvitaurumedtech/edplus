@@ -6383,7 +6383,7 @@ class InstituteApiController extends Controller
             return $count > 1;
         });
         if($repeatedValues){
-            return $this->response([], "Please remove repeated value", false, 400);
+            return $this->response([], "The name field contains duplicate values", false, 400);
         }
 
         $institute_id = $request->institute_id;
