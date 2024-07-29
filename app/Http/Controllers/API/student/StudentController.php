@@ -1899,6 +1899,7 @@ class StudentController extends Controller
                         ->groupBy('topic.video_category_id');
                 })
                 ->get();
+                // print_r($category);exit;
          
             $response = [];
             foreach ($category as $catvd) {
@@ -1912,7 +1913,10 @@ class StudentController extends Controller
                     ->where('topic.video_category_id', $catvd->id) 
                     ->select('topic.*', 'subject.name as sname', 'chapters.chapter_name as chname')
                     ->orderByDesc('topic.created_at')
-                    ->get()->toarray();
+                    ->get()
+                    ->toarray();
+                    // echo "<pre>";print_r($topics);exit;
+                        
                     if(!empty($topics))  {
                         $topicsArray = [];
                         foreach ($topics as $topval) {
