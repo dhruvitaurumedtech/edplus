@@ -67,7 +67,7 @@ class HomeworkController extends Controller
                     return $this->response([], "Homework Updated Successfully!");
                 }
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -103,7 +103,7 @@ class HomeworkController extends Controller
             }
             return $this->response($response, "Homework Display Successfully!");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 

@@ -211,7 +211,7 @@ class AuthController extends Controller
             return $this->response($data, "OTP is sent to you mail!");
         } catch (Exception $e) {
             dd($e);
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 

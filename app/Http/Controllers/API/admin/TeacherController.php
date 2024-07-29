@@ -821,7 +821,7 @@ class TeacherController extends Controller
 
             return $this->response($lectures, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function get_teacher_request_list(Request $request)

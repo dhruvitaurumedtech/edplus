@@ -119,7 +119,7 @@ class ForgotPasswordController extends Controller
     return $this->response([], "Code Match Successfully");
 
     } catch (Exception $e) {
-      return $this->response($e, "Something want Wrong!!", false, 400);
+      return $this->response($e, "Something went wrong!!", false, 400);
     }
   
   }
@@ -145,7 +145,7 @@ class ForgotPasswordController extends Controller
     ], 200);
 
     }catch (Exception $e) {
-      return $this->response($e, "Something want Wrong!!", false, 400);
+      return $this->response($e, "Something went wrong!!", false, 400);
     }
   }
 
