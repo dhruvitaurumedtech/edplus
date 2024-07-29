@@ -247,21 +247,16 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/role-list', [InstituteApiController::class, 'role_list']);
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
-
+    
 });
+    //token without use 
+    Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
 
 
    
     Route::post('/institute/testing', [InstituteApiController::class, 'testing']);
 
     // Route::post('test', [InstituteApiController::class, 'test']);
-
-
-// Route::post('/institude/get-institute', [InstituteApiController::class, 'get_institute'])->name('get_institude.get');
-// Route::post('/institute/get-board', [InstituteApiController::class, 'get_board'])->name('get_board.get');
-// Route::post('/institute/get-class', [InstituteApiController::class, 'get_class'])->name('get_class.get');
-// Route::post('/institute/get-subject-or-stream', [InstituteApiController::class, 'get_subject_stream'])->name('get_subject_stream.get');
-
 
 
   
