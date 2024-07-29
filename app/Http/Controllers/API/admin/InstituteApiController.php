@@ -6737,6 +6737,8 @@ class InstituteApiController extends Controller
 
     }
     public function mobile_verify(Request $request){
+        
+
         $validator = Validator::make($request->all(), [
             'mobile' => 'required',
             'email'  => 'required',
@@ -6753,7 +6755,7 @@ class InstituteApiController extends Controller
            
             return $this->response([], "Activate User");
         }else{
-            return $this->response([], "Invalid Mobile Number", false, 400);
+            return $this->response([], "Invalid Mobile && email Number!!", false, 400);
         }
         }
         catch(Exception $e){

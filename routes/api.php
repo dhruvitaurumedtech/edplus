@@ -49,7 +49,7 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 
-Route::middleware(['auth:api', 'apilogs'])->group(function () {
+Route::middleware(['api.auth', 'apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/delete-video', [VideoController::class, 'delete_video'])->middleware('check.permission:9,3'); //priyanka
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get')->middleware('check.permission:9,1');
@@ -247,11 +247,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/role-list', [InstituteApiController::class, 'role_list']);
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
-    
-});
-    //token without use 
     Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
 
+});
+    //token without use 
+    
 
    
     Route::post('/institute/testing', [InstituteApiController::class, 'testing']);
