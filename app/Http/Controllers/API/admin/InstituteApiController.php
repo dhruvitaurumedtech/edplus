@@ -6051,7 +6051,7 @@ class InstituteApiController extends Controller
     public function do_business_with()
     {
         try {
-            $data = Dobusinesswith_Model::all();
+            $data = Dobusinesswith_Model::where('status','active')->all();
             if (!empty($data)) {
                 foreach ($data as $value) {
                     $response[] = ['id' => $value->id, 'name' => $value->name];

@@ -49,7 +49,7 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 
-Route::middleware(['auth:api', 'apilogs'])->group(function () {
+Route::middleware(['apiauth','apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/delete-video', [VideoController::class, 'delete_video'])->middleware('check.permission:9,3'); //priyanka
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get')->middleware('check.permission:9,1');
