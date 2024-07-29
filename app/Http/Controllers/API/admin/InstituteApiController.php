@@ -6376,6 +6376,16 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
+        $nameu = explode(",",$request->name);
+        $valueCounts = array_count_values($nameu);
+
+       $repeatedValues = array_filter($valueCounts, function ($count) {
+            return $count > 1;
+        });
+        if($repeatedValues){
+            return $this->response([], "Please remove repeated value", false, 400);
+        }
+
         $institute_id = $request->institute_id;
         $names = array_map('trim', explode(',', $request->name));
         $capacities = array_map('trim', explode(',', $request->capacity));
