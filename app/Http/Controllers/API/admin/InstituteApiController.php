@@ -2757,6 +2757,12 @@ class InstituteApiController extends Controller
             $response = Student_detail::where('institute_id', $request->institute_id)
             ->where('student_id', $request->student_id)
             ->update(['status' =>'2']);
+
+            if ($response) {
+                Student_detail::where('institute_id', $request->institute_id)
+                    ->where('student_id', $request->student_id)
+                    ->increment('reject_count', 1);
+            }
             
             $serverKey = env('SERVER_KEY');
 
@@ -2905,6 +2911,7 @@ class InstituteApiController extends Controller
                     'stream' => $user_list->stream,
                     'stream_id' => $user_list->stream_id,
                     'subject_list' => $subjectslist,
+                    'reject_count'=>$user_list->reject_count
                 ];
                 return $this->response($response_data, "Successfully Fetch data.");
             } else {
