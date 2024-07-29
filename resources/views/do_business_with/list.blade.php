@@ -147,9 +147,8 @@
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">Category : </label>
                     <select class="form-control" name="category" id="category">
-                      <option value=" ">Select Option</option>
                       @foreach($category as $catval)
-                      <option value="{{$catval->id}}">{{$catval->name}}</option>
+                      <option value="{{$catval->id}}" {{ old('category') == $catval->id ? 'selected' : '' }}>{{$catval->name}}</option>
                       @endforeach
 
                     </select>
