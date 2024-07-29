@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\ChapterController;
 use App\Http\Controllers\Admin\FeatureController;
 use App\Http\Controllers\Admin\ModuleController;
 use App\Http\Controllers\Admin\NewAnnouncementController;
+use App\Http\Controllers\Admin\TeacherController;
 use App\Http\Controllers\Admin\TopicController;
 use App\Http\Controllers\Admin\VideoCategoryController;
 use App\Http\Controllers\Users;
@@ -178,7 +179,11 @@ Route::middleware('auth')->group(function () {
     Route::post('video-category-edit', [VideoCategoryController::class, 'edit'])->name('videocategory.edit');
     Route::post('video-category-update', [VideoCategoryController::class, 'update'])->name('videocategory.update');
     Route::post('video-category-delete', [VideoCategoryController::class, 'delete'])->name('videocategory.delete');
+ 
+    //teacher 
+    Route::get('/teacher/list/{id}', [TeacherController::class, 'list_teacher'])->name('teacher.list');
 
+     
     //student
     Route::get('/student/list/{id}', [StudentsController::class, 'list_student'])->name('student.list');
     Route::get('/student/create/{id}', [StudentsController::class, 'create_student'])->name('student.create');

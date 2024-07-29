@@ -53,6 +53,8 @@
                       <input type="submit" class="btn btn-danger institute_list_deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
                       <a href="{{url('/student/list/'.$value['id'])}}" class="btn btn-warning" style="text-wrap: nowrap;">Student List</a>
+                      <!-- &nbsp;&nbsp;
+                      <a href="{{url('/teacher/list/'.$value['id'])}}" class="btn btn-info" style="text-wrap: nowrap;">Teacher List</a> -->
                     </div>
                 </tr>
                 @php $i++ @endphp
