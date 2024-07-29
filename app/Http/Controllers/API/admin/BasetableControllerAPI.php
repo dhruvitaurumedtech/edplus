@@ -39,7 +39,7 @@ class BasetableControllerAPI extends Controller
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -64,7 +64,7 @@ class BasetableControllerAPI extends Controller
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -95,7 +95,7 @@ class BasetableControllerAPI extends Controller
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -136,7 +136,7 @@ class BasetableControllerAPI extends Controller
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -306,7 +306,7 @@ class BasetableControllerAPI extends Controller
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -360,7 +360,7 @@ class BasetableControllerAPI extends Controller
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -386,7 +386,7 @@ class BasetableControllerAPI extends Controller
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -410,7 +410,7 @@ class BasetableControllerAPI extends Controller
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function get_edit_medium(Request $request)
@@ -440,7 +440,7 @@ class BasetableControllerAPI extends Controller
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -484,7 +484,7 @@ class BasetableControllerAPI extends Controller
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -658,7 +658,7 @@ class BasetableControllerAPI extends Controller
             }    
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 }

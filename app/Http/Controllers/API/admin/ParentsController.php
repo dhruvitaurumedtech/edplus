@@ -402,7 +402,7 @@ class ParentsController extends Controller
         return $this->response($data, "Data Fetch Successfully");
 
         }catch(\Exception $e){
-            return $this->response($e, "Something want Wrong!!.", false, 400);
+            return $this->response($e, "Something went wrong!!.", false, 400);
         }
             
     }
@@ -476,7 +476,7 @@ class ParentsController extends Controller
                 // echo "<pre>";print_r($parent);exit;
                 return $this->response($response, "Data Fetch Successfully");
             }catch(\Exception $e){
-                return $this->response($e, "Something want Wrong!!.", false, 400);
+                return $this->response($e, "Something went wrong!!.", false, 400);
             }
 
     }

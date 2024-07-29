@@ -382,7 +382,7 @@ class StaffController extends Controller
             ];
             return $this->response($data, "Staff Added Successfully !");
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function view_staff(Request $request)
@@ -410,7 +410,7 @@ class StaffController extends Controller
             return $this->response($data, "Staff Fetch Successfully !");
         } catch (Exception $e) {
 
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
     }

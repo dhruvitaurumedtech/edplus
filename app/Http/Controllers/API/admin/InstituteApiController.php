@@ -474,9 +474,9 @@ class InstituteApiController extends Controller
                 );
                 return $this->response($data, "Fetch Data Successfully");
             }
-            return $this->response([], "Something want Wrong!!", false, 400);
+            return $this->response([], "Something went wrong!!", false, 400);
         } catch (Exception $e) {
-            return $this->response($e, "Something want Wrong!!", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 
@@ -6757,7 +6757,7 @@ class InstituteApiController extends Controller
         }
         }
         catch(Exception $e){
-            return $this->response($e, "Something want wrong.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
 
         }
     }

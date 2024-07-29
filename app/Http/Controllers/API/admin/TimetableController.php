@@ -26,7 +26,7 @@ class TimetableController extends Controller
 
             return $this->response($lecture_type,'Data Fetch Successfully');
         }catch(Exeption $e){
-            return $this->response($e,"Something want Wrong!!", false, 400);
+            return $this->response($e,"Something went wrong!!", false, 400);
         }
     }
 
@@ -40,7 +40,7 @@ class TimetableController extends Controller
 
             return $this->response($timetable_repeat,'Data Fetch Successfully');
         }catch(Exeption $e){
-            return $this->response($e,"Something want Wrong!!", false, 400);
+            return $this->response($e,"Something went wrong!!", false, 400);
         }
     }
 
@@ -235,7 +235,7 @@ class TimetableController extends Controller
                 
                 return $this->response([],'Data Repeat Successfully');
             }catch(Exeption $e){
-                return $this->response($e,"Something want Wrong!!", false, 400);
+                return $this->response($e,"Something went wrong!!", false, 400);
             }
     }
 
@@ -281,7 +281,7 @@ class TimetableController extends Controller
     //        return $this->response($data,'Data Fetch Successfully');
            
     //     }catch(Exeption $e){
-    //         return $this->response($e,"Something want Wrong!!", false, 400);
+    //         return $this->response($e,"Something went wrong!!", false, 400);
     //     }
     // }
     private  function convertTo12HourFormat($time24) {
@@ -393,7 +393,7 @@ class TimetableController extends Controller
             return $this->response([],'Timetable Update Successfully');
         }catch(Exeption $e){
             DB::rollback();
-            return $this->response($e,"Something want Wrong!!", false, 400);
+            return $this->response($e,"Something went wrong!!", false, 400);
         }
     }
 }
