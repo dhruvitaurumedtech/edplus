@@ -57,6 +57,7 @@ use App\Models\UserHasRole;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class InstituteApiController extends Controller
 {
@@ -6734,5 +6735,30 @@ class InstituteApiController extends Controller
         } 
        }
 
+    }
+    public function mobile_verify(Request $request){
+        $validator = Validator::make($request->all(), [
+            'mobile' => 'required',
+            'email'  => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+        $data= User::withTrashed()->where('mobile', $request->mobile)->where('email',$request->email)->first();
+        if(!empty($data)){
+            User::withTrashed()
+            ->where('mobile', $request->mobile)
+            ->restore();
+           
+            return $this->response([], "Activate User");
+        }else{
+            return $this->response([], "Invalid Mobile Number", false, 400);
+        }
+        }
+        catch(Exception $e){
+            return $this->response($e, "Something want wrong.", false, 400);
+
+        }
     }
 }
