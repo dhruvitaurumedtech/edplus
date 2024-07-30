@@ -3255,4 +3255,35 @@ class StudentController extends Controller
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
     }
+    public function add_subject(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id'
+        ]);
+          
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        $array1 = Subject_sub::where('institute_id', $request->institute_id)->get();
+        $array2 = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)
+            ->first();
+
+        $result = $array1->map(function ($item1) use ($array2) {
+            $isMatched = $array2 && $array2->subject_id == $item1->subject_id;
+            $item1->status = $isMatched ? true : false;
+            return $item1;
+        });
+
+        $subjectArray = $result->toArray();
+
+      
+        $batchlist=Batches_model::where('institute_id',$request->institute_id)->get();
+        $result2 = $batchlist->map(function ($item2) use ($array2) {
+            $isMatched = $array2 && $array2->batch_id == $item2->id;
+            $item2->status = $isMatched ? true : false;
+            return $item2;
+        });
+        $batchArray = $result2->toArray();
+        print_r($batchArray);exit;
+    }
 }
