@@ -3255,7 +3255,7 @@ class StudentController extends Controller
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
     }
-    public function add_subject(Request $request){
+    public function fetch_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
             'student_id' => 'required|exists:users,id'
