@@ -210,13 +210,14 @@ class StaffController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-   
             $actions = Action::select('id', 'name')->get();
             $modules = Module::where('type', 2)->with(['Features' => function ($query) {
                 $query->select('id', 'module_id', 'feature_name');
             }])->select('id', 'module_name')->where('status', 1)->get();
             $permissionsIds = collect();
+   
             if (empty($request->institute_id)) {
+   
                 $user = Auth::user();
                 $user_has_role = UserHasRole::where('role_id', $user->role_type)->first();
                 $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
