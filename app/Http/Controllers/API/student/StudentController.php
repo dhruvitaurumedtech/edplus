@@ -10,6 +10,7 @@ use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
 use App\Models\announcements_model;
 use App\Models\Attendance_model;
+use App\Models\Base_table;
 use App\Models\Batches_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
@@ -3266,16 +3267,26 @@ class StudentController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-             //total subject get
-        $total_subject = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
-
-        // Fetch the selected subject for the student
-        $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+            
+            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
             ->where('student_id', $request->student_id)
             ->first();
+            // print_r($selected_subject);exit;
 
+
+            $base_table_id=Base_table::where('board', $selected_subject->board_id)
+            ->where('medium', $selected_subject->medium_id)
+            ->where('standard', $selected_subject->standard_id)
+            ->pluck('id');
+            
+            $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
+            
+             //total subject get
+        // $total_subject = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
+        // Fetch the selected subject for the student
+        
         // Fetch all subjects based on the subject IDs
-        $subjects = Subject_model::whereIn('id', $total_subject)->get();
+        
 
         $result = $subjects->map(function ($subject) use ($selected_subject) {
             $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
@@ -3284,6 +3295,7 @@ class StudentController extends Controller
 
         // Convert the result to an array and print
         $subjectArray = $result->toArray();
+        // print_r($subjectArray);exit;
         
         foreach($subjectArray as $subjectArray_value){
             $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
