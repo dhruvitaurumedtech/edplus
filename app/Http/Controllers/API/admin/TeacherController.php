@@ -866,10 +866,22 @@ class TeacherController extends Controller
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
            
-            $response = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id)->update(['status' => '2']);
+            $response = Teacher_model::where('institute_id', $request->institute_id)
+            ->where('teacher_id', $request->teacher_id)
+            ->update(['status' => '2']);
+
+            if ($response) {
+                Teacher_model::where('institute_id', $request->institute_id)
+                    ->where('teacher_id', $request->teacher_id)
+                    ->increment('reject_count', 1);
+            }
+            $totalrcount = Teacher_model::where('institute_id', $request->institute_id)
+                    ->where('teacher_id', $request->teacher_id)
+                    ->select('reject_count')->first();
+            if($totalrcount->reject_count >= 2){
+                return $this->response([], "You already remove this student.");
+            }else{
             $serverKey = env('SERVER_KEY');
-
-
             $url = "https://fcm.googleapis.com/fcm/send";
             $users = User::where('id', $request->teacher_id)->pluck('device_key');
 
@@ -915,6 +927,7 @@ class TeacherController extends Controller
                 curl_close($ch);
             }
             return $this->response([], "Successfully Reject Request.");
+        } 
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
@@ -972,7 +985,7 @@ class TeacherController extends Controller
             $user_list = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
-                ->where('teacher_detail.status', '0')
+                //->where('teacher_detail.status', '0')
                 ->select(
                     'teacher_detail.*',
                     'users.*',
@@ -995,7 +1008,7 @@ class TeacherController extends Controller
 
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
-                ->where('teacher_detail.status', '0')
+                //->where('teacher_detail.status', '0')
                 ->select('teacher_detail.*',
                          'users.qualification',
                          'board.name as board',
@@ -1015,7 +1028,7 @@ class TeacherController extends Controller
                             'name' => $subDT->name,
                             'image' => asset($subDT->image)
                         );
-           }
+                    }
                     $batches=Batches_model::where('institute_id',$request->institute_id)
                                    ->where('board_id',$values->board_id)
                                   ->where('medium_id',$values->medium_id)
@@ -1043,7 +1056,7 @@ class TeacherController extends Controller
                             'subject'=>$subjectslist,
                             'batches'=>$batch_detail
                          ];
-                 }
+                }
                 $response_data = [
                     'id' => $user_list->id,
                     'teacher_id' => $user_list->teacher_id,
