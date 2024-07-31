@@ -1621,4 +1621,66 @@ class TeacherController extends Controller
     //         return $this->response($e, "Invalid token.", false, 400);
     //     }
     // }
+
+    function teacher_profile_edit_institute(Request $request){
+        $validator = Validator::make($request->all(), [
+                'institute_id' => 'required',
+                'teacher_id' => 'required',
+                'standard_id' => 'required',
+                'board_id' => 'required',
+                'medium_id' => 'required',
+                'subjec_twith_batch'=>'required|array|min:1',
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->response([], $validator->errors()->first(), false, 400);
+            }
+
+        try {
+            $subjec_twith_batch = json_decode($request->subjec_twith_batch, true);
+            foreach($subjec_twith_batch as $teacherDT){
+
+                Teacher_model::where('institute_id', $request->institute_id)
+                ->where('teacher_id', $request->teacher_id)
+                ->where('status', '1')
+                ->delete();
+
+                $sujctd = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
+                ->where('subject.id',$teacherDT['subject_id'])
+                ->select('base_table.institute_for','base_table.institute_for_class')
+                ->first();
+                
+                Teacher_model::create([
+                    'institute_id' => $request->institute_id,
+                    'teacher_id' => $request->teacher_id,
+                    'institute_for_id' => $sujctd->institute_for,
+                    'class_id' => $sujctd->institute_for_class,
+                    'board_id' => $request->board,
+                    'medium_id' => $request->medium,
+                    'standard_id' => $request->standard,
+                    'subject_id' => $teacherDT['subject_id'],
+                    'batch_id' => $teacherDT['batch_id'],
+                    'status' => '1',
+                ]);
+                
+                // if ($teacherDT['teacher_detail_id']) {
+                //     $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
+                //     $teacherDetail->update([
+                //         'board_id' => $teacherDT['board_id'],
+                //         'medium_id' => $teacherDT['medium_id'],
+                //         'standard_id' => $teacherDT['standard_id'],
+                //         'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                //         'subject_id' => $teacherDT['subjetc_id'],
+                //         'teacher_id' => $request->teacher_id,
+                //         'status' => '1',
+                //     ]);
+                // }
+                
+            }
+
+            return $this->response([], "Data updated successfully!");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }
