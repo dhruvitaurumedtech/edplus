@@ -58,7 +58,7 @@ class TimetableController extends Controller
             //'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
-            'repeat'=>'required',
+            'day'=>'required',
             'class_room_id'=>'required'
         ]);
 
@@ -75,6 +75,10 @@ class TimetableController extends Controller
             return $this->response([], "Minimum lecture time should be 30 min.", false, 400);
         }
         
+        $today = Carbon::now();
+        $nextDay = $today->next($request->day);
+        $start_date = $nextDay->format('Y-m-d');
+
         $insiddt = Batches_model::where('id',$request->batch_id)->first();
         $enddt = Institute_detail::where('id',$insiddt->institute_id)->first();
         //DB::beginTransaction();
@@ -84,19 +88,21 @@ class TimetableController extends Controller
         $timetablebase->class_room_id = $request->class_room_id;
         $timetablebase->teacher_id = $request->teacher_id;
         $timetablebase->lecture_type = $request->lecture_type;
-        $timetablebase->start_date = $request->start_date;
+        $timetablebase->start_date = $start_date;
         $timetablebase->end_date = $enddt->end_academic_year;
         $timetablebase->start_time = $request->start_time;
         $timetablebase->end_time = $request->end_time;
-        $timetablebase->repeat = $request->repeat;
+        $timetablebase->repeat = $request->day;
         $timetablebase->save();
 
         $lastInsertedId = $timetablebase->id;
 
-        $start_date = new DateTime($request->start_date);
+        $start_date = new DateTime($start_date);
         $end_date = new DateTime($enddt->end_academic_year);
-        $days = explode(',', $request->repeat);
+        $days = explode(',', $request->day);
         
+        
+
         if($request->id){
             $timetadt = Timetable::where('id',$request->id)->first();
             Timetable::where('batch_id',$request->batch_id)
@@ -110,14 +116,14 @@ class TimetableController extends Controller
         }
         
 
-        foreach ($days as $repeat) {
+        foreach ($days as $day) {
             
-            $repeat = trim(strtolower($repeat)); // Normalize the day name
+            $day = trim(strtolower($day)); // Normalize the day name
 
             $current_date = clone $start_date;
 
             while ($current_date <= $end_date) {
-                if (strtolower($current_date->format('l')) == $repeat) {
+                if (strtolower($current_date->format('l')) == $day) {
                     $lecture_date = $current_date->format('Y-m-d');
                     
                     $existing = Timetable::where([
@@ -160,12 +166,12 @@ class TimetableController extends Controller
                     $timetable->class_room_id = $request->class_room_id;
                     $timetable->teacher_id = $request->teacher_id;
                     $timetable->lecture_type = $request->lecture_type;
-                    $timetable->start_date = $request->start_date;
+                    $timetable->start_date = $start_date;
                     $timetable->end_date = $enddt->end_academic_year;
                     $timetable->lecture_date = $lecture_date;
                     $timetable->start_time = $request->start_time;
                     $timetable->end_time = $request->end_time;
-                    $timetable->repeat = $repeat;
+                    $timetable->repeat = $day;
                     $timetable->save();
                 }
 
