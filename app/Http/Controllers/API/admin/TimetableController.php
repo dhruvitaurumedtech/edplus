@@ -54,7 +54,7 @@ class TimetableController extends Controller
             'batch_id'=>'required|exists:batches,id',
             'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
-            'start_date'=>'required|date_format:Y-m-d|date',
+            //'start_date'=>'required|date_format:Y-m-d|date',
             //'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
