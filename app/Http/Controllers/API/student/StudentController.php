@@ -3351,10 +3351,17 @@ class StudentController extends Controller
             
 
             $teacher_detail = json_decode($request->bulk_data, true);
+
             $subject_ids = [];
             foreach ($teacher_detail as $teacherDT) {
                 if (isset($teacherDT['subject_id'])) {
                     $subject_ids[] = $teacherDT['subject_id'];
+                }
+                $batch_ids = array_column($teacher_detail, 'batch_id');
+
+                // Check if all numbers are the same
+                if (count(array_unique($batch_ids)) !== 1) {
+                    return $this->response([], "Please select all batch same!");
                 }
             }
             $subject_ids_string = implode(",", $subject_ids);
@@ -3362,9 +3369,6 @@ class StudentController extends Controller
             $teacherDetail = Student_detail::where('id', $selected_subject->id)->first();
             if ($teacherDetail) {
                 $teacherDetail->update([
-                    'board_id' => $selected_subject->board_id,
-                    'medium_id' => $selected_subject->medium_id,
-                    'standard_id' => $selected_subject->standard_id,
                     'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
                     'subject_id' => $subject_ids_string,
                     'status' => '1',
@@ -3377,4 +3381,5 @@ class StudentController extends Controller
     }    
 
     }
+    
 }
