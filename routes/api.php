@@ -250,12 +250,10 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
     Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
     Route::post('/institute/student/fetch-subject', [StudentController::class, 'fetch_subject']);
-    
-    
+    Route::post('/institute/student/add-edit-subject', [StudentController::class, 'add_edit_subject']);
 });
     //token without use 
    
-
    
     Route::post('/institute/testing', [StudentController::class, 'testing']);
 
