@@ -3369,9 +3369,6 @@ class StudentController extends Controller
             $teacherDetail = Student_detail::where('id', $selected_subject->id)->first();
             if ($teacherDetail) {
                 $teacherDetail->update([
-                    'board_id' => $selected_subject->board_id,
-                    'medium_id' => $selected_subject->medium_id,
-                    'standard_id' => $selected_subject->standard_id,
                     'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
                     'subject_id' => $subject_ids_string,
                     'status' => '1',
