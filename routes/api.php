@@ -253,7 +253,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     
 });
     //token without use 
-   
+    Route::post('/institute/student/add-edit-subject', [StudentController::class, 'add_edit_subject']);
 
    
     Route::post('/institute/testing', [StudentController::class, 'testing']);
