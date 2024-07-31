@@ -184,6 +184,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
     Route::post('/teacher/remove-institute-teacher', [TeacherController::class, 'remove_institute_teacher']);
+    Route::post('/teacher/teacher-profile-edit-institute', [TeacherController::class, 'teacher_profile_edit_institute']);
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role'])->middleware('check.permission:27,1');
     Route::post('/institute/edit-role', [StaffController::class, 'edit_role'])->middleware('check.permission:27,2');

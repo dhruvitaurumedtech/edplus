@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Batches_model;
+use App\Models\Institute_detail;
 use App\Models\Timetable;
 use App\Models\TimeTableBase;
 use App\Traits\ApiTrait;
@@ -53,7 +55,7 @@ class TimetableController extends Controller
             'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
             'start_date'=>'required|date_format:Y-m-d|date',
-            'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
+            //'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
             'repeat'=>'required',
@@ -73,6 +75,8 @@ class TimetableController extends Controller
             return $this->response([], "Minimum lecture time should be 30 min.", false, 400);
         }
         
+        $insiddt = Batches_model::where('id',$request->batch_id)->first();
+        $enddt = Institute_detail::where('id',$insiddt->institute_id)->first();
         //DB::beginTransaction();
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
@@ -81,7 +85,7 @@ class TimetableController extends Controller
         $timetablebase->teacher_id = $request->teacher_id;
         $timetablebase->lecture_type = $request->lecture_type;
         $timetablebase->start_date = $request->start_date;
-        $timetablebase->end_date = $request->end_date;
+        $timetablebase->end_date = $enddt->end_academic_year;
         $timetablebase->start_time = $request->start_time;
         $timetablebase->end_time = $request->end_time;
         $timetablebase->repeat = $request->repeat;
@@ -90,9 +94,22 @@ class TimetableController extends Controller
         $lastInsertedId = $timetablebase->id;
 
         $start_date = new DateTime($request->start_date);
-        $end_date = new DateTime($request->end_date);
+        $end_date = new DateTime($enddt->end_academic_year);
         $days = explode(',', $request->repeat);
         
+        if($request->id){
+            $timetadt = Timetable::where('id',$request->id)->first();
+            Timetable::where('batch_id',$request->batch_id)
+            ->whereBetween('lecture_date', [$start_date, $end_date]) //only current date to end date data should be edit , previous data can't be remove or edit
+            ->where('subject_id',$timetadt->subject_id)
+            ->where('class_room_id',$timetadt->class_room_id)
+            ->where('start_time',$timetadt->start_time)
+            ->where('end_time',$timetadt->end_time)
+            ->where('teacher_id',$timetadt->teacher_id)
+            ->where('lecture_type',$timetadt->lecture_type)->forceDelete();
+        }
+        
+
         foreach ($days as $repeat) {
             
             $repeat = trim(strtolower($repeat)); // Normalize the day name
@@ -144,7 +161,7 @@ class TimetableController extends Controller
                     $timetable->teacher_id = $request->teacher_id;
                     $timetable->lecture_type = $request->lecture_type;
                     $timetable->start_date = $request->start_date;
-                    $timetable->end_date = $request->end_date;
+                    $timetable->end_date = $enddt->end_academic_year;
                     $timetable->lecture_date = $lecture_date;
                     $timetable->start_time = $request->start_time;
                     $timetable->end_time = $request->end_time;
