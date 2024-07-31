@@ -6370,7 +6370,7 @@ class InstituteApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'name' => 'required',
+            'name' => 'required|string|unique:class_room,name',
             'capacity' => 'required'
         ]);
         if ($validator->fails()) {
@@ -6382,6 +6382,12 @@ class InstituteApiController extends Controller
        $repeatedValues = array_filter($valueCounts, function ($count) {
             return $count > 1;
         });
+        $class_room=Class_room_model::where('institute_id',$request->institute_id)->get();
+        $existingNames = array_intersect($nameu, $class_room);
+        if (!empty($existingNames)) {
+            return $this->response([],'The following names already exist:'.implode(",",$existingNames),false,400);
+        }
+
         if($repeatedValues){
             return $this->response([], "The name field contains duplicate values", false, 400);
         }
