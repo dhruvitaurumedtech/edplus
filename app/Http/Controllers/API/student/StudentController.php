@@ -10,6 +10,7 @@ use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
 use App\Models\announcements_model;
 use App\Models\Attendance_model;
+use App\Models\Base_table;
 use App\Models\Batches_model;
 use Illuminate\Support\Facades\Mail;
 use App\Models\Chapter;
@@ -3254,5 +3255,102 @@ class StudentController extends Controller
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
+    }
+    public function fetch_subject(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'student_id' => 'required|exists:users,id'
+
+        ]);
+          
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            
+            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)
+            ->first();
+            // print_r($selected_subject);exit;
+
+
+            $base_table_id=Base_table::where('board', $selected_subject->board_id)
+            ->where('medium', $selected_subject->medium_id)
+            ->where('standard', $selected_subject->standard_id)
+            ->pluck('id');
+            
+            $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
+            
+             //total subject get
+        // $total_subject = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
+        // Fetch the selected subject for the student
+        
+        // Fetch all subjects based on the subject IDs
+        
+
+        $result = $subjects->map(function ($subject) use ($selected_subject) {
+            $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
+            return $subject;
+        });
+
+        // Convert the result to an array and print
+        $subjectArray = $result->toArray();
+        // print_r($subjectArray);exit;
+        
+        foreach($subjectArray as $subjectArray_value){
+            $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
+            ->where('board_id', $selected_subject->board_id)
+            ->where('medium_id', $selected_subject->medium_id)
+            ->where('standard_id', $selected_subject->standard_id)
+            ->get();
+          
+            $subject_ids  = explode(',', $selected_subject->subject_id);
+            $selected_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
+                ->where('board_id', $selected_subject->board_id)
+                ->where('medium_id', $selected_subject->medium_id)
+                ->where('standard_id', $selected_subject->standard_id)
+                ->where(function($query) use ($subject_ids) {
+                    foreach ($subject_ids as $subject_id) {
+                        $query->orWhereRaw("FIND_IN_SET(?, subjects)", [$subject_id]);
+                    }
+                })
+                ->first();
+            $result2 = $total_batch->map(function ($item2) use ($selected_batch) {
+            $isMatched = $selected_batch && $selected_batch->id == $item2->id;
+            $item2->status = $isMatched ? 1 : 0;
+            return $item2;
+            });
+            $batchArray = $result2->toArray();                
+
+        }
+
+        $response_one=[];
+
+        $response_two=[];
+        foreach($batchArray as $batchArray_value){
+            $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+        }
+        foreach($subjectArray as $subjectArray_value){
+            $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+                               'batches'=>$response_two];
+        }
+                
+         
+         //total batch get
+        
+                        //   print_r($total_batch);exit;           
+        //seleceted batch student get
+      
+        // print_r($selected_batch);exit;                         
+        
+       
+        $response = ['subject_list'=>$response_one,
+                     ];
+        // print_r($response);  
+        return $this->response($response, "Successfully Fetch Subject and batch"); 
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!.", false, 400);
+        }          
+
     }
 }

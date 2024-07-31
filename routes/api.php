@@ -249,13 +249,15 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
     Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
-
+    Route::post('/institute/student/fetch-subject', [StudentController::class, 'fetch_subject']);
+    
+    
 });
     //token without use 
-    
+   
 
    
-    Route::post('/institute/testing', [InstituteApiController::class, 'testing']);
+    Route::post('/institute/testing', [StudentController::class, 'testing']);
 
     // Route::post('test', [InstituteApiController::class, 'test']);
 
