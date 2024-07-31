@@ -104,6 +104,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/register-institute', [InstituteApiController::class, 'register_institute'])->name('institude.register');
     Route::post('institute/update-institute', [InstituteApiController::class, 'update_institute']);
     Route::post('institute/student-fees-calculation', [InstituteApiController::class, 'student_fees_calculation'])->middleware('check.permission:7,1');
+    Route::post('institute/student-fees-calculation2', [InstituteApiController::class, 'student_fees_calculation2']);
+
 
     Route::post('/institute/add-student', [InstituteApiController::class, 'add_student'])->name('add_student');
     Route::post('/institute/student-list-exam', [InstituteApiController::class, 'student_list_for_add_marks'])->name('student_list_for_add_marks')->middleware('check.permission:5,4');

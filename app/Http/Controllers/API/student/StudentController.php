@@ -3356,10 +3356,10 @@ class StudentController extends Controller
             
             foreach($enter_subject as $subject_id){
                 $subject_fees=Subject_sub::where('institute_id',$request->institute_id)->where('subject_id',$subject_id)->get();
-                foreach($subject_fees as $value1){
-                    if($value1->amount==''){
-                       return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.", false, 400); 
-                    }
+                // foreach($subject_fees as $value1){
+                //     if($value1->amount==''){
+                //        return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.", false, 400); 
+                //     }
                     $amount = 0;
                     foreach ($subject_fees as $value) {
                             $amount += $value->amount;
@@ -3373,7 +3373,7 @@ class StudentController extends Controller
                             'total_fees' => (!empty($amount)) ? (float)$amount + $get_amount : 0.00,
                         ]);
                     }
-                }
+                // }
             }
             $batch_ids = explode(',', $request->batch_id);
             $selected_batch_ids = [];
