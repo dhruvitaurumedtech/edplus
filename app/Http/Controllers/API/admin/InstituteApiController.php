@@ -6382,11 +6382,6 @@ class InstituteApiController extends Controller
        $repeatedValues = array_filter($valueCounts, function ($count) {
             return $count > 1;
         });
-        $class_room=Class_room_model::where('institute_id',$request->institute_id)->get();
-        $existingNames = array_intersect($nameu, $class_room);
-        if (!empty($existingNames)) {
-            return $this->response([],'The following names already exist:'.implode(",",$existingNames),false,400);
-        }
 
         if($repeatedValues){
             return $this->response([], "The name field contains duplicate values", false, 400);
@@ -6404,17 +6399,17 @@ class InstituteApiController extends Controller
         
         try {
             foreach ($names as $index => $name) {
-                // $uniqueRules = [
-                //     'name' => 'required|string|unique:class_room,name' . ($request->edit_id ? ",{$request->edit_id}" : '')
-                // ];
+                $uniqueRules = [
+                    'name' => 'required|string|unique:class_room,name' . ($request->edit_id ? ",{$request->edit_id}" : '')
+                ];
     
-                // $nameValidator = Validator::make(['name' => $name], $uniqueRules);
+                $nameValidator = Validator::make(['name' => $name], $uniqueRules);
     
-                // if ($nameValidator->fails()) {
-                //     return response()->json([
-                //         'error' => 'The name already exists.',
-                //     ], 400);
-                // }
+                if ($nameValidator->fails()) {
+                    return response()->json([
+                        'error' => 'The name already exists.',
+                    ], 400);
+                }
                 $capacity = $capacities[$index];
                 if (empty($request->edit_id)) {
                     $class = new Class_room_model();
