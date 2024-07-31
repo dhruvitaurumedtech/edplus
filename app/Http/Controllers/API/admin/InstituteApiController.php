@@ -3220,6 +3220,38 @@ class InstituteApiController extends Controller
         }
         return $this->response([], 'Approve Screen.');
     }
+    function student_fees_calculation2(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            'student_id' => 'required|exists:users,id'
+
+        ]);
+          
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)
+            ->first();
+
+            $subject_ids = explode(',', $request->subject_id);
+            
+            $enter_subject = array_diff($subject_ids, explode(',',$selected_subject->subject_id));
+            
+            foreach($enter_subject as $subject_id){
+                $subject_fees=Subject_sub::where('institute_id',$request->institute_id)->where('subject_id',$subject_id)->get();
+                foreach($subject_fees as $value1){
+                    if($value1->amount==''){
+                       return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.", false, 400); 
+                    }
+                }
+            }
+            return $this->response([], 'Approve Screen.');
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!.", false, 400);
+        }  
+    }
     public function add_student(Request $request)
     {
         $validator = Validator::make($request->all(), [
