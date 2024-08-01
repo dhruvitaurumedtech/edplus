@@ -77,33 +77,34 @@ class TimetableController extends Controller
         }
     
         try {
-            $timtDT = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            $timtDT = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('days', 'days.id', '=', 'timetables.day')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
-                ->where('time_table.batch_id', $request->batch_id)
+                ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
+                ->where('timetables.batch_id', $request->batch_id)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
-                    'batches.batch_name', 'batches.standard_id', 'time_table.*', 'standard.name as standard')
-                ->orderBy('time_table.start_time', 'asc')
+                    'batches.batch_name', 'batches.standard_id','days.day as dayname', 'timetables.*', 'standard.name as standard')
+                ->orderBy('timetables.start_time', 'asc')
                 ->get();
-    
             $groupedData = [];
     
             foreach ($timtDT as $timtable) {
-                $date = $timtable->lecture_date;
-                if (!isset($groupedData[$date])) {
-                    $groupedData[$date] = [
-                        'date' => $date,
+                $day = $timtable->day;
+                if (!isset($groupedData[$day])) {
+                    $groupedData[$day] = [
+                        'day' => $day,
+                        'dayname'=>$timtable->dayname,
                         'sub_data' => []
                     ];
                 }
-                $groupedData[$date]['sub_data'][] = [
+                $groupedData[$day]['sub_data'][] = [
                     'id' => $timtable->id,
-                    'day' => $timtable->repeat,
-                    'date' => $timtable->lecture_date,
+                    'day' => $timtable->day,
+                    'dayname'=>$timtable->dayname,
                     'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
                     'end_time' => $this->convertTo12HourFormat($timtable->end_time),
                     'subject_id' => $timtable->subject_id,
