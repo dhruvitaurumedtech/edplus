@@ -159,25 +159,14 @@ class TimetableController extends Controller
             $insiddt = Batches_model::where('id',$request->batch_id)->first();
             $academic_end_date = Institute_detail::where('id',$insiddt->institute_id)->first();
             
-            if($request->id){
-                $timetadt = Timetable::where('id',$request->id)->first();
-                Timetable::where('batch_id',$request->batch_id)
-                ->whereBetween('lecture_date', [$start_date, $end_date]) 
-                ->where('subject_id',$timetadt->subject_id)
-                ->where('class_room_id',$timetadt->class_room_id)
-                ->where('start_time',$timetadt->start_time)
-                ->where('end_time',$timetadt->end_time)
-                ->where('teacher_id',$timetadt->teacher_id)
-                ->where('lecture_type',$timetadt->lecture_type)->forceDelete();
-            }
-
-                        
                         $existing = Timetables::where([
                             ['batch_id', $request->batch_id],
                             ['day', $request->day],
                             ['start_time', '<',$request->end_time ],
                             ['end_time', '>',  $request->start_time],
-                        ])->exists();
+                        ])
+                        ->where('id', '!=', $request->id)
+                        ->exists();
 
                         if ($existing) {
                             return $this->response([], "Lecture already scheduled for this day and time!", false, 400);
@@ -188,7 +177,9 @@ class TimetableController extends Controller
                             ['day', $request->day],
                             ['start_time', '<',$request->end_time ],
                             ['end_time', '>',  $request->start_time],
-                        ])->exists();
+                        ])
+                        ->where('id', '!=', $request->id)
+                        ->exists();
                         if ($existing) {
                             return $this->response([], "This teacher is already occupy for same day and time on another lecture!", false, 400);
                         }
@@ -198,12 +189,21 @@ class TimetableController extends Controller
                             ['day', $request->day],
                             ['start_time', '<',$request->end_time ],
                             ['end_time', '>',  $request->start_time],
-                        ])->exists();
+                        ])
+                        ->where('id', '!=', $request->id)
+                        ->exists();
+
                         if ($existing) {
                             return $this->response([], "This Classroom  is already occupy for same day and time on another lecture!", false, 400);
                         }
 
-                        $timetable = new Timetables();
+                        
+                        if($request->id){
+                            $timetable = Timetables::find($request->id);
+                        }else{
+                            $timetable = new Timetables();
+                        }
+
                         $timetable->batch_id = $request->batch_id;
                         $timetable->subject_id = $request->subject_id;
                         $timetable->teacher_id = $request->teacher_id;
