@@ -6429,23 +6429,16 @@ class InstituteApiController extends Controller
         $capacities = array_map('trim', explode(',', $request->capacity));
 
         if (count($names) !== count($capacities)) {
-            return response()->json([
-                'error' => 'The number of names and capacities must match.',
-            ], 400);
+            
+            return $this->response([], "The number of names and capacities must match.", false, 400);
         }
         
         try {
             foreach ($names as $index => $name) {
-                $uniqueRules = [
-                    'name' => 'required|string|unique:class_room,name' . ($request->edit_id ? ",{$request->edit_id}" : '')
-                ];
-    
-                $nameValidator = Validator::make(['name' => $name], $uniqueRules);
-    
-                if ($nameValidator->fails()) {
-                    return response()->json([
-                        'error' => 'The name already exists.',
-                    ], 400);
+                
+                $data=Class_room_model::where('institute_id',$request->institute_id)->where('name',$name)->first();
+                if(!empty($data)){
+                   return $this->response([], "The name already exists", false, 400);
                 }
                 $capacity = $capacities[$index];
                 if (empty($request->edit_id)) {
