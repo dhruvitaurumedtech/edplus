@@ -26,7 +26,8 @@ return new class extends Migration
             $table->date('academic_end_date');
             $table->time('start_time');
             $table->time('end_time');
-            $table->string('day');
+            $table->unsignedBigInteger('day');
+            $table->foreign('day')->references('id')->on('days');
             $table->timestamps();
             $table->softDeletes();
         });

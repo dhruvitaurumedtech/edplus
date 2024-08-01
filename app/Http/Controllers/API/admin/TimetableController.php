@@ -33,15 +33,29 @@ class TimetableController extends Controller
         }
     }
 
-    public function for_repeat_list(){
+    // public function for_repeat_list(){
+    //     try{
+    //         $timtblretDT = DB::table('timetable_repeat')->get();
+    //         $timetable_repeat = [];
+    //         foreach($timtblretDT as $reotreDT){
+    //             $timetable_repeat[] = array('id'=>$reotreDT->id,'name'=>$reotreDT->name);
+    //         }
+
+    //         return $this->response($timetable_repeat,'Data Fetch Successfully');
+    //     }catch(Exeption $e){
+    //         return $this->response($e,"Something went wrong!!", false, 400);
+    //     }
+    // }
+
+    public function days_list(){
         try{
-            $timtblretDT = DB::table('timetable_repeat')->get();
-            $timetable_repeat = [];
-            foreach($timtblretDT as $reotreDT){
-                $timetable_repeat[] = array('id'=>$reotreDT->id,'name'=>$reotreDT->name);
+            $daysDT = DB::table('days')->get();
+            $timetable_days = [];
+            foreach($daysDT as $dayDT){
+                $timetable_days[] = array('id'=>$dayDT->id,'day'=>$dayDT->day);
             }
 
-            return $this->response($timetable_repeat,'Data Fetch Successfully');
+            return $this->response($timetable_days,'Data Fetch Successfully');
         }catch(Exeption $e){
             return $this->response($e,"Something went wrong!!", false, 400);
         }
