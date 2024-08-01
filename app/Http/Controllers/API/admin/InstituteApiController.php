@@ -3247,7 +3247,9 @@ class InstituteApiController extends Controller
                     }
                 }
             }
-            return $this->response([], 'Approve Screen.');
+            if(empty($enter_subject)){
+                return $this->response([], 'Approve Screen.');
+            }
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }  
