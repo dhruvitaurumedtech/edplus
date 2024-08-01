@@ -68,7 +68,7 @@ class FeesController extends Controller
             $fee->save();
             return $this->response([], "Fees inserted successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function view_fees_detail(Request $request)
@@ -113,7 +113,7 @@ class FeesController extends Controller
             }
             return $this->response($data, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function paid_fees_student(Request $request)
@@ -221,7 +221,7 @@ class FeesController extends Controller
             
             return $this->response($students, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function pending_fees_student(Request $request)
@@ -455,7 +455,7 @@ class FeesController extends Controller
             ];
             return $this->response($data_final, "Successfully Display PaymentType.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong!!", false, 400);
         }
     }
     public function fees_collection(Request $request)
@@ -625,7 +625,7 @@ class FeesController extends Controller
             }
             return $this->response($student, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     function subject_amount(Request $request)
@@ -647,7 +647,7 @@ class FeesController extends Controller
             ]);
             return $this->response([], "Fees Update Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function student_list_for_discount(Request $request)
@@ -768,7 +768,7 @@ class FeesController extends Controller
             }
             return $this->response($data, "fetch Student list Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function fetch_discount_for_student(Request $request)
@@ -820,7 +820,7 @@ class FeesController extends Controller
             ];
             return $this->response($data, "Fetch Student list Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     function add_discount(Request $request)
@@ -940,11 +940,18 @@ class FeesController extends Controller
                 return $this->response([], "Discount added  successfully");
             }
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
     public function payment_type_new(Request $request)
     {
+        $validator = Validator::make($request->all(), [
+            'student_id' => 'required|integer',
+            'institute_id' => 'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
         try {
             // Fetch payment modes
             $payment_modes = Payment_type_model::whereNull('deleted_at')->get();
@@ -1033,7 +1040,35 @@ class FeesController extends Controller
 
             return $this->response($data_final, "Fetch data successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
+    function paid_fees_history(Request $request){
+        $validator = Validator::make($request->all(), [
+            'student_id' => 'required|integer',
+            'institute_id' => 'required|integer',
+          ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $student_history = Fees_colletion_model::where('student_id', $request->student_id)
+                ->where('institute_id', $request->institute_id)
+                ->orderBy('id', 'desc') 
+                ->get();
+                $history = [];
+                foreach ($student_history as $value) {
+                    $history[] = [
+                        'paid_amount' => $value->payment_amount,
+                        'date' => $value->created_at->setTimezone('Asia/Kolkata')->format('Y-m-d H:i'),
+                        'payment_mode' => $value->payment_type,
+                        'invoice_no' => $value->invoice_no,
+                        'transaction_id' => $value->transaction_id,
+                    ];
+               }
+               return $this->response($history, "Fetch data successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
 }

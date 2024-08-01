@@ -218,6 +218,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/fetch-discount-for-student', [FeesController::class, 'fetch_discount_for_student'])->middleware('check.permission:20,4');
     Route::post('/institute/add-discount', [FeesController::class, 'add_discount'])->middleware('check.permission:20,1');
     Route::post('/institute/payment-type', [FeesController::class, 'payment_type_new']);
+    Route::post('/institute/paid-fees-history', [FeesController::class, 'paid_fees_history']);
     Route::post('/institute/fees-collection', [FeesController::class, 'fees_collection'])->middleware('check.permission:7,1');
 
     Route::post('/institute/create-general-timetable', [General_timetableController::class, 'create_general_timetable']);
