@@ -125,6 +125,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable'])->middleware('check.permission:6,1');
     Route::post('/institute/add-timetables', [TimetableController::class, 'add_timetables']);
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable_institute'])->middleware('check.permission:6,4');
+    Route::post('/institute/list-timetables', [TimetableController::class, 'list_timetables_institute']);
     Route::post('/institute/days-list', [TimetableController::class, 'days_list']);
     Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list'])->middleware('check.permission:6,4'); //not in use
     Route::post('/institute/edit-timetable', [TimetableController::class, 'edit_timetable'])->middleware('check.permission:6,2'); //not in use
