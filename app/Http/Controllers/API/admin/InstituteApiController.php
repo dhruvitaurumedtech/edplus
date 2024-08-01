@@ -3243,7 +3243,7 @@ class InstituteApiController extends Controller
                 $subject_fees=Subject_sub::where('institute_id',$request->institute_id)->where('subject_id',$subject_id)->get();
                 foreach($subject_fees as $value1){
                     if($value1->amount==''){
-                       return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.", false, 400); 
+                       return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects."); 
                     }
                 }
             }

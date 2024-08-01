@@ -96,10 +96,11 @@
                             </table>
                         </div>
                     </div>
-                    <div class="d-flex justify-content-end">
+                    
+                </div>
+                <div class="d-flex justify-content-end mt-5">
                         {!! $features->links('pagination::bootstrap-5') !!}
                     </div>
-                </div>
             </div>
         </div>
         @include('layouts.footer_new')
