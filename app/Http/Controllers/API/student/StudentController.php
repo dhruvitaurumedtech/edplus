@@ -36,6 +36,7 @@ use App\Models\Medium_model;
 use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\VideoAssignToBatch;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Broadcasting\Channel;
@@ -46,6 +47,7 @@ use DateTime;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
@@ -1058,28 +1060,29 @@ class StudentController extends Controller
                 );
             }
            
-            $today = date('Y-m-d');
+            $today = date('l');
+            $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
             $todays_lecture = [];
             // $subject_ids = explode(",", $getstdntdata->subject_id);
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                ->where('time_table.batch_id', $getstdntdata->batch_id)
+            $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->where('timetables.batch_id', $getstdntdata->batch_id)
                 //->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
-                 ->whereIn('time_table.subject_id',explode(",",$getstdntdata->subject_id))
-                ->where('time_table.lecture_date', $today)
+                 ->whereIn('timetables.subject_id',explode(",",$getstdntdata->subject_id))
+                 ->where('timetables.day', $daysidg->id)
                 ->select(
                     'subject.name as subject',
                     'users.firstname',
                     'users.lastname',
                     'users.image',
                     'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date'
+                    'timetables.start_time',
+                    'timetables.end_time',
+                    'timetables.day'
                 )
-                ->orderBy('time_table.start_time', 'asc')
+                ->orderBy('timetables.start_time', 'asc')
                 ->get();
          
                 // print_r($todayslect);exit;
@@ -1089,7 +1092,6 @@ class StudentController extends Controller
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
-                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),  //$todayslecDT->start_time,
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
@@ -3102,7 +3104,7 @@ class StudentController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'date' => 'required',
+            'day' => 'required',
             'institute_id' => 'required',
         ]);
 
@@ -3125,24 +3127,23 @@ class StudentController extends Controller
 
             $lectures = [];
             if ($stdntdata) {
-                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                    ->where('time_table.batch_id', $stdntdata->batch_id)
-                    ->where('time_table.lecture_date', $request->date)
-                    ->whereIN('time_table.subject_id', explode(",",$stdntdata->subject_id))
+                $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                    ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                    ->where('timetables.batch_id', $stdntdata->batch_id)
+                    ->where('timetables.day', $request->day)
+                    ->whereIN('timetables.subject_id', explode(",",$stdntdata->subject_id))
                     ->select(
                         'subject.name as subject',
                         'users.firstname',
                         'users.lastname',
                         'users.image',
                         'lecture_type.name as lecture_type_name',
-                        'time_table.start_time',
-                        'time_table.end_time',
-                        'time_table.lecture_date'
+                        'timetables.start_time',
+                        'timetables.end_time',
                     )
-                    ->orderBy('time_table.start_time', 'asc')
+                    ->orderBy('timetables.start_time', 'asc')
                     ->get();
 
                 foreach ($todayslect as $todayslecDT) {
@@ -3150,7 +3151,6 @@ class StudentController extends Controller
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                         'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
-                        'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                         'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
