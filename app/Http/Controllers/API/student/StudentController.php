@@ -33,6 +33,7 @@ use Illuminate\Http\Request;
 use App\Models\User;
 use App\Models\VideoCategory;
 use App\Models\Medium_model;
+use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\Timetable;
 use App\Models\VideoAssignToBatch;
@@ -3348,33 +3349,50 @@ class StudentController extends Controller
             $selected_subject = Student_detail::where('institute_id', $request->institute_id)
             ->where('student_id', $request->student_id)
             ->first();
+
+            $subject_ids = explode(',', $request->subject_id);
             
-
-            $teacher_detail = json_decode($request->bulk_data, true);
-
-            $subject_ids = [];
-            foreach ($teacher_detail as $teacherDT) {
-                if (isset($teacherDT['subject_id'])) {
-                    $subject_ids[] = $teacherDT['subject_id'];
-                }
-                $batch_ids = array_column($teacher_detail, 'batch_id');
-
-                // Check if all numbers are the same
-                if (count(array_unique($batch_ids)) !== 1) {
-                    return $this->response([], "Please select all batch same!");
-                }
+            $enter_subject = array_diff($subject_ids, explode(',',$selected_subject->subject_id));
+            
+            foreach($enter_subject as $subject_id){
+                $subject_fees=Subject_sub::where('institute_id',$request->institute_id)->where('subject_id',$subject_id)->get();
+                // foreach($subject_fees as $value1){
+                //     if($value1->amount==''){
+                //        return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects.", false, 400); 
+                //     }
+                    $amount = 0;
+                    foreach ($subject_fees as $value) {
+                            $amount += $value->amount;
+                    }
+                    $studentFee = Student_fees_model::where('student_id', $request->student_id)->where('institute_id',$request->institute_id)->first();
+                    $get_amount = $studentFee->total_fees; 
+                    $studentFee = Student_fees_model::where('student_id', $request->student_id)->where('institute_id',$request->institute_id)->first();
+                    if ($studentFee) {
+                        $studentFee->update([
+                            'subject_id' => $request->subject_id,
+                            'total_fees' => (!empty($amount)) ? (float)$amount + $get_amount : 0.00,
+                        ]);
+                    }
+                // }
             }
-            $subject_ids_string = implode(",", $subject_ids);
-                
+            $batch_ids = explode(',', $request->batch_id);
+            $selected_batch_ids = [];
+            foreach ($batch_ids as $batch) {
+                    $selected_batch_ids[] = $batch;
+            }
+            if (count(array_unique($selected_batch_ids)) !== 1) {
+                return $this->response([], "Please select all batch same!", false, 400); 
+            }
             $teacherDetail = Student_detail::where('id', $selected_subject->id)->first();
             if ($teacherDetail) {
                 $teacherDetail->update([
-                    'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
-                    'subject_id' => $subject_ids_string,
+                    'batch_id' => !empty($selected_batch_ids[0]) ? $selected_batch_ids[0] : null,
+                    'subject_id' => !empty($request->subject_id) ? $request->subject_id : null,
                     'status' => '1',
                 ]);
             }
-            return $this->response([], "Successfully Update Subject and batch"); 
+              
+           return $this->response([], "Successfully Update Subject and batch"); 
         
     } catch (Exception $e) {
         return $this->response($e, "Something went wrong!!.", false, 400);
