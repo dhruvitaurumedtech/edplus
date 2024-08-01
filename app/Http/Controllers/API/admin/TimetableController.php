@@ -200,8 +200,10 @@ class TimetableController extends Controller
                         
                         if($request->id){
                             $timetable = Timetables::find($request->id);
+                            $msg = 'Successfully updated Timetable';
                         }else{
                             $timetable = new Timetables();
+                            $msg = 'Successfully created Timetable';
                         }
 
                         $timetable->batch_id = $request->batch_id;
@@ -215,7 +217,7 @@ class TimetableController extends Controller
                         $timetable->day = $request->day;
                         $timetable->save();
 
-            return $this->response([], 'Successfully created Timetable');
+            return $this->response([], $msg);
             } catch (Exception $e) {
                 return $this->response($e, "Something went wrong!!", false, 400);
             }
