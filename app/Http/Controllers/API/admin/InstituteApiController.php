@@ -3244,12 +3244,12 @@ class InstituteApiController extends Controller
                 foreach($subject_fees as $value1){
                     if($value1->amount==''){
                        return $this->response([], "Fees for the selected student's subjects are empty. Can you approve the student without fees? Otherwise, add the fees for the subjects."); 
+                    }else{
+                        return $this->response([], 'Approve Screen.');
                     }
                 }
             }
-            if(empty($enter_subject)){
-                return $this->response([], 'Approve Screen.');
-            }
+            return $this->response([], 'Approve Screen.');
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }  
