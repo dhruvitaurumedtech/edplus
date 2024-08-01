@@ -124,10 +124,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/lecture-type', [TimetableController::class, 'lecture_type_list']);
     Route::post('/institute/add-timetable', [TimetableController::class, 'add_timetable'])->middleware('check.permission:6,1');
     Route::post('/institute/list-timetable', [TimetableController::class, 'list_timetable_institute'])->middleware('check.permission:6,4');
-    Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list'])->middleware('check.permission:6,4');
-    Route::post('/institute/edit-timetable', [TimetableController::class, 'edit_timetable'])->middleware('check.permission:6,2');
+    Route::post('/institute/days-list', [TimetableController::class, 'days_list']);
+    Route::post('/institute/repeat-list', [TimetableController::class, 'for_repeat_list'])->middleware('check.permission:6,4'); //not in use
+    Route::post('/institute/edit-timetable', [TimetableController::class, 'edit_timetable'])->middleware('check.permission:6,2'); //not in use
     Route::post('/institute/fetch-teacher-list', [InstituteApiController::class, 'fetch_teacher_list'])->middleware('check.permission:15,4');
-    Route::post('/institute/repeat-timetable', [TimetableController::class, 'repeat_timetable'])->middleware('check.permission:6,2');
+    Route::post('/institute/repeat-timetable', [TimetableController::class, 'repeat_timetable'])->middleware('check.permission:6,2'); //not in use
     Route::post('/institute/get-edit-institute-for', [BasetableControllerAPI::class, 'get_edit_institute_for']);
     Route::post('/institute/get-edit-board', [BasetableControllerAPI::class, 'get_edit_board']);
     Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
