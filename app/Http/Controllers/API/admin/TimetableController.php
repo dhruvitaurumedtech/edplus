@@ -130,6 +130,71 @@ class TimetableController extends Controller
         }
     }
 
+    //new timetable list
+    public function list_timetables_institute(Request $request) {
+        $validator = validator::make($request->all(), [
+            'batch_id' => 'required',
+        ]);
+    
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+    
+        try {
+            $timtDT = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('days', 'days.id', '=', 'timetables.day')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('standard', 'standard.id', '=', 'batches.standard_id')
+                ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
+                ->where('timetables.batch_id', $request->batch_id)
+                ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
+                    'users.lastname', 'lecture_type.name as lecture_type_name',
+                    'batches.batch_name', 'batches.standard_id','days.day as dayname', 'timetables.*', 'standard.name as standard')
+                ->orderBy('timetables.start_time', 'asc')
+                ->get();
+            $groupedData = [];
+    
+            foreach ($timtDT as $timtable) {
+                $day = $timtable->day;
+                if (!isset($groupedData[$day])) {
+                    $groupedData[$day] = [
+                        'day' => $day,
+                        'dayname'=>$timtable->dayname,
+                        'sub_data' => []
+                    ];
+                }
+                $groupedData[$day]['sub_data'][] = [
+                    'id' => $timtable->id,
+                    'day' => $timtable->day,
+                    'dayname'=>$timtable->dayname,
+                    'start_time' => $this->convertTo12HourFormat( $timtable->start_time),
+                    'end_time' => $this->convertTo12HourFormat($timtable->end_time),
+                    'subject_id' => $timtable->subject_id,
+                    'subject' => $timtable->subject,
+                    'lecture_type_id' => $timtable->lecture_type,
+                    'lecture_type' => $timtable->lecture_type_name,
+                    'standard_id' => $timtable->standard_id,
+                    'standard' => $timtable->standard,
+                    'batch_id' => $timtable->batch_id,
+                    'batch_name' => $timtable->batch_name,
+                    'class_room_id'=>$timtable->class_room_id,
+                    'class_room'=>$timtable->class_room,
+                    'teacher_id' => $timtable->teacher_id,
+                    'teacher' => $timtable->firstname . ' ' . $timtable->lastname
+                ];
+            }
+    
+            $data = array_values($groupedData);
+    
+            return $this->response($data, 'Data Fetch Successfully');
+    
+        } catch (Exception $e) {
+            return $this->response([], "Something went wrong!!", false, 400);
+        }
+    }
+
     //new add timetable
     public function add_timetables(Request $request){
         $validator = validator::make($request->all(),[
