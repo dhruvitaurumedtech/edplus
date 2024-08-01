@@ -24,6 +24,7 @@ use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\TeacherAssignBatch;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\User;
 use App\Models\Users_sub_emergency;
 use App\Models\Users_sub_experience;
@@ -559,29 +560,30 @@ class TeacherController extends Controller
             $examlist = [];
 
             $user_id = Auth::id();
-            $today = date('Y-m-d');
+            $today = date('l');
+            $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
                        
             $batchesid = Batches_model::where('institute_id',$request->institute_id)->pluck('id')->toarray();
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('time_table.teacher_id', $user_id)
-                ->whereIn('time_table.batch_id', $batchesid)
-                ->where('time_table.lecture_date', $today)
+                ->where('timetables.teacher_id', $user_id)
+                ->whereIn('timetables.batch_id', $batchesid)
+                ->where('timetables.day', $daysidg->id)
                 ->select(
                     'subject.name as subject',
                     'standard.name as standard',
                     'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date',
-                    'time_table.batch_id',
+                    'timetables.start_time',
+                    'timetables.end_time',
+                    'timetables.batch_id',
                     'batches.batch_name',
+                    'timetables.day',
                     'users.image',
                 )
-                ->orderBy('time_table.start_time', 'asc')
+                ->orderBy('timetables.start_time', 'asc')
                 //->paginate(2);
                 ->get();
            
@@ -592,7 +594,7 @@ class TeacherController extends Controller
                     'standard' => $todayslecDT->standard,
                     'batch_id'=>$todayslecDT->batch_id,
                     'batch_name'=>$todayslecDT->batch_name,
-                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
+                    'day' => $todayslecDT->day,
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
