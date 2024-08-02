@@ -6864,7 +6864,7 @@ class InstituteApiController extends Controller
                 $batchlistdt = Batches_model::whereIN('id',explode(',',$batchdt))->get();
                 $batchlist = [];
                 foreach($batchlistdt as $batchnames){
-                    $batchlist[] = ['id'=>$batchnames->id,'name'=>$batchnames->batch_name];
+                    $batchlist[] = ['batch_id'=>$batchnames->id,'batch_name'=>$batchnames->batch_name];
                 }
                $subjectList[] = [
                     'subject_id' => $subjectId,
