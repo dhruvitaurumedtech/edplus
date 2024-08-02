@@ -1230,14 +1230,14 @@ class StudentController extends Controller
                 ->where('attendance', 'A')->count();
 
             //    echo $getstdntdata->subject_id;exit;
-            $totalLectures = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
-                ->where('batch_id', $getstdntdata->batch_id)
-                ->where('lecture_date', '<', $nextDayStr)
-                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))->count();
+            // $totalLectures = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
+            //     ->where('batch_id', $getstdntdata->batch_id)
+            //     ->where('lecture_date', '<', $nextDayStr)
+            //     ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))->count();
             $totalattendlec = [
-                'total_lectures' => $totalLectures,
+                'total_lectures' => $totalmissattlec + $totalattlec,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => max(0, $totalLectures - $totalattlec) //$totalmissattlec
+                'miss_lectures' => $totalmissattlec //$totalmissattlec
             ];
             $studentdata = [
                 'banners_data' => $banners_data,
