@@ -10,8 +10,10 @@ use App\Models\Timetable;
 use App\Models\Timetables;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class General_timetableController extends Controller
@@ -278,7 +280,7 @@ class General_timetableController extends Controller
     function view_general_timetable(Request $request){
         
         $validator = validator::make($request->all(), [
-            'day' => 'required',
+            'date' => 'required',
             'institute_id'=>'required',
         ]);
         
@@ -287,7 +289,9 @@ class General_timetableController extends Controller
         }
         
         //$insid = Institute_detail::where('user_id',Auth::id())->first();
-        
+        $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
         try {
             $timtDT = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
@@ -299,7 +303,7 @@ class General_timetableController extends Controller
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->where('batches.institute_id', $request->institute_id)
-                ->where('timetables.day', $request->day)
+                ->where('timetables.day', $daysidg->id)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
                     'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'timetables.*', 
