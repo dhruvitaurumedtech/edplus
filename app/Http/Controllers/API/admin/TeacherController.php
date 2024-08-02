@@ -768,7 +768,7 @@ class TeacherController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'date' => 'required',
+            'date'=> 'required',
             'institute_id' => 'required',
         ]);
 
