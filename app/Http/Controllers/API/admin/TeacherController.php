@@ -766,7 +766,6 @@ class TeacherController extends Controller
     //timetable list
     public function timetable_list_teacher(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'date'=> 'required',
             'institute_id' => 'required',
