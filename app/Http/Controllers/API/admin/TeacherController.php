@@ -768,7 +768,7 @@ class TeacherController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'day' => 'required',
+            'date' => 'required',
             'institute_id' => 'required',
         ]);
 
@@ -779,6 +779,10 @@ class TeacherController extends Controller
         try {
             $teacher_id = Auth::id();
             $lectures = [];
+            $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
+
             $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todaysletech = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
@@ -788,7 +792,7 @@ class TeacherController extends Controller
                 //->where('time_table.batch_id', $request->batch_id)
                 ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->whereIN('timetables.batch_id', $batchids)
-                ->where('timetables.day', $request->day)
+                ->where('timetables.day', $daysidg->id)
                 ->where('timetables.teacher_id', $teacher_id)
                 ->select(
                     'subject.name as subject',
@@ -1628,7 +1632,7 @@ class TeacherController extends Controller
                 'standard_id' => 'required',
                 'board_id' => 'required',
                 'medium_id' => 'required',
-                'subjec_twith_batch'=>'required|array|min:1',
+                'subject_with_batch'=>'required',
             ]);
     
             if ($validator->fails()) {
@@ -1636,8 +1640,14 @@ class TeacherController extends Controller
             }
 
         try {
-            $subjec_twith_batch = json_decode($request->subjec_twith_batch, true);
-            foreach($subjec_twith_batch as $teacherDT){
+            $subject_with_batch = json_decode($request->subject_with_batch, true);
+            $collection = collect($subject_with_batch);
+            print_r($collection->pluck('subject_id'));exit;
+            foreach($subject_with_batch as $teacherDT){
+
+                $timdt = Timetables::where('teacher_id',$request->teacher_id)
+                ->where('subject_id',$teacherDT['subject_id'])->get();
+                print_r($timdt);exit;
 
                 Teacher_model::where('institute_id', $request->institute_id)
                 ->where('teacher_id', $request->teacher_id)

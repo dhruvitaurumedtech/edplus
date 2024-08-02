@@ -3104,7 +3104,7 @@ class StudentController extends Controller
     {
 
         $validator = Validator::make($request->all(), [
-            'day' => 'required',
+            'date' => 'required',
             'institute_id' => 'required',
         ]);
 
@@ -3118,6 +3118,9 @@ class StudentController extends Controller
             } else {
                 $studentID = auth::id();
             }
+            $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
 
             $stdntdata = Student_detail::where('student_id', $studentID)
                 ->where('institute_id', $request->institute_id)
@@ -3132,7 +3135,7 @@ class StudentController extends Controller
                     ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                     ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                     ->where('timetables.batch_id', $stdntdata->batch_id)
-                    ->where('timetables.day', $request->day)
+                    ->where('timetables.day', $daysidg->id)
                     ->whereIN('timetables.subject_id', explode(",",$stdntdata->subject_id))
                     ->select(
                         'subject.name as subject',
