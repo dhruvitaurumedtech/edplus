@@ -309,7 +309,8 @@ class InstituteApiController extends Controller
     //         ], 400);
     //     }
     // }
-
+    
+    
     public function get_institute_reponse(Request $request)
     {
         try {
@@ -6792,6 +6793,8 @@ class InstituteApiController extends Controller
        }
 
     }
+
+    
     public function mobile_verify(Request $request){
         
 
@@ -6819,4 +6822,74 @@ class InstituteApiController extends Controller
 
         }
     }
+    public function teacher_subject_info(Request $request){
+       
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'teacher_id'  => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $teacherDetails = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
+            ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+            ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+            ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
+            ->select(
+                'teacher_detail.board_id',
+                'teacher_detail.medium_id',
+                'teacher_detail.standard_id',
+                DB::raw('MAX(board.name) as board_name'),
+                DB::raw('MAX(medium.name) as medium_name'),
+                DB::raw('MAX(standard.name) as standard_name'),
+                DB::raw('GROUP_CONCAT(DISTINCT subject.id) as subject_ids'),
+                DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_names')
+            )
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->groupBy('teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
+            ->get();
+        $response = [];
+        foreach ($teacherDetails as $detail) {
+
+            $subjectIds = explode(',', $detail->subject_ids);
+            $subjectNames = explode(',', $detail->subject_names);
+            $subjectList = [];
+            foreach ($subjectIds as $index => $subjectId) {
+                $batchdt = Teacher_model::where('institute_id',$request->institute_id)
+                ->where('teacher_id',$request->teacher_id)
+                ->where('subject_id',$subjectId)->pluck('batch_id')->first();
+
+                $batchlistdt = Batches_model::whereIN('id',explode(',',$batchdt))->get();
+                $batchlist = [];
+                foreach($batchlistdt as $batchnames){
+                    $batchlist[] = ['id'=>$batchnames->id,'name'=>$batchnames->batch_name];
+                }
+               $subjectList[] = [
+                    'subject_id' => $subjectId,
+                    'subject_name' => $subjectNames[$index],
+                    'batch_list' => $batchlist,
+                ];
+            }
+        
+            $response[] = [
+                'board_id' => $detail->board_id,
+                'board_name' => $detail->board_name,
+                'medium_id' => $detail->medium_id,
+                'medium_name' => $detail->medium_name,
+                'standard_id' => $detail->standard_id,
+                'standard_name' => $detail->standard_name,
+                'subject_list' => $subjectList,
+            ];
+        }
+            return $this->response($response, "Fetch detail sucessfully.");
+         }catch(Exception $e){
+            return $this->response($e, "Something went wrong.", false, 400);
+
+        }
+    }
+
+    
+    
 }
