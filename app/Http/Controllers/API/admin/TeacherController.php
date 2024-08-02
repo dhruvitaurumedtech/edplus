@@ -1641,13 +1641,26 @@ class TeacherController extends Controller
         try {
             $subject_with_batch = json_decode($request->subject_with_batch, true);
             $collection = collect($subject_with_batch);
-            print_r($collection->pluck('subject_id'));exit;
+            
+            $batids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
+            $timdt = Timetables::where('teacher_id',$request->teacher_id)
+            ->whereIN('batch_id',$batids)->pluck('batch_id')->toArray();
+            $arrmerg = array_merge($collection->pluck('batch_id')->toArray(),$timdt);
+
+            
+            
+            $valueCounts = array_count_values($arrmerg);
+
+            // Filter the array to get values that occur only once
+            $uniqueValues = array_filter($arrmerg, function($value) use ($valueCounts) {
+                return $valueCounts[$value] === 1;
+            });
+            if(!empty($uniqueValues)){
+                return $this->response([], "Please first replace teacher", false, 400); 
+            }
+            
             foreach($subject_with_batch as $teacherDT){
-
-                $timdt = Timetables::where('teacher_id',$request->teacher_id)
-                ->where('subject_id',$teacherDT['subject_id'])->get();
-                print_r($timdt);exit;
-
+                
                 Teacher_model::where('institute_id', $request->institute_id)
                 ->where('teacher_id', $request->teacher_id)
                 ->where('status', '1')
