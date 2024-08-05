@@ -3269,6 +3269,7 @@ class StudentController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
+        
         try {
             
             $selected_subject = Student_detail::where('institute_id', $request->institute_id)
