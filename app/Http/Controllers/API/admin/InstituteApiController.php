@@ -6906,6 +6906,8 @@ class InstituteApiController extends Controller
             ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
             ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
             ->select(
+                'teacher_detail.id',
+                'teacher_detail.batch_id',
                 'teacher_detail.board_id',
                 'teacher_detail.medium_id',
                 'teacher_detail.standard_id',
@@ -6918,7 +6920,7 @@ class InstituteApiController extends Controller
             )
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', $request->teacher_id)
-            ->groupBy('teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
+            ->groupBy('teacher_detail.id','teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
             ->get();
             $base_table_ids = []; // Initialize an empty array to collect IDs
             $selected_subject = [];
@@ -6933,26 +6935,31 @@ class InstituteApiController extends Controller
                 $selected_batch[]=explode(',',$value->batch_id);
                 $base_table_ids = array_merge($base_table_ids, $ids);
 
-                $total_batch = Batches_model::where('institute_id', $request->institute_id)
+                $total_batch[] = Batches_model::where('institute_id', $request->institute_id)
                 ->where('board_id', $value->board_id)
                 ->where('medium_id', $value->medium_id)
                 ->where('standard_id', $value->standard_id)
-                ->get();
+                ->pluck('id', 'batch_name')
+                ->toArray();
+                 // Convert to array
+              
 
-                
+
                  
+           
+                
             }
-            print_r($total_batch);exit;
+            
             $flattened_selected_batch = array_merge(...$selected_batch);
-            $result2 = $total_batch->map(function ($id,$name) use ($flattened_selected_batch) {
-                $subject = new Batches_model(); 
-                $subject->id = $id;
-                $subject->batch_name = $name;
-                $subject->status = in_array($id, $flattened_selected_batch) ? 1 : 0;
-                return $subject;
-            });    
-            $batch_array = $result2->toArray();
-            print_r($batch_array);exit; 
+            $result2 = collect($total_batch)->map(function ($batch_name, $id) use ($flattened_selected_batch) {
+                $batch = new Batches_model(); // Use stdClass if you don't have a specific model class
+                $batch->id = $id;
+                $batch->batch_name = $batch_name;
+                $batch->status = in_array($id, $flattened_selected_batch) ? 1 : 0;
+                return $batch;
+            })->toArray();
+          
+           
             $base_table_ids = array_unique($base_table_ids);
             $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('id','name'); 
             $flattened_selected_subject = array_merge(...$selected_subject);
@@ -6966,14 +6973,11 @@ class InstituteApiController extends Controller
             $subjectArray = $result->toArray();
            
              //batches
-             $batchdt = Teacher_model::where('institute_id',$request->institute_id)
-             ->where('teacher_id',$request->teacher_id)
-             ->pluck('batch_id')->first();
               
 
              $response = [];
              $response2 = [];
-             foreach($batch_array as $value3){
+             foreach($result2 as $value3){
                 $response2 [] = ['batch_id'=>$value3['id'],'batch_name'=>$value3['batch_name'],'status'=>$value3['status']];
               } 
             foreach($subjectArray as $value2){

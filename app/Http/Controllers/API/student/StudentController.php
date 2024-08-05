@@ -3287,7 +3287,6 @@ class StudentController extends Controller
 
         // Convert the result to an array and print
         $subjectArray = $result->toArray();
-        // print_r($subjectArray);exit;
         
         foreach($subjectArray as $subjectArray_value){
             $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
