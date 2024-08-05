@@ -6937,7 +6937,7 @@ class InstituteApiController extends Controller
                     ->pluck('id')
                     ->toArray();
                 $base_table_ids = array_merge($base_table_ids, $ids);
-                $subject_id[] = [$value->subject_id];
+                $subject_id[]= $value->subject_id;
                 
                 $selected_subject_ids = array_merge($selected_subject_ids, explode(',', $value->subject_id));
                 $selected_batch_ids = array_merge($selected_batch_ids, explode(',', $value->batch_id));
@@ -6952,14 +6952,14 @@ class InstituteApiController extends Controller
             }
            
            
-
+            $subject_id = implode(',',$subject_id);
             $batch_table_ids = array_unique($batch_table_ids);
              $batch_list = Batches_model::whereIn('id', $batch_table_ids)
-            // ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$subject_id_string])
-            ->pluck('batch_name', 'id')
-            ->toArray();
+                                        // ->whereRaw('FIND_IN_SET(?, subjects)', [$subject_id])
+                                        ->pluck('batch_name', 'id')
+                                        ->toArray();
+                                        
             $flattened_selected_batch_ids = array_map('intval', $selected_batch_ids);
-
             $all_batches_results = [];
             foreach ($batch_list as $id => $name) {
                 $all_batches_results[$id] = [

@@ -134,7 +134,7 @@ Route::middleware('auth')->group(function () {
     Route::get('create/subject', [SubjectController::class, 'create_subject'])->name('subject.create');
     Route::POST('get/standard_wise_stream', [SubjectController::class, 'standard_wise_stream'])->name('standard_wise_stream.list');
     Route::post('subject-save', [SubjectController::class, 'subject_list_save'])->name('subject_list.save');
-    Route::post('/subject/delete', [SubjectController::class, 'subject_delete'])->name('subject.delete');
+    Route::get('/subject/delete/{id}', [SubjectController::class, 'subject_delete'])->name('subject.delete');
     Route::get('/subject/edit/{id}', [SubjectController::class, 'subject_edit'])->name('subject.edit');
     Route::post('subject/update', [SubjectController::class, 'subject_update'])->name('subject.update');
     Route::post('/unique_subject/delete', [SubjectController::class, 'unique_subject_delete']);
