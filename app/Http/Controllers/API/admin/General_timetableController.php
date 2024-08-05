@@ -298,6 +298,7 @@ class General_timetableController extends Controller
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                 ->join('days', 'days.id', '=', 'timetables.day')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('institute_detail', 'institute_detail.id', '=', 'batches.institute_id')
                 ->join('board', 'board.id', '=', 'batches.board_id')
                 ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
@@ -306,6 +307,7 @@ class General_timetableController extends Controller
                 ->where('timetables.day', $daysidg->id)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
+                    'institute_detail.open_time','institute_detail.close_time',
                     'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'timetables.*', 
                     'standard.name as standard','board.name as board','medium.name as medium','days.day as dayname')
                 //->orderBy('time_table.start_time', 'asc')
@@ -325,6 +327,8 @@ class General_timetableController extends Controller
                 // $groupedData[$class_room]['sub_data'][] = [
                     $groupedData[] = [
                     'id' => $timtable->id,
+                    'open_time'=>$timtable->open_time,
+                    'close_time'=>$timtable->close_time,
                     'day' => $timtable->day,
                     'dayname'=>$timtable->dayname,
                     'start_time' =>$request->date.' '.$this->convertTo12HourFormat($timtable->start_time),
