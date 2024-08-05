@@ -3256,85 +3256,75 @@ class StudentController extends Controller
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
     }
-    public function fetch_subject(Request $request){
-        $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|exists:institute_detail,id',
-            'student_id' => 'required|exists:users,id'
+    // public function fetch_subject(Request $request){
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_id' => 'required|exists:institute_detail,id',
+    //         'student_id' => 'required|exists:users,id'
 
-        ]);
+    //     ]);
           
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
         
-        try {
+    //     try {
             
-            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
-            ->where('student_id', $request->student_id)
-            ->first();
-            // print_r($selected_subject);exit;
-           $base_table_id=Base_table::where('board', $selected_subject->board_id)
-            ->where('medium', $selected_subject->medium_id)
-            ->where('standard', $selected_subject->standard_id)
-            ->pluck('id');
+    //         $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+    //         ->where('student_id', $request->student_id)
+    //         ->first();
+    //        $base_table_id=Base_table::where('board', $selected_subject->board_id)
+    //         ->where('medium', $selected_subject->medium_id)
+    //         ->where('standard', $selected_subject->standard_id)
+    //         ->pluck('id');
             
-            $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
+    //         $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
             
      
-           $result = $subjects->map(function ($subject) use ($selected_subject) {
-                $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
-                return $subject;
-            });
+    //        $result = $subjects->map(function ($subject) use ($selected_subject) {
+    //             $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
+    //             return $subject;
+    //         });
 
-        // Convert the result to an array and print
-        $subjectArray = $result->toArray();
+    //     $subjectArray = $result->toArray();
         
-        foreach($subjectArray as $subjectArray_value){
-            $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
-            ->where('board_id', $selected_subject->board_id)
-            ->where('medium_id', $selected_subject->medium_id)
-            ->where('standard_id', $selected_subject->standard_id)
-            ->get();
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
+    //         ->where('board_id', $selected_subject->board_id)
+    //         ->where('medium_id', $selected_subject->medium_id)
+    //         ->where('standard_id', $selected_subject->standard_id)
+    //         ->get();
           
-            // $subject_ids  = explode(',', $selected_subject->subject_id);
-            // $selected_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
-            //     ->where('board_id', $selected_subject->board_id)
-            //     ->where('medium_id', $selected_subject->medium_id)
-            //     ->where('standard_id', $selected_subject->standard_id)
-            //     ->where(function($query) use ($subject_ids) {
-            //         foreach ($subject_ids as $subject_id) {
-            //             $query->orWhereRaw("FIND_IN_SET(?, subjects)", [$subject_id]);
-            //         }
-            //     })
-            //     ->first();
-            $batch_id=$selected_subject->batch_id;
-            $result2 = $total_batch->map(function ($item2) use ($batch_id) {
-            $isMatched = $batch_id && $batch_id == $item2->id;
-            $item2->status = $isMatched ? 1 : 0;
-            return $item2;
-            });
-            $batchArray = $result2->toArray();                
+    //          $batch_id=$selected_subject->batch_id;
+    //         $result2 = $total_batch->map(function ($item2) use ($batch_id) {
+    //         $isMatched = $batch_id && $batch_id == $item2->id;
+    //         $item2->status = $isMatched ? 1 : 0;
+    //         return $item2;
+    //         });
+    //         $batchArray = $result2->toArray();                
 
-        }
+    //     }
 
-        $response_one=[];
-        $response_two=[];
-        foreach($batchArray as $batchArray_value){
-            $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
-        }
-        foreach($subjectArray as $subjectArray_value){
-            $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
-                               'batches'=>$response_two];
-        }
-         $response = ['subject_list'=>$response_one,
-                     ];
-        // print_r($response);  
-        return $this->response($response, "Successfully Fetch Subject and batch"); 
-        } catch (Exception $e) {
-            return $this->response($e, "Something went wrong!!.", false, 400);
-        }          
+    //     $response_one=[];
+    //     $response_two=[];
+    //     foreach($batchArray as $batchArray_value){
+    //         $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+    //     }
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+    //                            'batches'=>$response_two];
+    //     }
+    //      $response = ['subject_list'=>$response_one,
+    //                  ];
 
-    }
+
+        
+    //     // print_r($response);  
+    //     return $this->response($response, "Successfully Fetch Subject and batch"); 
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Something went wrong!!.", false, 400);
+    //     }          
+
+    // }
     function add_edit_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
