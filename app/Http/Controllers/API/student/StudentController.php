@@ -3266,6 +3266,7 @@ class StudentController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
+        
         try {
             
             $selected_subject = Student_detail::where('institute_id', $request->institute_id)
@@ -3287,7 +3288,6 @@ class StudentController extends Controller
 
         // Convert the result to an array and print
         $subjectArray = $result->toArray();
-        // print_r($subjectArray);exit;
         
         foreach($subjectArray as $subjectArray_value){
             $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)

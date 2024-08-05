@@ -6901,92 +6901,114 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $teacherDetails = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
-            ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-            ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-            ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
-            ->select(
-                'teacher_detail.board_id',
-                'teacher_detail.medium_id',
-                'teacher_detail.standard_id',
-                DB::raw('MAX(board.name) as board_name'),
-                DB::raw('MAX(medium.name) as medium_name'),
-                DB::raw('MAX(standard.name) as standard_name'),
-                DB::raw('GROUP_CONCAT(DISTINCT subject.id) as subject_id'),
-                DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_names'),
-                DB::raw('GROUP_CONCAT(DISTINCT teacher_detail.id) as teacher_detail_id')
-            )
-            ->where('teacher_detail.institute_id', $request->institute_id)
-            ->where('teacher_detail.teacher_id', $request->teacher_id)
-            ->groupBy('teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
-            ->get();
-            $base_table_ids = []; // Initialize an empty array to collect IDs
-            $selected_subject = [];
+             // Fetch teacher details
+                $teacherDetails = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
+                ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
+                ->select(
+                    'teacher_detail.id',
+                    'teacher_detail.batch_id',
+                    'teacher_detail.board_id',
+                    'teacher_detail.medium_id',
+                    'teacher_detail.standard_id',
+                    DB::raw('MAX(board.name) as board_name'),
+                    DB::raw('MAX(medium.name) as medium_name'),
+                    DB::raw('MAX(standard.name) as standard_name'),
+                    DB::raw('GROUP_CONCAT(DISTINCT subject.id) as subject_id'),
+                    DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_names'),
+                    DB::raw('GROUP_CONCAT(DISTINCT teacher_detail.id) as teacher_detail_id')
+                )
+                ->where('teacher_detail.institute_id', $request->institute_id)
+                ->where('teacher_detail.teacher_id', $request->teacher_id)
+                ->groupBy('teacher_detail.id', 'teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
+                ->get();
+
+            $base_table_ids = [];
+            $selected_subject_ids = [];
+            $selected_batch_ids = [];
+            $batch_table_ids = [];
+            $subject_id= [];
+
             foreach ($teacherDetails as $value) {
                 $ids = Base_table::where('board', $value->board_id)
                     ->where('medium', $value->medium_id)
                     ->where('standard', $value->standard_id)
                     ->pluck('id')
                     ->toArray();
-                    
-                $selected_subject[] = explode(',', $value->subject_id);
-                $selected_batch[]=explode(',',$value->batch_id);
                 $base_table_ids = array_merge($base_table_ids, $ids);
-
-                $total_batch = Batches_model::where('institute_id', $request->institute_id)
-                ->where('board_id', $value->board_id)
-                ->where('medium_id', $value->medium_id)
-                ->where('standard_id', $value->standard_id)
-                ->get();
-
+                $subject_id[]= $value->subject_id;
                 
-                 
-            }
-            print_r($total_batch);exit;
-            $flattened_selected_batch = array_merge(...$selected_batch);
-            $result2 = $total_batch->map(function ($id,$name) use ($flattened_selected_batch) {
-                $subject = new Batches_model(); 
-                $subject->id = $id;
-                $subject->batch_name = $name;
-                $subject->status = in_array($id, $flattened_selected_batch) ? 1 : 0;
-                return $subject;
-            });    
-            $batch_array = $result2->toArray();
-            print_r($batch_array);exit; 
-            $base_table_ids = array_unique($base_table_ids);
-            $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('id','name'); 
-            $flattened_selected_subject = array_merge(...$selected_subject);
-            $result = $subject_list->map(function ($id,$name) use ($flattened_selected_subject) {
-                $subject = new Subject_model(); 
-                $subject->id = $id;
-                $subject->name = $name;
-                $subject->status = in_array($id, $flattened_selected_subject) ? 1 : 0;
-                return $subject;
-            });
-            $subjectArray = $result->toArray();
-           
-             //batches
-             $batchdt = Teacher_model::where('institute_id',$request->institute_id)
-             ->where('teacher_id',$request->teacher_id)
-             ->pluck('batch_id')->first();
-              
+                $selected_subject_ids = array_merge($selected_subject_ids, explode(',', $value->subject_id));
+                $selected_batch_ids = array_merge($selected_batch_ids, explode(',', $value->batch_id));
 
-             $response = [];
-             $response2 = [];
-             foreach($batch_array as $value3){
-                $response2 [] = ['batch_id'=>$value3['id'],'batch_name'=>$value3['batch_name'],'status'=>$value3['status']];
-              } 
-            foreach($subjectArray as $value2){
-              $response [] = ['subject_id'=>$value2['id'],'subject_name'=>$value2['name'],'status'=>$value2['status'],'batches'=>$response2];
+                $total_batch_ids = Batches_model::where('institute_id', $request->institute_id)
+                    ->where('board_id', $value->board_id)
+                    ->where('medium_id', $value->medium_id)
+                    ->where('standard_id', $value->standard_id)
+                    ->pluck('id')
+                    ->toArray();
+                $batch_table_ids = array_merge($batch_table_ids, $total_batch_ids);
             }
-            return $this->response($response, "Fetch data successfully.", false, 400);
+           
+           
+            $subject_id = implode(',',$subject_id);
+            $batch_table_ids = array_unique($batch_table_ids);
+             $batch_list = Batches_model::whereIn('id', $batch_table_ids)
+                                        // ->whereRaw('FIND_IN_SET(?, subjects)', [$subject_id])
+                                        ->pluck('batch_name', 'id')
+                                        ->toArray();
+                                        
+            $flattened_selected_batch_ids = array_map('intval', $selected_batch_ids);
+            $all_batches_results = [];
+            foreach ($batch_list as $id => $name) {
+                $all_batches_results[$id] = [
+                    'batch_id' => $id,
+                    'batch_name' => $name,
+                    'status' => in_array($id, $flattened_selected_batch_ids) ? 1 : 0,
+                ];
+            }
+
+            $base_table_ids = array_unique($base_table_ids);
+            $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('name', 'id')->toArray();
+            $flattened_selected_subject_ids = array_map('intval', $selected_subject_ids);
+
+            $subject_results = [];
+            foreach ($subject_list as $id => $name) {
+                $subject_status = in_array($id, $flattened_selected_subject_ids) ? 1 : 0;
+
+                $subject_batches = [];
+                if ($subject_status) {
+                    $subject_batches = array_values(array_filter($all_batches_results, function ($batch) use ($id) {
+                        return in_array($batch['batch_id'], $this->getBatchIdsForSubject($id));
+                    }));
+                } else {
+                    $subject_batches = array_values($all_batches_results);
+                }
+
+                $subject_results[] = [
+                    'subject_id' => $id,
+                    'subject_name' => $name,
+                    'status' => $subject_status,
+                    'batches' => $subject_batches,
+                ];
+            }
+
+// $response = $subject_results;
+
+        return $this->response($subject_results, "Fetch data successfully.", false, 400);
          
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
 
         }
     }
-
+    private function getBatchIdsForSubject($subjectId)
+    {
+        return  Batches_model::whereRaw('FIND_IN_SET(?, subjects) > 0', [$subjectId])
+        ->pluck('id')
+        ->toArray();
+    }
     
     
 }
