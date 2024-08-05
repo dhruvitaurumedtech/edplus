@@ -32,11 +32,14 @@ class SubjectController extends Controller
                 'base_table.id as base_id',
                 'base_table.status'
             )
-            ->where('standard.status', 'active')->orderBy('base_table.id', 'desc')->paginate(10);
+            ->where('standard.status', 'active')->orderBy('base_table.id', 'desc')->whereNull('base_table.deleted_at')->paginate(10);
 
         $subject_list = Base_table::join('subject', 'subject.base_table_id', '=', 'base_table.id')
             ->select('subject.*', 'base_table.standard', 'base_table.id as baset_id')
+            ->wherenull('subject.deleted_at')
             ->get();
+
+        // echo "<pre>";print_r($subject_list);exit;    
 
 
 
@@ -275,16 +278,23 @@ class SubjectController extends Controller
         }
         return redirect()->route('subject.list')->with('success', 'Subject Updated successfully');
     }
-    public function subject_delete(Request $request)
+    public function subject_delete($id,Request $request)
     {
-        $subject_id = $request->input('subject_id');
-        $subjectlist = Subject_model::find($subject_id);
-
+        // $subject_id = $request->input('subject_id');
+        // base_table::
+       $subjectlist = Subject_model::where('base_table_id',$id);
+       
         if (!$subjectlist) {
             return redirect()->route('subject.list')->with('error', 'Subject not found');
         }
-
+        
         $subjectlist->delete();
+        $base_table = Base_table::find($id);
+        if(!$base_table){
+            return redirect()->route('subject.list')->with('error', 'base_table not found');
+
+        }
+        $base_table->delete();
 
         return redirect()->route('subject.list')->with('success', 'Subject deleted successfully');
     }
