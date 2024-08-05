@@ -257,9 +257,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
     Route::post('/institute/student/fetch-subject', [StudentController::class, 'fetch_subject']);
     Route::post('/institute/student/add-edit-subject', [StudentController::class, 'add_edit_subject']);
+    Route::post('/institute/teacher-subject-info', [InstituteApiController::class, 'teacher_subject_info']);
+    Route::post('/institute/teacher-subject-info-edit', [InstituteApiController::class, 'teacher_subject_info_edit']);
+   
 });
     //token without use 
-   
    
     Route::post('/institute/testing', [StudentController::class, 'testing']);
 
