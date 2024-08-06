@@ -361,10 +361,10 @@ class TimetableController extends Controller
 
         //DB::commit();
         return $this->response([], 'Successfully created Timetable');
-    } catch (Exception $e) {
-        //DB::rollback();
-        return $this->response($e, "Something went wrong!!", false, 400);
-    }
+        } catch (Exception $e) {
+            //DB::rollback();
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
 }
 
 public function list_timetable_institute(Request $request) {

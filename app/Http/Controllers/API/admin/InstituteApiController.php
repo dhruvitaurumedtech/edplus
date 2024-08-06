@@ -6922,7 +6922,7 @@ class InstituteApiController extends Controller
             )
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', $request->teacher_id)
-            ->groupBy('teacher_detail.id', 'teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
+            ->groupBy('teacher_detail.batch_id','teacher_detail.id', 'teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
             ->get();
             
            
