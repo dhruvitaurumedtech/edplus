@@ -6966,13 +6966,11 @@ class InstituteApiController extends Controller
             $subject_results = [];
             foreach ($subject_list as $sid => $sname) {
             $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
-            
             $batch_list = Batches_model::where('institute_id', $request->institute_id)
                 
                  ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
                 ->pluck('batch_name', 'id')
                 ->toArray();
-
             $all_batches_results = [];
             foreach ($batch_list as $id => $name) {
                 $all_batches_results[$id] = [
@@ -6981,7 +6979,6 @@ class InstituteApiController extends Controller
                     'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
                 ];
             }
-
             $subject_batches = $subject_status ? array_values($all_batches_results) : [];
 
             $subject_results[] = [
