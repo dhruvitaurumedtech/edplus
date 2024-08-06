@@ -600,7 +600,9 @@ class TeacherController extends Controller
                 );
             }
 
-            $teacherbatchesids = Teacher_model::where('institute_id', $institute_id)->pluck('batch_id');
+            $teacherbatchesids = Teacher_model::where('institute_id', $institute_id)
+            ->where('teacher_id',$teacher_id)
+            ->pluck('batch_id')->toarray();
             $announcQY = announcements_model::where('institute_id', $institute_id)
             ->Where('role_type', 4)
             ->where(function($query) use ($teacherbatchesids) {
