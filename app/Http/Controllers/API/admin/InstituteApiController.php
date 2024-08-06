@@ -6897,6 +6897,9 @@ class InstituteApiController extends Controller
             'institute_id' => 'required',
             'student_id' => 'required_without:teacher_id|integer',
             'teacher_id' => 'required_without:student_id|integer',
+            'board_id' => 'required_without:student_id|integer',
+            'medium_id' => 'required_without:student_id|integer',
+            'standard_id' => 'required_without:student_id|integer',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
