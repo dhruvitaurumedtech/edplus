@@ -363,10 +363,7 @@ class AuthController extends Controller
                 $user = User::findOrFail(Auth::id());
     
             if (!Hash::check($request->current_password, $user->password)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'The current password is incorrect.'
-                ], 400);
+                return $this->response([], "The current password is incorrect.", false, 400);
             }
     
             $user->password = Hash::make($request->password);
