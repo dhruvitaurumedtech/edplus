@@ -3582,11 +3582,12 @@ class InstituteApiController extends Controller
                         // print_r($user_detail);exit;
                         $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
                         $users = User::where('id', $institute_user_id)->pluck('device_key');
+                        // print_r($users[0]);exit;
                         $notificationTitle = $user_detail->firstname . ' ' . $user_detail->lastname . " Send Request!!";
                         // $notificationBody = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
 
                         $data = [
-                            'registration_ids' => $users[0],
+                            'registration_ids' => $users,
                             'notification' => [
                                 'title' => $notificationTitle,
                                 // 'body' => $notificationBody,
