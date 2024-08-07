@@ -1666,13 +1666,12 @@ class TeacherController extends Controller
             if(!empty($timdt)){
                 return $this->response([], "Please first replace teacher", false, 400); 
             }
-            
-            foreach($subject_with_batch as $teacherDT){
-                
-                Teacher_model::where('institute_id', $request->institute_id)
+            Teacher_model::where('institute_id', $request->institute_id)
                 ->where('teacher_id', $request->teacher_id)
                 ->where('status', '1')
-                ->delete();
+                ->forceDelete();
+
+            foreach($subject_with_batch as $teacherDT){ 
 
                 $sujctd = Subject_model::join('base_table','base_table.id','=','subject.base_table_id')
                 ->where('subject.id',$teacherDT['subject_id'])
@@ -1684,9 +1683,9 @@ class TeacherController extends Controller
                     'teacher_id' => $request->teacher_id,
                     'institute_for_id' => $sujctd->institute_for,
                     'class_id' => $sujctd->institute_for_class,
-                    'board_id' => $request->board,
-                    'medium_id' => $request->medium,
-                    'standard_id' => $request->standard,
+                    'board_id' => $request->board_id,
+                    'medium_id' => $request->medium_id,
+                    'standard_id' => $request->standard_id,
                     'subject_id' => $teacherDT['subject_id'],
                     'batch_id' => $teacherDT['batch_id'],
                     'status' => '1',
