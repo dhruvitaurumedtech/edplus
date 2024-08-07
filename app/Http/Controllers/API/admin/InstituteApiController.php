@@ -3469,7 +3469,7 @@ class InstituteApiController extends Controller
 
                             curl_close($ch);
                         }
-                        return $this->response([], 'Successfully added Student.');
+                        return $this->response([], 'Successfully Update Student.');
                     } else {
                         return $this->response([], 'Not Inserted.', false, 400);
                     }
@@ -6969,10 +6969,16 @@ class InstituteApiController extends Controller
                 ->toArray();
             $all_batches_results = [];
             foreach ($batch_list as $id => $name) {
+                $tdl = Teacher_model::where('subject_id',$sid)
+                ->where('institute_id',$request->institute_id)
+                ->where('teacher_id',$request->teacher_id)->first();
+                $btchesid = explode(",",$tdl->batch_id);
+                
                 $all_batches_results[$id] = [
                     'batch_id' => $id,
                     'batch_name' => $name,
-                    'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
+                    //'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
+                   'status' => in_array($id,$btchesid) ? 1 : 0,
                 ];
             }
             $subject_batches = $subject_status ? array_values($all_batches_results) : [];
@@ -7045,6 +7051,54 @@ class InstituteApiController extends Controller
         }catch(Exception $e){
             return $this->response($e, "Something went wrong.", false, 400);
 
+        }
+    }
+
+    public function replacement_fetch_data(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+          
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            if ($request->child_id) {
+                $student_id = $request->child_id;
+            } else {
+                $student_id = Auth::id();
+            }
+            $announcement = [];
+            $getstdntdata = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $request->institute_id)
+                ->where('status', '=', '1')
+                ->whereNull('deleted_at')
+                ->first();
+            if (!empty($getstdntdata)) {
+                $announcQY = announcements_model::where('institute_id', $request->institute_id)
+                    ->where('batch_id', $getstdntdata->batch_id)
+                    ->whereRaw("FIND_IN_SET('6', role_type)")
+                    ->when($request->child_id ,function($query){
+                        $query->orwhereRaw("FIND_IN_SET('5', role_type)");
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                if (!empty($announcQY)) {
+                    foreach ($announcQY as $announcDT) {
+                        $announcement[] = array(
+                            'title' => $announcDT->title,
+                            'desc' => $announcDT->detail,
+                            'time' => $announcDT->created_at
+                        );
+                    }
+                }
+            }
+
+            return $this->response($announcement, "Announcement List");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!.", false, 400);
         }
     }
     // private function getBatchIdsForSubject($subjectId)
