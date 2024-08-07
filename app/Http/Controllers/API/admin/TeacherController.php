@@ -1663,7 +1663,8 @@ class TeacherController extends Controller
             $uniqueValues = array_filter($arrmerg, function($value) use ($valueCounts) {
                 return $valueCounts[$value] === 1;
             });
-            if(!empty($uniqueValues)){
+            
+            if(!empty($timdt)){
                 return $this->response([], "Please first replace teacher", false, 400); 
             }
             

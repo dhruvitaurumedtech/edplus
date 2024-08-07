@@ -7048,6 +7048,54 @@ class InstituteApiController extends Controller
 
         }
     }
+
+    public function replacement_fetch_data(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+        ]);
+          
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            if ($request->child_id) {
+                $student_id = $request->child_id;
+            } else {
+                $student_id = Auth::id();
+            }
+            $announcement = [];
+            $getstdntdata = Student_detail::where('student_id', $student_id)
+                ->where('institute_id', $request->institute_id)
+                ->where('status', '=', '1')
+                ->whereNull('deleted_at')
+                ->first();
+            if (!empty($getstdntdata)) {
+                $announcQY = announcements_model::where('institute_id', $request->institute_id)
+                    ->where('batch_id', $getstdntdata->batch_id)
+                    ->whereRaw("FIND_IN_SET('6', role_type)")
+                    ->when($request->child_id ,function($query){
+                        $query->orwhereRaw("FIND_IN_SET('5', role_type)");
+                    })
+                    ->orderByDesc('created_at')
+                    ->get();
+
+                if (!empty($announcQY)) {
+                    foreach ($announcQY as $announcDT) {
+                        $announcement[] = array(
+                            'title' => $announcDT->title,
+                            'desc' => $announcDT->detail,
+                            'time' => $announcDT->created_at
+                        );
+                    }
+                }
+            }
+
+            return $this->response($announcement, "Announcement List");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!.", false, 400);
+        }
+    }
     // private function getBatchIdsForSubject($subjectId)
     // {
     //     return  Batches_model::whereRaw('FIND_IN_SET(?, subjects) > 0', [$subjectId])
