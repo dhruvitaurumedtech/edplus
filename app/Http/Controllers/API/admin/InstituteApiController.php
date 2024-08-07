@@ -3469,7 +3469,7 @@ class InstituteApiController extends Controller
 
                             curl_close($ch);
                         }
-                        return $this->response([], 'Successfully added Student.');
+                        return $this->response([], 'Successfully Update Student.');
                     } else {
                         return $this->response([], 'Not Inserted.', false, 400);
                     }
@@ -7030,10 +7030,10 @@ class InstituteApiController extends Controller
         $response_one=[];
         $response_two=[];
         foreach($batchArray as $batchArray_value){
-            $response_two[] = ['batch_id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+            $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
         }
         foreach($subjectArray as $subjectArray_value){
-            $response_one[] = ['subject_id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+            $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
                                'batches'=>$response_two];
         }
          $response = ['subject_list'=>$response_one,
