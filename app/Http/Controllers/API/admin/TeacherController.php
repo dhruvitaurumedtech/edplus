@@ -356,10 +356,11 @@ class TeacherController extends Controller
             $url = "https://fcm.googleapis.com/fcm/send";
             $inst_owner_id = Institute_detail::where('id', $request->institute_id)->first();
             $users = User::where('id', $inst_owner_id->user_id)->pluck('device_key');
-
+           
             $notificationTitle = "Teacher Join Request";
-            $notificationBody = $request->firstname . " Requestd To Join Your Institute";
-
+            $notificationBody = $request->firstname." Requestd To Join Your Institute";
+            print_r($inst_owner_id->user_id);
+            print_r($notificationBody);exit;
             $data = [
                 'registration_ids' => $users,
                 'notification' => [
