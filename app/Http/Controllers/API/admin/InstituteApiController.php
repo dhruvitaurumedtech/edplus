@@ -3429,13 +3429,13 @@ class InstituteApiController extends Controller
                         $users = User::where('id', $student_id)->pluck('device_key');
 
                         $notificationTitle = "Your Request Accepted successfully!!";
-                        // $notificationBody = "Your Student Request Accepted successfully!!";
+                        $notificationBody = "";
 
                         $data = [
                             'registration_ids' => $users,
                             'notification' => [
                                 'title' => $notificationTitle,
-                                // 'body' => $notificationBody,
+                                'body' => $notificationBody,
                                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                             ],
                         ];
@@ -3469,7 +3469,7 @@ class InstituteApiController extends Controller
 
                             curl_close($ch);
                         }
-                        return $this->response([], 'Successfully Update Student.');
+                        return $this->response([], 'Successfully added Student.');
                     } else {
                         return $this->response([], 'Not Inserted.', false, 400);
                     }
@@ -3579,17 +3579,17 @@ class InstituteApiController extends Controller
 
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $user_detail = User::where('id', $student_id)->first();
+                        // print_r($user_detail);exit;
                         $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
                         $users = User::where('id', $institute_user_id)->pluck('device_key');
-
                         $notificationTitle = $user_detail->firstname . ' ' . $user_detail->lastname . " Send Request!!";
-                        // $notificationBody = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
+                        $notificationBody = "";
 
                         $data = [
                             'registration_ids' => $users,
                             'notification' => [
                                 'title' => $notificationTitle,
-                                // 'body' => $notificationBody,
+                                'body' => $notificationBody,
                                 'click_action' => 'FLUTTER_NOTIFICATION_CLICK',
                             ],
                         ];
@@ -6984,7 +6984,9 @@ class InstituteApiController extends Controller
                 'batches' => $subject_batches,
             ];
             }
-            return $this->response($subject_results, "Fetch data successfully.");
+            $response = ['subject_list'=>$subject_results];
+            
+            return $this->response($response, "Fetch data successfully.");
         }
 
         //stduent fetch_code
@@ -7028,10 +7030,10 @@ class InstituteApiController extends Controller
         $response_one=[];
         $response_two=[];
         foreach($batchArray as $batchArray_value){
-            $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+            $response_two[] = ['batch_id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
         }
         foreach($subjectArray as $subjectArray_value){
-            $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+            $response_one[] = ['subject_id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
                                'batches'=>$response_two];
         }
          $response = ['subject_list'=>$response_one,

@@ -55,6 +55,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/get-base-table-detail', [InstituteApiController::class, 'get_institute_reponse'])->name('institude.get');
     Route::post('/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/auth/set-new-password', [AuthController::class, 'setnew_password']);
     Route::post('/institute/videoAssign', [VideoController::class, 'videoassign'])->middleware('check.permission:10,1');
     Route::post('/institute/video_batchlist', [VideoController::class, 'video_batchlist'])->middleware('check.permission:10,1');
 
