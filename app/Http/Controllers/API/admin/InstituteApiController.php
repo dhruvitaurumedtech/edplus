@@ -3579,9 +3579,10 @@ class InstituteApiController extends Controller
 
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $user_detail = User::where('id', $student_id)->first();
+                        // print_r($user_detail);exit;
                         $institute_user_id = institute_detail::where('id', $request->institute_id)->pluck('user_id');
                         $users = User::where('id', $institute_user_id)->pluck('device_key');
-
+                        
                         $notificationTitle = $user_detail->firstname . ' ' . $user_detail->lastname . " Send Request!!";
                         // $notificationBody = $user_detail->firstname.' '.$user_detail->lastname." Send Request!!";
 
@@ -6895,11 +6896,7 @@ class InstituteApiController extends Controller
     function teacher_student_fetch_subject_selected_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-            'student_id' => 'required_without:teacher_id|integer',
-            'teacher_id' => 'required_without:student_id|integer',
-            'board_id' => 'required_without:student_id|integer',
-            'medium_id' => 'required_without:student_id|integer',
-            'standard_id' => 'required_without:student_id|integer',
+           
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -6988,7 +6985,9 @@ class InstituteApiController extends Controller
                 'batches' => $subject_batches,
             ];
             }
-            return $this->response($subject_results, "Fetch data successfully.");
+            $response = ['subject_list'=>$subject_results];
+            
+            return $this->response($response, "Fetch data successfully.");
         }
 
         //stduent fetch_code
