@@ -6985,8 +6985,8 @@ class InstituteApiController extends Controller
                 'batches' => $subject_batches,
             ];
             }
-            $response = ['subject_list'=>$subject_results];
-            return $this->response($response, "Fetch data successfully.");
+            
+            return $this->response($subject_results, "Fetch data successfully.");
         }
 
         //stduent fetch_code
