@@ -28,7 +28,7 @@ class AuthController extends Controller
     use ApiTrait;
 
     //    Google Login
-
+    
     public function handleGoogle(Request $request)
     {
         try {
@@ -347,7 +347,36 @@ class AuthController extends Controller
         }
     }
 
-
+    public function setnew_password(Request $request){
+            $validator = Validator::make($request->all(), [
+                'current_password' => 'required',
+                'password' => 'required|string|min:6',
+                'confirm_password' => 'required|string|same:password',
+            ]);
+    
+            if ($validator->fails()) {
+                return $this->response([], $validator->errors()->first(), false, 400);
+            }
+    
+            try{
+                
+                $user = User::findOrFail(Auth::id());
+    
+            if (!Hash::check($request->current_password, $user->password)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'The current password is incorrect.'
+                ], 400);
+            }
+    
+            $user->password = Hash::make($request->password);
+            $user->save();
+    
+            return $this->response([], "Password updated successfully.");
+        }catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
 
     // public function register(Request $request)
     // {
@@ -544,7 +573,7 @@ class AuthController extends Controller
     //     }
     // }
 
-
+    
     protected function validateToken($user, $providedToken)
     {
         return $user->token === $providedToken;
@@ -560,6 +589,8 @@ class AuthController extends Controller
             ]
         ]);
     }
+
+   
     // public function logout(Request $request)
     // {
     //     $userId = $request->user_id;
