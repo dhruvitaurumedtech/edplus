@@ -6972,13 +6972,13 @@ class InstituteApiController extends Controller
                 $tdl = Teacher_model::where('subject_id',$sid)
                 ->where('institute_id',$request->institute_id)
                 ->where('teacher_id',$request->teacher_id)->first();
-                $btchesid = explode(",",$tdl->batch_id);
+                $btchesids = explode(",",!empty($tdl->batch_id)?$tdl->batch_id:'');
                 
                 $all_batches_results[$id] = [
                     'batch_id' => $id,
                     'batch_name' => $name,
                     //'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
-                   'status' => in_array($id,$btchesid) ? 1 : 0,
+                   'status' => in_array($id,$btchesids) ? 1 : 0,
                 ];
             }
             $subject_batches = $subject_status ? array_values($all_batches_results) : [];
@@ -7042,8 +7042,7 @@ class InstituteApiController extends Controller
             $response_one[] = ['subject_id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
                                'batches'=>$response_two];
         }
-         $response = ['subject_list'=>$response_one,
-                     ];
+         $response = ['subject_list'=>$response_one];
 
                     
         return $this->response($response, "Fetch data successfully.");
