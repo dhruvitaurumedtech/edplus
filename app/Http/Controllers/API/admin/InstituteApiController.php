@@ -6895,8 +6895,8 @@ class InstituteApiController extends Controller
     function teacher_student_fetch_subject_selected_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-            'student_id' => 'required_without:teacher_id|integer',
-            'teacher_id' => 'required_without:student_id|integer',
+            'student_id' => 'required_without:teacher_id',
+            'teacher_id' => 'required_without:student_id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
