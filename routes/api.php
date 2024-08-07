@@ -190,7 +190,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     Route::post('/teacher/teacher-profile', [TeacherController::class, 'teacher_profile']);
     Route::post('/teacher/remove-institute-teacher', [TeacherController::class, 'remove_institute_teacher']);
-    Route::post('/teacher/teacher-profile-edit-institute', [TeacherController::class, 'teacher_profile_edit_institute']);
+    
 
     Route::post('/institute/create-role', [StaffController::class, 'create_role'])->middleware('check.permission:27,1');
     Route::post('/institute/edit-role', [StaffController::class, 'edit_role'])->middleware('check.permission:27,2');
@@ -260,7 +260,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/student/add-edit-subject', [StudentController::class, 'add_edit_subject']);
     Route::post('/institute/teacher-subject-info', [InstituteApiController::class, 'teacher_subject_info']);
     Route::post('/institute/teacher-student-fetch-subject', [InstituteApiController::class, 'teacher_student_fetch_subject_selected_subject']);
-   
+    Route::post('/institute/replacement-fetch-data', [InstituteApiController::class, 'replacement_fetch_data']);
+    Route::post('/teacher/teacher-profile-edit-institute', [TeacherController::class, 'teacher_profile_edit_institute']);
+    
 });
     //token without use 
    
