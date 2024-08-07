@@ -24,6 +24,7 @@ use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\TeacherAssignBatch;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\User;
 use App\Models\Users_sub_emergency;
 use App\Models\Users_sub_experience;
@@ -559,29 +560,30 @@ class TeacherController extends Controller
             $examlist = [];
 
             $user_id = Auth::id();
-            $today = date('Y-m-d');
+            $today = date('l');
+            $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
                        
             $batchesid = Batches_model::where('institute_id',$request->institute_id)->pluck('id')->toarray();
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->where('time_table.teacher_id', $user_id)
-                ->whereIn('time_table.batch_id', $batchesid)
-                ->where('time_table.lecture_date', $today)
+                ->where('timetables.teacher_id', $user_id)
+                ->whereIn('timetables.batch_id', $batchesid)
+                ->where('timetables.day', $daysidg->id)
                 ->select(
                     'subject.name as subject',
                     'standard.name as standard',
                     'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date',
-                    'time_table.batch_id',
+                    'timetables.start_time',
+                    'timetables.end_time',
+                    'timetables.batch_id',
                     'batches.batch_name',
+                    'timetables.day',
                     'users.image',
                 )
-                ->orderBy('time_table.start_time', 'asc')
+                ->orderBy('timetables.start_time', 'asc')
                 //->paginate(2);
                 ->get();
            
@@ -592,7 +594,6 @@ class TeacherController extends Controller
                     'standard' => $todayslecDT->standard,
                     'batch_id'=>$todayslecDT->batch_id,
                     'batch_name'=>$todayslecDT->batch_name,
-                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
@@ -765,9 +766,8 @@ class TeacherController extends Controller
     //timetable list
     public function timetable_list_teacher(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
-            'date' => 'required',
+            'date'=> 'required',
             'institute_id' => 'required',
         ]);
 
@@ -778,37 +778,39 @@ class TeacherController extends Controller
         try {
             $teacher_id = Auth::id();
             $lectures = [];
+            $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
+
             $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
-            $todaysletech = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            $todaysletech = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 //->where('time_table.batch_id', $request->batch_id)
-                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
-                ->whereIN('time_table.batch_id', $batchids)
-                ->where('time_table.lecture_date', $request->date)
-                ->where('time_table.teacher_id', $teacher_id)
+                ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
+                ->whereIN('timetables.batch_id', $batchids)
+                ->where('timetables.day', $daysidg->id)
+                ->where('timetables.teacher_id', $teacher_id)
                 ->select(
                     'subject.name as subject',
                     'class_room.name as class_room',
                     'users.image',
                     'standard.name as standard',
                     'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date',
+                    'timetables.start_time',
+                    'timetables.end_time',
                     'batches.id as batch_id',
                     'batches.batch_name',
                 )
-                ->orderBy('time_table.start_time', 'asc')
+                ->orderBy('timetables.start_time', 'asc')
                 ->get();
 
             foreach ($todaysletech as $todaysDT) {
                 $lectures[] = array(
                     'subject' => $todaysDT->subject,
                     'standard' => $todaysDT->standard,
-                    'lecture_date' => $todaysDT->lecture_date,
                     'lecture_type' => $todaysDT->lecture_type_name,
                     'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('profile/no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
@@ -1629,7 +1631,7 @@ class TeacherController extends Controller
                 'standard_id' => 'required',
                 'board_id' => 'required',
                 'medium_id' => 'required',
-                'subjec_twith_batch'=>'required|array|min:1',
+                'subject_with_batch'=>'required',
             ]);
     
             if ($validator->fails()) {
@@ -1637,9 +1639,28 @@ class TeacherController extends Controller
             }
 
         try {
-            $subjec_twith_batch = json_decode($request->subjec_twith_batch, true);
-            foreach($subjec_twith_batch as $teacherDT){
+            $subject_with_batch = json_decode($request->subject_with_batch, true);
+            $collection = collect($subject_with_batch);
+            
+            $batids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
+            $timdt = Timetables::where('teacher_id',$request->teacher_id)
+            ->whereIN('batch_id',$batids)->pluck('batch_id')->toArray();
+            $arrmerg = array_merge($collection->pluck('batch_id')->toArray(),$timdt);
 
+            
+            
+            $valueCounts = array_count_values($arrmerg);
+
+            // Filter the array to get values that occur only once
+            $uniqueValues = array_filter($arrmerg, function($value) use ($valueCounts) {
+                return $valueCounts[$value] === 1;
+            });
+            if(!empty($uniqueValues)){
+                return $this->response([], "Please first replace teacher", false, 400); 
+            }
+            
+            foreach($subject_with_batch as $teacherDT){
+                
                 Teacher_model::where('institute_id', $request->institute_id)
                 ->where('teacher_id', $request->teacher_id)
                 ->where('status', '1')

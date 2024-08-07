@@ -7,10 +7,13 @@ use App\Models\Class_room_model;
 use App\Models\General_timetable_model;
 use App\Models\Institute_detail;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Traits\ApiTrait;
 use Carbon\Carbon;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class General_timetableController extends Controller
@@ -280,33 +283,39 @@ class General_timetableController extends Controller
             'date' => 'required',
             'institute_id'=>'required',
         ]);
-    
+        
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-        //$insid = Institute_detail::where('user_id',Auth::id())->first();
         
+        //$insid = Institute_detail::where('user_id',Auth::id())->first();
+        $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
         try {
-            $timtDT = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
+            $timtDT = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('days', 'days.id', '=', 'timetables.day')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('institute_detail', 'institute_detail.id', '=', 'batches.institute_id')
                 ->join('board', 'board.id', '=', 'batches.board_id')
                 ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                ->leftjoin('class_room', 'class_room.id', '=', 'time_table.class_room_id')
+                ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->where('batches.institute_id', $request->institute_id)
-                ->where('time_table.lecture_date', $request->date)
+                ->where('timetables.day', $daysidg->id)
                 ->select('subject.name as subject', 'users.firstname','class_room.name as class_room',
                     'users.lastname', 'lecture_type.name as lecture_type_name',
-                    'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'time_table.*', 
-                    'standard.name as standard','board.name as board','medium.name as medium')
+                    'institute_detail.open_time','institute_detail.close_time',
+                    'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'timetables.*', 
+                    'standard.name as standard','board.name as board','medium.name as medium','days.day as dayname')
                 //->orderBy('time_table.start_time', 'asc')
                 ->orderBy('class_room.name', 'asc')
                 ->get();
-    
+                
             $groupedData = [];
-    
+            
             foreach ($timtDT as $timtable) {
                 $class_room = $timtable->class_room;
                 // if (!isset($groupedData[$class_room])) {
@@ -318,9 +327,12 @@ class General_timetableController extends Controller
                 // $groupedData[$class_room]['sub_data'][] = [
                     $groupedData[] = [
                     'id' => $timtable->id,
-                    'day' => $timtable->repeat,
-                    'start_time' =>$timtable->lecture_date.' '. $this->convertTo12HourFormat($timtable->start_time),
-                    'end_time' => $timtable->lecture_date.' '.$this->convertTo12HourFormat($timtable->end_time),
+                    'open_time'=>$timtable->open_time,
+                    'close_time'=>$timtable->close_time,
+                    'day' => $timtable->day,
+                    'dayname'=>$timtable->dayname,
+                    'start_time' =>$request->date.' '.$this->convertTo12HourFormat($timtable->start_time),
+                    'end_time' => $request->date.' '.$this->convertTo12HourFormat($timtable->end_time),
                     'subject_id' => $timtable->subject_id,
                     'subject' => $timtable->subject,
                     'lecture_type_id' => $timtable->lecture_type,

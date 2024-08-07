@@ -12,6 +12,7 @@ use App\Models\Parents;
 use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -233,27 +234,28 @@ class ParentsController extends Controller
                 );
 
             //today's lecture
-            $today = date('Y-m-d');
+            $today = date('l');
+            $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
             $todays_lecture = [];
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-            ->join('users', 'users.id', '=', 'time_table.teacher_id')
-            ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-            ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-            ->where('time_table.batch_id', $getstdntdata->batch_id)
-            ->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
+            $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+            ->join('users', 'users.id', '=', 'timetables.teacher_id')
+            ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+            ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+            ->where('timetables.batch_id', $getstdntdata->batch_id)
+            ->whereRaw("FIND_IN_SET(timetables.subject_id,?)", [$getstdntdata->subject_id])
             // ->whereIn('time_table.subject_id',$subject_ids)
-            ->where('time_table.lecture_date', $today)
+            ->where('timetables.day', $daysidg->id)
             ->select(
                 'subject.name as subject',
                 'users.firstname',
                 'users.lastname',
                 'users.image',
                 'lecture_type.name as lecture_type_name',
-                'time_table.start_time',
-                'time_table.end_time',
-                'time_table.lecture_date'
+                'timetables.start_time',
+                'timetables.end_time',
+                'timetables.day'
             )
-            ->orderBy('time_table.start_time', 'asc')
+            ->orderBy('timetables.start_time', 'asc')
             ->get();
           
             foreach ($todayslect as $todayslecDT) {
@@ -261,7 +263,7 @@ class ParentsController extends Controller
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
-                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
+                    'day' => $todayslecDT->day,
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
@@ -384,9 +386,9 @@ class ParentsController extends Controller
                 ->count();    
             
             $totalattendlec = array(
-                'total_lectures' => $totllect,
+                'total_lectures' => $totalmissattlec + $totalattlec,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => max(0, $totllect - $totalattlec) //$totalmissattlec 
+                'miss_lectures' => $totalmissattlec //$totalmissattlec 
             );
         $data = [
             'banners_data'=>$banners_data,

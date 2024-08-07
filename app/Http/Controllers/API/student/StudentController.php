@@ -36,6 +36,7 @@ use App\Models\Medium_model;
 use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\VideoAssignToBatch;
 use Illuminate\Auth\Events\Verified;
 use Illuminate\Broadcasting\Channel;
@@ -46,6 +47,7 @@ use DateTime;
 use Illuminate\Support\Str;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class StudentController extends Controller
@@ -1058,28 +1060,29 @@ class StudentController extends Controller
                 );
             }
            
-            $today = date('Y-m-d');
+            $today = date('l');
+            $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
             $todays_lecture = [];
             // $subject_ids = explode(",", $getstdntdata->subject_id);
-            $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                ->where('time_table.batch_id', $getstdntdata->batch_id)
+            $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->where('timetables.batch_id', $getstdntdata->batch_id)
                 //->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
-                 ->whereIn('time_table.subject_id',explode(",",$getstdntdata->subject_id))
-                ->where('time_table.lecture_date', $today)
+                 ->whereIn('timetables.subject_id',explode(",",$getstdntdata->subject_id))
+                 ->where('timetables.day', $daysidg->id)
                 ->select(
                     'subject.name as subject',
                     'users.firstname',
                     'users.lastname',
                     'users.image',
                     'lecture_type.name as lecture_type_name',
-                    'time_table.start_time',
-                    'time_table.end_time',
-                    'time_table.lecture_date'
+                    'timetables.start_time',
+                    'timetables.end_time',
+                    'timetables.day'
                 )
-                ->orderBy('time_table.start_time', 'asc')
+                ->orderBy('timetables.start_time', 'asc')
                 ->get();
          
                 // print_r($todayslect);exit;
@@ -1089,7 +1092,6 @@ class StudentController extends Controller
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                     'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
-                    'lecture_date' => date('d-m-Y',strtotime($todayslecDT->lecture_date)),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),  //$todayslecDT->start_time,
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),  //$todayslecDT->end_time,
@@ -1228,14 +1230,14 @@ class StudentController extends Controller
                 ->where('attendance', 'A')->count();
 
             //    echo $getstdntdata->subject_id;exit;
-            $totalLectures = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
-                ->where('batch_id', $getstdntdata->batch_id)
-                ->where('lecture_date', '<', $nextDayStr)
-                ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))->count();
+            // $totalLectures = Timetable::where('lecture_date', 'like', '%' . $cumnth . '%')
+            //     ->where('batch_id', $getstdntdata->batch_id)
+            //     ->where('lecture_date', '<', $nextDayStr)
+            //     ->whereIn('subject_id', explode(',',$getstdntdata->subject_id))->count();
             $totalattendlec = [
-                'total_lectures' => $totalLectures,
+                'total_lectures' => $totalmissattlec + $totalattlec,
                 'attend_lectures' => $totalattlec,
-                'miss_lectures' => max(0, $totalLectures - $totalattlec) //$totalmissattlec
+                'miss_lectures' => $totalmissattlec //$totalmissattlec
             ];
             $studentdata = [
                 'banners_data' => $banners_data,
@@ -3116,6 +3118,9 @@ class StudentController extends Controller
             } else {
                 $studentID = auth::id();
             }
+            $dateTime = new DateTime($request->date);
+            $day = $dateTime->format('l');
+            $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
 
             $stdntdata = Student_detail::where('student_id', $studentID)
                 ->where('institute_id', $request->institute_id)
@@ -3125,24 +3130,23 @@ class StudentController extends Controller
 
             $lectures = [];
             if ($stdntdata) {
-                $todayslect = Timetable::join('subject', 'subject.id', '=', 'time_table.subject_id')
-                    ->join('users', 'users.id', '=', 'time_table.teacher_id')
-                    ->join('lecture_type', 'lecture_type.id', '=', 'time_table.lecture_type')
-                    ->join('batches', 'batches.id', '=', 'time_table.batch_id')
-                    ->where('time_table.batch_id', $stdntdata->batch_id)
-                    ->where('time_table.lecture_date', $request->date)
-                    ->whereIN('time_table.subject_id', explode(",",$stdntdata->subject_id))
+                $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
+                    ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                    ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                    ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                    ->where('timetables.batch_id', $stdntdata->batch_id)
+                    ->where('timetables.day', $daysidg->id)
+                    ->whereIN('timetables.subject_id', explode(",",$stdntdata->subject_id))
                     ->select(
                         'subject.name as subject',
                         'users.firstname',
                         'users.lastname',
                         'users.image',
                         'lecture_type.name as lecture_type_name',
-                        'time_table.start_time',
-                        'time_table.end_time',
-                        'time_table.lecture_date'
+                        'timetables.start_time',
+                        'timetables.end_time',
                     )
-                    ->orderBy('time_table.start_time', 'asc')
+                    ->orderBy('timetables.start_time', 'asc')
                     ->get();
 
                 foreach ($todayslect as $todayslecDT) {
@@ -3150,7 +3154,6 @@ class StudentController extends Controller
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
                         'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
-                        'lecture_date' => $todayslecDT->lecture_date,
                         'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                         'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
@@ -3256,85 +3259,75 @@ class StudentController extends Controller
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
     }
-    public function fetch_subject(Request $request){
-        $validator = Validator::make($request->all(), [
-            'institute_id' => 'required|exists:institute_detail,id',
-            'student_id' => 'required|exists:users,id'
+    // public function fetch_subject(Request $request){
+    //     $validator = Validator::make($request->all(), [
+    //         'institute_id' => 'required|exists:institute_detail,id',
+    //         'student_id' => 'required|exists:users,id'
 
-        ]);
+    //     ]);
           
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
+    //     if ($validator->fails()) {
+    //         return $this->response([], $validator->errors()->first(), false, 400);
+    //     }
         
-        try {
+    //     try {
             
-            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
-            ->where('student_id', $request->student_id)
-            ->first();
-            // print_r($selected_subject);exit;
-           $base_table_id=Base_table::where('board', $selected_subject->board_id)
-            ->where('medium', $selected_subject->medium_id)
-            ->where('standard', $selected_subject->standard_id)
-            ->pluck('id');
+    //         $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+    //         ->where('student_id', $request->student_id)
+    //         ->first();
+    //        $base_table_id=Base_table::where('board', $selected_subject->board_id)
+    //         ->where('medium', $selected_subject->medium_id)
+    //         ->where('standard', $selected_subject->standard_id)
+    //         ->pluck('id');
             
-            $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
+    //         $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
             
      
-           $result = $subjects->map(function ($subject) use ($selected_subject) {
-                $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
-                return $subject;
-            });
+    //        $result = $subjects->map(function ($subject) use ($selected_subject) {
+    //             $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
+    //             return $subject;
+    //         });
 
-        // Convert the result to an array and print
-        $subjectArray = $result->toArray();
+    //     $subjectArray = $result->toArray();
         
-        foreach($subjectArray as $subjectArray_value){
-            $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
-            ->where('board_id', $selected_subject->board_id)
-            ->where('medium_id', $selected_subject->medium_id)
-            ->where('standard_id', $selected_subject->standard_id)
-            ->get();
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
+    //         ->where('board_id', $selected_subject->board_id)
+    //         ->where('medium_id', $selected_subject->medium_id)
+    //         ->where('standard_id', $selected_subject->standard_id)
+    //         ->get();
           
-            // $subject_ids  = explode(',', $selected_subject->subject_id);
-            // $selected_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
-            //     ->where('board_id', $selected_subject->board_id)
-            //     ->where('medium_id', $selected_subject->medium_id)
-            //     ->where('standard_id', $selected_subject->standard_id)
-            //     ->where(function($query) use ($subject_ids) {
-            //         foreach ($subject_ids as $subject_id) {
-            //             $query->orWhereRaw("FIND_IN_SET(?, subjects)", [$subject_id]);
-            //         }
-            //     })
-            //     ->first();
-            $batch_id=$selected_subject->batch_id;
-            $result2 = $total_batch->map(function ($item2) use ($batch_id) {
-            $isMatched = $batch_id && $batch_id == $item2->id;
-            $item2->status = $isMatched ? 1 : 0;
-            return $item2;
-            });
-            $batchArray = $result2->toArray();                
+    //          $batch_id=$selected_subject->batch_id;
+    //         $result2 = $total_batch->map(function ($item2) use ($batch_id) {
+    //         $isMatched = $batch_id && $batch_id == $item2->id;
+    //         $item2->status = $isMatched ? 1 : 0;
+    //         return $item2;
+    //         });
+    //         $batchArray = $result2->toArray();                
 
-        }
+    //     }
 
-        $response_one=[];
-        $response_two=[];
-        foreach($batchArray as $batchArray_value){
-            $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
-        }
-        foreach($subjectArray as $subjectArray_value){
-            $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
-                               'batches'=>$response_two];
-        }
-         $response = ['subject_list'=>$response_one,
-                     ];
-        // print_r($response);  
-        return $this->response($response, "Successfully Fetch Subject and batch"); 
-        } catch (Exception $e) {
-            return $this->response($e, "Something went wrong!!.", false, 400);
-        }          
+    //     $response_one=[];
+    //     $response_two=[];
+    //     foreach($batchArray as $batchArray_value){
+    //         $response_two[] = ['id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+    //     }
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $response_one[] = ['id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+    //                            'batches'=>$response_two];
+    //     }
+    //      $response = ['subject_list'=>$response_one,
+    //                  ];
 
-    }
+
+        
+    //     // print_r($response);  
+    //     return $this->response($response, "Successfully Fetch Subject and batch"); 
+    //     } catch (Exception $e) {
+    //         return $this->response($e, "Something went wrong!!.", false, 400);
+    //     }          
+
+    // }
     function add_edit_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
