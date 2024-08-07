@@ -255,7 +255,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/staff-view-profile', [StaffController::class, 'staff_view_profile']);
     Route::post('/institute/view-general-timetable', [General_timetableController::class, 'view_general_timetable']);
     Route::post('/institute/mobile-verify', [InstituteApiController::class, 'mobile_verify']);
-    // Route::post('/institute/student/fetch-subject', [StudentController::class, 'fetch_subject']);
+    //Route::post('/institute/student/fetch-subject', [StudentController::class, 'fetch_subject']);
     Route::post('/institute/student/add-edit-subject', [StudentController::class, 'add_edit_subject']);
     Route::post('/institute/teacher-subject-info', [InstituteApiController::class, 'teacher_subject_info']);
     Route::post('/institute/teacher-student-fetch-subject', [InstituteApiController::class, 'teacher_student_fetch_subject_selected_subject']);
