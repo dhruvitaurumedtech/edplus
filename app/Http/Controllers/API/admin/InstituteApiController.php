@@ -6969,10 +6969,16 @@ class InstituteApiController extends Controller
                 ->toArray();
             $all_batches_results = [];
             foreach ($batch_list as $id => $name) {
+                $tdl = Teacher_model::where('subject_id',$sid)
+                ->where('institute_id',$request->institute_id)
+                ->where('teacher_id',$request->teacher_id)->first();
+                $btchesid = explode(",",$tdl->batch_id);
+                
                 $all_batches_results[$id] = [
                     'batch_id' => $id,
                     'batch_name' => $name,
-                    'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
+                    //'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
+                   'status' => in_array($id,$btchesid) ? 1 : 0,
                 ];
             }
             $subject_batches = $subject_status ? array_values($all_batches_results) : [];
