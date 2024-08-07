@@ -359,9 +359,7 @@ class TeacherController extends Controller
            
             $notificationTitle = "Teacher Join Request";
             $notificationBody = $request->firstname." Requestd To Join Your Institute";
-            print_r($inst_owner_id->user_id);
-            print_r($notificationBody);exit;
-            $data = [
+           $data = [
                 'registration_ids' => $users,
                 'notification' => [
                     'title' => $notificationTitle,
