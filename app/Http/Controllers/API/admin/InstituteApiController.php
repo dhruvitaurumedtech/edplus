@@ -3469,7 +3469,7 @@ class InstituteApiController extends Controller
 
                             curl_close($ch);
                         }
-                        return $this->response([], 'Successfully Update Student.');
+                        return $this->response([], 'Successfully added Student.');
                     } else {
                         return $this->response([], 'Not Inserted.', false, 400);
                     }
