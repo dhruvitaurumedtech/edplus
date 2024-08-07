@@ -6981,8 +6981,8 @@ class InstituteApiController extends Controller
                    'status' => in_array($id,$btchesids) ? 1 : 0,
                 ];
             }
-            $subject_batches = $subject_status ? array_values($all_batches_results) : [];
-
+            //$subject_batches = $subject_status ? array_values($all_batches_results) : [];
+            $subject_batches = array_values($all_batches_results);
             $subject_results[] = [
                 'subject_id' => $sid,
                 'subject_name' => $sname,
@@ -6990,6 +6990,7 @@ class InstituteApiController extends Controller
                 'batches' => $subject_batches,
             ];
             }
+            
             $response = ['subject_list'=>$subject_results];
             
             return $this->response($response, "Fetch data successfully.");
