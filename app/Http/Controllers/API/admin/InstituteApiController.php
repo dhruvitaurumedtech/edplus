@@ -5647,6 +5647,28 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function fetch_batches(Request $request){
+        $validator = Validator::make($request->all(), [
+            'batch_id' =>'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $batch_list=Batches_model::where('id',$request->batch_id)->first();
+        // print_r(explode(',',$batch_list->subjects));exit;
+        $subject_list=Subject_model::whereIn('id',explode(',',$batch_list->subjects))->get();
+        $subject=[];
+        foreach($subject_list as $value){
+            $subject[] = ['subject_id'=>$value->id,'subject_name'=>$value->name];
+        }
+        $data = ['batch_id'=>$batch_list->id,'batch_name'=>$batch_list->batch_name,'subjects'=>$subject,'student_capacity'=>$batch_list->student_capacity]; 
+        return $this->response($data, "Batch fetch successfully."); 
+        } catch (Exception $e) {
+                return $this->response($e, "Something went wrong.", false, 400);
+            }
+    }
 
     //create batch
     // public function create_batch(Request $request)
