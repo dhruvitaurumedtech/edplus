@@ -1650,6 +1650,9 @@ class TeacherController extends Controller
             
             $teacherdt = Teacher_model::where('institute_id',$request->institute_id)
                 ->where('teacher_id',$request->teacher_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
                 ->select('subject_id', 'batch_id')
                 ->get()
                 ->toArray();
