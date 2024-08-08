@@ -1741,7 +1741,7 @@ class TeacherController extends Controller
             }
          try{
                 $timetable=Timetables::where('teacher_id',$request->teacher_id)->whereNull('deleted_at')->count();
-                if($timetable < 0){
+                if($timetable > 0){
                     return $this->response([], "Already timetable assign this teacher.", false, 400);
                 }
                 $data=Teacher_model::where('institute_id', $request->institute_id)
