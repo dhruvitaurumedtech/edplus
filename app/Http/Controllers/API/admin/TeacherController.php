@@ -1732,18 +1732,17 @@ class TeacherController extends Controller
                     return $this->response([], "Already timetable assign this teacher.", false, 400);
                 }
                 $data=Teacher_model::where('institute_id', $request->institute_id)
-                ->where('teacher_id', $request->teacher_id)
-                ->where('board_id', $request->board_id)
-                ->where('medium_id', $request->medium_id)
-                ->where('standard_id', $request->standard_id)
-                ->delete();
+                                    ->where('teacher_id', $request->teacher_id)
+                                    ->where('board_id', $request->board_id)
+                                    ->where('medium_id', $request->medium_id)
+                                    ->where('standard_id', $request->standard_id)
+                                    ->delete();
                 if($data > 0)
                 {
                     return $this->response([], "Remove successfully!");
                 }
                 else{
                     return $this->response([], "Someting went wrong!!", false, 400);
-
                 }
            
             } catch (Exception $e) {
