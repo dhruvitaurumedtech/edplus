@@ -5657,7 +5657,6 @@ class InstituteApiController extends Controller
         }
         try{
         $batch_list=Batches_model::where('id',$request->batch_id)->first();
-        // print_r(explode(',',$batch_list->subjects));exit;
         $subject_list=Subject_model::whereIn('id',explode(',',$batch_list->subjects))->get();
         $subject=[];
         foreach($subject_list as $value){
@@ -5666,8 +5665,8 @@ class InstituteApiController extends Controller
         $data = ['batch_id'=>$batch_list->id,'batch_name'=>$batch_list->batch_name,'subjects'=>$subject,'student_capacity'=>$batch_list->student_capacity]; 
         return $this->response($data, "Batch fetch successfully."); 
         } catch (Exception $e) {
-                return $this->response($e, "Something went wrong.", false, 400);
-            }
+              return $this->response($e, "Something went wrong.", false, 400);
+        }
     }
 
     //create batch
@@ -5738,18 +5737,9 @@ class InstituteApiController extends Controller
 
     public function batch_list(Request $request)
     {
-        $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
-            'board_id' => 'required',
-            'standard_id' => 'required',
-            //'medium_id' => 'required',
-        ]);
+       
 
-        if ($validator->fails()) {
-            return $this->response([], $validator->errors()->first(), false, 400);
-        }
-
-        try {
+       
             // $batchlist = Batches_model::where([
             //     ['user_id', Auth::id()],
             //     ['institute_id', $request->institute_id],
@@ -5757,20 +5747,111 @@ class InstituteApiController extends Controller
             //     ['medium_id', $request->medium_id],
             //     ['standard_id', $request->standard_id]
             // ])->get(['id', 'batch_name'])->toArray();
-            $batchlistQuery = Batches_model::
-                // where('user_id', Auth::id())->
-                where('institute_id', $request->institute_id)
-                ->where('board_id', $request->board_id)
-                ->where('standard_id', $request->standard_id);
+            // $batchlistQuery = Batches_model::
+            //     // where('user_id', Auth::id())->
+            //      where('institute_id', $request->institute_id)
+            //     ->where('board_id', $request->board_id)
+            //     ->where('standard_id', $request->standard_id);
 
-            if (!empty($request->medium_id)) {
-                $batchlistQuery->where('medium_id', $request->medium_id);
+            // if (!empty($request->medium_id)) {
+            //     $batchlistQuery->where('medium_id', $request->medium_id);
+            // }
+
+            // $batchlist = $batchlistQuery->get(['id', 'batch_name'])->toArray();
+
+
+
+            // return $this->response($batchlist, "Batch Fetch Successfully");
+            $validator = Validator::make($request->all(), [
+                'institute_id' => 'required|exists:institute_detail,id',
+                'board_id' => 'required|exists:board,id',
+                'medium_id' => 'required|exists:medium,id',
+                'standard_id' => 'required|exists:standard,id',
+
+            ]);
+            if ($validator->fails()) {
+                return $this->response([], $validator->errors()->first(), false, 400);
             }
-
-            $batchlist = $batchlistQuery->get(['id', 'batch_name'])->toArray();
-
-
-            return $this->response($batchlist, "Batch Fetch Successfully");
+            try {
+                $institute_id = $request->institute_id;
+    
+                if (empty($institute_id)) {
+                    $user_id = Auth::id();
+                    $institute_id = Institute_detail::where('user_id', $user_id)->first();
+                }
+                // Institute_detail::where();
+                $standard_list = DB::table('standard_sub')
+                    ->join('standard', 'standard_sub.standard_id', '=', 'standard.id')
+                    ->select('standard.*')
+                    ->where('standard_sub.institute_id', $institute_id)
+                    ->where('standard_sub.board_id',  $request->board_id)
+                    ->where('standard_sub.medium_id', $request->medium_id)
+                    ->where('standard_sub.standard_id', $request->standard_id)
+                    ->orderByRaw('CAST(standard.name AS UNSIGNED), standard.name')
+                    ->get();
+                // print_r($standard_list);exit;    
+    
+                $standard_array = [];
+                foreach ($standard_list as $standard_value) {
+    
+                    $getbsiqy = Base_table::where('board',  $request->board_id)
+                        ->where('medium', $request->medium_id)
+                        ->where('standard', $standard_value->id)
+                        ->pluck('id')
+                        ->toArray();
+                    // print_r($getbsiqy);exit;
+                    $subject_list = DB::table('subject_sub')
+                        ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
+                        ->select('subject.*')
+                        //->where('subject_sub.user_id', $user_id)
+                        ->where('subject_sub.institute_id', $institute_id)
+                        ->whereIN('subject.base_table_id', $getbsiqy)
+                        ->get();
+    
+                    $subject_array = [];
+                    foreach ($subject_list as $subject_value) {
+                        $subject_array[] = [
+                            'id' => $subject_value->id,
+                            'subject_value' => $subject_value->name,
+                            'image' => !empty($subject_value->image) ? asset($subject_value->image) : '',
+                        ];
+                    }
+                    // print_r($subject_array);
+    
+                    //batch list
+                    $batchqY = Batches_model::join('board', 'board.id', '=', 'batches.board_id')
+                        ->join('medium', 'medium.id', '=', 'batches.medium_id')
+                        ->leftjoin('stream', 'stream.id', '=', 'batches.stream_id')
+                        ->where('batches.institute_id', $institute_id)
+                        ->where('batches.standard_id', $standard_value->id)
+                        ->select('batches.*', 'board.name as board', 'medium.name as medium', 'stream.name as stream')->get();
+                    $batchesDT = [];
+                    foreach ($batchqY as $batDT) {
+                        $subids = explode(",", $batDT->subjects);
+                        $batSubQY = Subject_model::whereIN('id', $subids)->get();
+                        $subects = [];
+                        foreach ($batSubQY as $batDt) {
+                            $subects[] = array('id' => $batDt->id, 'subject_name' => $batDt->name);
+                        }
+    
+                        $batchesDT[] = array(
+                            'id' => $batDT->id,
+                            'batch_name' => $batDT->batch_name,
+                            'board' => $batDT->board,
+                            'medium' => $batDT->medium,
+                            'stream' => $batDT->stream,
+                            'subjects' => $subects
+                        );
+                    }
+    
+                    $standard_array[] = [
+                        'id' => $standard_value->id,
+                        'standard_name' => $standard_value->name,
+                        'All' => $subject_array,
+                        'batches' => $batchesDT
+                    ];
+                }
+                return $this->response($standard_array, "Data Fetch Successfully");
         } catch (Exception $e) {
             return $this->response([], "Invalid token.", false, 400);
         }
