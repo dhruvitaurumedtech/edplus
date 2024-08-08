@@ -1728,7 +1728,7 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-      public function teacher_profile_delete_institute(Request $request){
+    public function teacher_profile_delete_institute(Request $request){
             $validator = Validator::make($request->all(), [
                 'institute_id' => 'required',
                 'teacher_id' => 'required',
@@ -1763,6 +1763,70 @@ class TeacherController extends Controller
             }
 
     }
-  
+
+    public function add_standard(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required',
+            'institute_id' => 'required',
+            'teacher_detail' => 'required',
+            'teacher_detail.*.board_id' => 'required',
+            'teacher_detail.*.medium_id' => 'required',
+            'teacher_detail.*.standard_id' => 'required',
+            'teacher_detail.*.batch_id' => 'required',
+            'teacher_detail.*.subject_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        $teacher_detail = json_decode($request->teacher_detail, true);
+        foreach ($teacher_detail as $item) {
+            $batchIds = explode(',', $item['batch_id']);$existingRecord = DB::table('teacher_detail')
+                ->where('board_id', $item['board_id'])
+                ->where('medium_id', $item['medium_id'])
+                ->where('standard_id', $item['standard_id'])
+                ->where('subject_id', $item['subject_id'])
+                ->where(function($query) use ($batchIds) {
+                    foreach ($batchIds as $batchId) {
+                        $query->orWhere('batch_id', 'LIKE', "%$batchId%");
+                    }
+                })
+                ->exists();
+            if ($existingRecord) {
+                return $this->response([], 'A record with the same data already exists.', false, 400);
+                
+            }
+        }
+
+        try {
+
+            foreach($teacher_detail as $teacherDT){
+                $ids = Base_table::where('board', $teacherDT['board_id'])
+                    ->where('medium', $teacherDT['medium_id'])
+                    ->where('standard', $teacherDT['standard_id'])
+                    ->pluck('institute_for','institute_for_class')
+                    ->toArray();
+                
+                Teacher_model::create([
+                        'institute_id' => $request->institute_id,
+                        'teacher_id' => $request->teacher_id,
+                        'institute_for_id'=>implode(",",array_values($ids)),
+                        'class_id'=>implode(",",array_keys($ids)),
+                        'board_id' => $teacherDT['board_id'],
+                        'medium_id' => $teacherDT['medium_id'],
+                        'standard_id' => $teacherDT['standard_id'],
+                        'subject_id' => $teacherDT['subject_id'],
+                        'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
+                        'status' => '1',
+                    ]);
+                    
+            }
+            
+            return $this->response([], "Standard Add successfully");
+        } catch (\Exception $e) {
+            return $this->response($e, "Somthing went wrong.", false, 400);
+        }
+    }
 }
 
