@@ -262,6 +262,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/teacher-student-fetch-subject', [InstituteApiController::class, 'teacher_student_fetch_subject_selected_subject']);
     Route::post('/institute/replacement-fetch-data', [InstituteApiController::class, 'replacement_fetch_data']);
     Route::post('/teacher/teacher-profile-edit-institute', [TeacherController::class, 'teacher_profile_edit_institute']);
+    Route::post('/institute/teacher-profile-delete-institute', [TeacherController::class, 'teacher_profile_delete_institute']);
     
 });
     //token without use 

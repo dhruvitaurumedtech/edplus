@@ -1715,4 +1715,41 @@ class TeacherController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+      public function teacher_profile_delete_institute(Request $request){
+            $validator = Validator::make($request->all(), [
+                'institute_id' => 'required',
+                'teacher_id' => 'required',
+                'standard_id' => 'required',
+                'board_id' => 'required',
+                'medium_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return $this->response([], $validator->errors()->first(), false, 400);
+            }
+         try{
+                $timetable=Timetable::where('teacher_id',$request->teacher_id)->count();
+                if($timetable < 0){
+                    return $this->response([], "Already timetable assign this teacher.", false, 400);
+                }
+                $data=Teacher_model::where('institute_id', $request->institute_id)
+                ->where('teacher_id', $request->teacher_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->delete();
+                if($data > 0)
+                {
+                    return $this->response([], "Remove successfully!");
+                }
+                else{
+                    return $this->response([], "Someting went wrong!!", false, 400);
+
+                }
+           
+            } catch (Exception $e) {
+                return $this->response($e, "Invalid token.", false, 400);
+            }
+
+    }
 }
+
