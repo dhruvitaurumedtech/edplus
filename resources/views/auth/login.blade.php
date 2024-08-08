@@ -17,7 +17,6 @@
     <div class="login-form">
       <form class="auth-form" method="POST" action="{{ route('login') }}">
         @csrf
-        hi
         <div class="logo1">
           <img src="{{asset('front_asset/images/form-logo.svg')}}" alt="e school logo" class="img-fluid">
         </div>
