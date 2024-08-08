@@ -5615,7 +5615,38 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function edit_batch(Request $request){
 
+          $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'batch_id' =>'required',
+            'batch_name' => 'required',
+            'subjects' => 'required',
+            'student_capacity' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+
+            $batch = Batches_model::find($request->batch_id);
+            if ($batch) {
+                $batch->user_id = Auth::id(); 
+                $batch->institute_id = $request->institute_id;
+                $batch->batch_name = $request->batch_name;
+                $batch->subjects = $request->subjects;
+                $batch->student_capacity = $request->student_capacity;
+                $batch->save();
+                return $this->response([], "Batch update successfully.");
+            } else {
+                return $this->response([], "Batch not found.", false, 400);
+            }
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 
     //create batch
     // public function create_batch(Request $request)
