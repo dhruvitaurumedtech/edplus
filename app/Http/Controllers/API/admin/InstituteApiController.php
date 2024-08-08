@@ -5615,7 +5615,60 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    public function edit_batch(Request $request){
 
+          $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'batch_id' =>'required',
+            'batch_name' => 'required',
+            'subjects' => 'required',
+            'student_capacity' => 'required'
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+
+            $batch = Batches_model::find($request->batch_id);
+            if ($batch) {
+                $batch->user_id = Auth::id(); 
+                $batch->institute_id = $request->institute_id;
+                $batch->batch_name = $request->batch_name;
+                $batch->subjects = $request->subjects;
+                $batch->student_capacity = $request->student_capacity;
+                $batch->save();
+                return $this->response([], "Batch update successfully.");
+            } else {
+                return $this->response([], "Batch not found.", false, 400);
+            }
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
+    public function fetch_batches(Request $request){
+        $validator = Validator::make($request->all(), [
+            'batch_id' =>'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+        $batch_list=Batches_model::where('id',$request->batch_id)->first();
+        // print_r(explode(',',$batch_list->subjects));exit;
+        $subject_list=Subject_model::whereIn('id',explode(',',$batch_list->subjects))->get();
+        $subject=[];
+        foreach($subject_list as $value){
+            $subject[] = ['subject_id'=>$value->id,'subject_name'=>$value->name];
+        }
+        $data = ['batch_id'=>$batch_list->id,'batch_name'=>$batch_list->batch_name,'subjects'=>$subject,'student_capacity'=>$batch_list->student_capacity]; 
+        return $this->response($data, "Batch fetch successfully."); 
+        } catch (Exception $e) {
+                return $this->response($e, "Something went wrong.", false, 400);
+            }
+    }
 
     //create batch
     // public function create_batch(Request $request)
