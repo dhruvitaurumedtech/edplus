@@ -1630,7 +1630,7 @@ class TeacherController extends Controller
     //         return $this->response($e, "Invalid token.", false, 400);
     //     }
     // }
-
+    
     function teacher_profile_edit_institute(Request $request){
         $validator = Validator::make($request->all(), [
                 'institute_id' => 'required',
@@ -1647,26 +1647,38 @@ class TeacherController extends Controller
 
         try {
             $subject_with_batch = json_decode($request->subject_with_batch, true);
-            $collection = collect($subject_with_batch);
             
-            $batids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
-            $timdt = Timetables::where('teacher_id',$request->teacher_id)
-            ->whereIN('batch_id',$batids)->pluck('batch_id')->toArray();
+            $teacherdt = Teacher_model::where('institute_id',$request->institute_id)
+                ->where('teacher_id',$request->teacher_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->select('subject_id', 'batch_id')
+                ->get()
+                ->toArray();
 
-            $arrmerg = array_merge($collection->pluck('batch_id')->toArray(),$timdt);
-
-            
-            
-            $valueCounts = array_count_values($arrmerg);
-
-            // Filter the array to get values that occur only once
-            $uniqueValues = array_filter($arrmerg, function($value) use ($valueCounts) {
-                return $valueCounts[$value] === 1;
-            });
-            
-            if(!empty($timdt)){
-                return $this->response([], "Please first replace teacher", false, 400); 
+                function serializeArrayElements($array) {
+                    return array_map('serialize', $array);
+                }
+                $serialized_subject_with_batch = serializeArrayElements($subject_with_batch);
+                $serialized_teacherdt = serializeArrayElements($teacherdt);
+                
+                $diff2 = array_diff($serialized_teacherdt, $serialized_subject_with_batch);
+                $difference2 = array_map('unserialize', $diff2);
+                
+                foreach($difference2 as $validationde){
+                $batex = explode(",",$validationde['batch_id']);
+                $timdt = Timetables::join('subject','subject.id','=','timetables.subject_id')
+                ->where('timetables.teacher_id',$request->teacher_id)
+                ->where('timetables.subject_id',$validationde['subject_id'])
+                ->whereIN('timetables.batch_id',$batex)
+                ->pluck('subject.name')
+                ->first();
+                if(!empty($timdt)){
+                    return $this->response([], "Please first replace teacher of ".$timdt." subject", false, 400); 
+                }
             }
+            
             Teacher_model::where('institute_id', $request->institute_id)
                 ->where('teacher_id', $request->teacher_id)
                 ->where('board_id', $request->board_id)
@@ -1712,7 +1724,44 @@ class TeacherController extends Controller
 
             return $this->response([], "Data updated successfully!");
         } catch (Exception $e) {
+            return $e;
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+      public function teacher_profile_delete_institute(Request $request){
+            $validator = Validator::make($request->all(), [
+                'institute_id' => 'required',
+                'teacher_id' => 'required',
+                'standard_id' => 'required',
+                'board_id' => 'required',
+                'medium_id' => 'required',
+            ]);
+            if ($validator->fails()) {
+                return $this->response([], $validator->errors()->first(), false, 400);
+            }
+         try{
+                $timetable=Timetables::where('teacher_id',$request->teacher_id)->whereNull('deleted_at')->count();
+                if($timetable < 0){
+                    return $this->response([], "Already timetable assign this teacher.", false, 400);
+                }
+                $data=Teacher_model::where('institute_id', $request->institute_id)
+                                    ->where('teacher_id', $request->teacher_id)
+                                    ->where('board_id', $request->board_id)
+                                    ->where('medium_id', $request->medium_id)
+                                    ->where('standard_id', $request->standard_id)
+                                    ->delete();
+                if($data > 0)
+                {
+                    return $this->response([], "Remove successfully!");
+                }
+                else{
+                    return $this->response([], "Someting went wrong!!", false, 400);
+                }
+           
+            } catch (Exception $e) {
+                return $this->response($e, "Invalid token.", false, 400);
+            }
+
+    }
 }
+
