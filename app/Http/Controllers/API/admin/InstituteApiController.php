@@ -6845,17 +6845,20 @@ class InstituteApiController extends Controller
                 DB::raw('MAX(standard.name) as standard_name'),
                 DB::raw('GROUP_CONCAT(DISTINCT subject.id) as subject_ids'),
                 DB::raw('GROUP_CONCAT(DISTINCT subject.name) as subject_names'),
-                DB::raw('GROUP_CONCAT(DISTINCT teacher_detail.id) as teacher_detail_id')
+                DB::raw('GROUP_CONCAT(DISTINCT teacher_detail.id) as teacher_detail_id'),
+                DB::raw('GROUP_CONCAT(subject.image) as subject_image')
             )
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', $request->teacher_id)
             ->groupBy('teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
             ->get();
+            // print_r($teacherDetails);exit;
         $response = [];
         foreach ($teacherDetails as $detail) {
 
             $subjectIds = explode(',', $detail->subject_ids);
             $subjectNames = explode(',', $detail->subject_names);
+            $subject_image =  explode(',',$detail->subject_image);
             $teacher_detail_ids = explode(',', $detail->teacher_detail_id);
             $subjectList = [];
             foreach ($subjectIds as $index => $subjectId) {
@@ -6872,6 +6875,7 @@ class InstituteApiController extends Controller
                     'teacher_detail_id'=>$teacher_detail_ids[$index],
                     'subject_id' => $subjectId,
                     'subject_name' => $subjectNames[$index],
+                    'subject_image' => (!empty($subject_image[$index])) ? asset($subject_image[$index]) : asset('profile/no-image.png'),
                     'batch_list' => $batchlist,
                 ];
             }
