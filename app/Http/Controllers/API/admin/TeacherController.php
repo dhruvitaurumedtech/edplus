@@ -556,8 +556,6 @@ class TeacherController extends Controller
             $subjects = [];
             $result = [];
             $announcement = [];
-            $examlist = [];
-
             $user_id = Auth::id();
             $today = date('l');
             $daysidg = DB::table('days')->where('day',$today)->select('id')->first();
@@ -1725,7 +1723,7 @@ class TeacherController extends Controller
             return $this->response([], "Data updated successfully!");
         } catch (Exception $e) {
             return $e;
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function teacher_profile_delete_institute(Request $request){
