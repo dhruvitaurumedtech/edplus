@@ -26,25 +26,18 @@ use Laravel\Socialite\Facades\Socialite;
 class AuthController extends Controller
 {
     use ApiTrait;
-
-    //    Google Login
-    
     public function handleGoogle(Request $request)
     {
         try {
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
-            
             if (!$user) {
                 return $this->response([], "UnAuthorized User", false, 400);
             }
             return $this->handleUser($user, "google", $request);
         } catch (Exception $e) {
-            // print_r($e);
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
-
-
     private function handleUser($ssoUser, $ssoPlatform, $request)
     {
         try {
@@ -65,17 +58,10 @@ class AuthController extends Controller
                 }
             }
             if (!$user) {
-
-                $name = $ssoUser->user['name'];
-
-                // Explode the full name into an array based on spaces
-                $nameParts = explode(' ', $name);
-                
-                // Assign firstname and lastname based on array parts
+               $name = $ssoUser->user['name'];
+               $nameParts = explode(' ', $name);
                 $firstname = $nameParts[0]; // First element is the first name
                 $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
-
-
                 $user = new User();
                 $user->firstname = $firstname;
                 $user->lastname = $lastname;
@@ -91,15 +77,13 @@ class AuthController extends Controller
             $tomail = $ssoUser->user['email'];
             Mail::send('emails.welcomemailtogooglelogin', ['name'=>$firstname], function ($message) use ($tomail) {
                 $message->to($tomail);
-                $message->subject('Verification Code');
+                $message->subject('Welcome to Edwide');
               });
-
             return $this->login_res($user);
         } catch (Exception $e) {
             return $this->response($e, "Something went Wrong!!", false, 400);
         }
     }
-
     private function login_res(User $user)
     {
         $token = JWTAuth::fromUser($user);
@@ -128,14 +112,11 @@ class AuthController extends Controller
         ];
         return $this->response($data, "Login SuccessFully!!");
     }
-
-
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'firstname' => 'required',
             'lastname' => 'required',
-            //'email' => 'required|email|unique:users,email',
             'email' => 'required',
             'password' => 'required|string|min:6',
             'mobile' => 'required|min:10',
@@ -153,12 +134,10 @@ class AuthController extends Controller
         }
         $data= User::withTrashed()->where('email', $request->email)->whereNotNull('deleted_at')->first();
         if(!empty($data)){
-            
             return $this->response([],'Enter Your Mobile Number!' , false, 400);
         }
         try {
             $user = User::where('email', $request->email)->first();
-            // print_r($user);exit;
             if(!isset($user)){
                 $user = new User();
                 $user->firstname = $request->firstname;
@@ -173,7 +152,6 @@ class AuthController extends Controller
                 $user->device_key = $request->device_key;
                 $user->save();
             }
-            
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
             $user->save();
@@ -186,16 +164,12 @@ class AuthController extends Controller
             } else {
                 $institute_id = null;
             }
-
             $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-                        
             User::where('email',$request->email)->update(['otp_num'=>$token]);
-
             Mail::send('emails.registerotpverifymail', ['token' => $token,'name'=>$request->firstname], function ($message) use ($request) {
               $message->to($request->email);
               $message->subject('Verification Code');
             });
-            
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
@@ -206,7 +180,6 @@ class AuthController extends Controller
                 'user_image' => $user->image,
                 'role_type' => (int)$user->role_type,
                 'institute_id' => $institute_id,
-                //'token' => $token,
             ];
             return $this->response($data, "OTP is sent to you mail!");
         } catch (Exception $e) {
@@ -214,7 +187,6 @@ class AuthController extends Controller
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -223,8 +195,6 @@ class AuthController extends Controller
             'login_type' => 'required|in:1,2',
             'device_key' => 'nullable',
         ]);
-
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
@@ -234,25 +204,12 @@ class AuthController extends Controller
         if ($user) {
             return $this->response(['status'=>0], "Please verify OTP", false, 400);
         }
-
-        
          $user = User::where('email', $request->email)
                     ->where('status', '1')
                     ->first();
         if (!$user) {
             return $this->response([], "User not found", false, 400);
         }
-
-        // $validRoles = ($request->login_type == 1) ? [5, 6] : [3, 4];
-
-        // if (empty($user->password) && !empty($user->social_id)) {
-        //     return $this->response([], "Please use Social Login", false, 400);
-        // }
-        // if (!in_array($user->role_type, $validRoles)) {
-        //     $errorMessage = ($request->login_type == 1) ? "Please use Institute Application" : "Please use Student Application";
-        //     return $this->response([], $errorMessage, false, 400);
-        // }
-
         if ($request->login_type == 1) {
             $validRoles = [5, 6];
             $errorMessage = "Please use Institute Application";
@@ -263,19 +220,15 @@ class AuthController extends Controller
         } else {
             return $this->response([], "Invalid login type", false, 400);
         }
-
         if (!in_array($user->role_type, $validRoles)) {
             return $this->response([], $errorMessage, false, 400);
         }
-
         if($user->device_key != null || $user->device_key!=''){
         if($request->device_key != $user->device_key){
             return $this->response([], "Already logged in another device.", false, 400);
         }
         }
-        
         if (Auth::attempt($request->only('email', 'password'))) {
-            
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
@@ -289,9 +242,6 @@ class AuthController extends Controller
                     $institute_id = $userdata->id;
                     $institute_name = $userdata->institute_name;
                 } elseif ($user->role_type != 3 && $user->role_type != 4 && $user->role_type != 5 && $user->role_type != 6) {
-                    // $ins = Staff_detail_Model::where('user_id', $user->id)->first();
-                    // $institute_id = $ins->institute_id;
-                    // $institute_name = null;
                     $ins = Staff_detail_Model::where('user_id', $user->id)->first();
                     $institute_id = $ins->institute_id;
                     $institutename = Institute_detail::where('id', $institute_id)->first();
@@ -300,8 +250,6 @@ class AuthController extends Controller
                     $institute_id = null;
                     $institute_name = null;
                 }
-
-
             $data = [
                 'user_id' => $user->id,
                 'user_name' => $user->firstname . ' ' . $user->lastname,
@@ -315,24 +263,16 @@ class AuthController extends Controller
                 'institute_name' => $institute_name,
                 'token' => $token,
             ];
-
             return $this->response($data, "Login successful");
         } else {
-            // return $this->response([], "Invalid Username Or Password!", false, 400);
             $user = User::where('email', $request->email)->first();
-    
             if (!$user) {
-                // Email does not exist
                 return $this->response([], "Invalid Email", false, 400);
             } else {
-                // Email exists but password is incorrect
                 return $this->response([], "Invalid Password", false, 400);
             }
         }
     }
-
-
-
     public function logout(Request $request)
     {
         try {
@@ -346,151 +286,33 @@ class AuthController extends Controller
             return $this->response([], "Something went wrong!", false, 400);
         }
     }
-
     public function setnew_password(Request $request){
             $validator = Validator::make($request->all(), [
                 'current_password' => 'required',
                 'password' => 'required|string|min:6',
                 'confirm_password' => 'required|string|same:password',
             ]);
-    
             if ($validator->fails()) {
                 return $this->response([], $validator->errors()->first(), false, 400);
             }
-    
             try{
-                
                 $user = User::findOrFail(Auth::id());
-    
             if (!Hash::check($request->current_password, $user->password)) {
                 return $this->response([], "The current password is incorrect.", false, 400);
             }
-    
             $user->password = Hash::make($request->password);
             $user->save();
-    
             return $this->response([], "Password updated successfully.");
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
-
-    // public function register(Request $request)
-    // {
-    //     $validator = \Validator::make(
-    //         $request->all(),
-    //         [
-    //             'firstname' => 'required',
-    //             'lastname' => 'required',
-    //             'email' => 'required|email|unique:users,email',
-    //             'password' => 'required|string|min:6',
-    //             'mobile' => 'required|min:10',
-    //             'role_type' => 'required|integer',
-    //         ],
-    //         [
-    //             'mobile' => 'The mobile field must be at least 10 characters',
-    //             'role_type' => 'select roleid'
-    //         ]
-    //     );
-    //     if ($validator->fails()) {
-    //         $errorMessages = array_values($validator->errors()->all());
-
-    //         return response()->json([
-    //             'status' => 400,
-    //             'errors' => $errorMessages,
-    //         ], 400);
-    //     }
-
-    //     $existingUser = User::where('email', $request->email)->first();
-    //     if ($existingUser) {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'This email already exists.',
-
-    //         ]);
-    //     }
-    //     if ($request->password != $request->confirm_password) {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'Password and confirm_password does not match!',
-    //         ]);
-    //     }
-    //     $user = new User();
-    //     $user->firstname = $request->firstname;
-    //     $user->lastname = $request->lastname;
-    //     $user->email = $request->email;
-    //     $user->password = Hash::make($request->password);
-    //     $user->mobile = $request->mobile;
-    //     $user->role_type = $request->role_type;
-    //     $user->otp_num = rand(100000, 999999);
-    //     $user->save();
-    //     $token = JWTAuth::fromUser($user);
-    //     $user->token = $token;
-    //     $user->save();
-    //     $responseData = [
-    //         'success' => 200,
-    //         'message' => 'OTP Sent Successfully !',
-    //         'data' => array('OTP' => $user->otp_num),
-    //     ];
-    //     return response()->json($responseData);
-    // }
-
-    // public function verify_otp12(Request $request)
-    // {
-    //     $phone = $request->input('mobile');
-    //     $otp_num = $request->input('otp_num');
-
-    //     $user = DB::table('users')->where('mobile', $phone)->get();
-
-    //     if ($user->count() > 0) {
-
-    //         $otp_check = DB::table('users')->where('otp_num', $otp_num)->get();
-
-    //         if ($otp_check->isNotEmpty()) {
-    //             if (!empty($user->photo)) {
-    //                 $photo = asset('profile/' . $user->image);
-    //             } else {
-    //                 $photo = asset('profile/image.jpg');
-    //             }
-    //             foreach ($user as $value) {
-    //                 $data = array(
-    //                     'user_id' => $value->id,
-    //                     'user_name' => $value->firstname . ' ' . $value->lastname,
-    //                     'mobile_no' => $value->mobile,
-    //                     'user_email' => $value->email,
-    //                     'user_image' => $photo,
-    //                     'role_type' => $value->role_type,
-    //                     'token' => $value->token
-    //                 );
-    //             }
-    //             return response()->json([
-    //                 'status' => 200,
-    //                 'message' => 'Registered successfully',
-    //                 'data' => $data
-    //             ], 200, [], JSON_NUMERIC_CHECK);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 400,
-    //                 'message' => 'Invalid OTP.',
-    //             ]);
-    //         }
-    //     } else {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'This mobile_no does not already exists.',
-
-    //         ]);
-    //     }
-    // }
-
-
     public function verify_otp(Request $request)
     {
         try {
             $user = User::where('email', $request->email)
                 ->where('otp_num', $request->otp_num)
                 ->first();
-
             if ($user) {
                 $data = [
                     'user_id' => $user->id,
@@ -516,8 +338,6 @@ class AuthController extends Controller
             return $this->response([], "Something went wrong!", false, 400);
         }
     }
-
-
     protected function createNewToken($token)
     {
         return response()->json([
@@ -527,50 +347,6 @@ class AuthController extends Controller
             'user' => auth()->user()
         ]);
     }
-
-    // public function login(Request $request)
-    // {
-    //     $request->validate([
-    //         'email' => 'required|email|exists:users,email',
-    //         'password' => 'required',
-    //     ]);
-    //     $userexists = User::where('email', $request->email)->first();
-    //     if ($userexists) {
-    //         if (Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
-    //             $user = Auth::user();
-    //             $token = JWTAuth::fromUser($user);
-    //             $user->token = $token;
-    //             $user->save();
-    //             $institute_id = ($user->role_type == 3) ? (Institute_detail::where('user_id', $user->id)->first()?->id ?? null) : null;
-    //             return response()->json([
-    //                 'status' => 200,
-    //                 'message' => 'Login successful',
-    //                 'data' => [
-    //                     'user_id' => $user->id,
-    //                     'user_name' => $user->firstname . ' ' . $user->lastname,
-    //                     'mobile_no' => $user->mobile,
-    //                     'user_email' => $user->email,
-    //                     'user_image' => $user->image,
-    //                     'role_type' => $user->role_type,
-    //                     'institute_id' => $institute_id,
-    //                     'token' => $token,
-    //                 ]
-    //             ], 200, [], JSON_NUMERIC_CHECK);
-    //         } else {
-    //             return response()->json([
-    //                 'status' => 400,
-    //                 'message' => 'Invalid credentials'
-    //             ]);
-    //         }
-    //     } else {
-    //         return response()->json([
-    //             'status' => '404',
-    //             'message' => 'User not found',
-    //         ], 404);
-    //     }
-    // }
-
-    
     protected function validateToken($user, $providedToken)
     {
         return $user->token === $providedToken;
@@ -586,30 +362,4 @@ class AuthController extends Controller
             ]
         ]);
     }
-
-   
-    // public function logout(Request $request)
-    // {
-    //     $userId = $request->user_id;
-    //     $token = $request->header('Authorization');
-    //     if (strpos($token, 'Bearer ') === 0) {
-    //         $token = substr($token, 7);
-    //     }
-
-    //     $existingUser = User::where('token', $token)->where('id', $userId)->first();
-    //     if ($existingUser) {
-
-    //         Auth::logout($userId);
-    //         user::where('id', $userId)->update(['token' => '']);
-    //         return response()->json([
-    //             'status' => '200',
-    //             'message' => 'Successfully logged out',
-    //         ]);
-    //     } else {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'Invalid token.',
-    //         ], 400);
-    //     }
-    // }
 }

@@ -32,14 +32,11 @@ class ForgotPasswordController extends Controller
     if ($request->validate([
       'email' => 'required|email|exists:users',
     ])) {
-      // $token = $request->header('Authorization');
-       //print_r($token);
       $existingUser = User::where('email', $request->email)->first();
       if (empty($existingUser)) {
         return $this->sendError("This email is not registered", 401);
       }
-
-      if ($request->login_type == 1) {
+     if ($request->login_type == 1) {
         $validRoles = [5, 6];
         $errorMessage = "Please use Institute Application";
     } elseif ($request->login_type == 2) {
@@ -49,25 +46,20 @@ class ForgotPasswordController extends Controller
     } else {
         return $this->response([], "Invalid login type", false, 400);
     }
-
     if (!in_array($existingUser->role_type, $validRoles)) {
         return $this->response([], $errorMessage, false, 400);
     }
-
-    try {
+   try {
       $token = str_pad(mt_rand(0, 999999), 6, '0', STR_PAD_LEFT);
-
       $abc = DB::table('password_resets')->insert([
         'email' => $request->email,
         'token' => $token,
         'created_at' => Carbon::now()
       ]);
-      
       Mail::send('emails.forgot', ['token' => $token,'name' => $existingUser->firstname], function ($message) use ($request) {
         $message->to($request->email);
         $message->subject('Reset Your Password');
       });
-      
       return response()->json([
         'status' => 200,
         'message' => 'We have e-mailed your verification code!'
@@ -75,7 +67,6 @@ class ForgotPasswordController extends Controller
     } catch (Exception $e) {
       return $this->sendError($e->getMessage(), 422);
     }
-      // return response()->json(['message' => 'Invalid credentials'], 401);
     } else {
       return response()->json([
         'status' => 400,
@@ -83,11 +74,6 @@ class ForgotPasswordController extends Controller
       ], 400);
     }
   }
-  /**
-   * Write code on Method
-   *
-   * @return response()
-   */
   public function showResetPasswordForm($token): View
   {
     return view('auth.forgetPasswordLink', ['token' => $token]);
@@ -148,20 +134,13 @@ class ForgotPasswordController extends Controller
       return $this->response($e, "Something went wrong!!", false, 400);
     }
   }
-
-  /**
-   * Write code on Method
-   *
-   * @return response()
-   */
-  public function submitResetPasswordForm(Request $request): JsonResponse
+public function submitResetPasswordForm(Request $request): JsonResponse
   {
     $request->validate([
       'email' => 'required|email|exists:users',
       'password' => 'required|string|min:6|confirmed',
       'password_confirmation' => 'required'
     ]);
-    // print_r($request->all());exit;
     $updatePassword = DB::table('password_resets')
       ->where([
         'email' => $request->email,

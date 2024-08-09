@@ -33,19 +33,7 @@ class TimetableController extends Controller
         }
     }
 
-    // public function for_repeat_list(){
-    //     try{
-    //         $timtblretDT = DB::table('timetable_repeat')->get();
-    //         $timetable_repeat = [];
-    //         foreach($timtblretDT as $reotreDT){
-    //             $timetable_repeat[] = array('id'=>$reotreDT->id,'name'=>$reotreDT->name);
-    //         }
-
-    //         return $this->response($timetable_repeat,'Data Fetch Successfully');
-    //     }catch(Exeption $e){
-    //         return $this->response($e,"Something went wrong!!", false, 400);
-    //     }
-    // }
+   
 
     public function days_list(){
         try{
@@ -234,8 +222,6 @@ class TimetableController extends Controller
             'batch_id'=>'required|exists:batches,id',
             'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
-            //'start_date'=>'required|date_format:Y-m-d|date',
-            //'end_date'=>'required|date_format:Y-m-d|date|after:start_date',
             'start_time'=>'required',
             'end_time'=>'required|after:start_time',
             'day'=>'required',
@@ -261,7 +247,6 @@ class TimetableController extends Controller
 
         $insiddt = Batches_model::where('id',$request->batch_id)->first();
         $enddt = Institute_detail::where('id',$insiddt->institute_id)->first();
-        //DB::beginTransaction();
         $timetablebase = new TimeTableBase();
         $timetablebase->subject_id = $request->subject_id;
         $timetablebase->batch_id = $request->batch_id;
@@ -308,7 +293,6 @@ class TimetableController extends Controller
                     
                     $existing = Timetable::where([
                         ['batch_id', $request->batch_id],
-                        //['teacher_id', $request->teacher_id],
                         ['lecture_date', $lecture_date],
                         ['start_time', '<',$request->end_time ],
                         ['end_time', '>',  $request->start_time],
@@ -359,13 +343,11 @@ class TimetableController extends Controller
             }
         }
 
-        //DB::commit();
         return $this->response([], 'Successfully created Timetable');
         } catch (Exception $e) {
-            //DB::rollback();
             return $this->response($e, "Something went wrong!!", false, 400);
         }
-}
+    }
 
 public function list_timetable_institute(Request $request) {
     $validator = validator::make($request->all(), [
@@ -501,97 +483,5 @@ public function list_timetable_institute(Request $request) {
             }catch(Exception $e){
                 return $this->response($e,"Something went wrong!!", false, 400);
             }
-    }
-
-    // public function list_timetable_institute(Request $request){
-    //     $validator = validator::make($request->all(),[
-    //         'batch_id'=>'required',
-    //     ]);
-
-    //     if($validator->fails()) 
-    //     return $this->response([],$validator->errors()->first(),false,400);
-
-    //     try{
-    //        $timtDT = Timetable::join('subject','subject.id','=','time_table.subject_id')
-    //        ->join('users','users.id','=','time_table.teacher_id')
-    //        ->join('lecture_type','lecture_type.id','=','time_table.lecture_type')
-    //        ->join('batches','batches.id','=','time_table.batch_id')
-    //        ->join('standard','standard.id','=','batches.standard_id')
-    //        ->where('time_table.batch_id',$request->batch_id)
-    //        ->select('subject.name as subject','users.firstname',
-    //        'users.lastname','lecture_type.name as lecture_type_name',
-    //        'batches.batch_name','batches.standard_id','time_table.*','standard.name as standard')
-    //        ->get();
-    //        $data = [];
-    //        foreach($timtDT as $timtable){
-            
-    //         $data[] = array('id'=>$timtable->id,
-    //         'date'=>$timtable->lecture_date,
-    //         'day'=>$timtable->repeat,
-    //         'start_time'=>$timtable->start_time,
-    //         'end_time'=>$timtable->end_time,
-    //         'subject_id'=>$timtable->subject_id,
-    //         'subject'=>$timtable->subject,
-    //         'lecture_type_id'=>$timtable->lecture_type,
-    //         'lecture_type'=>$timtable->lecture_type_name,
-    //         'standard_id'=>$timtable->standard_id,
-    //         'standard'=>$timtable->standard,
-    //         'batch_id'=>$timtable->batch_id,
-    //         'batch_name'=>$timtable->batch_name,
-    //         'teacher_id'=>$timtable->teacher_id,
-    //         'teacher'=>$timtable->firstname .' '.$timtable->lastname);
-    //        }
-
-    //        return $this->response($data,'Data Fetch Successfully');
-           
-    //     }catch(Exeption $e){
-    //         return $this->response($e,"Something went wrong!!", false, 400);
-    //     }
-    // }
-   
-    
-
-    //edit time table
-    // public function edit_timetable(Request $request){
-    //     $validator = validator::make($request->all(),[
-            
-    //         'subject_id'=>'required',
-    //         'teacher_id'=>'required',
-    //         'lecture_type'=>'required',
-    //         'start_time'=>'required',
-    //         'end_time'=>'required',
-
-    //     ]);
-
-    //     if($validator->fails()) 
-    //     return $this->response([],$validator->errors()->first(),false,400);
-
-    //     try{
-    //         DB::beginTransaction();
-            
-    //             $timetableedit = Timetable::find($request->id);
-    //             if (!$timetableedit) {
-    //                 return $this->response([],'Record Not Found',404);
-    //             }
-
-            
-    //         $timetableedit->subject_id = $request->subject_id;
-    //         //$timetableedit->batch_id = $request->batch_id;
-    //         $timetableedit->teacher_id = $request->teacher_id;
-    //         $timetableedit->lecture_type = $request->lecture_type;
-    //         //$timetableedit->start_date = $request->start_date;
-    //         //$timetableedit->end_date = $request->end_date;
-    //         $timetableedit->start_time = $request->start_time;
-    //         $timetableedit->end_time = $request->end_time;
-    //         //$timetableedit->repeat = $request->repeat;
-    //         $timetableedit->save();
-            
-               
-    //         DB::commit();
-    //         return $this->response([],'Timetable Update Successfully');
-    //     }catch(Exeption $e){
-    //         DB::rollback();
-    //         return $this->response($e,"Something went wrong!!", false, 400);
-    //     }
-    // }
+    }    
 }

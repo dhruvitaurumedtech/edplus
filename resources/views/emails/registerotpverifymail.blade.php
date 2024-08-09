@@ -27,7 +27,7 @@ Hey {{$name}},
 
 <p>Welcome to EdWide! We’re excited to have you on board. To complete your account setup, please use the verification code below:</p>
 
-<p>Verification Code: {{$token}}</p>
+<p>Verification Code: <b>{{$token}}</b></p>
 
 <p>Please enter this code in the verification section of your account settings to activate your account. If you didn’t sign up for Edwide, you can ignore this email.</p>
 

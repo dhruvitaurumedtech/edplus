@@ -86,79 +86,6 @@ class ParentsController extends Controller
         }
     }
 
-
-    // public function child_list123(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'user_id' => 'required',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         $errorMessages = array_values($validator->errors()->all());
-    //         return response()->json([
-    //             'success' => 400,
-    //             'message' => 'Validation error',
-    //             'errors' => $errorMessages,
-    //         ], 400);
-    //     }
-    //     $token = $request->header('Authorization');
-
-    //     if (strpos($token, 'Bearer ') === 0) {
-    //         $token = substr($token, 7);
-    //     }
-
-    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-
-    //     if ($existingUser) {
-    //         $user_id = $request->user_id;
-    //         try {
-    //             //banner
-
-    //             //child
-    //             $childs = [];
-    //             $chilsdata = Parents::join('users', 'users.id', '=', 'parents.student_id')
-    //                 ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
-    //                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
-    //                 ->where('parents.parent_id', $user_id)->where('parents.verify', '1')
-    //                 ->select('users.firstname', 'users.lastname', 'institute_detail.institute_name')->get();
-    //             foreach ($chilsdata as $chilDT) {
-    //                 $subids = explode(',', $chilDT->subject_id);
-    //                 $subjectQY = Subject_model::whereIN('id', $subids);
-    //                 $subjDTs = [];
-    //                 foreach ($subjectQY as $subDT) {
-    //                     $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
-    //                 }
-
-    //                 $childs[] = array(
-    //                     'child_id' => $chilDT->student_id,
-    //                     'firstname' => $chilDT->firstname,
-    //                     'lastname' => $chilDT->lastname,
-    //                     'institute_name' => $chilDT->institute_name,
-    //                     'subjects' => $subjDTs
-    //                 );
-    //             }
-
-    //             return response()->json([
-    //                 'status' => '200',
-    //                 'message' => 'Data',
-    //                 'data' => $childs
-    //             ]);
-    //         } catch (\Exception $e) {
-    //             return response()->json([
-    //                 'status' => '200',
-    //                 'message' => 'Something went wrong',
-    //                 'data' => []
-    //             ]);
-    //         }
-    //     } else {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'Invalid token.',
-    //         ], 400);
-    //     }
-    // }
-
-
     
     private  function convertTo12HourFormat($time24)
     {
@@ -166,7 +93,6 @@ class ParentsController extends Controller
         return $time->format('g:i:s A');
     }
 
-    //pending work in below
     public function parents_child_homescreen(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -243,7 +169,6 @@ class ParentsController extends Controller
             ->join('batches', 'batches.id', '=', 'timetables.batch_id')
             ->where('timetables.batch_id', $getstdntdata->batch_id)
             ->whereRaw("FIND_IN_SET(timetables.subject_id,?)", [$getstdntdata->subject_id])
-            // ->whereIn('time_table.subject_id',$subject_ids)
             ->where('timetables.day', $daysidg->id)
             ->select(
                 'subject.name as subject',
@@ -308,13 +233,9 @@ class ParentsController extends Controller
                         return $query->where('exam.batch_id', $batch_id);
                     })
                     ->where('exam.standard_id', $getstdntdata->standard_id)
-                    // ->when($stdetail->stream_id, function ($query, $stream_id) {
-                    //     return $query->where('exam.stream_id', $stream_id);
-                    // })
                     ->whereIn('exam.subject_id', $subjectIds)
                     ->orderBy('exam.created_at', 'desc')
                     ->select('exam.*', 'subject.name as subject', 'standard.name as standard')
-                    //->limit(3) I remove this on Parin's request
                     ->get();
                    
                 foreach ($exams as $examsDT) {
@@ -338,9 +259,7 @@ class ParentsController extends Controller
             ->whereIN('exam.subject_id', explode(",",$getstdntdata->subject_id))
             ->select('marks.*', 'subject.name as subject', 'exam.subject_id', 'exam.total_mark', 'exam.exam_type', 'exam.exam_date', 'exam.exam_title')
             ->orderByDesc('marks.created_at')
-            //->limit(3) I remove this on Parin's request
             ->get();
-        //$highestMarks = $resultQY->max('mark');
         foreach ($resultQY as $resultDDt) {
             $highestMarks = Marks_model::where('exam_id', $resultDDt->exam_id)
                     ->max('mark');
@@ -398,7 +317,6 @@ class ParentsController extends Controller
             'examlist'=>$examlist,
             'result' => $result,
             'attendance'=>$totalattendlec
-            // 'fees' => $fees,
         ];
 
         return $this->response($data, "Data Fetch Successfully");
@@ -420,7 +338,6 @@ class ParentsController extends Controller
             $student = Parents::join('users', 'users.id', '=', 'parents.student_id')
             ->join('students_details', 'students_details.student_id', '=', 'parents.student_id')
             ->where('parents.parent_id', $parent_id)
-            // ->where('parents.verify', '1')
             ->whereNull('students_details.deleted_at')
             ->where('students_details.status','1')
               ->select('users.*')
@@ -474,8 +391,6 @@ class ParentsController extends Controller
                             'city'=>$parent->city,
                             'pincode'=>$parent->pincode,
                             'child'=>$data2];
-                //$response = ['parent'=>$data1,'student'=>$data2];
-                // echo "<pre>";print_r($parent);exit;
                 return $this->response($response, "Data Fetch Successfully");
             }catch(\Exception $e){
                 return $this->response($e, "Something went wrong!!.", false, 400);
@@ -489,9 +404,6 @@ class ParentsController extends Controller
             'lastname' => 'required|string',
             'mobile' => 'required|string',
             'address' => 'required|string',
-            // 'state' => 'required|string',
-            // 'city' => 'required|string',
-            // 'pincode' => 'required|string',
             'country_code' => 'required',
             'country_code_name'=>'required',
         ]);

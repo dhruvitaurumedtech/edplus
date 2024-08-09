@@ -19,61 +19,7 @@ class AttendanceController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // public function attendance(Request $request)
-    // {
-    //     $token = $request->header('Authorization');
-
-    //     if (strpos($token, 'Bearer ') === 0) {
-    //         $token = substr($token, 7);
-    //     }
-
-    //     $existingUser = User::where('token', $token)->where('id', $request->user_id)->first();
-    //     if ($existingUser) {
-    //         $request->validate([
-    //             'user_id' => 'required|integer',
-    //             'institute_id' => 'required|integer',
-    //             'student_id' => 'required|integer',
-    //             'batch_id' => 'required|integer',
-    //             'subject_id' => 'required|integer',
-    //             'status' => 'required|in:P,A',
-    //         ]);
-
-    //         $existingAttendance = Attendance_model::where([
-    //             'user_id' => $request->user_id,
-    //             'institute_id' => $request->institute_id,
-    //             'student_id' => $request->student_id,
-    //             'batch_id' => $request->batch_id,
-    //             'subject_id' => $request->subject_id,
-    //             'date' => $request->date,
-    //         ])->first();
-
-    //         if ($existingAttendance) {
-    //             $existingAttendance->attendance = $request->status;
-    //             $existingAttendance->save();
-    //             return response()->json(['status' => 200, 'message' => 'Attendance updated successfully'], 200);
-    //         }
-
-    //         Attendance_model::create([
-    //             'user_id' => $request->user_id,
-    //             'institute_id' => $request->institute_id,
-    //             'student_id' => $request->student_id,
-    //             'batch_id' => $request->batch_id,
-    //             'subject_id' => $request->subject_id,
-    //             'attendance' => $request->status,
-    //             'date' => $request->date,
-    //         ]);
-
-    //         return response()->json(['status' => 200, 'message' => 'Attendance marked successfully'], 201);
-    //     } else {
-    //         return response()->json([
-    //             'status' => 400,
-    //             'message' => 'Invalid token.',
-    //         ]);
-    //     }
-    // }
-
-
-    public function attendance(Request $request)
+public function attendance(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|integer',

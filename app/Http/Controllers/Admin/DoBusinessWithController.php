@@ -36,7 +36,6 @@ class DoBusinessWithController extends Controller
             'category_id' => $request->input('category'),
             'status' => $request->input('status'),
         ]);
-
         return redirect()->route('do_business_with.list')->with('success', 'Do Business With Created Successfully');
     }
     function edit(Request $request)
@@ -54,7 +53,6 @@ class DoBusinessWithController extends Controller
             'category' => 'required',
             'status' => 'required',
         ]);
-
         $role->update([
             'category_id' => $request->input('category'),
             'name' => $request->input('name'),
@@ -66,13 +64,10 @@ class DoBusinessWithController extends Controller
     {
         $id = $request->input('id');
         $DoBusinessWith = Dobusinesswith_Model::find($id);
-
         if (!$DoBusinessWith) {
             return redirect()->route('do_business_with.list')->with('error', 'Do Business With for not found');
         }
-
         $DoBusinessWith->delete();
-
         return redirect()->route('do_business_with.list')->with('success', 'Do Business With for deleted successfully');
     }
 }

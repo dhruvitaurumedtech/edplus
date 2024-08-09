@@ -15,9 +15,6 @@ use Illuminate\Support\Facades\Auth;
 
 class TopicController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
         $Standard = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
@@ -32,8 +29,7 @@ class TopicController extends Controller
                 'base_table.id as base_id'
             )
             ->where('standard.status', 'active')->get();
-
-        $topics = Topic_model::join('base_table', 'topic.base_table_id', '=', 'base_table.id')
+      $topics = Topic_model::join('base_table', 'topic.base_table_id', '=', 'base_table.id')
             ->join('chapters', 'topic.chapter_id', '=', 'chapters.id')
             ->join('subject', 'topic.subject_id', '=', 'subject.id')
             ->join('standard', 'topic.standard_id', '=', 'standard.id')
@@ -52,7 +48,6 @@ class TopicController extends Controller
                 'subject.id as subject_id'
             )
             ->where('standard.status', 'active')->paginate(10);
-        // echo "<pre>";print_r($topics);exit;
         $subjects = Subject_model::get();
         $videolist = VideoCategory::get();
         $institute_list = Institute_detail::where('user_id', Auth::user()->id)->get();
@@ -86,9 +81,6 @@ class TopicController extends Controller
     }
     public function topic_save(Request $request)
     {
-        // echo "<pre>";
-        // print_r($request->all());
-        // exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
@@ -99,12 +91,9 @@ class TopicController extends Controller
             'video_category_id.*' => 'required',
             'video_upload.*' => 'required|mimes:mp4,mov,avi|max:10240',
         ]);
-
-
         for ($i = 0; $i < count($request->input('topic_no')); $i++) {
             $base_table = Base_table::where('id', $request->input('standard_id'))->first();
             $topic_video = $request->file('topic_video')[$i];
-
             $topic_model = Topic_model::create([
                 'user_id' => Auth::user()->id,
                 'institute_id' => $request->input('institute_id'),
@@ -126,7 +115,6 @@ class TopicController extends Controller
             }
             return back()->with('Success!', 'Data Added!');
         }
-
         return redirect()->route('list.topic')->with('success', 'Topic Created Successfully');
     }
     public function topic_list(Request $request)
@@ -140,30 +128,5 @@ class TopicController extends Controller
             ->where('chapter_id', $chapter_id)
             ->get();
         return response()->json(['topic_list' => $topic_list]);
-    }
-
-    public function store(Request $request)
-    {
-        //
-    }
-
-    public function show(string $id)
-    {
-        //
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    public function destroy(string $id)
-    {
-        //
     }
 }

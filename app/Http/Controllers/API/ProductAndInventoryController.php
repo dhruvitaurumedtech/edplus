@@ -33,8 +33,7 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
-
-    public function inventory_status(Request $request){
+   public function inventory_status(Request $request){
         try {
             $products = Products_status::select('id', 'name')->get();
             return $this->response($products, "Inventory Status.");
@@ -42,7 +41,6 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         } 
     }
-
     public function add_inventory(Request $request){
         $validator = Validator::make($request->all(), [
             'status' => 'required|exists:products_inventory_status,id',
@@ -63,7 +61,6 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
-
     public function product_list(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required'

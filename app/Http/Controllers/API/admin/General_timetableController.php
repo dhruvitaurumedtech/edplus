@@ -288,7 +288,6 @@ class General_timetableController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         
-        //$insid = Institute_detail::where('user_id',Auth::id())->first();
         $dateTime = new DateTime($request->date);
             $day = $dateTime->format('l');
             $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
@@ -310,7 +309,6 @@ class General_timetableController extends Controller
                     'institute_detail.open_time','institute_detail.close_time',
                     'batches.batch_name', 'batches.standard_id','batches.board_id','batches.medium_id', 'timetables.*', 
                     'standard.name as standard','board.name as board','medium.name as medium','days.day as dayname')
-                //->orderBy('time_table.start_time', 'asc')
                 ->orderBy('class_room.name', 'asc')
                 ->get();
                 
@@ -318,13 +316,6 @@ class General_timetableController extends Controller
             
             foreach ($timtDT as $timtable) {
                 $class_room = $timtable->class_room;
-                // if (!isset($groupedData[$class_room])) {
-                //     $groupedData[$class_room] = [
-                //         'class_room' => $class_room,
-                //         'sub_data' => []
-                //     ];
-                // }
-                // $groupedData[$class_room]['sub_data'][] = [
                     $groupedData[] = [
                     'id' => $timtable->id,
                     'open_time'=>$timtable->open_time,
