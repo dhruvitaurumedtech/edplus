@@ -27,15 +27,10 @@ class StudentsController extends Controller
 {
     public function list_student(Request $request, $institute_id): View
     {
-    //    echo  $id = Auth::id();
-        // $institute_id =  $id;
-
         $student = User::leftjoin('students_details', 'users.id', '=', 'students_details.student_id')
             ->where('users.role_type', [6])
             ->where('students_details.institute_id', $institute_id)
             ->select('users.*', 'students_details.status')->orderBy('users.id', 'desc')->paginate(10);
-        // echo "<pre>";print_r($student);exit;    
-
         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id', $institute_id)->select('institute_for.*')->get();
         $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id', $institute_id)->select('board.*')->get();
         $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')->where('medium_sub.institute_id', $institute_id)->select('medium.*')->get();
@@ -45,12 +40,10 @@ class StudentsController extends Controller
         $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')->where('standard_sub.institute_id', $institute_id)->select('standard.*')->get();
         return view('student.list', compact('institute_id', 'student', 'institute_for', 'board', 'medium', 'class', 'stream', 'subject', 'standard'));
     }
-
-    public function create_student(Request $request, $institute_id)
+   public function create_student(Request $request, $institute_id)
     {
         $id = Auth::id();
         $institute_id = $institute_id;
-
         $institute_for = Institute_for_model::join('institute_for_sub', 'institute_for.id', '=', 'institute_for_sub.institute_for_id')->where('institute_for_sub.institute_id', $institute_id)->select('institute_for.*')->get();
         $board = board::join('board_sub', 'board.id', '=', 'board_sub.board_id')->where('board_sub.institute_id', $institute_id)->select('board.*')->get();
         $medium = Medium_model::join('medium_sub', 'medium.id', '=', 'medium_sub.medium_id')->where('medium_sub.institute_id', $institute_id)->select('medium.*')->get();
@@ -60,7 +53,6 @@ class StudentsController extends Controller
         $standard = Standard_model::join('standard_sub', 'standard.id', '=', 'standard_sub.standard_id')->where('standard_sub.institute_id', $institute_id)->select('standard.*')->get();
         return view('student.create', compact('institute_id', 'institute_for', 'board', 'medium', 'class', 'stream', 'subject', 'standard'));
     }
-
     public function createformdata(Request $request)
     {
         $inst_id = $request->institute_id;
@@ -70,14 +62,12 @@ class StudentsController extends Controller
             ->where('board.institute_for_id', $instfor_id)
             ->select('board.*')
             ->get();
-
         if (!empty($boardDT)) {
             return response()->json(['boards' => $boardDT]);
         } else {
             return response()->json(['error' => 'Data not found'], 404);
         }
     }
-
     public function save_student(Request $request)
     {
         $validator = $request->validate([
@@ -95,7 +85,6 @@ class StudentsController extends Controller
         } else {
             $imageName = "";
         }
-
         $student = User::create([
             'firstname' => $request->firstname,
             'lastname' => $request->lastname,
@@ -108,7 +97,6 @@ class StudentsController extends Controller
             'role_type' => 6,
             'status' => $request->status,
         ]);
-
         $student_id = $student->id;
         $id = Auth::id();
         if (is_array($request->subject_id)) {
@@ -135,7 +123,6 @@ class StudentsController extends Controller
             return Redirect::route('student.create')->with('success', 'fail!');
         }
     }
-
     public function edit_student(Request $request)
     {
         $student_id = $request->input('student_id');
@@ -150,15 +137,10 @@ class StudentsController extends Controller
             return response()->json(['error' => 'Student not found'], 404);
         }
     }
-
     public function update_student(Request $request)
     {
-        // echo "<pre>";
-        // print_r($_POST);
-        // exit;
         $student_id = $request->student_id;
         $studentUP = User::find($student_id);
-
         $validator = $request->validate([
             'firstname' => [
                 'required',
@@ -168,7 +150,6 @@ class StudentsController extends Controller
             ],
             'lastname' => 'required|string|max:255',
         ]);
-
         //image
         if ($request->hasFile('image')) {
             $image = $request->file('image');
@@ -178,9 +159,7 @@ class StudentsController extends Controller
         } else {
             $imagepath = $request->uploded_image;
         }
-
         //update
-
         $studentUP->update([
             'firstname' => $request->input('firstname'),
             'lastname' => $request->input('lastname'),
@@ -190,7 +169,6 @@ class StudentsController extends Controller
             'dob' => $request->input('dob'),
             'image' => $imagepath
         ]);
-
         $user_id = Auth::id();
         $Student_detail_id = $request->Student_detail_id;
         if (is_array($request->subject_id)) {
@@ -199,7 +177,6 @@ class StudentsController extends Controller
             $subject_id = $request->subject_id;
         }
         $studentdetailsDT = Student_detail::where('id', $Student_detail_id)->first();
-
         $studentdetailsDT->update([
             'institute_for_id' => $request->institute_for_id,
             'board_id' =>  $request->board_id,
@@ -210,24 +187,19 @@ class StudentsController extends Controller
             'subject_id' => $subject_id,
             'status' => $request->status,
             'note' => ($request->note) ? $request->note : ''
-
         ]);
-
         return redirect('student/list/' . $request->institute_id)->with('success', 'profile-created');
     }
-
     public function view_student(Request $request)
     {
         $sid = $request->student_id;
         $institute_id = $request->institute_id;
-
         $student = User::leftjoin('students_details', 'users.id', '=', 'students_details.student_id')
             ->where('users.id', $sid)
             ->where('students_details.institute_id', $institute_id)
             ->select('users.*')->paginate(10);
         return view('student.view', compact('student'));
     }
-
     public function delete_student(Request $request)
     {
         $did = $request->input('student_id');

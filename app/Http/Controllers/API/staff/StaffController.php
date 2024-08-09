@@ -27,17 +27,14 @@ use Illuminate\Support\Facades\Cache;
 class StaffController extends Controller
 {
     use ApiTrait;
-
     public function create_role(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'role_name' => 'required',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $role = new Roles();
             $role->role_name = $request->role_name;
@@ -53,18 +50,15 @@ class StaffController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
     public function edit_role(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'edit_id' => 'required|exists:roles,id',
             'role_name' => 'required',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $role = Roles::find($request->edit_id);
             $role->role_name = $request->role_name;
@@ -112,11 +106,9 @@ class StaffController extends Controller
         $validator = Validator::make($request->all(), [
             'role_id' => 'required|exists:roles,id',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $role = Roles::where('id', $request->role_id)->delete();
             return $this->response([], "Role Deleted");
@@ -124,8 +116,6 @@ class StaffController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-
-
     public function view_roles(Request $request)
     {
         try {
@@ -134,7 +124,6 @@ class StaffController extends Controller
                 ->pluck('role_id');
             $roles = Roles::whereIn('id', $userHasRole)->get();
             $data = [];
-
             foreach ($roles as $value) {
                 $isEditable = !in_array($value->id, [4, 5, 6]);
                 $data[] = [
@@ -149,17 +138,14 @@ class StaffController extends Controller
             return $this->response([], "Invalid token.", false, 400);
         }
     }
-
     public function Get_Permission(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'role_id' => 'nullable',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $actions = Action::select('id', 'name')->get();
             $modules = Module::where('type', 2)->with(['Features' => function ($query) {
@@ -181,31 +167,26 @@ class StaffController extends Controller
                                 ->where('action_id', $action->id)
                                 ->exists();
                         }
-
                         $featureActions[] = [
                             'id' => $action->id,
                             'name' => $action->name,
                             'has_permission' => $hasPermission
                         ];
                     }
-
                     $feature->actions = $featureActions;
                 }
             }
-
             return $this->response($modules, "Permissions retrieved successfully.", true, 200);
         } catch (Exception $e) {
             return $e->getMessage();
             return $this->response([], "An error occurred.", false, 400);
         }
     }
-
     public function User_Get_Permission(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'nullable'
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
@@ -215,21 +196,16 @@ class StaffController extends Controller
                 $query->select('id', 'module_id', 'feature_name');
             }])->select('id', 'module_name')->where('status', 1)->get();
             $permissionsIds = collect();
-   
             if (empty($request->institute_id)) {
-   
                 $user = Auth::user();
                 $user_has_role = UserHasRole::where('role_id', $user->role_type)->first();
                 $permissionsIds = RoleHasPermission::where('user_has_role_id', $user_has_role->id)
                     ->get(['feature_id', 'action_id']);
    
                 } else {
-                
-   
                 $user = Auth::user();
                 $institute = Institute_detail::where('id', $request->institute_id)->first(); 
                 $temp_role_id = $user->role_type; 
-                // echo $user->id;echo $request->institute_id;exit;
                 $user_role_mapping=UserRoleMapping::where('user_id', $user->id)->where('institute_id', $request->institute_id)->first();
                 if(!is_null($user_role_mapping))
                 {
@@ -241,17 +217,12 @@ class StaffController extends Controller
             }
 
             foreach ($modules as $module) {
-                // echo "<pre>";print_r($module->Features);
                 foreach ($module->Features as $feature) {
                     $featureActions = [];
-
                     foreach ($actions as $action) {
-
                         $hasPermission = $permissionsIds->contains(function ($permission) use ($feature, $action) {
-                        //    echo $permission->action_id;echo "<br>";echo $action->id;
                             return $permission->feature_id == $feature->id && $permission->action_id == $action->id;
                         });
-
                         $featureActions[] = [
                             'id' => $action->id,
                             'name' => $action->name,
@@ -268,8 +239,6 @@ class StaffController extends Controller
             return $this->response([], "An error occurred.", false, 400);
         }
     }
-
-
     public function updateRolePermissions(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -279,15 +248,12 @@ class StaffController extends Controller
             'permissions.*.actions' => 'required|array',
             'permissions.*.actions.*' => 'exists:actions,id',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $roleId = $request->role_id;
             $user_has_role = UserHasRole::where('role_id', $roleId)->where('user_id', Auth::id())->first();
-
             DB::beginTransaction();
             DB::table('role_has_permissions')->where('user_has_role_id', $user_has_role->id)->delete();
             $permissions = [];
@@ -311,11 +277,6 @@ class StaffController extends Controller
             return $this->response([], "An error occurred while updating permissions.", false, 400);
         }
     }
-
-
-
-
-
     public function add_staff(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -329,7 +290,6 @@ class StaffController extends Controller
             'confirm_password' => 'required|string|same:password',
             'device_key' => 'nullable',
             'country_code' => 'required',
-            //'country_code_name' => 'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         $user = User::where('email', $request->email)->first();
@@ -350,12 +310,10 @@ class StaffController extends Controller
             $user->device_key = $request->device_key;
             $user->status = '1';
             $user->save();
-
             $staff = new Staff_detail_Model();
             $staff->institute_id = $request->institute_id;
             $staff->user_id = $user->id;
             $staff->save();
-
             $token = JWTAuth::fromUser($user);
             $user->token = $token;
             $user->save();
@@ -420,7 +378,6 @@ class StaffController extends Controller
         $validator = Validator::make($request->all(), [
             'staff_id' => 'required|exists:users,id',
         ]);
-
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }

@@ -20,9 +20,6 @@ class BannerController extends Controller
             ->whereNull('banner.deleted_at')
             ->where('banner.user_id', Auth::user()->id)
             ->paginate(10);
-    // echo "<pre>";print_r($banner_list);exit;
-        // $institute_list = Institute_detail::get();
-        // $banner_list = Banner_model::where('user_id', Auth::user()->id)->paginate(10);
         return view('banner/list', compact('banner_list', 'institute_list'));
     }
     public function create_banner()
@@ -64,9 +61,8 @@ class BannerController extends Controller
                 ]);
             }
         }
-     
         if (auth::user()->role_type == '1') {
-           
+
             foreach ($bannerImages as $imagePath) {
 
                 $banner_id = Banner_model::create([
@@ -74,10 +70,8 @@ class BannerController extends Controller
                     'banner_image' => $imagePath,
                     'status' => $request->input('status'),
                 ]);
-               
             }
         }
-
         return redirect()->route('banner.list')->with('success', 'Banner Created Successfully');
     }
     function edit_banner(Request $request)
@@ -88,13 +82,7 @@ class BannerController extends Controller
     }
     function update_banner(Request $request)
     {
-        // dd($request->all());exit;
         $role = Banner_model::find($request->banner_id);
-        // $request->validate([
-        //     'banner_image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-        //     'status' => 'required',
-        // ]);
-
         $iconFile = $request->file('banner_image');
         if (!empty($iconFile)) {
             $imagePath = $iconFile->store('banner_image', 'public');
@@ -111,13 +99,10 @@ class BannerController extends Controller
     function banner_delete(Request $request)
     {
         $banner_list = Banner_model::find($request->banner_id);
-
         if (!$banner_list) {
             return redirect()->route('banner.list')->with('error', 'banner not found');
         }
-
         $banner_list->delete();
-
         return redirect()->route('banner.list')->with('success', 'Banner deleted successfully');
     }
 }

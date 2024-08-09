@@ -34,18 +34,15 @@ class MediumController extends Controller
         ]);
         $iconFile = $request->file('icon');
         $imagePath = $iconFile->store('icon', 'public');
-
         Medium_model::create([
             'name' => $request->input('name'),
             'icon' => $imagePath,
             'status' => $request->input('status'),
         ]);
-
         return redirect()->route('medium.list')->with('success', 'Medium  Created Successfully');
     }
     function medium_list_edit(Request $request)
     {
-        // $id = $request->input('medium_id');
         $medium_list = Medium_model::find($request->medium_id);
         return response()->json(['medium_list' => $medium_list]);
     }

@@ -23,7 +23,6 @@ class RoleController extends Controller
                 Rule::unique('roles', 'role_name'),
             ],
         ]);
-
         Roles::create([
             'role_name' => $request->input('role_name'),
         ]);
@@ -53,7 +52,6 @@ class RoleController extends Controller
                 Rule::unique('roles', 'role_name')->ignore($id),
             ],
         ]);
-
         $role->update([
             'role_name' => $request->input('role_name'),
         ]);
@@ -63,13 +61,10 @@ class RoleController extends Controller
     {
         $id = $request->input('roleId');
         $role = Roles::find($id);
-
         if (!$role) {
             return redirect()->route('roles.list')->with('error', 'Role not found');
         }
-
         $role->delete();
-
         return redirect()->route('roles.list')->with('success', 'Role deleted successfully');
     }
 }

@@ -15,8 +15,7 @@ class PermissionController extends Controller
     }
     public function insert_permission(Request $request)
     {
-
-        $request->validate([
+       $request->validate([
             'role_id' => 'required|integer',
             'menu_id' => 'required|array',
             'add'     => 'nullable|array',
@@ -24,14 +23,11 @@ class PermissionController extends Controller
             'view'    => 'nullable|array',
             'delete'  => 'nullable|array',
         ]);
-
         // Loop through the submitted data and insert into the database
         $permissions = $request->input('permissions');
-
         if (!empty($permissions)) {
             foreach ($permissions as $menuId => $permission) {
                 $existingPermission = Permission::where(['role_id' => $request->role_id, 'menu_id' => $menuId])->first();
-
                 if ($existingPermission) {
                     // Update existing permission
                     $existingPermission->update([
