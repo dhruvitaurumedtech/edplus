@@ -51,14 +51,14 @@ class SubjectController extends Controller
             'status' => 'required',
             'subject' => 'required|array',
             'subject.*' => 'required',
-            'subject_image'=>'required',
-            'subject_image.*'=>'required|mimes:svg,jpeg,png,pdf|max:2048',
+            // 'subject_image'=>'required',
+            // 'subject_image.*'=>'required|mimes:svg,jpeg,png,pdf|max:2048',
 
         ],[
             'subject.*.required' => 'Subject name is required.',
-            'subject_image.*.required' => 'Subject image image is required.',
-            'subject_image.*.mimes' => 'Subject image image must be a valid SVG, JPEG, PNG, or PDF file.',
-            'subject_image.*.max' => 'Subject image image may not be greater than 2048 kilobytes in size.',
+            // 'subject_image.*.required' => 'Subject image image is required.',
+            // 'subject_image.*.mimes' => 'Subject image image must be a valid SVG, JPEG, PNG, or PDF file.',
+            // 'subject_image.*.max' => 'Subject image image may not be greater than 2048 kilobytes in size.',
         ]);
         $subquery = DB::table('subject')
             ->select(DB::raw(1))
@@ -90,22 +90,26 @@ class SubjectController extends Controller
 
             $subjects = $request->input('subject');
             $subject_images = $request->file('subject_image');
-            if ($subjects && $subject_images) {
+            if ($subjects) {
                 foreach ($subjects as $i => $subject) {
+                    $imagePath = null; // Default to null
+            
                     if (isset($subject_images[$i])) {
                         $subject_image = $subject_images[$i];
                         $name = $subject_image->getClientOriginalName();
                         $subject_image->move(public_path() . '/subject/', $name);
-                        Subject_model::create([
-                            'base_table_id' => $base_table_id,
-                            'name' => $subject,
-                            'image' => '/subject/' . $name,
-                            'status' => 'active',
-                            'created_by' => Auth::id(),
-                        ]);
-                    } else {
+                        $imagePath = '/subject/' . $name;
                     }
+            
+                    Subject_model::create([
+                        'base_table_id' => $base_table_id,
+                        'name' => $subject,
+                        'image' => $imagePath, 
+                        'status' => 'active',
+                        'created_by' => Auth::id(),
+                    ]);
                 }
+            
             }
         return redirect()->route('subject.list')->with('success', 'Subject Created Successfully');
         } else {

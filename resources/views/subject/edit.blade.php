@@ -135,12 +135,18 @@
                                 </div>
                                 <div class="col-md-4">
                                     <h3>Image:</h3>
-                                    <input type="hidden" name="old_subject_image[]" value="{{$subject_value['image']}}">
-                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange='openFile(event, "output{{ $subject_value["id"] }}")' value="{{$subject_value['image']}}">
+                                    <input type="hidden" name="old_subject_image[]" value="{{ !empty($subject_value['image']) ? $subject_value['image'] : asset('no-image.png') }}">
+                                    <input type="file" name="subject_image[]" class="form-control" placeholder="Select Subject Image" onchange="openFile(event, 'output{{ $subject_value['id'] }}')">
                                 </div>
-                                <div class="col-md-2"><img src="{{url($subject_value['image'])}}" id='output{{ $subject_value["id"] }}' class="subject-img-resize mt-4"></div>
                                 <div class="col-md-2">
-                                    <div class="f-icons"><a class="btn text-white btn-rmv2 delete" data-id="{{$subject_value['id']}}"><i class="fas fa-trash py-1"></i></a></div>
+                                    <img src="{{ !empty($subject_value['image']) ? $subject_value['image'] : asset('no-image.png') }}" id="output{{ $subject_value['id'] }}" class="subject-img-resize mt-4">
+                                </div>
+                                <div class="col-md-2">
+                                    <div class="f-icons">
+                                        <a class="btn text-white btn-rmv2 delete" data-id="{{ $subject_value['id'] }}">
+                                            <i class="fas fa-trash py-1"></i>
+                                        </a>
+                                    </div>
                                 </div>
                             </div>
                             @endforeach
