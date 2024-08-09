@@ -3733,7 +3733,7 @@ class InstituteApiController extends Controller
             ->pluck('name', 'id')->toArray();
             $subject_results = [];
             foreach ($subject_list as $sid => $sname) {
-            $subject_status = in_array($sid, explode(",",$selected_subject->batch_id)) ? 1 : 0;
+            $subject_status = in_array($sid, explode(",",$selected_subject->subject_id)) ? 1 : 0;
             $batch_list = Batches_model::where('institute_id', $request->institute_id)
             
              ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
