@@ -32,7 +32,7 @@
             <p> I acknowledge that I have reviewed the enrollment details and agree to the terms and conditions outlined by the institute."
             </p>
 
-            <p>Please Click Here to <a href="{{ url('/update-value/' . $id) }}" class="btn btn-success">"Verify"</a></p>
+            <b><p>Please Click Here to <a href="{{ url('/update-value/' . $id) }}" class="btn btn-success"><button>Verify</button></a></p></b>
             
             <br>
             <p>Thank you for your prompt attention to this matter. We look forward to welcoming {{$sname}} to our institute.</p>
@@ -45,8 +45,8 @@
             <p>{{$contact_no}}</p>
             <p>{{$website_link}}</p>
             @else
-            <p>Email : {{$email}}</p>
-            <p>Password : {{$password}}</p>
+            <p>Email : <b>{{$email}}</b></p>
+            <p>Password : <b>{{$password}}</b></p>
         @endif
         <br>
         <a href="https://play.google.com/store/apps/details?id=com.aurum.edwide">https://play.google.com/store/apps/details?id=com.aurum.edwide</a>

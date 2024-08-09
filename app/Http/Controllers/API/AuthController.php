@@ -91,7 +91,7 @@ class AuthController extends Controller
             $tomail = $ssoUser->user['email'];
             Mail::send('emails.welcomemailtogooglelogin', ['name'=>$firstname], function ($message) use ($tomail) {
                 $message->to($tomail);
-                $message->subject('Verification Code');
+                $message->subject('Welcome to Edwide');
               });
 
             return $this->login_res($user);
