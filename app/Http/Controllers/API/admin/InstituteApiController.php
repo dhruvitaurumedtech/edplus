@@ -5647,7 +5647,7 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function fetch_batches(Request $request){
+    public function selected_fetch_batches(Request $request){
         $validator = Validator::make($request->all(), [
             'batch_id' =>'required',
         ]);
@@ -5657,7 +5657,6 @@ class InstituteApiController extends Controller
         }
         try{
         $batch_list=Batches_model::where('id',$request->batch_id)->first();
-        // print_r(explode(',',$batch_list->subjects));exit;
         $subject_list=Subject_model::whereIn('id',explode(',',$batch_list->subjects))->get();
         $subject=[];
         foreach($subject_list as $value){
@@ -5666,8 +5665,8 @@ class InstituteApiController extends Controller
         $data = ['batch_id'=>$batch_list->id,'batch_name'=>$batch_list->batch_name,'subjects'=>$subject,'student_capacity'=>$batch_list->student_capacity]; 
         return $this->response($data, "Batch fetch successfully."); 
         } catch (Exception $e) {
-                return $this->response($e, "Something went wrong.", false, 400);
-            }
+              return $this->response($e, "Something went wrong.", false, 400);
+        }
     }
 
     //create batch
@@ -5738,28 +5737,26 @@ class InstituteApiController extends Controller
 
     public function batch_list(Request $request)
     {
+       
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
-            'board_id' => 'required',
-            'standard_id' => 'required',
-            //'medium_id' => 'required',
-        ]);
+            'institute_id' => 'required|exists:institute_detail,id',
+            'board_id' => 'required|exists:board,id',
+            'medium_id' => 'required|exists:medium,id',
+            'standard_id' => 'required|exists:standard,id',
 
+        ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
-        try {
-            // $batchlist = Batches_model::where([
-            //     ['user_id', Auth::id()],
-            //     ['institute_id', $request->institute_id],
-            //     ['board_id', $request->board_id],
-            //     ['medium_id', $request->medium_id],
-            //     ['standard_id', $request->standard_id]
-            // ])->get(['id', 'batch_name'])->toArray();
+           $batchlist = Batches_model::where([
+                ['user_id', Auth::id()],
+                ['institute_id', $request->institute_id],
+                ['board_id', $request->board_id],
+                ['medium_id', $request->medium_id],
+                ['standard_id', $request->standard_id]
+            ])->get(['id', 'batch_name'])->toArray();
             $batchlistQuery = Batches_model::
-                // where('user_id', Auth::id())->
-                where('institute_id', $request->institute_id)
+                 where('institute_id', $request->institute_id)
                 ->where('board_id', $request->board_id)
                 ->where('standard_id', $request->standard_id);
 
@@ -5768,13 +5765,92 @@ class InstituteApiController extends Controller
             }
 
             $batchlist = $batchlistQuery->get(['id', 'batch_name'])->toArray();
-
-
+            $allOption = [
+                'id' => null,
+                'batch_name' => 'All'
+            ];
+            
+            $batchlist = array_merge([$allOption], $batchlist);
             return $this->response($batchlist, "Batch Fetch Successfully");
-        } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
-        }
+      
     }
+    public function batch_list_get_subject(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|exists:institute_detail,id',
+            // 'board_id' => 'required|exists:board,id',
+            // 'medium_id' => 'required|exists:medium,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $institute_id = $request->institute_id;
+            if(empty($request->batch_id)){
+
+            if (empty($institute_id)) {
+                $user_id = Auth::id();
+                $institute_id = Institute_detail::where('user_id', $user_id)->first();
+            }
+            // Institute_detail::where();
+            $standard_list = DB::table('standard_sub')
+                ->join('standard', 'standard_sub.standard_id', '=', 'standard.id')
+                ->select('standard.*')
+                //->where('standard_sub.user_id', $user_id)
+                ->where('standard_sub.institute_id', $institute_id)
+                ->where('standard_sub.board_id',  $request->board_id)
+                ->where('standard_sub.medium_id', $request->medium_id)
+                ->where('standard_sub.standard_id', $request->standard_id)
+                ->orderByRaw('CAST(standard.name AS UNSIGNED), standard.name')
+                ->get();
+            // print_r($standard_list);exit;    
+
+            $standard_array = [];
+            foreach ($standard_list as $standard_value) {
+
+                $getbsiqy = Base_table::where('board',  $request->board_id)
+                    ->where('medium', $request->medium_id)
+                    ->where('standard', $standard_value->id)
+                    ->pluck('id')
+                    ->toArray();
+                // print_r($getbsiqy);exit;
+                $subject_list = DB::table('subject_sub')
+                    ->join('subject', 'subject_sub.subject_id', '=', 'subject.id')
+                    ->select('subject.*')
+                    //->where('subject_sub.user_id', $user_id)
+                    ->where('subject_sub.institute_id', $institute_id)
+                    ->whereIN('subject.base_table_id', $getbsiqy)
+                    ->get();
+
+                $subject_array = [];
+                foreach ($subject_list as $subject_value) {
+                    $subject_array[] = [
+                        'id' => $subject_value->id,
+                        'subject_name' => $subject_value->name,
+                        'image' => !empty($subject_value->image) ? asset($subject_value->image) : '',
+                    ];
+                }
+            }
+            
+          }else{
+                // print_r($subject_array);
+
+                //batch list
+                $batchlist = Batches_model::where('id', $request->batch_id)->first();
+                $subids = explode(",", $batchlist->subjects);
+                $batSubQY = Subject_model::whereIN('id', $subids)->get();
+                $subject_array = [];
+                foreach ($batSubQY as $batDt) {
+                    $subject_array[] = array('id' => $batDt->id, 'subject_name' => $batDt->name,'image' => !empty($batDt->image) ? asset($batDt->image) : '');
+                }
+               }
+                $standard_array[] = [
+                    'subject' => $subject_array,
+                ];
+            return $this->response($standard_array, "Data Fetch Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+        }
 
 
     // public function batch_list(Request $request)
@@ -5830,6 +5906,7 @@ class InstituteApiController extends Controller
     //         ]);
     //     }
     // }
+    
 
 
     public function subjectList(Request $request)
