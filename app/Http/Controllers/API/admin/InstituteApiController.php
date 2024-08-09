@@ -5647,7 +5647,7 @@ class InstituteApiController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
-    public function fetch_batches(Request $request){
+    public function selected_fetch_batches(Request $request){
         $validator = Validator::make($request->all(), [
             'batch_id' =>'required',
         ]);
