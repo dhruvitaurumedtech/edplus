@@ -46,6 +46,7 @@ use Illuminate\Support\Facades\Mail;
 use App\Mail\WelcomeMail;
 use App\Models\Attendance_model;
 use App\Models\Batch_assign_teacher_model;
+use App\Models\Home_work_model;
 use App\Models\Parents;
 use App\Models\Remainder_model;
 use App\Models\RoleHasPermission;
@@ -53,6 +54,7 @@ use App\Models\Staff_detail_Model;
 use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\Timetable;
+use App\Models\Timetables;
 use App\Models\UserHasRole;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -305,7 +307,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -766,7 +768,7 @@ class InstituteApiController extends Controller
             return $this->response($data, "institute create Successfully");
         } catch (Exception $e) {
             DB::rollback();
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function update_institute(Request $request)
@@ -2013,7 +2015,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -2223,7 +2225,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -2353,7 +2355,7 @@ class InstituteApiController extends Controller
             ];
             return $this->response($response, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -2459,7 +2461,7 @@ class InstituteApiController extends Controller
 
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -2556,7 +2558,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($standard_array, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -2588,7 +2590,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "student not found.", false, 400);
             }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -2640,7 +2642,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -2670,7 +2672,7 @@ class InstituteApiController extends Controller
             }
             return $this->response([], "Successfully Reject Request.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
     public function get_accept_request_convert(Request $request){
@@ -2684,7 +2686,7 @@ class InstituteApiController extends Controller
            
             return $this->response([], "Successfully Request Convert.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -2738,7 +2740,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -2846,7 +2848,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -2927,7 +2929,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "Successfully Fetch data.");
             }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -3029,7 +3031,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -3183,7 +3185,7 @@ class InstituteApiController extends Controller
     //         return $this->response([], "Banner created Successfully");
     //     } catch (Exception $e) {
     //         DB::rollback();
-    //         return $this->response($e, "Invalid token.", false, 400);
+    //         return $this->response($e, "Something went wrong.", false, 400);
     //     }
     // }
     public function student_fees_calculation(Request $request)
@@ -3798,7 +3800,7 @@ class InstituteApiController extends Controller
 
             return $this->response($alldata, 'Successfully fetch Data.');
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
     //student list for add exam marks
@@ -3884,7 +3886,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -4034,7 +4036,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -4076,7 +4078,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "Exam not found.", false, 400);
             }
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -4115,7 +4117,7 @@ class InstituteApiController extends Controller
             }
             return $this->response([], "Mark Added!!");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -4185,7 +4187,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //             'data' => []
     //         ]);
     //     }
@@ -4427,7 +4429,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -4560,7 +4562,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -4690,7 +4692,7 @@ class InstituteApiController extends Controller
             $user->delete();
             return $this->response([], "Delete Account Successfully!");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -4716,7 +4718,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -4747,7 +4749,7 @@ class InstituteApiController extends Controller
 
             return $this->response($rolesDT, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -4801,7 +4803,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ], 400);
     //     }
     // }
@@ -4860,7 +4862,7 @@ class InstituteApiController extends Controller
                 'batch_name' => $stdDT->batch_name,
             ]), "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -4972,7 +4974,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5041,7 +5043,7 @@ class InstituteApiController extends Controller
 
             return $this->response($boardArray, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -5152,7 +5154,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5245,7 +5247,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($institute_response, "Institute Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -5343,7 +5345,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5441,7 +5443,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5502,7 +5504,7 @@ class InstituteApiController extends Controller
             $institutedt->save();
             return $this->response([], "Institute Update Successfully!.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -5557,7 +5559,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5576,7 +5578,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($cat_array, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -5612,7 +5614,7 @@ class InstituteApiController extends Controller
             $batch->save();
             return $this->response([], "Batch Added Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function edit_batch(Request $request){
@@ -5644,8 +5646,50 @@ class InstituteApiController extends Controller
                 return $this->response([], "Batch not found.", false, 400);
             }
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
+    }
+    public function delete_batch(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'batch_id' =>'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $attendance=Attendance_model::where('institute_id',$request->institute_id)->where('batch_id',$request->batch_id)->whereNull('deleted_at')->count();
+            if($attendance > 0){
+                return $this->response([], "Already batch assign student.", false, 400);
+            }
+            $batch=Home_work_model::where('batch_id',$request->batch_id)->whereNull('deleted_at')->count();
+            if($batch > 0){
+                return $this->response([], "Already batch assign homework.", false, 400);
+            }
+            $student_detail=Student_detail::where('institute_id',$request->institute_id)->where('batch_id',$request->batch_id)->whereNull('deleted_at')->count();
+            if($student_detail > 0){
+                return $this->response([], "Already batch assign student.", false, 400);
+            }
+            $teacher_detail=Teacher_model::where('institute_id',$request->institute_id)->whereRaw('FIND_IN_SET(?, batch_id) > 0', [$request->batch_id])->whereNull('deleted_at')->count();
+            if($teacher_detail > 0){
+                return $this->response([], "Already batch assign teacher.", false, 400);
+            }
+            $timetable=Timetables::where('batch_id',$request->batch_id)->whereNull('deleted_at')->count();
+            if($timetable > 0){
+                return $this->response([], "Already batch assign timetable.", false, 400);
+            }
+            $batch_model=Batches_model::where('institute_id',$request->institute_id)->where('id',$request->batch_id)->whereNull('deleted_at');
+            if(!$batch_model){
+              return $this->response([], "Batch not found..", false, 400);
+            }
+            $batch_model->delete();
+            return $this->response([], "Batch delete successfully.");
+
+
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong.", false, 400);
+        }
+
     }
     public function selected_fetch_batches(Request $request){
         $validator = Validator::make($request->all(), [
@@ -5729,7 +5773,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5848,7 +5892,7 @@ class InstituteApiController extends Controller
                 ];
             return $this->response($standard_array, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
         }
 
@@ -5902,7 +5946,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -5997,7 +6041,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -6030,7 +6074,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($allsub_response, "Data Fetch Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -6088,7 +6132,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -6151,7 +6195,7 @@ class InstituteApiController extends Controller
            
             return $this->response([], "Updated Successfully");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -6212,7 +6256,7 @@ class InstituteApiController extends Controller
     //     } else {
     //         return response()->json([
     //             'status' => 400,
-    //             'message' => 'Invalid token.',
+    //             'message' => 'Something went wrong.',
     //         ]);
     //     }
     // }
@@ -6229,7 +6273,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "No data found.");
             }
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     // public function approve_teacher(Request $request)
@@ -6347,7 +6391,7 @@ class InstituteApiController extends Controller
     //         }
     //         return $this->response([], "Teacher Assign successfully");
     //     } catch (\Exception $e) {
-    //         return $this->response($e, "Invalid token.", false, 400);
+    //         return $this->response($e, "Something went wrong.", false, 400);
     //     }
     // }
     
@@ -6466,7 +6510,7 @@ class InstituteApiController extends Controller
             }
             return $this->response([], "Teacher Add successfully");
         } catch (\Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -6529,7 +6573,7 @@ class InstituteApiController extends Controller
 
             return $this->response($response, "Data Fetch Successfully");
         } catch (\Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -6595,7 +6639,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "Class saved successfully:");
             }
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function view_classRoom(Request $request)
@@ -6627,7 +6671,7 @@ class InstituteApiController extends Controller
             $exam  = Class_room_model::where('id', $request->class_id)->delete();
             return $this->response([], "Successfully Deleted Classroom.");
         } catch (Exception $e) {
-            return $this->response([], "Invalid token.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
     function create_remainder(Request $request)
@@ -6655,7 +6699,7 @@ class InstituteApiController extends Controller
             ]);
             return $this->response([], "Remainder set successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -6683,7 +6727,7 @@ class InstituteApiController extends Controller
             ]);
             return $this->response([], "Greeting set successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function test(Request $request)
@@ -6783,7 +6827,7 @@ class InstituteApiController extends Controller
             }
             return $this->response($data, "Fetch successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     public function user_list(Request $request)
@@ -6887,7 +6931,7 @@ class InstituteApiController extends Controller
 
             return $this->response($response, "Fetch successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
 
         // print_r($users);
@@ -6909,7 +6953,7 @@ class InstituteApiController extends Controller
                            
            return $this->response($role_list, "Fetch successfully.");
         } catch (Exception $e) {
-            return $this->response($e, "Invalid token.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     function testing(Request $request){
