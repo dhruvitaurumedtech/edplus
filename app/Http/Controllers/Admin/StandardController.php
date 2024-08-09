@@ -14,12 +14,6 @@ class StandardController extends Controller
     function list_standard()
     {
         $standardlist = Standard_model::paginate(10);
-        // $standardlist =DB::table('standard')
-        //     ->join('class', 'standard.class_id', '=', 'class.id')
-        //     ->select('standard.*', 'class.name as class_name')
-        //     ->whereNull('standard.deleted_at')
-        //     ->paginate(10);
-        // $class_list = Class_model::get()->toArray();
         return view('standard.list', compact('standardlist'));
     }
     function create_standard()
@@ -33,12 +27,10 @@ class StandardController extends Controller
             'name' => ['required', 'string', 'max:255', Rule::unique('standard', 'name')],
             'status' => 'required',
         ]);
-
         Standard_model::create([
             'name' => $request->input('name'),
             'status' => $request->input('status'),
         ]);
-
         return redirect()->route('standard.create')->with('success', 'Standard Created Successfully');
     }
     function standard_list_edit(Request $request)
@@ -67,13 +59,10 @@ class StandardController extends Controller
     {
         $standard_id = $request->input('standard_id');
         $standard_list = Standard_model::find($standard_id);
-
         if (!$standard_list) {
             return redirect()->route('standard.list')->with('error', 'Standard not found');
         }
-
         $standard_list->delete();
-
         return redirect()->route('standard.list')->with('success', 'Standard deleted successfully');
     }
 }

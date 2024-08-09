@@ -25,11 +25,7 @@ class ChapterController extends Controller
                 'base_table.id as base_id'
             )
             ->where('standard.status', 'active')->get();
-
-
-
         $subjects = Subject_model::get();
-
         return view('chapter.create', compact('Standard', 'subjects'));
     }
     public function chapter_list(Request $request)
@@ -48,13 +44,7 @@ class ChapterController extends Controller
                 'base_table.id as base_id',
             )
             ->paginate(10);
-            // print_r($Standards);exit;
-
-
-
-
         $subjects = Subject_model::get();
-
         return view('chapter.list', compact('Standards', 'subjects'));
     }
     //strandard wise data
@@ -64,7 +54,6 @@ class ChapterController extends Controller
         $subject = Subject_model::where('base_table_id', $bas_id)->get();
         return response()->json(['subject' => $subject]);
     }
-
     //chapter_save
     public function chapter_save(Request $request)
     {
@@ -84,7 +73,6 @@ class ChapterController extends Controller
             'chapter_image.*.mimes' => 'Chapter image must be a valid SVG, JPEG, PNG, or PDF file.',
             'chapter_image.*.max' => 'Chapter image may not be greater than 2048 kilobytes in size.',
         ]);
-
         $exists = Chapter::where('subject_id', $request->input('subject'))
             ->where('base_table_id', $request->input('standard_id'))
             ->where('chapter_name', $request->input('chapter_name'))
@@ -96,7 +84,6 @@ class ChapterController extends Controller
             foreach ($request->chapter_name as $i => $chapterName) {
                 $chapter_imageFile = $request->file('chapter_image')[$i];
                 $imagePath = $chapter_imageFile->store('chapter', 'public');
-
                 $base_table = Chapter::create([
                     'subject_id' => $request->input('subject'),
                     'base_table_id' => $request->input('standard_id'),
@@ -109,7 +96,6 @@ class ChapterController extends Controller
             return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
         }
     }
-
     //chapter_lists
     public function chapter_lists(Request $request)
     {
@@ -118,7 +104,7 @@ class ChapterController extends Controller
 
         $chapters = Chapter::where('subject_id', $subject_id)
             ->where('base_table_id', $base_id)->get();
-            
+
         return response()->json(['chapters' => $chapters]);
     }
     function chapter_edit(Request $request, $id)
@@ -142,7 +128,7 @@ class ChapterController extends Controller
             )
             ->where('standard.status', 'active')
             ->where('chapters.id', $id)->get();
-            // echo "<pre>";print_r($Standard);exit;
+        // echo "<pre>";print_r($Standard);exit;
         $Standard_list = Standard_model::join('base_table', 'standard.id', '=', 'base_table.standard')
 
             ->leftjoin('stream', 'stream.id', '=', 'base_table.stream')
@@ -157,14 +143,11 @@ class ChapterController extends Controller
             )
             ->where('standard.status', 'active')
             ->get();
-            // echo "<pre>";print_r($Standard);
-            // echo "<pre>";print_r($Standard_list);exit;
         $subject = Subject_model::get();
         return view('chapter.edit', compact('Standard', 'subject', 'Standard_list'));
     }
     public function chapter_update(Request $request)
     {
-        // echo "<pre>";print_r($request->all());exit;
         $request->validate([
             'standard_id' => 'required',
             'subject' => 'required',
@@ -192,7 +175,7 @@ class ChapterController extends Controller
             }
             return redirect()->route('chapter.list')->with('success', 'Already Exists!');
         } else {
-            
+
             foreach ($request->chapter_name as $i => $chapterName) {
                 $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
@@ -208,20 +191,16 @@ class ChapterController extends Controller
                 $chapter->save();
             }
         }
-
         return redirect()->route('chapter.list')->with('success', 'Chapters Updated Successfully');
     }
     function chapter_delete(Request $request)
     {
         $chapter_id = $request->input('id');
         $class_list = Chapter::where('id', $chapter_id);
-       
         if (!$class_list) {
             return redirect()->route('chapter.list')->with('error', 'Chapters not found');
         }
-
         $class_list->delete();
-
         return redirect()->route('chapter.list')->with('success', 'Chapters deleted successfully');
     }
 }
