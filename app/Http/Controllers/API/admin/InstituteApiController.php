@@ -3741,7 +3741,7 @@ class InstituteApiController extends Controller
             ->toArray();
             $all_batches_results = [];
             foreach ($batch_list as $id => $name) {
-            $tdl = Student_detail::where('subject_id',$sid)
+            $tdl = Student_detail::where('subject_id', 'LIKE', "%$sid%")
             ->where('institute_id',$request->institute_id)
             ->where('student_id',$request->student_id)->first();
             $btchesids = explode(",",!empty($tdl->batch_id)?$tdl->batch_id:'');
