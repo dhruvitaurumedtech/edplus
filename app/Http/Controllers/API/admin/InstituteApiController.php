@@ -7131,22 +7131,22 @@ class InstituteApiController extends Controller
                 $batch_table_ids = array_merge($batch_table_ids, $total_batch_ids);
                 }
 
-            $base_table_ids = array_unique($base_table_ids);
-            $selected_subject_ids = array_map('intval', array_unique($selected_subject_ids));
-            $selected_batch_ids = array_map('intval', array_unique($selected_batch_ids));
-            $batch_table_ids = array_unique($batch_table_ids);
+                $base_table_ids = array_unique($base_table_ids);
+                $selected_subject_ids = array_map('intval', array_unique($selected_subject_ids));
+                $selected_batch_ids = array_map('intval', array_unique($selected_batch_ids));
+                $batch_table_ids = array_unique($batch_table_ids);
 
-            $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('name', 'id')->toArray();
-            $subject_results = [];
-            foreach ($subject_list as $sid => $sname) {
-            $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
-            $batch_list = Batches_model::where('institute_id', $request->institute_id)
+                $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('name', 'id')->toArray();
+                $subject_results = [];
+                foreach ($subject_list as $sid => $sname) {
+                $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
+                $batch_list = Batches_model::where('institute_id', $request->institute_id)
                 
                  ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
                 ->pluck('batch_name', 'id')
                 ->toArray();
-            $all_batches_results = [];
-            foreach ($batch_list as $id => $name) {
+             $all_batches_results = [];
+                foreach ($batch_list as $id => $name) {
                 $tdl = Teacher_model::where('subject_id',$sid)
                 ->where('institute_id',$request->institute_id)
                 ->where('teacher_id',$request->teacher_id)->first();
@@ -7159,6 +7159,68 @@ class InstituteApiController extends Controller
                    'status' => in_array($id,$btchesids) ? 1 : 0,
                 ];
             }
+
+            
+                //$subject_batches = $subject_status ? array_values($all_batches_results) : [];
+                $subject_batches = array_values($all_batches_results);
+                $subject_results[] = [
+                    'subject_id' => $sid,
+                    'subject_name' => $sname,
+                    'status' => $subject_status,
+                    'batches' => $subject_batches,
+                ];
+            }
+                
+                $response = ['subject_list'=>$subject_results];
+                
+                return $this->response($response, "Fetch data successfully.");
+        }
+
+        //student data
+        if(!empty($request->student_id)){
+            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+            ->where('student_id', $request->student_id)
+            ->first();
+       
+            $base_table_ids = [];
+            $selected_subject_ids = [];
+            $selected_batch_ids = [];
+            $batch_table_ids = [];
+
+            $ids = Base_table::where('board', $selected_subject->board_id)
+                ->where('medium', $selected_subject->medium_id)
+                ->where('standard', $selected_subject->standard_id)
+                ->pluck('id')
+                ->toArray();
+
+            $base_table_ids = $ids;
+
+            $subject_list = Subject_model::whereIn('base_table_id', $ids)
+            ->pluck('name', 'id')->toArray();
+            $subject_results = [];
+            foreach ($subject_list as $sid => $sname) {
+            $subject_status = in_array($sid, explode(",",$selected_subject->batch_id)) ? 1 : 0;
+            $batch_list = Batches_model::where('institute_id', $request->institute_id)
+            
+             ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
+            ->pluck('batch_name', 'id')
+            ->toArray();
+            $all_batches_results = [];
+            foreach ($batch_list as $id => $name) {
+            $tdl = Student_detail::where('subject_id',$sid)
+            ->where('institute_id',$request->institute_id)
+            ->where('student_id',$request->student_id)->first();
+            $btchesids = explode(",",!empty($tdl->batch_id)?$tdl->batch_id:'');
+            
+            $all_batches_results[$id] = [
+                'batch_id' => $id,
+                'batch_name' => $name,
+                //'status' => in_array($id, $selected_batch_ids) ? 1 : 0,
+               'status' => in_array($id,$btchesids) ? 1 : 0,
+            ];
+            }
+
+        
             //$subject_batches = $subject_status ? array_values($all_batches_results) : [];
             $subject_batches = array_values($all_batches_results);
             $subject_results[] = [
@@ -7172,65 +7234,62 @@ class InstituteApiController extends Controller
             $response = ['subject_list'=>$subject_results];
             
             return $this->response($response, "Fetch data successfully.");
-        }
+    }
 
         //stduent fetch_code
-        if(!empty($request->student_id)){
-            $selected_subject = Student_detail::where('institute_id', $request->institute_id)
-            ->where('student_id', $request->student_id)
-            ->first();
+    // if(!empty($request->student_id)){
+    //         $selected_subject = Student_detail::where('institute_id', $request->institute_id)
+    //         ->where('student_id', $request->student_id)
+    //         ->first();
            
-           $base_table_id=Base_table::where('board', $selected_subject->board_id)
-            ->where('medium', $selected_subject->medium_id)
-            ->where('standard', $selected_subject->standard_id)
-            ->pluck('id');
+    //        $base_table_id=Base_table::where('board', $selected_subject->board_id)
+    //         ->where('medium', $selected_subject->medium_id)
+    //         ->where('standard', $selected_subject->standard_id)
+    //         ->pluck('id');
             
-            $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
+    //         $subjects = Subject_model::where('base_table_id', $base_table_id)->get();
             
      
-           $result = $subjects->map(function ($subject) use ($selected_subject) {
-                $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
-                return $subject;
-            });
+    //        $result = $subjects->map(function ($subject) use ($selected_subject) {
+    //             $subject->status = $selected_subject && in_array($subject->id, explode(',', $selected_subject->subject_id)) ? 1 : 0;
+    //             return $subject;
+    //         });
 
-        $subjectArray = $result->toArray();
-        // print_r($subjectArray);exit;
-        foreach($subjectArray as $subjectArray_value){
-            $subjectId = $subjectArray_value['id'];
-            $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
-            ->where('board_id', $selected_subject->board_id)
-            ->where('medium_id', $selected_subject->medium_id)
-            ->where('standard_id', $selected_subject->standard_id)
-            // ->where(function ($query) use ($subjectId) {
-            //     $query->where('subjects', 'LIKE', "%$subjectId%");
-            // })
-            ->get();
+    //     $subjectArray = $result->toArray();
+        
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
+    //         ->where('board_id', $selected_subject->board_id)
+    //         ->where('medium_id', $selected_subject->medium_id)
+    //         ->where('standard_id', $selected_subject->standard_id)
+    //         ->get();
           
-             $batch_id=$selected_subject->batch_id;
-            $result2 = $total_batch->map(function ($item2) use ($batch_id) {
-            $isMatched = $batch_id && $batch_id == $item2->id;
-            $item2->status = $isMatched ? 1 : 0;
-            return $item2;
-            });
-            $batchArray = $result2->toArray();                
+    //         $batch_id=$selected_subject->batch_id;
+    //         $result2 = $total_batch->map(function ($item2) use ($batch_id) {
+    //         $isMatched = $batch_id && $batch_id == $item2->id;
+    //         $item2->status = $isMatched ? 1 : 0;
+    //         return $item2;
+    //         });
+    //         $batchArray = $result2->toArray();                
 
-        }
+    //     }
 
-        $response_one=[];
-        $response_two=[];
-        foreach($batchArray as $batchArray_value){
-            $response_two[] = ['batch_id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
-        }
-        foreach($subjectArray as $subjectArray_value){
-            $response_one[] = ['subject_id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
-                               'batches'=>$response_two];
-        }
-         $response = ['subject_list'=>$response_one];
+    //     $response_one=[];
+    //     $response_two=[];
+    //     foreach($batchArray as $batchArray_value){
+    //         $response_two[] = ['batch_id'=>$batchArray_value['id'],'batch_name'=>$batchArray_value['batch_name'],'status'=>$batchArray_value['status']];
+    //     }
+    //     foreach($subjectArray as $subjectArray_value){
+    //         $response_one[] = ['subject_id'=>$subjectArray_value['id'],'subject_name'=>$subjectArray_value['name'],'status'=>$subjectArray_value['status'],
+    //                            'batches'=>$response_two];
+    //     }
+    //      $response = ['subject_list'=>$response_one];
 
                     
-        return $this->response($response, "Fetch data successfully.");
-                    }
+    //     return $this->response($response, "Fetch data successfully.");
+    // }
         }catch(Exception $e){
+            return $e;
             return $this->response($e, "Something went wrong.", false, 400);
 
         }
