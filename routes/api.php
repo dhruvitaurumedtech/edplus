@@ -94,6 +94,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/edit-batch', [InstituteApiController::class, 'edit_batch'])->middleware('check.permission:8,2');
     Route::post('/institute/pdfAssign', [PdfController::class, 'pdfAssign'])->middleware('check.permission:10,1');
     Route::post('/institute/fetch-batch', [InstituteApiController::class, 'batch_list'])->middleware('check.permission:8,4');
+    Route::post('/institute/fetch-batch-get-subject', [InstituteApiController::class, 'batch_list_get_subject'])->middleware('check.permission:8,4');
     // ->middleware('check.permission:8,4');
     Route::post('/institute/student_list', [StudentController::class, 'student_list'])->middleware('check.permission:5,4');
     Route::post('/institute/institute-profile', [InstituteApiController::class, 'institute_profile']);
