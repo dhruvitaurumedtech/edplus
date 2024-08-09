@@ -5825,7 +5825,7 @@ class InstituteApiController extends Controller
                 foreach ($subject_list as $subject_value) {
                     $subject_array[] = [
                         'id' => $subject_value->id,
-                        'subject_value' => $subject_value->name,
+                        'subject_name' => $subject_value->name,
                         'image' => !empty($subject_value->image) ? asset($subject_value->image) : '',
                     ];
                 }
@@ -7152,10 +7152,13 @@ class InstituteApiController extends Controller
         $subjectArray = $result->toArray();
         
         foreach($subjectArray as $subjectArray_value){
+            
             $total_batch = Batches_model::where('institute_id', $selected_subject->institute_id)
             ->where('board_id', $selected_subject->board_id)
             ->where('medium_id', $selected_subject->medium_id)
             ->where('standard_id', $selected_subject->standard_id)
+            
+            // ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$subjectArray_value->subject_id])
             ->get();
           
              $batch_id=$selected_subject->batch_id;
