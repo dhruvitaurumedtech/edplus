@@ -74,7 +74,6 @@ class TeacherController extends Controller
                     $query->where('unique_id', 'like', '%' . $search_keyword . '%')
                         ->orWhere('institute_name', 'like', '%' . $search_keyword . '%');
                 })->paginate($perPage);
-                // echo "<pre>";print_r($allinstitute);exit;
             $search_list = [];
             foreach ($allinstitute as $value) {
                 $search_list[] = array(
@@ -107,13 +106,6 @@ class TeacherController extends Controller
             }
 
             //requested institute
-            // $requestnstitute = Teacher_model::join('institute_detail', 'institute_detail.id', '=', 'teacher_detail.institute_id')
-            //     ->where('teacher_detail.status', '!=', '1')
-            //     ->where('teacher_detail.teacher_id', $teacher_id)
-            //     ->select('institute_detail.*', 'teacher_detail.status as sstatus', 'teacher_detail.id')
-            //     ->groupBy('teacher_detail.institute_id', 'teacher_detail.teacher_id')
-            //     ->paginate($perPage);
-
                 $subQuery = DB::table('teacher_detail')
                 ->select('institute_id', 'teacher_id', DB::raw('MAX(id) as max_id'))
                 ->where('status', '!=', '1')
@@ -147,16 +139,11 @@ class TeacherController extends Controller
             ->whereNull('deleted_at')->pluck('institute_id');
             
             $joininstitute = Institute_detail::where('status', 'active')
-                //->where('end_academic_year', '>=', $date)
                 ->whereDate('end_academic_year', '>=', $date)
                 ->whereNull('deleted_at')
                 ->whereIN('id',$teachrdt)
                 ->paginate($perPage);
 
-            
-            // echo "<pre>";
-            // print_r($joininstitute);
-            // exit; // ->where('end_academic_year', '>=', now())
             $join_with = [];
             foreach ($joininstitute as $value) {
                 $join_with[] = array(
@@ -176,20 +163,6 @@ class TeacherController extends Controller
                     'announcement' => !empty($value['announcement']) ? $value['announcement'] : '',
                 ];
             }
-
-
-            // $parentsdt = Parents::where('student_id', $user_id)->get();
-
-            // $veryfy = [];
-            // foreach ($parentsdt as $checkvery) {
-            //     $veryfy[] = array('relation' => $checkvery->relation, 'verify' => $checkvery->verify);
-            // }
-            // if ($parentsdt->isEmpty()) {
-
-            //     $studentparents = '0';
-            // } else {
-            //     $studentparents = '1';
-            // }
             $final_repsonse = [
                 'banner' => $banners_data,
                 'search_list' => $search_list,
@@ -218,7 +191,6 @@ class TeacherController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
             $teacher = Teacher_model::where('teacher_id', $request->teacher_id)->where('institute_id', $request->institute_id)->where('status', '0')->get()->toarray();
             if (empty($teacher)) {
@@ -236,7 +208,6 @@ class TeacherController extends Controller
         }
     }
 
-
     public function add_teacher(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -249,7 +220,6 @@ class TeacherController extends Controller
             'board_id' => 'required',
             'medium_id' => 'required',
             'standard_id' => 'required',
-            // 'stream_id' => 'required',
             'subject_id' => 'required',
             'teacher_id' => 'required',
             'country_code' =>'required',
@@ -284,39 +254,6 @@ class TeacherController extends Controller
             }
             $subject = Subject_model::whereIn('id', explode(',', $request->subject_id))->pluck('base_table_id');
 
-            //foreach ($subject as $value) {
-                // $batch_list = Batches_model::whereRaw("FIND_IN_SET($value->id, subjects)")
-                //     ->select('*')->get()->toarray();
-
-                // foreach ($batch_list as $values_batch) {
-
-                //     Batch_assign_teacher_model::create([
-                //         'teacher_id' => $request->teacher_id,
-                //         'batch_id' => $values_batch['id'],
-                //     ]);
-                // }
-                // $base_table_response = Base_table::where('id', $value->base_table_id)->get()->toarray();
-                // foreach ($base_table_response as $value2) {
-                //     $subject=Subject_model::where('base_table_id',$value2['id'])->get();
-                //     $subject_implode=[];
-                //     foreach($subject as $value){
-                //         $subject_implode[]=$value->id;  
-                //     }
-                //     $subject_id = implode(',',$subject_implode);
-                //     // echo "<pre>";print_r($subject_name);exit;
-                //     Teacher_model::create([
-                //         'institute_id' => $request->institute_id,
-                //         'teacher_id' => $request->teacher_id,
-                //         'institute_for_id' => $value2['institute_for'],
-                //         'board_id' => $value2['board'],
-                //         'medium_id' => $value2['medium'],
-                //         'class_id' => $value2['institute_for_class'],
-                //         'standard_id' => $value2['standard'],
-                //         'stream_id' => $value2['stream'],
-                //         'subject_id' => $subject_id,
-                //         'status' => '0',
-                //     ]);
-                // }
                 
                 $base_table_response = Base_table::whereIN('id', $subject)->get()->toArray();
                     foreach ($base_table_response as $value2) {
@@ -423,9 +360,6 @@ class TeacherController extends Controller
                 'website_link','instagram_link','facebook_link','whatsaap_link','youtube_link')
                 ->first();
 
-            // $boards = board::join('board_sub', 'board_sub.board_id', '=', 'board.id')
-            //     ->where('board_sub.institute_id', $request->institute_id)
-            //     ->select('board.name')->get();
             $institute_id = $request->institute_id;
             $uniqueBoardIds = Institute_board_sub::where('institute_id', $institute_id)
                 ->distinct()
@@ -461,28 +395,6 @@ class TeacherController extends Controller
                 ];
             }
 
-            //feedbacks
-            // $feedback_list = FeedbackModel::select(
-            //     'feedbacks.id as feedback_id',
-            //     'feedbacks.feedback',
-            //     'feedbacks.feedback_to_id',
-            //     'feedbacks.institute_id',
-            //     'feedbacks.rating',
-            //     'feedbacks.role_type',
-            //     'feedbacks.created_at',
-            //     'users.firstname',
-            //     'users.lastname',
-            //     'users.image',
-            //     'roles.role_name',
-            // )
-            // ->Join('users', 'users.id', '=', 'feedbacks.feedback_to_id')
-            // ->Join('roles', 'roles.id', '=', 'users.role_type')
-            // ->Join('institute_detail', 'institute_detail.id', '=', 'feedbacks.institute_id')
-            // ->where('feedbacks.institute_id', $institute_id)
-            // ->where('feedbacks.role_type', '1')
-            // ->orderByDesc('feedbacks.created_at')->get()->toArray();
-            
-
             $stdcount = Student_detail::where('institute_id', $request->institute_id)->where('status','1')->count();
             $subcount = Subject_sub::where('institute_id', $request->institute_id)->count();
             $teacherdt = Teacher_model::where('institute_id', $request->institute_id)->where('status','1')->distinct('teacher_id')->count(); //by priyanka
@@ -505,7 +417,6 @@ class TeacherController extends Controller
                 'students' => $stdcount,
                 'subject' => $subcount,
                 'teacher' => $teacherdt,
-                //'feedback'=>$feedback_list
             );
             return $this->response($institutedetaa, "Successfully fetch data.");
         } catch (Exception $e) {
@@ -534,7 +445,6 @@ class TeacherController extends Controller
             //banner
             $bannerss = Banner_model::where('status', 'active')
                 ->Where('institute_id', $institute_id)
-                //->Where('user_id', $teacher_id)
                 ->paginate(10);
     
             if ($bannerss->isEmpty()) {
@@ -581,7 +491,6 @@ class TeacherController extends Controller
                     'users.image',
                 )
                 ->orderBy('timetables.start_time', 'asc')
-                //->paginate(2);
                 ->get();
            
             foreach ($todayslect as $todayslecDT) {
@@ -615,16 +524,12 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            //  join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
-                
             $teacher_data = Teacher_model::Join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->where('teacher_detail.teacher_id', $teacher_id)
                 ->where('teacher_detail.institute_id', $institute_id)
                 ->whereNotNull('teacher_detail.batch_id')
-                //->whereNull('teacher_detail.deleted_at')
-                // ->groupBy('standard.id')
                 ->groupBy(
                     'teacher_detail.standard_id',
                     'board.name',
@@ -632,27 +537,18 @@ class TeacherController extends Controller
                     'standard.name',
                     'medium.name',
                     'teacher_detail.batch_id',
-                    // 'batches.id',
-                    // 'batches.batch_name'
                 )
 
                 ->select(
-                    // 'board.name as board_name',
                     'standard.id as standard_id',
-                    // 'batches.id as batch_id',
                     'teacher_detail.batch_id',
                    
                     'standard.name as standard_name',
                     DB::raw('MAX(board.name) as board_name'),
                     DB::raw('MAX(medium.name) as medium_name')
-                    // DB::raw('MAX(batches.batch_name) as batch_name'
-                    // )
                 )
                 ->get()
                 ->toArray();
-                // print_r($teacher_data);exit;
-                 
-                   
 
             $teacher_response = [];
             $processed_batches = [];
@@ -660,8 +556,6 @@ class TeacherController extends Controller
 
                 $batchIds = explode(',', $value['batch_id']);
                 $batches_Data = Batches_model::whereIn('id', $batchIds)
-                // ->select('id','batch_name')
-                // ->groupBy('id', 'batch_name')
                 ->get();
 
                 foreach ($batches_Data as $batch) {
@@ -705,14 +599,12 @@ class TeacherController extends Controller
         try {
             $batchId = $request->batch_id;
             $teacher_details = DB::table('teacher_detail')
-                //->join('batches', 'batches.id', '=', 'teacher_detail.batch_id')
                 ->join('board', 'board.id', '=', 'teacher_detail.board_id')
                 ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
                 ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
                 ->join('subject', 'subject.id', '=', 'teacher_detail.subject_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.standard_id', $request->standard_id)
-                //->where('teacher_detail.batch_id', $request->batch_id)
                 ->where(function ($query) use ($batchId) {
                     $query->whereRaw("FIND_IN_SET(?, teacher_detail.batch_id)", [$batchId]);
                 })
@@ -722,8 +614,6 @@ class TeacherController extends Controller
                     'standard.name as standard_name',
                     'medium.id as medium_id',
                     'medium.name as medium_name',
-                    // 'batches.id as batch_id',
-                    // 'batches.batch_name',
                     'subject.id as subject_id',
                     'subject.name as subject_name',
                     'subject.image as subject_image')
@@ -793,7 +683,6 @@ class TeacherController extends Controller
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
-                //->where('time_table.batch_id', $request->batch_id)
                 ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->whereIN('timetables.batch_id', $batchids)
                 ->where('timetables.day', $daysidg->id)
@@ -992,18 +881,9 @@ class TeacherController extends Controller
             $user_list = Teacher_model::join('users', 'users.id', '=', 'teacher_detail.teacher_id')
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
-                //->where('teacher_detail.status', '0')
                 ->select(
                     'teacher_detail.*',
                     'users.*',
-                    // 'users.qualification',
-                    // 'users.lastname',
-                    // 'users.dob',
-                    // 'users.address',
-                    // 'users.email',
-                    // 'users.mobile',
-                    // 'users.employee_type'
-                    
                 )
                 ->first();
             if ($user_list) {
@@ -1015,7 +895,6 @@ class TeacherController extends Controller
 
                 ->where('teacher_detail.teacher_id', $request->teacher_id)
                 ->where('teacher_detail.institute_id', $request->institute_id)
-                //->where('teacher_detail.status', '0')
                 ->select('teacher_detail.*',
                          'users.qualification',
                          'board.name as board',
@@ -1117,12 +996,6 @@ class TeacherController extends Controller
             $institute_fors = [];
             foreach ($institute_for as $inst_forsd) {
                 $board = Board::
-                // join('board_sub', function ($join) use ($institute_id, $user_id, $inst_forsd) {
-                //         $join->on('board.id', '=', 'board_sub.board_id')
-                //         ->where('board_sub.institute_id', $institute_id)
-                //         ->where('board_sub.user_id', $user_id)
-                //         ->where('board_sub.institute_for_id', $inst_forsd->id);
-                // })
                 join('teacher_detail', function ($join) use ($institute_id,$teacher_id) {
                         $join->on('board.id','=','teacher_detail.board_id')
                         ->where('teacher_detail.institute_id', $institute_id)
@@ -1203,11 +1076,9 @@ class TeacherController extends Controller
                                     ->toArray();
 
                                 $subject = Subject_model::join('teacher_detail','subject.id','=','teacher_detail.subject_id')
-                                    //->where('subject_sub.institute_id', $institute_id)
                                     ->where('teacher_detail.institute_id', $institute_id)
                                     ->where('teacher_detail.teacher_id', $teacher_id)
                                     ->where('teacher_detail.status', '0')
-                                    //->where('subject_sub.user_id', $user_id)
                                     ->whereIN('subject.base_table_id', $batableids)
                                     ->select('subject.*')
                                     ->distinct()->get();
@@ -1254,7 +1125,6 @@ class TeacherController extends Controller
                     'boards' => $boards
                 );
             }
-            // echo "<pre>";print_r($standards);exit;
             $alldata = array(
                 'institute_fors' => $institute_fors,
             );
@@ -1283,18 +1153,9 @@ class TeacherController extends Controller
             'dob' => 'required',
             'address' => 'required|string|max:255',
             'pincode' => 'required|string|max:10',
-            //'area' => 'required|string|max:255',
-            //'about_us' => 'nullable|string',
             'qualification' => 'required|string|max:255',
-            //'institute_name' => 'required|string|max:255',
-            //'startdate' => 'required',
-            //'enddate' => 'nullable',
-            //'name' => 'required|string|max:255',
-            //'relation_with' => 'required|string|max:255',
-            //'mobile_no' => 'required|string|max:255',
             'country_code' =>'required',
             'country_code_name'=>'required',
-            //'emergency_country_code' =>'required',
         ]);
         
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
@@ -1308,8 +1169,6 @@ class TeacherController extends Controller
         $user->dob = (!empty($request['dob'])) ? date('d-m-Y', strtotime($request['dob'])) : '';
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
-        //$user->area = $request['area'];
-        
         if ($request->file('image')) {
             $iconFile = $request->file('image');
             $imagePath = $iconFile->store('profile', 'public');
@@ -1385,7 +1244,6 @@ class TeacherController extends Controller
             }
             
             $userSub2 = Users_sub_emergency::where('user_id', $teacher_id)->first();
-            // echo "<pre>";print_r($userSub2);exit;
             if (!empty($userSub2)) {
                 if(!empty($request['name'])){
                 $delete_qualification = Users_sub_emergency::where('user_id', $request->teacher_id);
@@ -1396,8 +1254,6 @@ class TeacherController extends Controller
                 $emergency_country_code = explode(',', $request['emergency_country_code']);
                 $emergency_country_code_name = explode(',', $request['emergency_country_code_name']);
                 
-                //print_r(count($qualification));exit;
-                // print_r($emergency_country_code);exit;
                 for ($i = 0; $i < count($name); $i++) {
                     Users_sub_emergency::create([
                         'user_id' => $teacher_id,
@@ -1416,7 +1272,6 @@ class TeacherController extends Controller
                     $mobile_no = explode(',', $request['mobile_no']);
                     $emergency_country_code = explode(',', $request['emergency_country_code']);
                     $emergency_country_code_name = explode(',', $request['emergency_country_code_name']);
-                    //print_r($emergency_country_code);exit;
                     for ($i = 0; $i < count($name); $i++) {
                         Users_sub_emergency::create([
                             'user_id' => $teacher_id,
@@ -1512,10 +1367,8 @@ class TeacherController extends Controller
             'institute_name'=>$expdata->institute_name,
             'experience'=>$expdata->experience];
           }
-          //print_r($teacher_id);exit;
           $emergency = Users_sub_emergency::where('user_id',$teacher_id)->get();
           $emergency_contacts = [];
-          //print_r($emergency);exit;
           foreach($emergency as $emergencydata){
             $emergency_contacts[] = ['id'=>$emergencydata->id,
             'name'=>$emergencydata->name,
@@ -1541,14 +1394,12 @@ class TeacherController extends Controller
             'state' => $userdetl ? $userdetl->state . '' : '',
             'city' => $userdetl ? $userdetl->city . '' : '',
             'pincode' => $userdetl ? $userdetl->pincode . '' : '',
-            //'area'=>$userdetl ? $userdetl->area . '' : '',
             'about_us' => $user_sub ? $user_sub->about_us .'' : '',
             'standard' => $stds,
             'institutes' => $workwith, // work with
             'education' => $education,
             'experience'=>$experience,
             'emergency_contacts' => $emergency_contacts
-            //'medium' => $sdtls ? $sdtls->medium . '(' . $sdtls->board . ')' : '',
         );
 
             return $this->response($userdetail, "Successfully fetch data.");
@@ -1603,31 +1454,6 @@ class TeacherController extends Controller
         }
 
     }
-    // function role_change(Request $request)
-    // {
-    //     $validator = Validator::make($request->all(), [
-    //         'institute_id' => 'required',
-    //         'role_type_id' => 'required',
-    //         'teacher_id' => 'required',
-
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return $this->response([], $validator->errors()->first(), false, 400);
-    //     }
-    //     try {
-    //         $teacherDetail = Teacher_model::where('institute_id', $request->institute_id)->where('teacher_id', $request->teacher_id);
-
-    //         if ($teacherDetail) {
-    //             $teacherDetail->update([
-    //                 'role_type' => $request->role_type_id
-    //             ]);
-    //         }
-    //         return $this->response([], "Roletype change successfully");
-    //     } catch (Exception $e) {
-    //         return $this->response($e, "Invalid token.", false, 400);
-    //     }
-    // }
     
     function teacher_profile_edit_institute(Request $request){
         $validator = Validator::make($request->all(), [
@@ -1704,19 +1530,6 @@ class TeacherController extends Controller
                     'batch_id' => $teacherDT['batch_id'],
                     'status' => '1',
                 ]);
-                
-                // if ($teacherDT['teacher_detail_id']) {
-                //     $teacherDetail = Teacher_model::where('id', $teacherDT['teacher_detail_id'])->first();
-                //     $teacherDetail->update([
-                //         'board_id' => $teacherDT['board_id'],
-                //         'medium_id' => $teacherDT['medium_id'],
-                //         'standard_id' => $teacherDT['standard_id'],
-                //         'batch_id' => !empty($teacherDT['batch_id']) ? $teacherDT['batch_id'] : null,
-                //         'subject_id' => $teacherDT['subjetc_id'],
-                //         'teacher_id' => $request->teacher_id,
-                //         'status' => '1',
-                //     ]);
-                // }
                 
             }
 
