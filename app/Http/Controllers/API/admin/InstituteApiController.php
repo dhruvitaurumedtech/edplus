@@ -60,6 +60,8 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
 use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Rules\UniqueClassRoomName;
+
 
 class InstituteApiController extends Controller
 {
@@ -3134,7 +3136,7 @@ class InstituteApiController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
-            'name' => 'required|string|unique:class_room,name',
+            'name' => ['required', 'string', new UniqueClassRoomName($request->edit_id)],
             'capacity' => 'required'
         ]);
         if ($validator->fails()) {
@@ -3163,12 +3165,14 @@ class InstituteApiController extends Controller
         try {
             foreach ($names as $index => $name) {
                 
-                $data=Class_room_model::where('institute_id',$request->institute_id)->where('name',$name)->first();
-                if(!empty($data)){
-                   return $this->response([], "The name already exists", false, 400);
-                }
+              
                 $capacity = $capacities[$index];
                 if (empty($request->edit_id)) {
+
+                    $data=Class_room_model::where('institute_id',$request->institute_id)->where('name',$request->name)->first();
+                    if(!empty($data)){
+                        return $this->response([], "Class room name already exists.", false, 400);
+                    } 
                     $class = new Class_room_model();
                 } else {
                     $class = Class_room_model::find($request->edit_id);
@@ -3585,7 +3589,7 @@ class InstituteApiController extends Controller
                 foreach($batchlistdt as $batchnames){
                     $batchlist[] = ['batch_id'=>$batchnames->id,'batch_name'=>$batchnames->batch_name];
                 }
-               $subjectList[] = [
+                $subjectList[] = [
                     'teacher_detail_id'=>$teacher_detail_ids[$index],
                     'subject_id' => $subjectId,
                     'subject_name' => $subject->name,
