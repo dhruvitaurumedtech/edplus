@@ -3781,41 +3781,27 @@ class InstituteApiController extends Controller
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-            if ($request->child_id) {
-                $student_id = $request->child_id;
-            } else {
-                $student_id = Auth::id();
-            }
-            $announcement = [];
-            $getstdntdata = Student_detail::where('student_id', $student_id)
-                ->where('institute_id', $request->institute_id)
-                ->where('status', '=', '1')
-                ->whereNull('deleted_at')
-                ->first();
-            if (!empty($getstdntdata)) {
-                $announcQY = announcements_model::where('institute_id', $request->institute_id)
-                    ->where('batch_id', $getstdntdata->batch_id)
-                    ->whereRaw("FIND_IN_SET('6', role_type)")
-                    ->when($request->child_id ,function($query){
-                        $query->orwhereRaw("FIND_IN_SET('5', role_type)");
-                    })
-                    ->orderByDesc('created_at')
-                    ->get();
-
-                if (!empty($announcQY)) {
-                    foreach ($announcQY as $announcDT) {
-                        $announcement[] = array(
-                            'title' => $announcDT->title,
-                            'desc' => $announcDT->detail,
-                            'time' => $announcDT->created_at
-                        );
-                    }
+            
+            $teacherlist = [];
+            $teacherDt = Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', '!=', $request->teacher_id)
+            ->where('teacher_detail.status', '=', '1')
+            ->whereNull('teacher_detail.deleted_at')
+            ->select('users.firstname','users.lastname','teacher_detail.teacher_id')
+            ->distinct('teacher_detail.teacher_id')
+            ->get();
+            if (!empty($teacherDt)) {
+                foreach ($teacherDt as $teacherDtDT) {
+                    $teacherlist[] = array(
+                        'teacher_id' => $teacherDtDT->teacher_id,
+                        'teacher_name' => $teacherDtDT->firstname.''.$teacherDtDT->lastname
+                    );
                 }
             }
 
-            return $this->response($announcement, "Announcement List");
+            return $this->response($teacherlist, "Teacher List");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
