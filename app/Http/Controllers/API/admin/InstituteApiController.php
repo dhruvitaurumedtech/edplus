@@ -3565,10 +3565,11 @@ class InstituteApiController extends Controller
             ->where('teacher_detail.teacher_id', $request->teacher_id)
             ->groupBy('teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
             ->get();
+            // print_r($teacherDetails);exit;
         $response = [];
         foreach ($teacherDetails as $detail) {
-
             $subjectIds = explode(',', $detail->subject_ids);
+            
             $subjectNames = explode(',', $detail->subject_names);
             $subject_image =  explode(',',$detail->subject_image);
             $teacher_detail_ids = explode(',', $detail->teacher_detail_id);
@@ -3577,7 +3578,8 @@ class InstituteApiController extends Controller
                 $batchdt = Teacher_model::where('institute_id',$request->institute_id)
                 ->where('teacher_id',$request->teacher_id)
                 ->where('subject_id',$subjectId)->pluck('batch_id')->first();
-
+                $subject=Subject_model::where('id',$subjectIds[$index])->first();
+               
                 $batchlistdt = Batches_model::whereIN('id',explode(',',$batchdt))->get();
                 $batchlist = [];
                 foreach($batchlistdt as $batchnames){
@@ -3586,12 +3588,11 @@ class InstituteApiController extends Controller
                $subjectList[] = [
                     'teacher_detail_id'=>$teacher_detail_ids[$index],
                     'subject_id' => $subjectId,
-                    'subject_name' => $subjectNames[$index],
+                    'subject_name' => $subject->name,
                     'subject_image' => (!empty($subject_image[$index])) ? asset($subject_image[$index]) : asset('profile/no-image.png'),
                     'batch_list' => $batchlist,
                 ];
             }
-        
             $response[] = [
                 'board_id' => $detail->board_id,
                 'board_name' => $detail->board_name,
