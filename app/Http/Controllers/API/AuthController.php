@@ -224,9 +224,9 @@ class AuthController extends Controller
             return $this->response([], $errorMessage, false, 400);
         }
         if($user->device_key != null || $user->device_key!=''){
-        if($request->device_key != $user->device_key){
-            return $this->response([], "Already logged in another device.", false, 400);
-        }
+        // if($request->device_key != $user->device_key){
+        //     return $this->response([], "Already logged in another device.", false, 400);
+        // }
         }
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
