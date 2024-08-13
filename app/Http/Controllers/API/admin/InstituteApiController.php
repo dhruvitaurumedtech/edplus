@@ -906,14 +906,14 @@ class InstituteApiController extends Controller
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
-                ->get(['id', 'banner_image', 'url']);
+            ->get(['id', 'banner_image', 'url']);
             if ($banner_list->isEmpty()) {
                 // If no results found, use the second condition
                 $banner_list = Banner_model::where(function ($query) {
                     $query->where('status', 'active')
                         ->where('user_id', 1);
                 })
-                    ->get(['id', 'banner_image', 'url']);
+                ->get(['id', 'banner_image', 'url']);
             }
 
             $banner_array = $banner_list->map(function ($banner) {
@@ -3780,46 +3780,118 @@ class InstituteApiController extends Controller
     public function replacement_fetch_data(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required|exists:institute_detail,id',
+            'teacher_id'=>'required'
         ]);
           
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
-
         try {
-            if ($request->child_id) {
-                $student_id = $request->child_id;
-            } else {
-                $student_id = Auth::id();
-            }
-            $announcement = [];
-            $getstdntdata = Student_detail::where('student_id', $student_id)
-                ->where('institute_id', $request->institute_id)
-                ->where('status', '=', '1')
-                ->whereNull('deleted_at')
-                ->first();
-            if (!empty($getstdntdata)) {
-                $announcQY = announcements_model::where('institute_id', $request->institute_id)
-                    ->where('batch_id', $getstdntdata->batch_id)
-                    ->whereRaw("FIND_IN_SET('6', role_type)")
-                    ->when($request->child_id ,function($query){
-                        $query->orwhereRaw("FIND_IN_SET('5', role_type)");
-                    })
-                    ->orderByDesc('created_at')
-                    ->get();
-
-                if (!empty($announcQY)) {
-                    foreach ($announcQY as $announcDT) {
-                        $announcement[] = array(
-                            'title' => $announcDT->title,
-                            'desc' => $announcDT->detail,
-                            'time' => $announcDT->created_at
-                        );
-                    }
+            $teacherboardlist = [];
+            $board = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->select('board.id','board.name')->get();
+            if (!empty($board)) {
+                foreach ($board as $boardDT) {
+                    $teacherboardlist[] = array(
+                        'id' => $boardDT->id,
+                        'name' => $boardDT->name
+                    );
                 }
             }
 
-            return $this->response($announcement, "Announcement List");
+            $teachermediumlist = [];
+            $medium = Medium_model::join('teacher_detail','teacher_detail.medium_id','=','medium.id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->where('teacher_detail.board_id', $request->board_id)
+            ->select('medium.id','medium.name')->get();
+            if (!empty($medium)) {
+                foreach ($medium as $mediumDT) {
+                    $teachermediumlist[] = array(
+                        'id' => $mediumDT->id,
+                        'name' => $mediumDT->name
+                    );
+                }
+            }
+
+            $teacherstandardlist = [];
+            $standard = Standard_model::join('teacher_detail','teacher_detail.standard_id','=','standard.id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->where('teacher_detail.board_id', $request->board_id)
+            ->where('teacher_detail.medium_id', $request->medium_id)
+            ->select('standard.id','standard.name')->get();
+            if (!empty($standard)) {
+                foreach ($standard as $standardDT) {
+                    $teacherstandardlist[] = array(
+                        'id' => $standardDT->id,
+                        'name' => $standardDT->name
+                    );
+                }
+            }
+
+            $teachersubjectlist = [];
+            $subject = Subject_model::join('teacher_detail','teacher_detail.subject_id','=','subject.id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', $request->teacher_id)
+            ->where('teacher_detail.board_id', $request->board_id)
+            ->where('teacher_detail.medium_id', $request->medium_id)
+            ->where('teacher_detail.standard_id', $request->standard_id)
+            ->select('subject.id','subject.name')->get();
+            if (!empty($subject)) {
+                foreach ($subject as $subjectdDT) {
+                    $teachersubjectlist[] = array(
+                        'id' => $subjectdDT->id,
+                        'name' => $subjectdDT->name
+                    );
+                }
+            }
+
+            $teacherbatchlist = [];
+            $batchesids = Teacher_model::where('institute_id', $request->institute_id)
+            ->where('teacher_id', $request->teacher_id)
+            ->where('board_id', $request->board_id)
+            ->where('medium_id', $request->medium_id)
+            ->where('standard_id', $request->standard_id)
+            ->where('subject_id', $request->subject_id)->get();
+            print_r($batchesids);exit;
+            if (!empty($batches)) {
+                foreach ($batches as $batchesDT) {
+                    $teacherbatchlist[] = array(
+                        'id' => $batchesDT->id,
+                        'name' => $batchesDT->batch_name
+                    );
+                }
+            }
+
+            $teacherlist = [];
+            $teacherDt = Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
+            ->where('teacher_detail.teacher_id', '!=', $request->teacher_id)
+            ->where('teacher_detail.status', '=', '1')
+            ->whereNull('teacher_detail.deleted_at')
+            ->select('users.firstname','users.lastname','teacher_detail.teacher_id')
+            ->distinct('teacher_detail.teacher_id')
+            ->get();
+            if (!empty($teacherDt)) {
+                foreach ($teacherDt as $teacherDtDT) {
+                    $teacherlist[] = array(
+                        'teacher_id' => $teacherDtDT->teacher_id,
+                        'teacher_name' => $teacherDtDT->firstname.''.$teacherDtDT->lastname
+                    );
+                }
+            }
+
+            $data = ['teacher_board'=>$teacherboardlist,
+                    'teacher_medium'=>$teachermediumlist,
+                    'teacher_standard'=>$teacherstandardlist,
+                    'teacher_subjects'=>$teachersubjectlist,
+                    'teacher_list'=>$teacherlist,
+                    ];
+
+            return $this->response($data, "Teacher List");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }

@@ -1593,7 +1593,11 @@ class TeacherController extends Controller
 
         $teacher_detail = json_decode($request->teacher_detail, true);
         foreach ($teacher_detail as $item) {
-            $batchIds = explode(',', $item['batch_id']);$existingRecord = DB::table('teacher_detail')
+            $batchIds = explode(',', $item['batch_id']);
+            
+            $existingRecord = DB::table('teacher_detail')
+                ->where('teacher_id', $request->teacher_id)
+                ->where('institute_id', $request->institute_id)
                 ->where('board_id', $item['board_id'])
                 ->where('medium_id', $item['medium_id'])
                 ->where('standard_id', $item['standard_id'])
@@ -1602,8 +1606,7 @@ class TeacherController extends Controller
                     foreach ($batchIds as $batchId) {
                         $query->orWhere('batch_id', 'LIKE', "%$batchId%");
                     }
-                })
-                ->exists();
+                })->exists();
             if ($existingRecord) {
                 return $this->response([], 'A record with the same data already exists.', false, 400);
                 
