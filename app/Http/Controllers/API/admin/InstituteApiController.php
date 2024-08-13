@@ -906,14 +906,14 @@ class InstituteApiController extends Controller
                     ->where('status', 'active')
                     ->where('institute_id', $institute_id);
             })
-                ->get(['id', 'banner_image', 'url']);
+            ->get(['id', 'banner_image', 'url']);
             if ($banner_list->isEmpty()) {
                 // If no results found, use the second condition
                 $banner_list = Banner_model::where(function ($query) {
                     $query->where('status', 'active')
                         ->where('user_id', 1);
                 })
-                    ->get(['id', 'banner_image', 'url']);
+                ->get(['id', 'banner_image', 'url']);
             }
 
             $banner_array = $banner_list->map(function ($banner) {
@@ -3786,8 +3786,10 @@ class InstituteApiController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            
             $teacherlist = [];
+            // $board = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+            // ->where('teacher_detail.');
+
             $teacherDt = Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', '!=', $request->teacher_id)
