@@ -132,10 +132,10 @@ class AuthController extends Controller
         // if (isset($user)) {
         //     return $this->response([], 'This email already exists.', false, 400);
         // }
-        $data= User::withTrashed()->where('email', $request->email)->whereNull('deleted_at')->first();
-        if(!empty($data)){
-            return $this->response([],'Enter Your Mobile Number !' , false, 400);
-        }
+        // $data= User::withTrashed()->where('email', $request->email)->whereNull('deleted_at')->first();
+        // if(!empty($data)){
+        //     return $this->response([],'Enter Your Mobile Number !' , false, 400);
+        // }
         try {
             $user = User::where('email', $request->email)->first();
             if(!isset($user)){
