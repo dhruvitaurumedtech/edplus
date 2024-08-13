@@ -1560,7 +1560,7 @@ class TeacherController extends Controller
                                     ->where('board_id', $request->board_id)
                                     ->where('medium_id', $request->medium_id)
                                     ->where('standard_id', $request->standard_id)
-                                    ->delete();
+                                    ->forceDelete();
                 if($data > 0)
                 {
                     return $this->response([], "Remove successfully!");
