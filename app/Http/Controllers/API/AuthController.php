@@ -223,11 +223,11 @@ class AuthController extends Controller
         if (!in_array($user->role_type, $validRoles)) {
             return $this->response([], $errorMessage, false, 400);
         }
-        if($user->device_key != null || $user->device_key!=''){
+        // if($user->device_key != null || $user->device_key!=''){
         // if($request->device_key != $user->device_key){
         //     return $this->response([], "Already logged in another device.", false, 400);
         // }
-        }
+        // }
         if (Auth::attempt($request->only('email', 'password'))) {
             $user = Auth::user();
             $token = JWTAuth::fromUser($user);
