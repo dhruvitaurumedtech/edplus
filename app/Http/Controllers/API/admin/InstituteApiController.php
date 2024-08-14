@@ -3696,7 +3696,7 @@ class InstituteApiController extends Controller
                 $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
                 $batch_list = Batches_model::where('institute_id', $request->institute_id)
                 
-                 ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
+                ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
                 ->pluck('batch_name', 'id')
                 ->toArray();
                 $all_batches_results = [];

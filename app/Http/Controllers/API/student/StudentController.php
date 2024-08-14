@@ -582,7 +582,8 @@ class StudentController extends Controller
             $examlist = [];
             $announcQY = announcements_model::where('institute_id', $institute_id)
                 ->where('standard_id', $getstdntdata->standard_id)
-                ->WhereRaw("FIND_IN_SET($getstdntdata->batch_id, batch_id)")
+                //->WhereRaw("FIND_IN_SET($getstdntdata->batch_id, batch_id)")
+                ->Where('batch_id', 'like', '%' . $getstdntdata->batch_id . '%')
                 ->whereRaw("FIND_IN_SET('6', role_type)")
                 ->whereNull('deleted_at')
                 ->orderByDesc('created_at')
