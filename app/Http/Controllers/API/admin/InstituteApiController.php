@@ -3616,7 +3616,6 @@ class InstituteApiController extends Controller
     function teacher_student_fetch_subject_selected_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-           
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -3647,30 +3646,41 @@ class InstituteApiController extends Controller
                 ->where('teacher_detail.standard_id', $request->standard_id)
                 ->groupBy('teacher_detail.batch_id','teacher_detail.id', 'teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
                 ->get();
-            
-           
+                
                 $base_table_ids = [];
                 $selected_subject_ids = [];
                 $selected_batch_ids = [];
                 $batch_table_ids = [];
+                $base_table_ids = Base_table::where('board', $request->board_id)
+                    ->where('medium', $request->medium_id)
+                    ->where('standard', $request->standard_id)
+                    ->pluck('id')
+                    ->toArray();
 
+                $total_batch_ids = Batches_model::where('institute_id', $request->institute_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->pluck('id')
+                ->toArray();
                 foreach ($teacherDetails as $value) {
                 $ids = Base_table::where('board', $value->board_id)
                     ->where('medium', $value->medium_id)
                     ->where('standard', $value->standard_id)
                     ->pluck('id')
                     ->toArray();
+
                 $base_table_ids = array_merge($base_table_ids, $ids);
 
                 $selected_subject_ids = array_merge($selected_subject_ids, explode(',', $value->subject_id));
                 $selected_batch_ids = array_merge($selected_batch_ids, explode(',', $value->batch_id));
 
                 $total_batch_ids = Batches_model::where('institute_id', $request->institute_id)
-                                                ->where('board_id', $value->board_id)
-                                                ->where('medium_id', $value->medium_id)
-                                                ->where('standard_id', $value->standard_id)
-                                                ->pluck('id')
-                                                ->toArray();
+                ->where('board_id', $value->board_id)
+                ->where('medium_id', $value->medium_id)
+                ->where('standard_id', $value->standard_id)
+                ->pluck('id')
+                ->toArray();
                 $batch_table_ids = array_merge($batch_table_ids, $total_batch_ids);
                 }
 
@@ -3678,17 +3688,18 @@ class InstituteApiController extends Controller
                 $selected_subject_ids = array_map('intval', array_unique($selected_subject_ids));
                 $selected_batch_ids = array_map('intval', array_unique($selected_batch_ids));
                 $batch_table_ids = array_unique($batch_table_ids);
-
-                $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('name', 'id')->toArray();
+                $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)
+                ->pluck('name', 'id')->toArray();
+                
                 $subject_results = [];
                 foreach ($subject_list as $sid => $sname) {
                 $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
                 $batch_list = Batches_model::where('institute_id', $request->institute_id)
                 
-                 ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
+                ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
                 ->pluck('batch_name', 'id')
                 ->toArray();
-             $all_batches_results = [];
+                $all_batches_results = [];
                 foreach ($batch_list as $id => $name) {
                 $tdl = Teacher_model::where('subject_id',$sid)
                 ->where('institute_id',$request->institute_id)
@@ -3791,7 +3802,9 @@ class InstituteApiController extends Controller
             $board = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', $request->teacher_id)
-            ->select('board.id','board.name')->get();
+            ->select('board.id','board.name')
+            ->distinct('board.id')
+            ->get();
             if (!empty($board)) {
                 foreach ($board as $boardDT) {
                     $teacherboardlist[] = array(
@@ -3806,6 +3819,7 @@ class InstituteApiController extends Controller
             ->where('teacher_detail.institute_id', $request->institute_id)
             ->where('teacher_detail.teacher_id', $request->teacher_id)
             ->where('teacher_detail.board_id', $request->board_id)
+            ->distinct('medium.id')
             ->select('medium.id','medium.name')->get();
             if (!empty($medium)) {
                 foreach ($medium as $mediumDT) {
@@ -3822,6 +3836,7 @@ class InstituteApiController extends Controller
             ->where('teacher_detail.teacher_id', $request->teacher_id)
             ->where('teacher_detail.board_id', $request->board_id)
             ->where('teacher_detail.medium_id', $request->medium_id)
+            ->distinct('standard.id')
             ->select('standard.id','standard.name')->get();
             if (!empty($standard)) {
                 foreach ($standard as $standardDT) {
@@ -3831,7 +3846,7 @@ class InstituteApiController extends Controller
                     );
                 }
             }
-
+            
             $teachersubjectlist = [];
             $subject = Subject_model::join('teacher_detail','teacher_detail.subject_id','=','subject.id')
             ->where('teacher_detail.institute_id', $request->institute_id)
@@ -3848,24 +3863,24 @@ class InstituteApiController extends Controller
                     );
                 }
             }
-
+           
             $teacherbatchlist = [];
             $batchesids = Teacher_model::where('institute_id', $request->institute_id)
             ->where('teacher_id', $request->teacher_id)
             ->where('board_id', $request->board_id)
             ->where('medium_id', $request->medium_id)
             ->where('standard_id', $request->standard_id)
-            ->where('subject_id', $request->subject_id)->get();
-            print_r($batchesids);exit;
-            if (!empty($batches)) {
-                foreach ($batches as $batchesDT) {
+            ->where('subject_id', $request->subject_id)->pluck('batch_id')->toArray();
+            if (!empty($batchesids)) {
+            $idsArray = explode(',', $batchesids[0]);
+            $batchesdt = Batches_model::whereIN('id',$idsArray)->get();
+                foreach ($batchesdt as $batchesDtT) {
                     $teacherbatchlist[] = array(
-                        'id' => $batchesDT->id,
-                        'name' => $batchesDT->batch_name
+                        'id' => $batchesDtT->id,
+                        'name' => $batchesDtT->batch_name
                     );
                 }
             }
-
             $teacherlist = [];
             $teacherDt = Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
             ->where('teacher_detail.institute_id', $request->institute_id)
@@ -3888,10 +3903,11 @@ class InstituteApiController extends Controller
                     'teacher_medium'=>$teachermediumlist,
                     'teacher_standard'=>$teacherstandardlist,
                     'teacher_subjects'=>$teachersubjectlist,
+                    'teacher_batches'=>$teacherbatchlist,
                     'teacher_list'=>$teacherlist,
                     ];
 
-            return $this->response($data, "Teacher List");
+            return $this->response($data, "Teacher Data");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
         }
