@@ -29,8 +29,6 @@ class AuthController extends Controller
     public function handleGoogle(Request $request)
     {
         try {
-            dd($request);
-            DB::table("google_login_api_log")->create([ 'request' =>  $request ]);
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
             if (!$user) {
                 return $this->response([], "UnAuthorized User", false, 400);
@@ -77,7 +75,7 @@ class AuthController extends Controller
             }
             $user = User::find($user->id);
             $tomail = $ssoUser->user['email'];
-            Mail::send('emails.welcomemailtogooglelogin', ['name'=>$firstname], function ($message) use ($tomail) {
+            Mail::send('emails.welcomemailtogooglelogin', ['name'=>$ssoUser->user['name']], function ($message) use ($tomail) {
                 $message->to($tomail);
                 $message->subject('Welcome to Edwide');
               });
