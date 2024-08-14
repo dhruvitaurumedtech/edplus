@@ -29,6 +29,7 @@ class AuthController extends Controller
     public function handleGoogle(Request $request)
     {
         try {
+            DB::table("google_login_api_log")->create([ 'request' =>  $request ]);
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
             if (!$user) {
                 return $this->response([], "UnAuthorized User", false, 400);
@@ -58,13 +59,13 @@ class AuthController extends Controller
                 }
             }
             if (!$user) {
-            //    $name = $ssoUser->user['name'];
-            //    $nameParts = explode(' ', $name);
-            //     $firstname = $nameParts[0]; // First element is the first name
-            //     $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
+               $name = $ssoUser->user['name'];
+               $nameParts = explode(' ', $name);
+                $firstname = $nameParts[0]; // First element is the first name
+                $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
                 $user = new User();
-                $user->firstname = $ssoUser->user['firstname'];
-                $user->lastname = $ssoUser->user['lastname'];
+                $user->firstname = $firstname;
+                $user->lastname = $lastname;
                 $user->email = $ssoUser->user['email'];
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
