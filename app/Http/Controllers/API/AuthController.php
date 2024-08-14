@@ -29,6 +29,7 @@ class AuthController extends Controller
     public function handleGoogle(Request $request)
     {
         try {
+            dd($request);
             DB::table("google_login_api_log")->create([ 'request' =>  $request ]);
             $user = Socialite::with('google')->stateless()->userFromToken($request->token);
             if (!$user) {
