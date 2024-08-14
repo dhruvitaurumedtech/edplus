@@ -3616,7 +3616,6 @@ class InstituteApiController extends Controller
     function teacher_student_fetch_subject_selected_subject(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
-           
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -3647,30 +3646,41 @@ class InstituteApiController extends Controller
                 ->where('teacher_detail.standard_id', $request->standard_id)
                 ->groupBy('teacher_detail.batch_id','teacher_detail.id', 'teacher_detail.board_id', 'teacher_detail.medium_id', 'teacher_detail.standard_id')
                 ->get();
-            
-           
+                
                 $base_table_ids = [];
                 $selected_subject_ids = [];
                 $selected_batch_ids = [];
                 $batch_table_ids = [];
+                $base_table_ids = Base_table::where('board', $request->board_id)
+                    ->where('medium', $request->medium_id)
+                    ->where('standard', $request->standard_id)
+                    ->pluck('id')
+                    ->toArray();
 
+                $total_batch_ids = Batches_model::where('institute_id', $request->institute_id)
+                ->where('board_id', $request->board_id)
+                ->where('medium_id', $request->medium_id)
+                ->where('standard_id', $request->standard_id)
+                ->pluck('id')
+                ->toArray();
                 foreach ($teacherDetails as $value) {
                 $ids = Base_table::where('board', $value->board_id)
                     ->where('medium', $value->medium_id)
                     ->where('standard', $value->standard_id)
                     ->pluck('id')
                     ->toArray();
+
                 $base_table_ids = array_merge($base_table_ids, $ids);
 
                 $selected_subject_ids = array_merge($selected_subject_ids, explode(',', $value->subject_id));
                 $selected_batch_ids = array_merge($selected_batch_ids, explode(',', $value->batch_id));
 
                 $total_batch_ids = Batches_model::where('institute_id', $request->institute_id)
-                                                ->where('board_id', $value->board_id)
-                                                ->where('medium_id', $value->medium_id)
-                                                ->where('standard_id', $value->standard_id)
-                                                ->pluck('id')
-                                                ->toArray();
+                ->where('board_id', $value->board_id)
+                ->where('medium_id', $value->medium_id)
+                ->where('standard_id', $value->standard_id)
+                ->pluck('id')
+                ->toArray();
                 $batch_table_ids = array_merge($batch_table_ids, $total_batch_ids);
                 }
 
@@ -3678,8 +3688,9 @@ class InstituteApiController extends Controller
                 $selected_subject_ids = array_map('intval', array_unique($selected_subject_ids));
                 $selected_batch_ids = array_map('intval', array_unique($selected_batch_ids));
                 $batch_table_ids = array_unique($batch_table_ids);
-
-                $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)->pluck('name', 'id')->toArray();
+                $subject_list = Subject_model::whereIn('base_table_id', $base_table_ids)
+                ->pluck('name', 'id')->toArray();
+                
                 $subject_results = [];
                 foreach ($subject_list as $sid => $sname) {
                 $subject_status = in_array($sid, $selected_subject_ids) ? 1 : 0;
@@ -3688,7 +3699,7 @@ class InstituteApiController extends Controller
                  ->whereRaw('FIND_IN_SET(?, subjects) > 0', [$sid])
                 ->pluck('batch_name', 'id')
                 ->toArray();
-             $all_batches_results = [];
+                $all_batches_results = [];
                 foreach ($batch_list as $id => $name) {
                 $tdl = Teacher_model::where('subject_id',$sid)
                 ->where('institute_id',$request->institute_id)
