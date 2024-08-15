@@ -58,13 +58,13 @@ class AuthController extends Controller
                 }
             }
             if (!$user) {
-            //    $name = $ssoUser->user['name'];
-            //    $nameParts = explode(' ', $name);
-            //     $firstname = $nameParts[0]; // First element is the first name
-            //     $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
+               $name = $ssoUser->user['name'];
+               $nameParts = explode(' ', $name);
+                $firstname = $nameParts[0]; // First element is the first name
+                $lastname = isset($nameParts[1]) ? $nameParts[1] : '';
                 $user = new User();
-                $user->firstname = $ssoUser->user['firstname'];
-                $user->lastname = $ssoUser->user['lastname'];
+                $user->firstname = $firstname;
+                $user->lastname = $lastname;
                 $user->email = $ssoUser->user['email'];
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
@@ -75,7 +75,7 @@ class AuthController extends Controller
             }
             $user = User::find($user->id);
             $tomail = $ssoUser->user['email'];
-            Mail::send('emails.welcomemailtogooglelogin', ['name'=>$firstname], function ($message) use ($tomail) {
+            Mail::send('emails.welcomemailtogooglelogin', ['name'=>$ssoUser->user['name']], function ($message) use ($tomail) {
                 $message->to($tomail);
                 $message->subject('Welcome to Edwide');
               });
