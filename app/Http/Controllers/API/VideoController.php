@@ -93,7 +93,7 @@ class VideoController extends Controller
                 if ($request->parent_category_id == '1') {
                     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
                     $fileNames = str_replace(' ', '_', $fileName);
-                    $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/videos", $fileNames);
+                    $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileNames);
                     //s3 bucket
                      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
                      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
@@ -101,7 +101,7 @@ class VideoController extends Controller
                     if (implode(',', $extensions) == 'pdf') {
                         $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
                         $fileNames = str_replace(' ', '_', $fileName);
-                        $path = $request->file('topic_video_pdf')->storeAs("$dynamicPath/pdfs", $fileNames);
+                        $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileNames);
                           
                         //s3 bucket
                         // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
@@ -130,7 +130,7 @@ class VideoController extends Controller
             $videoupld->topic_description = $request->input('topic_description');
             $videoupld->topic_name = $request->input('topic_name');
             $videoupld->video_category_id = $request->input('category_id');
-            $videoupld->topic_video = isset($fullPath) ? asset($fullPath) : null;//Storage::disk('s3')->url($path)
+            $videoupld->topic_video = isset($fullPath) ? $fullPath : null;//Storage::disk('s3')->url($path)
             $videoupld->created_by = ($request->user_id)? $request->user_id:'';
             $videoupld->save();   
             return $this->response($videoupld, "Topic and file $msg successfully");
