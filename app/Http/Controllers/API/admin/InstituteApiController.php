@@ -55,6 +55,7 @@ use App\Models\Student_fees_model;
 use App\Models\Teacher_model;
 use App\Models\Timetable;
 use App\Models\Timetables;
+use App\Models\Timetables_history;
 use App\Models\UserHasRole;
 use Exception;
 use Illuminate\Support\Facades\Auth;
@@ -3894,7 +3895,7 @@ class InstituteApiController extends Controller
                 foreach ($teacherDt as $teacherDtDT) {
                     $teacherlist[] = array(
                         'teacher_id' => $teacherDtDT->teacher_id,
-                        'teacher_name' => $teacherDtDT->firstname.''.$teacherDtDT->lastname
+                        'teacher_name' => $teacherDtDT->firstname.' '.$teacherDtDT->lastname
                     );
                 }
             }
@@ -3910,6 +3911,82 @@ class InstituteApiController extends Controller
             return $this->response($data, "Teacher Data");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!.", false, 400);
+        }
+    }
+
+    public function replace_teacher(Request $request){
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required',
+            'institute_id' => 'required',
+            'replace_with_teacher_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $board = $request->board_id;
+            $medium_id = $request->medium_id;
+            $standard_id = $request->standard_id;
+            $subject_id = $request->subject_id;
+            $batch_id = $request->batch_id;
+
+            $teacherDT = Teacher_model::where('teacher_id',$request->teacher_id)
+            ->where('institute_id',$request->institute_id)
+            ->when($request->board_id, function ($query, $board) {
+                $query->where('board_id', $board);
+            })
+            ->when($request->medium_id, function ($query, $medium_id) {
+                $query->where('medium_id', $medium_id);
+            })
+            ->when($request->standard_id, function ($query, $standard_id) {
+                $query->whereIN('standard_id', explode(",",$standard_id));
+            })
+            ->when($request->subject_id, function ($query, $subject_id) {
+                $query->whereIN('subject_id', explode(",",$subject_id));
+            })
+            ->when($request->batch_id, function ($query, $batch_id) {
+                foreach (explode(",",$batch_id) as $batchId) {
+                    $query->orWhere('batch_id', 'LIKE', "%$batchId%");
+                }
+            })
+            ->get();
+
+            foreach($teacherDT as $teacherassiDT){
+                $timetbles = Timetables::where('teacher_id',$request->teacher_id)
+                ->whereIN('batch_id',explode(",",$teacherassiDT->batch_id))
+                ->where('subject_id',$teacherassiDT->subject_id)->get();
+
+                foreach($timetbles as $timtbleadup){
+                    $addhistory = Timetables_history::create([
+                        'batch_id' => $timtbleadup->batch_id,
+                        'subject_id' => $timtbleadup->subject_id,
+                        'teacher_id'=>$timtbleadup->teacher_id,
+                        'lecture_type'=>$timtbleadup->lecture_type,
+                        'class_room_id' => $timtbleadup->class_room_id,
+                        'academic_end_date' => $timtbleadup->academic_end_date,
+                        'start_date' => $timtbleadup->created_at, 
+                        'end_date' => date('y-m-d H:i:s'),
+                        'start_time' => $timtbleadup->start_time,
+                        'end_time'=>$timtbleadup->end_time,
+                        'day'=>$timtbleadup->day,
+                    ]);
+
+                    Timetables::where('id',$timtbleadup->id)
+                    ->update(['teacher_id'=>$request->replace_with_teacher_id]);
+                }
+                        Teacher_model::where('teacher_id',$request->teacher_id)
+                        ->where('institute_id',$request->institute_id)
+                        ->where('id',$teacherassiDT->id)
+                        ->update([
+                            'teacher_id' => $request->replace_with_teacher_id,
+                        ]);
+            }
+            
+            return $this->response([], "Replaced successfully");
+        } catch (\Exception $e) {
+            return $e;
+            return $this->response($e, "Somthing went wrong.", false, 400);
         }
     }
     
