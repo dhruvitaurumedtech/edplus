@@ -3022,7 +3022,7 @@ class InstituteApiController extends Controller
             $users = User::where('id', $request->teacher_id)->pluck('device_key');
 
             $notificationTitle = "Your Request Approved successfully!!";
-            $notificationBody = "Your Teacher Request Approved successfully!!";
+            $notificationBody = "";
 
             $data = [
                 'registration_ids' => $users,
