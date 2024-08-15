@@ -108,6 +108,7 @@ class VideoController extends Controller
                         // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/pdfs", $request->file('topic_video_pdf'), $filename);
                      }
                 }
+                $fullPath = storage_path('app/' . $path);
             }
             $videoupld = new Topic_model();
             $msg = 'uploaded';
@@ -129,7 +130,7 @@ class VideoController extends Controller
             $videoupld->topic_description = $request->input('topic_description');
             $videoupld->topic_name = $request->input('topic_name');
             $videoupld->video_category_id = $request->input('category_id');
-            $videoupld->topic_video = isset($path) ? asset($path) : null;//Storage::disk('s3')->url($path)
+            $videoupld->topic_video = isset($fullPath) ? asset($fullPath) : null;//Storage::disk('s3')->url($path)
             $videoupld->created_by = ($request->user_id)? $request->user_id:'';
             $videoupld->save();   
             return $this->response($videoupld, "Topic and file $msg successfully");
