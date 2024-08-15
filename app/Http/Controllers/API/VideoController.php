@@ -90,25 +90,62 @@ class VideoController extends Controller
         try {
             if ($request->hasFile('topic_video_pdf') && $request->file('topic_video_pdf')->isValid()) {
                 $path = '';
-                if ($request->parent_category_id == '1') {
-                    $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                    $fileNames = str_replace(' ', '_', $fileName);
-                    $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileNames);
-                    //s3 bucket
-                     // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
-                     // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
-                  } elseif ($request->parent_category_id == '3') {
-                    if (implode(',', $extensions) == 'pdf') {
-                        $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
-                        $fileNames = str_replace(' ', '_', $fileName);
-                        $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileNames);
+                // if ($request->parent_category_id == '1') {
+                //     $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
+                //     $fileNames = str_replace(' ', '_', $fileName);
+                //     $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/videos", $fileNames);
+                //     //s3 bucket
+                //      // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
+                //      // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/videos", $request->file('topic_video_pdf'), $filename);
+                //   } elseif ($request->parent_category_id == '3') {
+                //     if (implode(',', $extensions) == 'pdf') {
+                //         $fileName = $request->file('topic_video_pdf')->getClientOriginalName();
+                //         $fileNames = str_replace(' ', '_', $fileName);
+                //         $path = $request->file('topic_video_pdf')->storeAs("public/$dynamicPath/pdfs", $fileNames);
                           
-                        //s3 bucket
-                        // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
-                        // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/pdfs", $request->file('topic_video_pdf'), $filename);
-                     }
+                //         //s3 bucket
+                //         // $filename = $request->file('topic_video_pdf')->getClientOriginalName();
+                //         // $filePath = Storage::disk('s3')->putFileAs("$dynamicPath/pdfs", $request->file('topic_video_pdf'), $filename);
+                //      }
+                // }
+                if ($request->parent_category_id == '1') {
+                    $file = $request->file('topic_video_pdf');
+                    $fileName = $file->getClientOriginalName();
+                    $fileNames = str_replace(' ', '_', $fileName);
+                    $destinationPath = public_path("$dynamicPath/videos");
+                
+                    // Ensure the directory exists
+                    if (!file_exists($destinationPath)) {
+                        mkdir($destinationPath, 0755, true);
+                    }
+                
+                    // Move the file
+                    $file->move($destinationPath, $fileNames);
+                
+                    // Optionally, you can store the file path
+                    $path = "$dynamicPath/videos/$fileNames";
+                    
+                } elseif ($request->parent_category_id == '3') {
+                    if (in_array($request->file('topic_video_pdf')->extension(), ['pdf'])) {
+                        $file = $request->file('topic_video_pdf');
+                        $fileName = $file->getClientOriginalName();
+                        $fileNames = str_replace(' ', '_', $fileName);
+                        $destinationPath = public_path("$dynamicPath/pdfs");
+                
+                        // Ensure the directory exists
+                        if (!file_exists($destinationPath)) {
+                            mkdir($destinationPath, 0755, true);
+                        }
+                
+                        // Move the file
+                        $file->move($destinationPath, $fileNames);
+                
+                        // Optionally, you can store the file path
+                        $path = "$dynamicPath/pdfs/$fileNames";
+                    }
                 }
-                $fullPath = storage_path('app/' . $path);
+                
+                $fullPath =  url($path);
             }
             $videoupld = new Topic_model();
             $msg = 'uploaded';
