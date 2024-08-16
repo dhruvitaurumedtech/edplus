@@ -3945,11 +3945,11 @@ class InstituteApiController extends Controller
             ->when($request->subject_id, function ($query, $subject_id) {
                 $query->whereIN('subject_id', explode(",",$subject_id));
             })
-            ->when($request->batch_id, function ($query, $batch_id) {
-                foreach (explode(",",$batch_id) as $batchId) {
-                    $query->orWhere('batch_id', 'LIKE', "%$batchId%");
-                }
-            })
+            // ->when($request->batch_id, function ($query, $batch_id) {
+            //     foreach (explode(",",$batch_id) as $batchId) {
+            //         $query->orWhere('batch_id', 'LIKE', "%$batchId%");
+            //     }
+            // })
             ->get();
 
             foreach($teacherDT as $teacherassiDT){
@@ -4001,16 +4001,18 @@ class InstituteApiController extends Controller
                         ]);
 
                         if($addt){
-                            $array = array_filter($tablbatches, function($value) use ($batch_id) {
-                                return !in_array($value, $batch_id);
+                            $batchesid = explode(",",$batch_id);
+                            $array =  array_merge($batchesid,$tablbatches);
+                            $counts = array_count_values($array);
+                            $uniqueValues = array_filter($array, function($value) use ($counts) {
+                                return $counts[$value] === 1;
                             });
-                            $array = array_values($array);
-    
+                            
                             Teacher_model::where('teacher_id',$request->teacher_id)
                             ->where('institute_id',$request->institute_id)
                             ->where('id',$teacherassiDT->id)
                             ->update([
-                                'batch_id' => $array, //here batch after remove replace batch
+                                'batch_id' => implode(",",$uniqueValues), //here batch after remove replace batch
                             ]);
                         }
                         
