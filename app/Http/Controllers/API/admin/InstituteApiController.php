@@ -3930,7 +3930,7 @@ class InstituteApiController extends Controller
             $standard_id = $request->standard_id;
             $subject_id = $request->subject_id;
             $batch_id = $request->batch_id;
-
+            
             $teacherDT = Teacher_model::where('teacher_id',$request->teacher_id)
             ->where('institute_id',$request->institute_id)
             ->when($request->board_id, function ($query, $board) {
@@ -3953,9 +3953,16 @@ class InstituteApiController extends Controller
             ->get();
 
             foreach($teacherDT as $teacherassiDT){
-                $timetbles = Timetables::where('teacher_id',$request->teacher_id)
-                ->whereIN('batch_id',explode(",",$teacherassiDT->batch_id))
-                ->where('subject_id',$teacherassiDT->subject_id)->get();
+                $tablbatches = explode(",",$teacherassiDT->batch_id);
+                if($request->batch_id){
+                    $timetbles = Timetables::where('teacher_id',$request->teacher_id)
+                    ->whereIN('batch_id',explode(",",$request->batch_id))
+                    ->where('subject_id',$teacherassiDT->subject_id)->get();                    
+                }else{
+                    $timetbles = Timetables::where('teacher_id',$request->teacher_id)
+                    ->whereIN('batch_id',explode(",",$teacherassiDT->batch_id))
+                    ->where('subject_id',$teacherassiDT->subject_id)->get();
+                }
 
                 foreach($timetbles as $timtbleadup){
                     $addhistory = Timetables_history::create([
@@ -3972,15 +3979,50 @@ class InstituteApiController extends Controller
                         'day'=>$timtbleadup->day,
                     ]);
 
+                    if($addhistory){
                     Timetables::where('id',$timtbleadup->id)
                     ->update(['teacher_id'=>$request->replace_with_teacher_id]);
+                    }
+                    
                 }
+                    if($request->batch_id && count($tablbatches) > 1){
+                        //add new entry for replace few batch to new teacher 
+                        $addt = Teacher_model::create([
+                            'institute_id'=>$request->institute_id,
+                            'teacher_id'=>$request->replace_with_teacher_id,
+                            'institute_for_id '=>$teacherassiDT->institute_for_id,
+                            'board_id '=>$request->institute_id,
+                            'medium_id'=>$request->institute_id,
+                            'class_id' =>$teacherassiDT->class_id,
+                            'standard_id'=>$request->standard_id,
+                            'subject_id'=>$request->subject_id,
+                            'batch_id'=>$request->batch_id,
+                            'status'=>'1',
+                        ]);
+
+                        if($addt){
+                            $array = array_filter($tablbatches, function($value) use ($batch_id) {
+                                return !in_array($value, $batch_id);
+                            });
+                            $array = array_values($array);
+    
+                            Teacher_model::where('teacher_id',$request->teacher_id)
+                            ->where('institute_id',$request->institute_id)
+                            ->where('id',$teacherassiDT->id)
+                            ->update([
+                                'batch_id' => $array, //here batch after remove replace batch
+                            ]);
+                        }
+                        
+                    }else{
                         Teacher_model::where('teacher_id',$request->teacher_id)
                         ->where('institute_id',$request->institute_id)
                         ->where('id',$teacherassiDT->id)
                         ->update([
                             'teacher_id' => $request->replace_with_teacher_id,
                         ]);
+                    }
+                    
             }
             
             return $this->response([], "Replaced successfully");
