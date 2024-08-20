@@ -147,14 +147,16 @@ class VideoController extends Controller
                 
                 $fullPath =  url($path);
             }
-            $videoupld = new Topic_model();
-            $msg = 'uploaded';
+            
             if ($request->video_id) {
                 $msg = 'updated';
-                $videoupld = Topic_model::where('id',$request->video_id);
+                $videoupld = Topic_model::where('id',$request->video_id)->first();
                 if (!$videoupld) {
                     return $this->response([], 'Record not found', false, 400);
                 }
+            }else{
+                $videoupld = new Topic_model();
+                $msg = 'uploaded';
             }
 
             $videoupld->user_id = $request->input('user_id');
