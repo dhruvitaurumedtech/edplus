@@ -151,7 +151,7 @@ class VideoController extends Controller
             $msg = 'uploaded';
             if ($request->video_id) {
                 $msg = 'updated';
-                $videoupld = $videoupld->find($request->video_id);
+                $videoupld = Topic_model::where('id',$request->video_id);
                 if (!$videoupld) {
                     return $this->response([], 'Record not found', false, 400);
                 }
