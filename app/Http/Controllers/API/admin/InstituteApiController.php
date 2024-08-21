@@ -62,7 +62,7 @@ use Illuminate\Support\Facades\Auth;
 use PhpParser\Node\Stmt\TryCatch;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Rules\UniqueClassRoomName;
-
+use DateTime;
 
 class InstituteApiController extends Controller
 {
@@ -3367,7 +3367,10 @@ class InstituteApiController extends Controller
             }
             $subjectids = explode(',', $subjects->subjects);
             if ($request->date) {
-                $subjectids = Timetable::where('lecture_date', $request->date)
+                $dateTime = new DateTime($request->date);
+                $day = $dateTime->format('l');
+                $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
+                $subjectids = Timetables::where('day', $daysidg->id)
                     ->where('batch_id', $request->batch_id)
                     ->pluck('subject_id');
             }
