@@ -1573,7 +1573,7 @@ class TeacherController extends Controller
                 return $this->response($e, "Invalid token.", false, 400);
             }
 
-    }
+    }   
 
     public function add_standard(Request $request)
     {
@@ -1609,7 +1609,6 @@ class TeacherController extends Controller
                 })->exists();
             if ($existingRecord) {
                 return $this->response([], 'A record with the same data already exists.', false, 400);
-                
             }
         }
 

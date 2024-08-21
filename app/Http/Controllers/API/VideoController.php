@@ -147,14 +147,16 @@ class VideoController extends Controller
                 
                 $fullPath =  url($path);
             }
-            $videoupld = new Topic_model();
-            $msg = 'uploaded';
+            
             if ($request->video_id) {
                 $msg = 'updated';
-                $videoupld = $videoupld->find($request->video_id);
+                $videoupld = Topic_model::where('id',$request->video_id)->first();
                 if (!$videoupld) {
                     return $this->response([], 'Record not found', false, 400);
                 }
+            }else{
+                $videoupld = new Topic_model();
+                $msg = 'uploaded';
             }
 
             $videoupld->user_id = $request->input('user_id');
@@ -202,21 +204,33 @@ class VideoController extends Controller
         }
 
         try {
-            $topic = Topic_model::create([
-                'user_id' => $request->input('user_id'),
-                'institute_id' => $request->input('institute_id'),
-                'base_table_id' => $request->input('base_table_id'),
-                'standard_id' => $request->input('standard_id'),
-                'subject_id' => $request->input('subject_id'),
-                'chapter_id' => $request->input('chapter_id'),
-                'topic_no' => $request->input('topic_no'),
-                'topic_description' => $request->input('topic_description'),
-                'topic_name' => $request->input('topic_name'),
-                'video_category_id' => $request->input('category_id'),
-                'topic_video' =>  $request->youtube_url,
-                'created_by' => ($request->user_id) ? $request->user_id:'',
-            ]);
-            return $this->response($topic, 'Topic and file uploaded successfully');
+            if ($request->video_id) {
+                $msg = 'updated';
+                $videoupld = Topic_model::where('id',$request->video_id)->first();
+                if (!$videoupld) {
+                    return $this->response([], 'Record not found', false, 400);
+                }
+            }else{
+                $videoupld = new Topic_model();
+                $msg = 'uploaded';
+            }
+
+            
+            $videoupld->user_id = $request->input('user_id');
+            $videoupld->institute_id = $request->input('institute_id');
+            $videoupld->base_table_id = $request->input('base_table_id');
+            $videoupld->standard_id = $request->input('standard_id');
+            $videoupld->subject_id = $request->input('subject_id');
+            $videoupld->chapter_id = $request->input('chapter_id');
+            $videoupld->topic_no = $request->input('topic_no');
+            $videoupld->topic_description = $request->input('topic_description');
+            $videoupld->topic_name = $request->input('topic_name');
+            $videoupld->video_category_id = $request->input('category_id');
+            $videoupld->topic_video = $request->youtube_url;//Storage::disk('s3')->url($path)
+            $videoupld->created_by = ($request->user_id)? $request->user_id:'';
+            $videoupld->save(); 
+
+            return $this->response($videoupld, "Topic and file $msg successfully");
         } catch (Exception $e) {
             return $this->response($e, 'Something went Wrong!!', false, 400);
         }
