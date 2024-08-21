@@ -3370,7 +3370,7 @@ class InstituteApiController extends Controller
                 $dateTime = new DateTime($request->date);
                 $day = $dateTime->format('l');
                 $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
-                $subjectids = Timetables::where('day', $daysidg)
+                $subjectids = Timetables::where('day', $daysidg->id)
                     ->where('batch_id', $request->batch_id)
                     ->pluck('subject_id');
             }
