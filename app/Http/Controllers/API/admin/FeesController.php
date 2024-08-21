@@ -279,6 +279,7 @@ class FeesController extends Controller
             }
 
             $student_response = $query->get()->toArray();
+            // print_r($student_response);exit;
             $students = [];
 
             foreach ($student_response as $value) {
@@ -287,13 +288,14 @@ class FeesController extends Controller
                         ->where('institute_id', $request->institute_id)
                         ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
                         ->first();
-
+                // print_r($fees_detail);exit;
                     // Access the total payment amount
                      $total_payment_amount = $fees_detail->total_payment_amount;
                 
                 $student_fees = Student_fees_model::where('student_id',  $value['id'])
                     ->where('institute_id', $request->institute_id)
                     ->first();
+                    // print_r($student_fees);exit;
 
                 $discount = Discount_model::where('institute_id', $request->institute_id)
                     ->where('student_id', $value['id'])

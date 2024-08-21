@@ -1573,7 +1573,7 @@ class TeacherController extends Controller
                 return $this->response($e, "Invalid token.", false, 400);
             }
 
-    }
+    }   
 
     public function add_standard(Request $request)
     {
