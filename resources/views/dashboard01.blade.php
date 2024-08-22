@@ -36,32 +36,32 @@
           <div class="col-xl-3 col-lg-6">
             <div class="card l-bg-blue-dark">
               <div class="card-statistic-3 p-4">
-                <div class="card-icon card-icon-large"><i class="fas fa-user-plus"></i></div>
+                <div class="card-icon card-icon-large"></div>
                 <div class="mb-4">
-                  <h5 class="card-title mb-0">Total Admin</h5>
+                  <h5 class="card-title mb-0">Total Institute</h5>
                 </div>
                 <div class="row align-items-center mb-3 d-flex">
                   <div class="col-8">
                     <h3 class="d-flex align-items-center mb-0">
-                      150
+                      {{ $institute_count }}
                     </h3>
                   </div>
                 </div>
-                <a href="#" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="institute-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           </div>
           <div class="col-xl-3 col-lg-6">
             <div class="card l-bg-sky-dark">
               <div class="card-statistic-3 p-4">
-                <div class="card-icon card-icon-large"><i class="fas fa-chart-bar"></i></div>
+                <div class="card-icon card-icon-large"></i></div>
                 <div class="mb-4">
-                  <h5 class="card-title mb-0">Bounce Rate</h5>
+                  <h5 class="card-title mb-0">Total Student</h5>
                 </div>
                 <div class="row align-items-center mb-3 d-flex">
                   <div class="col-8">
                     <h3 class="d-flex align-items-center mb-0">
-                      53%
+                      {{ $student_count }}
                     </h3>
                   </div>
                 </div>
@@ -72,14 +72,14 @@
           <div class="col-xl-3 col-lg-6">
             <div class="card l-bg-green-dark">
               <div class="card-statistic-3 p-4">
-                <div class="card-icon card-icon-large"><i class="fas fa-user-plus"></i></div>
+                <div class="card-icon card-icon-large"></div>
                 <div class="mb-4">
-                  <h5 class="card-title mb-0">User Registrations</h5>
+                  <h5 class="card-title mb-0">Total Banner</h5>
                 </div>
                 <div class="row align-items-center mb-3 d-flex">
                   <div class="col-8">
                     <h3 class="d-flex align-items-center mb-0">
-                      44
+                      {{$banner_count}}
                     </h3>
                   </div>
                 </div>
@@ -90,18 +90,90 @@
           <div class="col-xl-3 col-lg-6 mt-md-0 mt-0">
             <div class="card l-bg-orange-dark">
               <div class="card-statistic-3 p-4">
-                <div class="card-icon card-icon-large"><i class="fas fa-chart-pie"></i></div>
+                <div class="card-icon card-icon-large"></i></div>
                 <div class="mb-4">
-                  <h5 class="card-title mb-0">Unique Visitors</h5>
+                  <h5 class="card-title mb-0">Total Institute_for</h5>
                 </div>
                 <div class="row align-items-center mb-3 d-flex">
                   <div class="col-8">
                     <h3 class="d-flex align-items-center mb-0">
-                      65
+                      {{ $institute_for_count }}
                     </h3>
                   </div>
                 </div>
-                <a href="#" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="institute-for-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-6 mt-md-0 mt-0">
+            <div class="card l-bg-orange-dark">
+              <div class="card-statistic-3 p-4">
+                <div class="card-icon card-icon-large"></i></div>
+                <div class="mb-4">
+                  <h5 class="card-title mb-0">Total Board</h5>
+                </div>
+                <div class="row align-items-center mb-3 d-flex">
+                  <div class="col-8">
+                    <h3 class="d-flex align-items-center mb-0">
+                      {{ $board_for_count }}
+                    </h3>
+                  </div>
+                </div>
+                <a href="board-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-6">
+            <div class="card l-bg-green-dark">
+              <div class="card-statistic-3 p-4">
+                <div class="card-icon card-icon-large"></div>
+                <div class="mb-4">
+                  <h5 class="card-title mb-0">Total Class</h5>
+                </div>
+                <div class="row align-items-center mb-3 d-flex">
+                  <div class="col-8">
+                    <h3 class="d-flex align-items-center mb-0">
+                      {{$class_for_count}}
+                    </h3>
+                  </div>
+                </div>
+                <a href="class-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-6">
+            <div class="card l-bg-sky-dark">
+              <div class="card-statistic-3 p-4">
+                <div class="card-icon card-icon-large"></div>
+                <div class="mb-4">
+                  <h5 class="card-title mb-0">Total Standard</h5>
+                </div>
+                <div class="row align-items-center mb-3 d-flex">
+                  <div class="col-8">
+                    <h3 class="d-flex align-items-center mb-0">
+                      {{ $standard_for_count }}
+                    </h3>
+                  </div>
+                </div>
+                <a href="standard-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+              </div>
+            </div>
+          </div>
+          <div class="col-xl-3 col-lg-6">
+            <div class="card l-bg-blue-dark">
+              <div class="card-statistic-3 p-4">
+                <div class="card-icon card-icon-large"></i></div>
+                <div class="mb-4">
+                  <h5 class="card-title mb-0">Total Subject</h5>
+                </div>
+                <div class="row align-items-center mb-3 d-flex">
+                  <div class="col-8">
+                    <h3 class="d-flex align-items-center mb-0">
+                      {{ $subject_for_count }}
+                    </h3>
+                  </div>
+                </div>
+                <a href="subject-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           </div>
@@ -110,7 +182,7 @@
         <!-- dashboard card end  -->
 
         <!-- Holiday & Leaves cards start -->
-        <div class="h-l-card">
+        <!-- <div class="h-l-card">
           <div class="row">
             <div class="col-lg-6">
               <div class="holiday-card bg-w-background">
@@ -145,7 +217,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </div> -->
         <!-- Holiday & Leaves cards end -->
 
         <!-- Announcement list start -->
@@ -158,54 +230,60 @@
                 <thead class="thead-primary-color">
                   <tr>
                     <th>No</th>
-                    <th>Date</th>
                     <th>Title</th>
-                    <th>Description</th>
+                    <th>Annoucement</th>
+                    <th>Institute</th>
+                    <th>Teacher</th>
+                    <th>Parent</th>
+                    <th>student</th>
+                  
                   </tr>
                 </thead>
 
                 <tbody>
-                  <tr>
-                    <td>1</td>
-                    <td class="date">15 <span>feb</span></td>
-                    <td class="standard">10 <span>Standard</span></td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
-
-                  <tr>
-                    <td>2</td>
-                    <td class="date">12 <span>feb</span></td>
-                    <td class="standard">3 <span>Standard</span> </td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
-
-                  <tr>
-                    <td>3</td>
-                    <td class="date">8 <span>feb</span></td>
-                    <td class="standard">All <span>Standard</span></td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
-
-                  <tr>
-                    <td>4</td>
-                    <td class="date">5 <span>feb</span></td>
-                    <td class="standard">12 <span>Standard</span>(Science)</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
-
-                  <tr>
-                    <td>5</td>
-                    <td class="date">4 <span>feb</span></td>
-                    <td class="standard">11 <span>Standard</span> (Comm)</td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
-
-                  <tr>
-                    <td>6</td>
-                    <td class="date">1 <span>feb</span></td>
-                    <td class="standard">5 <span>Standard</span></td>
-                    <td>Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do </td>
-                  </tr>
+                  @php $i = 1 @endphp
+                @foreach($response as $values)
+                                    <tr>
+                                    <td>{{$i}}</td>
+                                        <td>{{$values['title']}}</td>
+                                        <td>{{$values['announcement']}}</td>
+                                        <td style="height: 100px; overflow-y: auto;">
+                                            @foreach($values['institute_show'] as $institute)
+                                            {{$institute['institute_name']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                            @foreach($values['teacher_show'] as $teacher)
+                                            {{$teacher['firstname']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                        @foreach($values['parent_show'] as $parent)
+                                            {{$parent['firstname']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        <td>
+                                        @foreach($values['student_show'] as $student)
+                                            {{$student['firstname']}}
+                                            @if (!$loop->last)
+                                            <br>
+                                            @endif
+                                            @endforeach
+                                        </td>
+                                        
+                                    </tr>
+                                    @php $i++ @endphp
+                                    @endforeach
+                  </tbody>
                 </tbody>
               </table>
             </div>

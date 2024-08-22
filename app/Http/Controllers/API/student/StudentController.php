@@ -1144,6 +1144,10 @@ class StudentController extends Controller
                 $remove = Student_detail::where('student_id', $student_id)
                     ->where('institute_id', $institute_id)
                     ->delete();
+
+                $remove = Student_fees_model::where('student_id', $student_id)
+                            ->where('institute_id', $institute_id)
+                            ->delete();    
                 return $this->response([], "Institute Removed");
             } else {
                 return $this->response([], "Data not found", false, 400);
