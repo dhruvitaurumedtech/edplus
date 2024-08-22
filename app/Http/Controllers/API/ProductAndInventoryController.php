@@ -43,21 +43,35 @@ class ProductAndInventoryController extends Controller
     }
     public function add_inventory(Request $request){
         $validator = Validator::make($request->all(), [
-            'status' => 'required|exists:products_inventory_status,id',
-            'product_id' => 'required|exists:products,id',
-            'quantity' =>'required'
+            'institute_id' => 'required|exists:institute_detail,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $product = new Products_inventory();
-            $product->product_id = $request->product_id; 
-            $product->status = $request->status;
-            $product->quantity = $request->quantity;
-            $product->save();
+            $product_inventory = json_decode($request->product_inventory,true);
+            foreach($product_inventory as $productinventory){
+            if($productinventory['product_name']){
+                $product = new Products();
+                $product->name = $productinventory['product_name'];
+                $product->institute_id = $request->institute_id;
+                $product->status = '1';
+                $product->save();
+                $product_id = $product->id;
+            }else{
+                $product_id = $request->product_id;
+            }
+            if($productinventory['quantity']){
+                $product = new Products_inventory();
+                $product->product_id = $product_id; 
+                $product->status = $productinventory['status'];
+                $product->quantity = $productinventory['quantity'];
+                $product->save();
+            }
+            }
             return $this->response([], "Created successfully.");
         }catch (Exception $e) {
+            return $e;
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
@@ -87,7 +101,7 @@ class ProductAndInventoryController extends Controller
                 'available'=>$availableqty];
             }
             
-            return $this->response($productsList, "Products List.");
+        return $this->response($productsList, "Products List.");
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         } 

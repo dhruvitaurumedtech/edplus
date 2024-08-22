@@ -49,7 +49,7 @@ Route::group(['middleware' => ['web']], function () {
 });
 
 
-Route::middleware(['auth:api', 'apilogs'])->group(function () {
+Route::middleware(['apiauth', 'apilogs'])->group(function () {
     Route::post('/institute/upload-video', [VideoController::class, 'upload_video'])->name('upload_Video.get')->middleware('check.permission:9,1');
     Route::post('/institute/delete-video', [VideoController::class, 'delete_video'])->middleware('check.permission:9,3'); //priyanka
     Route::post('/institute/upload-youtube-video', [VideoController::class, 'upload_youtube_video'])->name('upload_youtube_Video.get')->middleware('check.permission:9,1');
@@ -232,7 +232,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/delete-general-timetable', [General_timetableController::class, 'delete_general_timetable']);
     Route::post('/institute/institute-day-filter-general-timetable', [General_timetableController::class, 'institute_day_filter_general_timetable']);
     Route::post('/institute/batch-standard-filter-general-timetable', [General_timetableController::class, 'batch_standard_filter_general_timetable']);
-    Route::post('/institute/add-product', [ProductAndInventoryController::class, 'create_product']);
+    Route::post('/institute/add-product', [ProductAndInventoryController::class, 'create_product']); // not in use 
     Route::post('/institute/inventory-status', [ProductAndInventoryController::class, 'inventory_status']);
     Route::post('/institute/add-inventory', [ProductAndInventoryController::class, 'add_inventory']);
     Route::post('/institute/product-list', [ProductAndInventoryController::class, 'product_list']);
