@@ -61,11 +61,13 @@ class ProductAndInventoryController extends Controller
             }else{
                 $product_id = $request->product_id;
             }
-            $product = new Products_inventory();
-            $product->product_id = $product_id; 
-            $product->status = $productinventory['status'];
-            $product->quantity = $productinventory['quantity'];
-            $product->save();
+            if($productinventory['quantity']){
+                $product = new Products_inventory();
+                $product->product_id = $product_id; 
+                $product->status = $productinventory['status'];
+                $product->quantity = $productinventory['quantity'];
+                $product->save();
+            }
             }
             return $this->response([], "Created successfully.");
         }catch (Exception $e) {
