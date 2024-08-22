@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Models\Products_assign;
 use App\Models\Products_inventory;
 use App\Models\Products_status;
 
@@ -33,7 +34,7 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
-   public function inventory_status(Request $request){
+    public function inventory_status(Request $request){
         try {
             $products = Products_status::select('id', 'name')->get();
             return $this->response($products, "Inventory Status.");
@@ -105,6 +106,26 @@ class ProductAndInventoryController extends Controller
         }catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         } 
+    }
+
+    public function product_assign(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $product = new Products_assign();
+            $product->user_id = $request->user_id;
+            $product->product_id = $request->product_id; 
+            $product->status = $request->status; 
+            $product->quantity = $request->quantity; 
+            $product->save();
+            return $this->response([], "Assign successfully.");
+        }catch (Exception $e) {
+            return $this->response($e, "Something went wrong!.", false, 400);
+        }
     }
 
 }
