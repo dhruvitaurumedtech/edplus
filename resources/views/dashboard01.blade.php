@@ -83,7 +83,7 @@
                     </h3>
                   </div>
                 </div>
-                <a href="#" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
+                <a href="banner-list" class="card-link">More info <i class="fas fa-arrow-circle-right"></i></a>
               </div>
             </div>
           </div>
