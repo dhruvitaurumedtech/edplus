@@ -3479,9 +3479,6 @@ class InstituteApiController extends Controller
                     'image' => (!empty($value->image)) ? asset($value->image) : asset('profile/no-image.png')
                 ];
             }
-
-
-
             return $this->response($response, "Fetch successfully.");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong.", false, 400);
