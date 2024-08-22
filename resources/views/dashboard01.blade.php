@@ -179,48 +179,7 @@
           </div>
 
         </div>
-        <!-- dashboard card end  -->
-
-        <!-- Holiday & Leaves cards start -->
-        <!-- <div class="h-l-card">
-          <div class="row">
-            <div class="col-lg-6">
-              <div class="holiday-card bg-w-background">
-                <h3>Holiday</h3>
-                <table>
-                  <tr>
-                    <th>Dhuleti</th>
-                    <td>25 - Mar</td>
-                  </tr>
-                  <tr>
-                    <th>Good Friday</th>
-                    <td>29 - Mar</td>
-                  </tr>
-                  <tr>
-                    <th>Ram Navami</th>
-                    <td>17 - Apr</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-            <div class="col-lg-6">
-              <div class="leaves-card bg-w-background">
-                <h3>Leaves</h3>
-                <div class="form-group">
-                  <select class="form-control" id="exampleFormControlSelect1">
-                    <option>Today</option>
-                    <option>Tomorrow</option>
-                    <option>Upcoming</option>
-                  </select>
-                </div>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div> -->
-        <!-- Holiday & Leaves cards end -->
-
-        <!-- Announcement list start -->
+     
         <div class="announcement bg-w-background pb-5">
           <div class="row">
             <div class="col-lg-12">
@@ -247,11 +206,10 @@
                                     <td>{{$i}}</td>
                                         <td>{{$values['title']}}</td>
                                         <td>{{$values['announcement']}}</td>
-                                        <td style="height: 100px; overflow-y: auto;">
+                                        <td>
                                             @foreach($values['institute_show'] as $institute)
                                             {{$institute['institute_name']}}
                                             @if (!$loop->last)
-                                            <br>
                                             @endif
                                             @endforeach
                                         </td>
@@ -259,7 +217,6 @@
                                             @foreach($values['teacher_show'] as $teacher)
                                             {{$teacher['firstname']}}
                                             @if (!$loop->last)
-                                            <br>
                                             @endif
                                             @endforeach
                                         </td>
@@ -267,7 +224,6 @@
                                         @foreach($values['parent_show'] as $parent)
                                             {{$parent['firstname']}}
                                             @if (!$loop->last)
-                                            <br>
                                             @endif
                                             @endforeach
                                         </td>
@@ -275,7 +231,6 @@
                                         @foreach($values['student_show'] as $student)
                                             {{$student['firstname']}}
                                             @if (!$loop->last)
-                                            <br>
                                             @endif
                                             @endforeach
                                         </td>
@@ -295,7 +250,6 @@
 
   </div>
 
-  <!-- js -->
   <script src="{{asset('mayal_assets/js/jquery-3.7.1.min.js')}}"></script>
   <script src="{{asset('mayal_assets/js/bootstrap.bundle.min.js')}}"></script>
   <script src="{{asset('mayal_assets/js/main.js')}}"></script>
