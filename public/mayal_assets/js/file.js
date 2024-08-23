@@ -181,17 +181,16 @@ document.querySelectorAll('.institute_list_editButton').forEach(function (button
     button.addEventListener('click', function () {
         var user_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
-        axios.post(baseUrl + '/admin/edit', {
+        axios.post(baseUrl + '/institute_list_admin/edit', {
             user_id: user_id
         })
             .then(response => {
                 var reponse_data = response.data.userDT;
                 console.log(reponse_data);
                 $('#user_id').val(reponse_data.id);
-                $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.firstname);
+                $('#name').val(reponse_data.institute_name);
                 $('#email').val(reponse_data.email);
-                $('#mobile').val(reponse_data.mobile);
+                $('#mobile').val(reponse_data.contact_no);
                 $('#usereditModal').modal('show');
             })
             .catch(error => {

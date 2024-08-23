@@ -68,7 +68,9 @@ Route::middleware('auth')->group(function () {
     Route::get('create/admin', [Users::class, 'subadmin_create'])->name('admin.create');
     Route::post('store/admin', [Users::class, 'subadmin_store'])->name('admin.store');
     Route::post('admin/edit', [Users::class, 'subadmin_edit'])->name('admin.edit');
+    Route::post('/institute_list_admin/edit', [Users::class, 'institute_subadmin_edit'])->name('institute_list_admin.edit');
     Route::post('admin/update', [Users::class, 'subadmin_update'])->name('admin.update');
+    Route::post('institute_admin/update', [Users::class, 'institute_subadmin_update'])->name('institute_admin.update');
     Route::post('admin/delete', [Users::class, 'subadmin_delete'])->name('admin.delete');
 
     //institute
@@ -147,9 +149,11 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter-save', [ChapterController::class, 'chapter_save'])->name('chapter.save');
     Route::post('chapter-list', [ChapterController::class, 'chapter_lists']);
     Route::get('chapter/edit/{id}', [ChapterController::class, 'chapter_edit']);
+    Route::post('chapter/get-chapters', [ChapterController::class, 'chapter_lists']);
+
     Route::post('chapter/update', [ChapterController::class, 'chapter_update']);
     Route::post('chapter-delete', [ChapterController::class, 'chapter_delete'])->name('chapter.delete');
-
+    
     //topic
     Route::get('topic-list', [TopicController::class, 'index'])->name('list.topic');
     Route::get('create/topic', [TopicController::class, 'list_topic'])->name('create.topic');

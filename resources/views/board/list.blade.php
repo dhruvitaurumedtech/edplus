@@ -10,9 +10,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('board-list')}}" class="active-link-dir">Board</a></li>
+         <li><a href="{{url('board-list')}}" class="active-link-dir">Board</a></li>
         </ul>
       </div>
       @include('layouts/alert')

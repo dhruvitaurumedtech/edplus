@@ -98,9 +98,9 @@
             <i class="fas fa-images"></i>&nbsp; Banner
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('banner-sizes') ? 'show' : '' }}" id="access-control-menu">
-                <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-sizes') ? 'active' : '' }}" id="submenu1-toggle">
+                <!-- <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-sizes') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Banner-size
-                </a>
+                </a> -->
                 <a href="{{ url('banner-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Banner
                 </a>
@@ -113,7 +113,7 @@
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('video-category-list') ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-category-list') ? 'active' : '' }}" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Video Category
+                    <i class="fas fa-angle-right"></i>&nbsp; Content Category
                 </a>
             </div>
         </div>

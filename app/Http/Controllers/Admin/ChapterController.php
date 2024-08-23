@@ -100,11 +100,10 @@ class ChapterController extends Controller
     public function chapter_lists(Request $request)
     {
         $subject_id = $request->subject_id;
-        $base_id = $request->base_id;
+        $base_id = $request->standard_id;
 
         $chapters = Chapter::where('subject_id', $subject_id)
             ->where('base_table_id', $base_id)->get();
-
         return response()->json(['chapters' => $chapters]);
     }
     function chapter_edit(Request $request, $id)
@@ -146,6 +145,7 @@ class ChapterController extends Controller
         $subject = Subject_model::get();
         return view('chapter.edit', compact('Standard', 'subject', 'Standard_list'));
     }
+    
     public function chapter_update(Request $request)
     {
         $request->validate([

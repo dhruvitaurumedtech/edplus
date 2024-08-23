@@ -8,9 +8,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}" class="active-link-dir">Institute List</a></li>
+          <li><a href="{{url('institute-list')}}" class="active-link-dir">List Institute</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -48,7 +46,7 @@
                   <td>{{$value['status']}}</td>
                   <td>
                     <div class="d-flex">
-                      <input type="submit" class="btn text-white btn-rmv2 institute_list_editButton" data-user-id="{{ $value['id'] }}" value="Edit">&nbsp;&nbsp;
+                      <input type="submit" class="btn text-white btn-rmv2 institute_list_editButton" data-user-id="{{ $value['id'] }}"  value="Edit">&nbsp;&nbsp;
                       &nbsp;&nbsp;
                       <input type="submit" class="btn btn-danger institute_list_deletebutton" data-user-id="{{ $value['id'] }}" value="Delete">
                       &nbsp;&nbsp;
@@ -87,22 +85,10 @@
         </button>
       </div>
       <div class="modal-body">
-        <form method="post" action="{{ url('admin/update') }}">
+        <form method="post" action="{{ url('institute_admin/update') }}">
           @csrf
           <div class="card-body">
-            <div class="form-group row">
-              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
-              <div class="col-sm-10">
-                <select class="form-control" name="role_type" id="role_type">
-                  <option value="">Select Role</option>
-                  <option value="2">Admin</option>
-                  <option value="3">Institute</option>
-                </select>
-                @error('role_type')
-                <div class="alert alert-danger">{{ $message }}</div>
-                @enderror
-              </div>
-            </div>
+           
             <div class="form-group row">
               <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
               <div class="col-sm-10">

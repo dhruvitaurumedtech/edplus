@@ -8,9 +8,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Banner</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}" class="active-link-dir">Create Banner</a></li>
+          <li><a href="javascript:void(0)" class="active-link-dir">Create Banner</a></li>
         </ul>
       </div>
       @include('layouts/alert')

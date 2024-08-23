@@ -8,11 +8,7 @@
                 <ul>
                     <li><a href="index.php">Home</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)">Base Table</a></li>
-                    <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="chapter-list.php">Chapter</a></li>
-                    <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)" class="active-link-dir">Create Chapter List</a></li>
+                    <li><a href="javascript:void(0)" class="active-link-dir">Chapter</a></li>
                 </ul>
             </div>
             @include('layouts/alert')
@@ -42,27 +38,42 @@
                         @error('subject')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
+                        <div class="row">
+                        <div class="col-lg-6" id="table_chapter"  style="display: none;">
+                            <table border="2" style="padding: 10px;" class="table table-responsive-sm table-bordered institute-table mt-4" >
+                                <thead>
+                                    <tr class="text-center">
+                                        <th style="width: 50%">Chapter No</th>
+                                        <th>Chapter Name</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="chapter_table_body" class="text-center">
+                                    <!-- Chapters will be dynamically inserted here -->
+                                </tbody>
+                            </table>
+                        </div>
+                        </div>
                         <h3>Chapter Number</h3>
                         <div class="border-line-chapter">
                             <div class="search-box-2 form-group">
                                 <input type="search" name="chapter_no[]" placeholder="Chapter Number" class="form-control">
                             </div>
                             @error('chapter_no.*')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                             <h3>Chapter Name</h3>
                             <div class="search-box-2 form-group">
                                 <input type="search" name="chapter_name[]" placeholder="Chapter Name" class="form-control" multiple>
                             </div>
                             @error('chapter_name.*')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                             <h3>Chapter Image</h3>
                             <div class="search-box-2 form-group">
                                 <input class="py-2 pl-2" type="file" name="chapter_image[]" onchange='openFile(event,"output")'>
                             </div>
                             @error('chapter_image.*')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                             <img id="output" src="" class="img-resize" style="display: none;" />
                         </div>
@@ -117,13 +128,46 @@
                                 var option = new Option(subjects.name, subjects.id);
                                 secondDropdown.appendChild(option);
                             });
+
+
                         })
                         .catch(function(error) {
                             console.error(error);
                         });
                 });
             });
+            $('#subject').on('change', function() {
+                var subject_id = $(this).val();
+                var standard_id = $('#standard_id').val();
 
+                if (subject_id && standard_id) {
+                    axios.post('chapter/get-chapters', {
+                            standard_id: standard_id,
+                            subject_id: subject_id,
+                        })
+                        .then(function(response) {
+                        var chapterTableBody = document.getElementById('chapter_table_body');
+                        var table_chapter = document.getElementById('table_chapter');
+                        table_chapter.style.display = 'block';
+                        chapterTableBody.innerHTML = ''; // Clear existing rows
+
+                        response.data.chapters.forEach(function(chapter) {
+                            var row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>${chapter.chapter_no}</td>
+                                <td>${chapter.chapter_name}</td>
+                            `;
+                            chapterTableBody.appendChild(row);
+                        });
+                    })
+                    .catch(function(error) {
+                        console.error('Error fetching chapters:', error);
+                    });
+                } else {
+                    // Clear the chapters dropdown if no subject is selected
+                    document.getElementById('chapter').innerHTML = '<option value="">Select Chapter</option>';
+                }
+            });
             var container = document.querySelector('.add-chapter-btn');
             var chapterCount = 0;
 
