@@ -24,7 +24,7 @@
 
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">Class Name : </label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
+                    <input type="text" name="name" class="form-control" placeholder="Enter Class Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -87,7 +87,11 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize"></td>
+                    <td>
+                            <img src="{{ !empty($value->icon) ? asset($value->icon) : asset('no-image.png') }}" 
+                                alt="{{ !empty($value->icon) ? 'Icon' : 'No image available' }}" 
+                                class="img-resize" >
+                        </td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else

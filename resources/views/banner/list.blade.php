@@ -108,7 +108,11 @@
                         <td>{{$value->institute_name}}</td>
                         <td>{{$value->url}}</td>
                         @endif
-                        <td><img src="{{asset($value->banner_image) }}" alt="banner" class="img-resize mt-3"></td>
+                        <td>
+                            <img src="{{ !empty($value->banner_image) ? asset($value->banner_image) : asset('no-image.png') }}" 
+                                alt="{{ !empty($value->banner_image) ? 'Banner image' : 'No image available' }}" 
+                                class="img-resize" >
+                        </td>
                         <td>@if($value->status == 'active')
                           <input type="button" value="Active" class="btn btn-success">
                           @else

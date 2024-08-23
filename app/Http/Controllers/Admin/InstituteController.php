@@ -22,6 +22,8 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rule;
 
 class InstituteController extends Controller
@@ -263,5 +265,26 @@ class InstituteController extends Controller
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+    public function change_password(Request $request){
+        return view('admin.change_password');
+    }
+    public function change_password_save(Request $request){
+        $request->validate([
+            'old_password' => 'required',
+            'new_password' => ['required',  'min:8'],
+        ]);
+    
+        // Check if the old password matches
+        if (!Hash::check($request->old_password, Auth::user()->password)) {
+            return back()->withErrors(['old_password' => 'The provided password does not match your current password.']);
+        }
+    
+        // Update the user's password
+        $user = Auth::user();
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+    
+        return redirect()->back()->with('success', 'Password updated successfully!');
     }
 }

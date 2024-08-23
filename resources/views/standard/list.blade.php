@@ -25,7 +25,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">Standard Name : </label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
+                    <input type="text" name="name" class="form-control" placeholder="Enter Standard Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
