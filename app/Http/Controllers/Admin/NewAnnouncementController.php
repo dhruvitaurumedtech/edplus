@@ -82,7 +82,7 @@ class NewAnnouncementController extends Controller
         $announcement = Common_announcement::create([
             'institute_id' => implode(",", $request->institute_id),
             'teacher_id' => implode(",", $request->selected_users),
-            'title' => $request->title,
+            'title' => (!empty($request->title))? $request->title : '',
             'announcement' => $request->announcement,
         ]);
         // Get device keys of selected users
