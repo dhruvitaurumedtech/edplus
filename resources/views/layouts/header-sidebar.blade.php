@@ -17,7 +17,7 @@
 
     <div class="dashboard-nav-dropdown {{ Request::is('dashboard') ? 'show' : '' }}" id="admin-dropdown">
         <a href="dashboard" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
-        <i class="fas fa-tachometer-alt"></i>&nbsp; dashboard
+        <i class="fas fa-tachometer-alt"></i>&nbsp; Dashboard
         </a>
    </div> 
     <div class="dashboard-nav-dropdown {{ Request::is('admin') ? 'show' : '' }}" id="admin-dropdown">
@@ -109,7 +109,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ Request::is('video-category-list')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-            <i class="fas fa-certificate"></i>&nbsp; Content Category
+            <i class="fas fa-ticket-alt"></i>&nbsp; Content Category
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('video-category-list') ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-category-list') ? 'active' : '' }}" id="submenu1-toggle">

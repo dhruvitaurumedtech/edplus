@@ -25,8 +25,8 @@
                 @csrf
                 <div class="row">
                   <div class="col-md-12">
-                    <label for="exampleInputEmail1">Name : </label>
-                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Name" value="{{old('name')}}">
+                    <label for="exampleInputEmail1">Institute For Name : </label>
+                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Institute For Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror

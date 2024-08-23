@@ -246,6 +246,9 @@ Route::middleware('auth')->group(function () {
     Route::get('app_role/{id}/permissions', [AppRoleController::class, 'permissions'])->name('app_role.permissions');
     Route::post('app_role/{id}/permissions/update', [AppRoleController::class, 'update_permissions'])->name('app_role.update_permissions');
 
+    Route::get('change-password', [InstituteController::class, 'change_password'])->name('changepassword');
+    Route::post('change-password-save', [InstituteController::class, 'change_password_save'])->name('changepassword.save');
+    
     // ACL Management Module End
 });
 
