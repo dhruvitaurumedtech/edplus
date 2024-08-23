@@ -237,6 +237,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-inventory', [ProductAndInventoryController::class, 'add_inventory']);
     Route::post('/institute/product-list', [ProductAndInventoryController::class, 'product_list']);
     Route::post('/institute/product-assign', [ProductAndInventoryController::class, 'product_assign']);
+    Route::post('/institute/product-assign-history', [ProductAndInventoryController::class, 'product_assign_history']);
     
 
     //remainder

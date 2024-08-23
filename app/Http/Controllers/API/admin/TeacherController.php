@@ -122,10 +122,19 @@ class TeacherController extends Controller
 
             $requested_institute = [];
             foreach ($requestInstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status','!=', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')->pluck('board.name')
+                ->unique()
+                ->implode(', ');
+
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address' => $value->address,
+                    'board'=>$teachrboarddt,
                     'logo' => asset($value->logo),
                     'status' => $value->sstatus,
                 );
@@ -146,10 +155,18 @@ class TeacherController extends Controller
 
             $join_with = [];
             foreach ($joininstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')->pluck('board.name')
+                ->unique()
+                ->implode(', ');
                 $join_with[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                     'address' => $value->address,
+                    'board'=>$teachrboarddt,
                     'logo' => asset($value->logo),
                 );
             }
