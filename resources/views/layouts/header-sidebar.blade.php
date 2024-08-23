@@ -16,7 +16,7 @@
     <nav class="dashboard-nav-list">
 
     <div class="dashboard-nav-dropdown {{ Request::is('dashboard') ? 'show' : '' }}" id="admin-dropdown">
-        <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
+        <a href="dashboard" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
         <i class="fas fa-tachometer-alt"></i>&nbsp; dashboard
         </a>
    </div> 
