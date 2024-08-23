@@ -122,10 +122,24 @@ class TeacherController extends Controller
 
             $requested_institute = [];
             foreach ($requestInstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status','!=', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')
+                ->select('board.name')
+                ->distinct()
+                ->get();
+                $boards = [];
+                foreach($teachrboarddt as $tchbd){
+                    $boards[]=['name'=>$tchbd->name];
+                }
+
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address' => $value->address,
+                    'board'=>$boards,
                     'logo' => asset($value->logo),
                     'status' => $value->sstatus,
                 );
@@ -145,11 +159,25 @@ class TeacherController extends Controller
                 ->paginate($perPage);
 
             $join_with = [];
+            
             foreach ($joininstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')
+                ->select('board.name')
+                ->distinct()
+                ->get();
+                $jboards = [];
+                foreach($teachrboarddt as $tchbd){
+                    $jboards[]=['name'=>$tchbd->name];
+                }
                 $join_with[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                     'address' => $value->address,
+                    'board'=>$jboards,
                     'logo' => asset($value->logo),
                 );
             }
