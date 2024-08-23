@@ -15,7 +15,11 @@
 <div class="dashboard-nav">
     <nav class="dashboard-nav-list">
 
-       
+    <div class="dashboard-nav-dropdown {{ Request::is('dashboard') ? 'show' : '' }}" id="admin-dropdown">
+        <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
+        <i class="fas fa-tachometer-alt"></i>&nbsp; dashboard
+        </a>
+   </div> 
     <div class="dashboard-nav-dropdown {{ Request::is('admin') ? 'show' : '' }}" id="admin-dropdown">
     <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
     <i class="fas fa-user"></i>&nbsp; Admin
@@ -91,7 +95,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ Request::is('banner-sizes') || Request::is('banner-list') ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle " id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Banner
+            <i class="fas fa-images"></i>&nbsp; Banner
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('banner-sizes') ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-sizes') ? 'active' : '' }}" id="submenu1-toggle">
@@ -105,7 +109,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ Request::is('video-category-list')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Category
+            <i class="fas fa-certificate"></i>&nbsp; Category
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('video-category-list') ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-category-list') ? 'active' : '' }}" id="submenu1-toggle">
@@ -115,7 +119,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ Request::is('announcement-create-new')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Announcement
+            <i class="fas fa-bullhorn"></i>&nbsp; Announcement
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('announcement-create-new') ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('announcement-create-new') }}" class="dashboard-nav-dropdown-item {{ Request::is('announcement-create-new') ? 'active' : '' }}" id="submenu1-toggle">
@@ -125,7 +129,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ Request::is('video-time-limit')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Video Time Limit
+            <i class="fas fa-video"></i>&nbsp; Video Time Limit
             </a>
             <div class="dashboard-nav-dropdown-menu {{ Request::is('video-time-limit')  ? 'show' : '' }}" id="access-control-menu">
                 <a href="{{ url('video-time-limit') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-time-limit')  ? 'active' : '' }}" id="submenu1-toggle">
@@ -135,7 +139,7 @@
         </div>
         <div class="dashboard-nav-dropdown {{ in_array(Route::currentRouteName(), ['module.list', 'feature.list', 'app_role.list']) ? 'show' : '' }}" id="access-control-dropdown">
     <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-        <i class="fas fa-graduation-cap"></i>&nbsp; Access Control
+    <i class="fas fa-gamepad"></i>&nbsp; Access Control
     </a>
     <div class="dashboard-nav-dropdown-menu">
         <a href="{{ route('module.list') }}" class="dashboard-nav-dropdown-item {{ Route::currentRouteName() == 'module.list' ? 'active' : '' }}" id="submenu1-toggle">
