@@ -16,136 +16,140 @@
     <nav class="dashboard-nav-list">
 
        
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Admin
+    <div class="dashboard-nav-dropdown {{ Request::is('admin') ? 'show' : '' }}" id="admin-dropdown">
+    <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="admin-toggle">
+    <i class="fas fa-user"></i>&nbsp; Admin
+    </a>
+    <div class="dashboard-nav-dropdown-menu {{ Request::is('admin') ? 'show' : '' }}" id="admin-menu">
+        <a href="{{ url('admin') }}" class="dashboard-nav-dropdown-item {{ Request::is('admin') ? 'active' : '' }}" id="submenu1-toggle">
+            <i class="fas fa-angle-right"></i>&nbsp; Admin
+        </a>
+    </div>
+</div>
+
+        <div class="dashboard-nav-dropdown {{ Request::is('institute-admin') || Request::is('institute-list') || Request::is('institute-for-list') ||
+           Request::is('board-list') || Request::is('class-list') || Request::is('medium-list') || Request::is('standard-list') || 
+           Request::is('stream-list') || Request::is('subject-list') || Request::is('add-lists') || Request::is('do-business-with-list')? 'show' : ''  }}" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle {{ Request::is('institute-admin') ? 'active' : '' }}" id="access-control-toggle">
+            <i class="fas fa-university"></i>&nbsp; Institute
             </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('admin') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Admin
-                </a>
-               </div>
-        </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Institute
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('institute-admin') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('institute-admin') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('institute-admin') }}" class="dashboard-nav-dropdown-item {{ Request::is('institute-admin') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Institutes Admins
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('institute-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('institute-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('institute-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('institute-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; List institute
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('institute-for-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('institute-for-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('institute-for-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('institute-for-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Institute_for
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('board-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('board-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('board-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('board-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Board
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('class-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('class-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('class-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('class-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Class
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('medium-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('medium-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('medium-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('medium-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Medium
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('standard-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('standard-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('standard-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('standard-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Standard
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('stream-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('stream-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('stream-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('stream-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Stream
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('subject-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('subject-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('subject-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('subject-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Subject
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('add-lists') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('add-lists') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('add-lists') }}" class="dashboard-nav-dropdown-item {{ Request::is('add-lists') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Chapter
                 </a>
             </div>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('do-business-with-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('do-business-with-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('do-business-with-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('do-business-with-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Do_business_with
                 </a>
             </div>
         </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+        <div class="dashboard-nav-dropdown {{ Request::is('banner-sizes') || Request::is('banner-list') ? 'show' : '' }}" id="access-control-dropdown">
+            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle " id="access-control-toggle">
                 <i class="fas fa-graduation-cap"></i>&nbsp; Banner
             </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('banner-sizes') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('banner-sizes') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-sizes') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Banner-size
                 </a>
-                <a href="{{ url('banner-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; banner
+                <a href="{{ url('banner-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('banner-list') ? 'active' : '' }}" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Banner
                 </a>
                 
             </div>
         </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+        <div class="dashboard-nav-dropdown {{ Request::is('video-category-list')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
                 <i class="fas fa-graduation-cap"></i>&nbsp; Category
             </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('video-category-list') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('video-category-list') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-category-list') ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Video Category
                 </a>
             </div>
         </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+        <div class="dashboard-nav-dropdown {{ Request::is('announcement-create-new')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
                 <i class="fas fa-graduation-cap"></i>&nbsp; Announcement
             </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('announcement-create-new') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; announcement
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('announcement-create-new') ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('announcement-create-new') }}" class="dashboard-nav-dropdown-item {{ Request::is('announcement-create-new') ? 'active' : '' }}" id="submenu1-toggle">
+                    <i class="fas fa-angle-right"></i>&nbsp; Announcement
                 </a>
             </div>
         </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
+        <div class="dashboard-nav-dropdown {{ Request::is('video-time-limit')  ? 'show' : '' }}" id="access-control-dropdown">
             <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
                 <i class="fas fa-graduation-cap"></i>&nbsp; Video Time Limit
             </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ url('video-time-limit') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
+            <div class="dashboard-nav-dropdown-menu {{ Request::is('video-time-limit')  ? 'show' : '' }}" id="access-control-menu">
+                <a href="{{ url('video-time-limit') }}" class="dashboard-nav-dropdown-item {{ Request::is('video-time-limit')  ? 'active' : '' }}" id="submenu1-toggle">
                     <i class="fas fa-angle-right"></i>&nbsp; Video Time Limit
                 </a>
             </div>
         </div>
-        <div class="dashboard-nav-dropdown" id="access-control-dropdown">
-            <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
-                <i class="fas fa-graduation-cap"></i>&nbsp; Access Control
-            </a>
-            <div class="dashboard-nav-dropdown-menu" id="access-control-menu">
-                <a href="{{ route('module.list') }}" class="dashboard-nav-dropdown-item" id="submenu1-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Module
-                </a>
-                <a href="{{ route('feature.list') }}" class="dashboard-nav-dropdown-item" id="submenu2-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; Feature
-                </a>
-                <a href="{{ route('app_role.list') }}" class="dashboard-nav-dropdown-item" id="submenu2-toggle">
-                    <i class="fas fa-angle-right"></i>&nbsp; App Role
-                </a>
-            </div>
-        </div>
+        <div class="dashboard-nav-dropdown {{ in_array(Route::currentRouteName(), ['module.list', 'feature.list', 'app_role.list']) ? 'show' : '' }}" id="access-control-dropdown">
+    <a href="#" class="dashboard-nav-item dashboard-nav-dropdown-toggle" id="access-control-toggle">
+        <i class="fas fa-graduation-cap"></i>&nbsp; Access Control
+    </a>
+    <div class="dashboard-nav-dropdown-menu">
+        <a href="{{ route('module.list') }}" class="dashboard-nav-dropdown-item {{ Route::currentRouteName() == 'module.list' ? 'active' : '' }}" id="submenu1-toggle">
+            <i class="fas fa-angle-right"></i>&nbsp; Module
+        </a>
+        <a href="{{ route('feature.list') }}" class="dashboard-nav-dropdown-item {{ Route::currentRouteName() == 'feature.list' ? 'active' : '' }}" id="submenu2-toggle">
+            <i class="fas fa-angle-right"></i>&nbsp; Feature
+        </a>
+        <a href="{{ route('app_role.list') }}" class="dashboard-nav-dropdown-item {{ Route::currentRouteName() == 'app_role.list' ? 'active' : '' }}" id="submenu3-toggle">
+            <i class="fas fa-angle-right"></i>&nbsp; App Role
+        </a>
+    </div>
+</div>
+
 
 
     </nav>
