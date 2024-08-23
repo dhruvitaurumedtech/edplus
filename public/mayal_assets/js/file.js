@@ -993,3 +993,33 @@ document.querySelectorAll('.video_limit_editButton').forEach(function (button) {
             });
     });
 });
+document.querySelectorAll('.video_limit_deletebutton').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var video_time_limit_id = this.getAttribute('data-user-id');
+       
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('video-timelimit-delete', {
+                    video_time_limit_id: video_time_limit_id
+                })
+                    .then(response => {
+                        location.reload(true);
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+    });
+});

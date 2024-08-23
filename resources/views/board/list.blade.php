@@ -92,7 +92,11 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize"></td>
+                    <td>
+                            <img src="{{ !empty($value->icon) ? asset($value->icon) : asset('no-image.png') }}" 
+                                alt="{{ !empty($value->icon) ? 'Icon image' : 'No image available' }}" 
+                                class="img-resize" >
+                        </td>
                     <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else

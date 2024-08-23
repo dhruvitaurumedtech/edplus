@@ -89,7 +89,8 @@ class Videotimelimitcontroller extends Controller
 
     public function destroy(Request $request)
     {
-        $timw_id = $request->input('id');
+         $timw_id = $request->input('video_time_limit_id');
+
         $tim_list = Video_time_limit_model::find($timw_id);
 
         if (!$tim_list) {

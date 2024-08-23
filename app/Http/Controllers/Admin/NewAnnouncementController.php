@@ -92,7 +92,7 @@ class NewAnnouncementController extends Controller
         $serverKey = "AAAAw2iOsiU:APA91bFvtJsovqQESQi_Tzf0rPxBxcCXHTASZBVScK_MZBrg-Tbx5sBFfTVu9ryq-bJx-mr3GdPqFfX-PNJhBuEea5sz9XT7ytSoHFwg45jX_oS60IxFiYxLXJCA38ZL2HSb3WBuBENa";
         $url = "https://fcm.googleapis.com/fcm/send";
         $registrationIds = $users->pluck('device_key')->toArray();
-        $notificationTitle = $request->title;
+        $notificationTitle = (!empty($request->title))? $request->title : '';
         $notificationBody = $request->announcement;
         $data = [
             'registration_ids' => $registrationIds,
