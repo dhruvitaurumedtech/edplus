@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Banner_model;
 use App\Models\Base_table;
 use App\Models\board;
 use App\Models\Class_model;
@@ -22,6 +23,7 @@ use App\Models\Stream_sub;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\User;
+use App\Models\VideoCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -158,6 +160,44 @@ class InstituteController extends Controller
 
                     if ($user) {
                         // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'do-businesss-with'){
+                    $user = Dobusinesswith_Model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'banner_list'){
+                    $user = Banner_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'video-category-list'){
+                    $user = VideoCategory::find($request->user_id);
+
+                    if ($user) {
                         $user->status = $user->status === 'active' ? 'inactive' : 'active';
                         $user->save();
 
