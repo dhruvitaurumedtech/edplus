@@ -123,6 +123,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/base-board', [BasetableControllerAPI::class, 'board']);
     Route::post('/institute/base-medium', [BasetableControllerAPI::class, 'medium']);
     Route::post('/institute/base-class', [BasetableControllerAPI::class, 'class']);
+    Route::post('/institute/with-class-medium', [BasetableControllerAPI::class, 'with_class_medium']);
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);

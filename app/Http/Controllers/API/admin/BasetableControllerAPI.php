@@ -88,17 +88,63 @@ class BasetableControllerAPI extends Controller
             $data = [];
             foreach ($base_medium as $basemedium) {
                 $data[] = array(
-                    'id' => $basemedium->id, 'name' => $basemedium->name,
+                    'id' => $basemedium->id, 
+                    'name' => $basemedium->name,
                     'icon' => url($basemedium->icon)
                 );
             }
+            
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
+    public function with_class_medium(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $board_ids = explode(',', $request->board_id);
+            $medium_ids = explode(',', $request->medium_id);
+            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
+            $base_class =  Class_model::whereIn('id', $getClassId)->get();
+            $classData = [];
+            foreach ($base_class as $baseclass) {
+                $classData[] = array(
+                    'id' => $baseclass->id, 'name' => $baseclass->name,
+                    'icon' => (!empty($baseclass->icon))?url($baseclass->icon):asset('profile/no-image.png'),
+                );
+            }
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $board_ids = explode(',', $request->board_id);
+            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
+            $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
+            $mediumData = [];
+            foreach ($base_medium as $basemedium) {
+                $mediumData[] = array(
+                    'id' => $basemedium->id, 
+                    'name' => $basemedium->name,
+                    'icon' => (!empty($basemedium->icon))?url($basemedium->icon):asset('profile/no-image.png'),
+                    'classes' => $classData,
+                );
+            }
+            
+            
+
+            return $this->response($mediumData, "Fetch Data Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
 
     public function class(Request $request)
     {
@@ -119,15 +165,18 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
             $base_class =  Class_model::whereIn('id', $getClassId)->get();
-            $data = [];
+            $classData = [];
             foreach ($base_class as $baseclass) {
-                $data[] = array(
+                $classData[] = array(
                     'id' => $baseclass->id, 'name' => $baseclass->name,
-                    'icon' => url($baseclass->icon)
+                    'icon' => (!empty($baseclass->icon))?url($baseclass->icon):asset('profile/no-image.png'),
                 );
             }
+           
+            
+            
 
-            return $this->response($data, "Fetch Data Successfully");
+            return $this->response($classData, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
