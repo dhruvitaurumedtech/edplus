@@ -15,8 +15,11 @@ use App\Models\Institute_for_model;
 use App\Models\Institute_for_sub;
 use App\Models\Medium_model;
 use App\Models\Medium_sub;
+use App\Models\Standard_model;
 use App\Models\Standard_sub;
+use App\Models\Stream_model;
 use App\Models\Stream_sub;
+use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -70,6 +73,102 @@ class InstituteController extends Controller
         $institute_for = Institute_for_model::paginate(10);
         return view('institute/create_institute_for', compact('institute_for'));
     }
+    public function toggleStatus(Request $request)
+        {
+            if($request->name == 'board'){
+                $user = Board::find($request->user_id);
+
+                if ($user) {
+                    $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                    $user->save();
+    
+                    return response()->json(['status' => $user->status]);
+                }
+    
+                return response()->json(['error' => 'User not found'], 404);
+                   
+            }
+            if($request->name == 'institute_for'){
+                    $user = Institute_for_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'class_list'){
+                    $user = Class_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'medium_list'){
+                    $user = Medium_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'standard_list'){
+                    $user = Standard_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'stream_list'){
+                    $user = Stream_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                if($request->name == 'subject_list'){
+                    $user = Subject_model::find($request->user_id);
+
+                    if ($user) {
+                        // Toggle the active state; switch between 'active' and 'inactive'
+                        $user->status = $user->status === 'active' ? 'inactive' : 'active';
+                        $user->save();
+
+                        return response()->json(['status' => $user->status]);
+                    }
+            
+            return response()->json(['error' => 'User not found'], 404);
+                }
+                
+        }
+
     public function list_institute_for()
     {
         $institute_for = Institute_for_model::paginate(10);

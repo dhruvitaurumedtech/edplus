@@ -75,12 +75,17 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
+                    </td> -->
+                    <td>
+                        <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="standard_list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                            {{ ucfirst($value->status) }}
+                        </button>
                     </td>
 
                     <td>
@@ -157,3 +162,14 @@
     @include('layouts/footer_new')
   </div>
 </body>
+<style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>

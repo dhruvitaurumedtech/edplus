@@ -97,11 +97,16 @@
                     <td><img src="{{ !empty($value->icon) ? asset($value->icon) : asset('no-image.png') }}" 
                                 alt="{{ !empty($value->icon) ? 'Icon' : 'No image available' }}" 
                                 class="img-resize" ></td>
-                    <td>@if($value->status == 'active')
+                    
+                      <!-- @if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
-                      @endif
+                      @endif -->
+                      <td>
+                      <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="institute_for" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                          {{ ucfirst($value->status) }}
+                      </button>
                     </td>
 
                     <td>
@@ -224,4 +229,16 @@
     }
 
   </script>
+  <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
+ 
   @include('layouts/footer_new')

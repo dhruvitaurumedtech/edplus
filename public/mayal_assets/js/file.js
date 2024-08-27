@@ -1022,3 +1022,34 @@ document.querySelectorAll('.video_limit_deletebutton').forEach(function (button)
         });
     });
 });
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('[id^="status-button-"]'); 
+
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const userId = button.getAttribute('data-user-id');
+            const name = button.getAttribute('data-name-id');
+
+
+    axios.post('list-institute-for-/toggle-status', {
+        user_id: userId,
+        name : name ,
+    })
+    .then(function(response) {
+        const status = response.data.status;
+        if (status === 'active') {
+            button.classList.remove('btn-inactive');
+            button.classList.add('btn-active');
+            button.textContent = 'Active';
+        } else {
+            button.classList.remove('btn-active');
+            button.classList.add('btn-inactive');
+            button.textContent = 'Inactive';
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+    });
+});
+});
+});

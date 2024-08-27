@@ -90,14 +90,18 @@
                                 alt="{{ !empty($value->icon) ? 'Icon' : 'No image available' }}" 
                                 class="img-resize" >
                         </td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
+                    </td> -->
+                    <td>
+                        <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="class_list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                            {{ ucfirst($value->status) }}
+                        </button>
                     </td>
-
                     <td>
                       <div class="d-flex">
                         <input type="submit" class="btn text-white btn-rmv2 class_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
@@ -185,6 +189,17 @@
     @include('layouts/footer_new')
   </div>
 </body>
+<style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
 <script>
   function previewFile_create() {
     $("#icon_create").show();

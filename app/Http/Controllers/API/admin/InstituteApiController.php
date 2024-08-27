@@ -1012,6 +1012,8 @@ class InstituteApiController extends Controller
                         'id' => $batDT->id,
                         'batch_name' => $batDT->batch_name,
                         'board' => $batDT->board,
+                        'board_image' => (!empty($batDT->icon))?asset($batDT->icon): asset('profile/no-image.png'),
+                       
                         'medium' => $batDT->medium,
                         'stream' => $batDT->stream,
                         'subjects' => $subects

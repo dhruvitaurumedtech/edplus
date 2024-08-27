@@ -80,6 +80,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('institute-for-list', [InstituteController::class, 'list_institute_for'])->name('institute_for.list');
     Route::get('/create/institute_for', [InstituteController::class, 'create_institute_for'])->name('institute_for.create');
+    Route::post('list-institute-for-/toggle-status', [InstituteController::class, 'toggleStatus'])->name('institute_for.create');
+
     Route::post('institute-for/save', [InstituteController::class, 'institute_for_save'])->name('institute_for.save');
     Route::post('/institute-for/edit', [InstituteController::class, 'institute_for_edit'])->name('institute_for.edit');
     Route::post('institute-for/update', [InstituteController::class, 'institute_for_update'])->name('institute.update');
