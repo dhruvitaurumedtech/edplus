@@ -104,7 +104,7 @@ class BasetableControllerAPI extends Controller
         $validator = Validator::make($request->all(), [
             'institute_for_id' => 'required',
             'board_id' => 'required',
-            'medium_id' => 'required',
+            // 'medium_id' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -114,8 +114,8 @@ class BasetableControllerAPI extends Controller
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
-            $medium_ids = explode(',', $request->medium_id);
-            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
+            // $medium_ids = explode(',', $request->medium_id);
+            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('institute_for_class');
             $base_class =  Class_model::whereIn('id', $getClassId)->get();
             $classData = [];
             foreach ($base_class as $baseclass) {
