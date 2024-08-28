@@ -51,7 +51,7 @@
                 @if($value->base_id == $subvalue->baset_id)
                     @if(!$hasSubjects)
                         <!-- Print table header once -->
-                        <table>
+                        <table class="table table-js table-responsive-sm ">
                             <tr><th>Subject</th><th>Status</th></tr>
                         @php $hasSubjects = true; @endphp
                     @endif
