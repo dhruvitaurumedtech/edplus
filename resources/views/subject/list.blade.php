@@ -50,7 +50,6 @@
             @foreach($subject_list as $subvalue)
                 @if($value->base_id == $subvalue->baset_id)
                     @if(!$hasSubjects)
-                        <!-- Print table header once -->
                         <table class="table table-js table-responsive-sm ">
                             <tr><th>Subject</th><th>Status</th></tr>
                         @php $hasSubjects = true; @endphp
@@ -69,7 +68,6 @@
                 @endif
             @endforeach
 
-            <!-- Close the table if subjects were listed -->
             @if($hasSubjects)
                 </table>
             @endif
