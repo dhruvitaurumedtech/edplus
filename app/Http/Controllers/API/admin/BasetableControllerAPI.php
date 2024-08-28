@@ -201,6 +201,7 @@ class BasetableControllerAPI extends Controller
             
             foreach ($request->data as $datas) {
                 $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                ->join('institute_for', 'base_table.institute_for', '=', 'institute_for.id')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
@@ -208,7 +209,7 @@ class BasetableControllerAPI extends Controller
                 ->where('base_table.board', $datas['board_id'])
                 ->where('base_table.medium', $datas['medium_id'])
                 ->whereIN('base_table.institute_for_class', $datas['class_id'])
-                ->select('standard.id', 'standard.name','class.id as class_id','medium.id as medium_id','board.id as board_id','class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+                ->select('standard.id', 'standard.name','institute_for.id as institute_for_id','institute_for.name as institute_for_name','class.id as class_id','medium.id as medium_id','board.id as board_id','class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
                 ->distinct()
                 ->get();
                   
@@ -217,6 +218,8 @@ class BasetableControllerAPI extends Controller
                 $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
                 if (!array_key_exists($key, $data)) {
                     $data[$key] = [
+                        'institute_for_id' => $base_standard->institute_for_id,
+                        'institute_for_name' => $base_standard->institute_for_name,
                         'class_id' => $base_standard->class_id,
                         'class_name' => $base_standard->class_name,
                         'medium_id' => $base_standard->medium_id,
