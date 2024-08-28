@@ -141,6 +141,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-edit-board', [BasetableControllerAPI::class, 'get_edit_board']);
     Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
+    Route::post('/institute/get-with-class-medium', [BasetableControllerAPI::class, 'get_with_class_medium']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
     Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);

@@ -1634,6 +1634,7 @@ class InstituteApiController extends Controller
                         }
 
                         $serverKey = env('SERVER_KEY');
+                        // print_r($serverKey);exit;
 
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $user_detail = User::where('id', $student_id)->first();
