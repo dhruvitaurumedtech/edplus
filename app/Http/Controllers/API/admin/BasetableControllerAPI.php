@@ -197,44 +197,85 @@ class BasetableControllerAPI extends Controller
 
         try {
             
-            $data = [];
-            
+            $data = []; // Initialize the data array
+
             foreach ($request->data as $datas) {
+                // Query to get the base standards
                 $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
-                ->join('institute_for', 'base_table.institute_for', '=', 'institute_for.id')
-                ->join('class', 'base_table.institute_for_class', '=', 'class.id')
-                ->join('medium', 'base_table.medium', '=', 'medium.id')
-                ->join('board', 'base_table.board', '=', 'board.id')
-                ->where('base_table.institute_for', $datas['institute_for_id'])
-                ->where('base_table.board', $datas['board_id'])
-                ->where('base_table.medium', $datas['medium_id'])
-                ->whereIN('base_table.institute_for_class', $datas['class_id'])
-                ->select('standard.id', 'standard.name','institute_for.id as institute_for_id','institute_for.name as institute_for_name','class.id as class_id','medium.id as medium_id','board.id as board_id','class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
-                ->distinct()
-                ->get();
-                  
+                    ->join('institute_for', 'base_table.institute_for', '=', 'institute_for.id')
+                    ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+                    ->join('medium', 'base_table.medium', '=', 'medium.id')
+                    ->join('board', 'base_table.board', '=', 'board.id')
+                    ->where('base_table.institute_for', $datas['institute_for_id'])
+                    ->where('base_table.board', $datas['board_id'])
+                    ->where('base_table.medium', $datas['medium_id'])
+                    ->whereIn('base_table.institute_for_class', $datas['class_id'])
+                    ->select('standard.id', 'standard.name', 'institute_for.id as institute_for_id', 'institute_for.name as institute_for_name', 'class.id as class_id', 'medium.id as medium_id', 'board.id as board_id', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+                    ->distinct()
+                    ->get();
+            
+                // Iterate over each base standard
                 foreach ($base_standards as $base_standard) {
-                   
-                $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
-                if (!array_key_exists($key, $data)) {
-                    $data[$key] = [
-                        'institute_for_id' => $base_standard->institute_for_id,
-                        'institute_for_name' => $base_standard->institute_for_name,
-                        'class_id' => $base_standard->class_id,
-                        'class_name' => $base_standard->class_name,
-                        'medium_id' => $base_standard->medium_id,
-                        'medium_name' => $base_standard->medium_name,
-                        'board_id' => $base_standard->board_id,
-                        'board_name' => $base_standard->board_name,
-                        'std_data' => [],
-                    ];
-                }
-                $data[$key]['std_data'][] = [
-                    'id' => $base_standard->id,
-                    'standard_name' => $base_standard->name,
-                ];
+                    $key = $base_standard->institute_for_id . '_' . $base_standard->medium_id . '_' . $base_standard->board_id;
+            
+                    // Check if the key already exists in the data array
+                    if (!array_key_exists($key, $data)) {
+                        $data[$key] = [
+                            'institute_for_id' => $base_standard->institute_for_id,
+                            'institute_for_name' => $base_standard->institute_for_name,
+                            'medium_id' => $base_standard->medium_id,
+                            'medium_name' => $base_standard->medium_name,
+                            'board_id' => $base_standard->board_id,
+                            'board_name' => $base_standard->board_name,
+                            'class_data' => [], // Initialize class_data as an empty array
+                        ];
+                    }
+            
+                    // Initialize class-specific data
+                    $classId = $base_standard->class_id;
+            
+                    // Search for the class in the class_data array
+                    $classExists = false;
+                    foreach ($data[$key]['class_data'] as &$class) {
+                        if ($class['class_id'] === $classId) {
+                            $classExists = true;
+                            // Append the standard to the appropriate class in class_data
+                            $class['std_data'][] = [
+                                'id' => $base_standard->id,
+                                'standard_name' => $base_standard->name,
+                            ];
+                            break;
+                        }
+                    }
+            
+                    // If the class does not exist, add a new entry for it
+                    if (!$classExists) {
+                        $data[$key]['class_data'][] = [
+                            'class_id' => $base_standard->class_id,
+                            'class_name' => $base_standard->class_name,
+                            'std_data' => [
+                                [
+                                    'id' => $base_standard->id,
+                                    'standard_name' => $base_standard->name,
+                                ]
+                            ],
+                        ];
+                    }
                 }
             }
+            
+            // Format the final response array
+            $response = [
+                'data' => array_values($data), // Convert the associative array to a numerically indexed array
+                'message' => 'Fetch Data Successfully',
+                'success' => true,
+            ];
+            
+            // Return the JSON response
+            return response()->json($response);
+            
+            
+            // Format the final response array
             $data = array_values($data);
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
