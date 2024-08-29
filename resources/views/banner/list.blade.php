@@ -8,9 +8,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Banner</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}" class="active-link-dir">Create Banner</a></li>
+          <li><a href="javascript:void(0)" class="active-link-dir">Create Banner</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -113,12 +111,17 @@
                                 alt="{{ !empty($value->banner_image) ? 'Banner image' : 'No image available' }}" 
                                 class="img-resize" >
                         </td>
-                        <td>@if($value->status == 'active')
+                        <!-- <td>@if($value->status == 'active')
                           <input type="button" value="Active" class="btn btn-success">
                           @else
                           <input type="button" value="Inactive" class="btn btn-danger">
                           @endif
-                        </td>
+                        </td> -->
+                        <td>
+    <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="banner_list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+        {{ ucfirst($value->status) }}
+    </button>
+</td>
                         <td>
                           <div class="d-flex">
                             <input type="submit" class="btn text-white blue-button banner_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
@@ -198,6 +201,17 @@
         </div>
 
       </div>
+      <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
       @include('layouts/footer_new')
       <script>
         function previewFile() {

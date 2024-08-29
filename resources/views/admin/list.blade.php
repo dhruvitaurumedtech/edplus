@@ -10,10 +10,8 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Admin</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-list')}}" class="active-link-dir">Admin List</a></li>
-        </ul>
+          <li><a href="javascript:void(0)" class="active-link-dir">Admin</a></li>
+         </ul>
       </div>
       @include('layouts/alert')
       <div class="dashboard-content side-content">

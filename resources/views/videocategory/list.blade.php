@@ -6,13 +6,11 @@
     <div class="dashboard-app">
       @include('layouts/header-topbar')
       <div class="link-dir">
-        <h1 class="display-4">Video category</h1>
+        <h1 class="display-4">Content category</h1>
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Category</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)" class="active-link-dir">Video category</a></li>
+             <li><a href="javascript:void(0)" class="active-link-dir">Content category</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -20,15 +18,15 @@
         <div class="row">
           <div class="col-md-5">
             <div class="institute-form">
-              <h3 class="card-title">Create Video Category</h3>
+              <h3 class="card-title">Create Content Category</h3>
               <form method="post" action="{{ url('video-category-save') }}" enctype="multipart/form-data">
                 @csrf
                 <div class="card-body">
                   <div class="form-group">
                     <div class="row">
                       <div class="col-md-12">
-                        <label for="exampleInputEmail1">Video Name : </label>
-                        <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
+                        <label for="exampleInputEmail1">Content Name : </label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter Content Name" value="{{old('name')}}">
                         @error('name')
                         <div class="text-danger">{{ $message }}</div>
                         @enderror
@@ -56,7 +54,7 @@
           <!-- list -->
           <div class="col-md-7">
             <div class="institute-form">
-              <h3 class="card-title">Video Category List</h3>
+              <h3 class="card-title">Content Category List</h3>
               <form action="#">
                 <div class="search-box">
                   <input type="search" class="form-control myInput" name="search" placeholder="Search">
@@ -80,13 +78,18 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
-                    </td>
+                    </td> -->
+                    <td>
+                          <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="video-category-list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                              {{ ucfirst($value->status) }}
+                          </button>
+                      </td>
 
                     <td>
                       <div class="d-flex">
@@ -112,7 +115,7 @@
               <div class="modal-dialog">
                 <div class="modal-content">
                   <div class="modal-header">
-                    <h5 class="modal-title" id="usereditModalLabel">Edit Board </h5>
+                    <h5 class="modal-title" id="usereditModalLabel">Edit Content Category </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -164,3 +167,14 @@
     </div>
     @include('layouts/footer_new')
   </div>
+  <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>

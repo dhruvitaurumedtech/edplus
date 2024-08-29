@@ -181,17 +181,16 @@ document.querySelectorAll('.institute_list_editButton').forEach(function (button
     button.addEventListener('click', function () {
         var user_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
-        axios.post(baseUrl + '/admin/edit', {
+        axios.post(baseUrl + '/institute_list_admin/edit', {
             user_id: user_id
         })
             .then(response => {
                 var reponse_data = response.data.userDT;
                 console.log(reponse_data);
                 $('#user_id').val(reponse_data.id);
-                $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.firstname);
+                $('#name').val(reponse_data.institute_name);
                 $('#email').val(reponse_data.email);
-                $('#mobile').val(reponse_data.mobile);
+                $('#mobile').val(reponse_data.contact_no);
                 $('#usereditModal').modal('show');
             })
             .catch(error => {
@@ -1022,4 +1021,35 @@ document.querySelectorAll('.video_limit_deletebutton').forEach(function (button)
             }
         });
     });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('[id^="status-button-"]'); 
+
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const userId = button.getAttribute('data-user-id');
+            const name = button.getAttribute('data-name-id');
+
+
+    axios.post('list-institute-for-/toggle-status', {
+        user_id: userId,
+        name : name ,
+    })
+    .then(function(response) {
+        const status = response.data.status;
+        if (status === 'active') {
+            button.classList.remove('btn-inactive');
+            button.classList.add('btn-active');
+            button.textContent = 'Active';
+        } else {
+            button.classList.remove('btn-active');
+            button.classList.add('btn-inactive');
+            button.textContent = 'Inactive';
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+    });
+});
+});
 });

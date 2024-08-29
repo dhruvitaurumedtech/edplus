@@ -88,17 +88,63 @@ class BasetableControllerAPI extends Controller
             $data = [];
             foreach ($base_medium as $basemedium) {
                 $data[] = array(
-                    'id' => $basemedium->id, 'name' => $basemedium->name,
+                    'id' => $basemedium->id, 
+                    'name' => $basemedium->name,
                     'icon' => url($basemedium->icon)
                 );
             }
+            
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
+    public function with_class_medium(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            // 'medium_id' => 'required',
+        ]);
 
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $board_ids = explode(',', $request->board_id);
+            // $medium_ids = explode(',', $request->medium_id);
+            $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('institute_for_class');
+            $base_class =  Class_model::whereIn('id', $getClassId)->get();
+            $classData = [];
+            foreach ($base_class as $baseclass) {
+                $classData[] = array(
+                    'id' => $baseclass->id, 'name' => $baseclass->name,
+                    'icon' => (!empty($baseclass->icon))?url($baseclass->icon):asset('profile/no-image.png'),
+                );
+            }
+            $institute_for_ids = explode(',', $request->institute_for_id);
+            $board_ids = explode(',', $request->board_id);
+            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
+            $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
+            $mediumData = [];
+            foreach ($base_medium as $basemedium) {
+                $mediumData[] = array(
+                    'id' => $basemedium->id, 
+                    'name' => $basemedium->name,
+                    'icon' => (!empty($basemedium->icon))?url($basemedium->icon):asset('profile/no-image.png'),
+                    'classes' => $classData,
+                );
+            }
+            
+            
+
+            return $this->response($mediumData, "Fetch Data Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
 
     public function class(Request $request)
     {
@@ -119,15 +165,18 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
             $base_class =  Class_model::whereIn('id', $getClassId)->get();
-            $data = [];
+            $classData = [];
             foreach ($base_class as $baseclass) {
-                $data[] = array(
+                $classData[] = array(
                     'id' => $baseclass->id, 'name' => $baseclass->name,
-                    'icon' => url($baseclass->icon)
+                    'icon' => (!empty($baseclass->icon))?url($baseclass->icon):asset('profile/no-image.png'),
                 );
             }
+           
+            
+            
 
-            return $this->response($data, "Fetch Data Successfully");
+            return $this->response($classData, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
@@ -148,38 +197,85 @@ class BasetableControllerAPI extends Controller
 
         try {
             
-            $data = [];
-            
+            $data = []; // Initialize the data array
+
             foreach ($request->data as $datas) {
+                // Query to get the base standards
                 $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
-                ->join('class', 'base_table.institute_for_class', '=', 'class.id')
-                ->join('medium', 'base_table.medium', '=', 'medium.id')
-                ->join('board', 'base_table.board', '=', 'board.id')
-                ->where('base_table.institute_for', $datas['institute_for_id'])
-                ->where('base_table.board', $datas['board_id'])
-                ->where('base_table.medium', $datas['medium_id'])
-                ->whereIN('base_table.institute_for_class', $datas['class_id'])
-                ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
-                ->distinct()
-                ->get();
-                  
+                    ->join('institute_for', 'base_table.institute_for', '=', 'institute_for.id')
+                    ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+                    ->join('medium', 'base_table.medium', '=', 'medium.id')
+                    ->join('board', 'base_table.board', '=', 'board.id')
+                    ->where('base_table.institute_for', $datas['institute_for_id'])
+                    ->where('base_table.board', $datas['board_id'])
+                    ->where('base_table.medium', $datas['medium_id'])
+                    ->whereIn('base_table.institute_for_class', $datas['class_id'])
+                    ->select('standard.id', 'standard.name', 'institute_for.id as institute_for_id', 'institute_for.name as institute_for_name', 'class.id as class_id', 'medium.id as medium_id', 'board.id as board_id', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+                    ->distinct()
+                    ->get();
+            
+                // Iterate over each base standard
                 foreach ($base_standards as $base_standard) {
-                   
-                $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
-                if (!array_key_exists($key, $data)) {
-                    $data[$key] = [
-                        'class_name' => $base_standard->class_name,
-                        'medium_name' => $base_standard->medium_name,
-                        'board_name' => $base_standard->board_name,
-                        'std_data' => [],
-                    ];
-                }
-                $data[$key]['std_data'][] = [
-                    'id' => $base_standard->id,
-                    'standard_name' => $base_standard->name,
-                ];
+                    $key = $base_standard->institute_for_id . '_' . $base_standard->medium_id . '_' . $base_standard->board_id;
+            
+                    // Check if the key already exists in the data array
+                    if (!array_key_exists($key, $data)) {
+                        $data[$key] = [
+                            'institute_for_id' => $base_standard->institute_for_id,
+                            'institute_for_name' => $base_standard->institute_for_name,
+                            'medium_id' => $base_standard->medium_id,
+                            'medium_name' => $base_standard->medium_name,
+                            'board_id' => $base_standard->board_id,
+                            'board_name' => $base_standard->board_name,
+                            'class_data' => [], // Initialize class_data as an empty array
+                        ];
+                    }
+            
+                    // Initialize class-specific data
+                    $classId = $base_standard->class_id;
+            
+                    // Search for the class in the class_data array
+                    $classExists = false;
+                    foreach ($data[$key]['class_data'] as &$class) {
+                        if ($class['class_id'] === $classId) {
+                            $classExists = true;
+                            // Append the standard to the appropriate class in class_data
+                            $class['std_data'][] = [
+                                'id' => $base_standard->id,
+                                'standard_name' => $base_standard->name,
+                            ];
+                            break;
+                        }
+                    }
+            
+                    // If the class does not exist, add a new entry for it
+                    if (!$classExists) {
+                        $data[$key]['class_data'][] = [
+                            'class_id' => $base_standard->class_id,
+                            'class_name' => $base_standard->class_name,
+                            'std_data' => [
+                                [
+                                    'id' => $base_standard->id,
+                                    'standard_name' => $base_standard->name,
+                                ]
+                            ],
+                        ];
+                    }
                 }
             }
+            
+            // Format the final response array
+            $response = [
+                'data' => array_values($data), // Convert the associative array to a numerically indexed array
+                'message' => 'Fetch Data Successfully',
+                'success' => true,
+            ];
+            
+            // Return the JSON response
+            return response()->json($response);
+            
+            
+            // Format the final response array
             $data = array_values($data);
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
@@ -399,7 +495,87 @@ class BasetableControllerAPI extends Controller
                     'is_added' => $isAdded
                 );
             }
+            
 
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
+    public function get_with_class_medium(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'institute_for_id' => 'required',
+            'board_id' => 'required',
+            'medium_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+      // Extracting IDs from the request
+$institute_for_ids = explode(',', $request->institute_for_id);
+$board_ids = explode(',', $request->board_id);
+$medium_ids = explode(',', $request->medium_id);
+
+// Fetching distinct medium IDs based on provided criteria
+$getMediumIds = Base_table::whereIn('institute_for', $institute_for_ids)
+    ->whereIn('board', $board_ids)
+    ->distinct()
+    ->pluck('medium');
+
+// Fetching all relevant mediums
+$base_medium = Medium_model::whereIn('id', $getMediumIds)->get();
+
+// Initialize an array to store the final data
+$data = [];
+
+// Fetching class IDs already associated with the institute
+$institute_base_class_id = Class_sub::where('institute_id', $request->institute_id)
+    ->whereIn('board_id', $board_ids)
+    ->whereIn('medium_id', $medium_ids)
+    ->pluck('class_id')
+    ->toArray();
+
+// Loop through each medium
+foreach ($base_medium as $basemedium) {
+    // Fetching distinct class IDs for this medium based on criteria
+    $getClassId = Base_table::whereIn('institute_for', $institute_for_ids)
+        ->whereIn('board', $board_ids)
+        ->where('medium', $basemedium->id)
+        ->distinct()
+        ->pluck('institute_for_class');
+
+    // Fetching classes based on the class IDs
+    $base_class = Class_model::whereIn('id', $getClassId)->get();
+
+    // Initialize an array to store the classes data for the current medium
+    $classes = [];
+
+    // Loop through each class to build the classes array for the medium
+    foreach ($base_class as $baseclass) {
+        $isAdded = in_array($baseclass->id, $institute_base_class_id);
+        $classes[] = [
+            'id' => $baseclass->id,
+            'name' => $baseclass->name,
+            'icon' => url($baseclass->icon),
+            'is_added' => $isAdded,
+            'is_active' => $baseclass->status // Adding is_active field
+        ];
+    }
+
+    // Add medium and its associated classes to the final data array
+    $data[] = [
+        'id' => $basemedium->id,
+        'name' => $basemedium->name,
+        'icon' => url($basemedium->icon),
+        'is_active' => $basemedium->status, // Adding is_active field
+        'classes' => $classes // Nested classes array
+    ];
+}
+
+
+            
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);

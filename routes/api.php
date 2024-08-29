@@ -123,6 +123,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/base-board', [BasetableControllerAPI::class, 'board']);
     Route::post('/institute/base-medium', [BasetableControllerAPI::class, 'medium']);
     Route::post('/institute/base-class', [BasetableControllerAPI::class, 'class']);
+    Route::post('/institute/with-class-medium', [BasetableControllerAPI::class, 'with_class_medium']);
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
@@ -140,6 +141,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-edit-board', [BasetableControllerAPI::class, 'get_edit_board']);
     Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
+    Route::post('/institute/get-with-class-medium', [BasetableControllerAPI::class, 'get_with_class_medium']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
     Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);

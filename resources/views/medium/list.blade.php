@@ -10,9 +10,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('class-list')}}" class="active-link-dir">Medium</a></li>
+           <li><a href="{{url('medium-list')}}" class="active-link-dir">Medium</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -96,13 +94,18 @@
                                 alt="{{ !empty($value->icon) ? 'Icon' : 'No image available' }}" 
                                 class="img-resize" >
                         </td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
-                    </td>
+                    </td> -->
+                    <td>
+                      <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="medium_list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                          {{ ucfirst($value->status) }}
+                      </button>
+                  </td>
                     <td>
                       <div class="d-flex">
                         <input type="submit" class="btn text-white btn-rmv2 medium_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
@@ -128,7 +131,7 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h5 class="modal-title" id="usereditModalLabel">Medium </h5>
+                <h5 class="modal-title" id="usereditModalLabel">Edit Medium </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                   <span aria-hidden="true">&times;</span>
                 </button>
@@ -227,3 +230,14 @@
         }
       }
     </script>
+    <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
