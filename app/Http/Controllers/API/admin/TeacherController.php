@@ -48,7 +48,7 @@ class TeacherController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
-            'per_page' => 'required|integer',
+            //'per_page' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -68,7 +68,6 @@ class TeacherController extends Controller
                     'banner_image' => $imgpath,
                 );
             }
-            $perPage = 10;
             $allinstitute = Institute_detail::where('status', 'active')
                 ->where(function ($query) use ($search_keyword) {
                     $query->where('unique_id', 'like', '%' . $search_keyword . '%')
@@ -84,7 +83,9 @@ class TeacherController extends Controller
                 );
             }
             //student search history
-            $searchhistory = Search_history::where('user_id', $teacher_id)->paginate($perPage);
+            $searchhistory = Search_history::where('user_id', $teacher_id)
+            //->paginate($perPage);
+            ->get();
             $searchhistory_list = [];
             foreach ($searchhistory as $value) {
                 // Check if the title already exists in the $searchhistory_list array

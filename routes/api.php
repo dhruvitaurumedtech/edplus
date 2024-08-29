@@ -158,6 +158,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/parents/edit-profile', [ParentsController::class, 'edit_profile']);
     // Student Api 
     Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add']);
+    Route::post('/student/clear-search-history', [StudentController::class, 'clear_search_history']);
     Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request']);
     Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail']);
     Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->middleware('check.permission:29,4');

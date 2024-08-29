@@ -206,6 +206,21 @@ class StudentController extends Controller
             return $this->response($e, "Invalid token.", false, 400);
         }
     }
+    //clear search history
+    public function clear_search_history(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            Search_history::where('user_id',$request->user_id)->delete(); 
+            return $this->response([], "History clear successfully.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
     //add parents details
     public function student_parents_details_add(Request $request)
     {
