@@ -716,12 +716,18 @@ class TeacherController extends Controller
             $dateTime = new DateTime($request->date);
             $day = $dateTime->format('l');
             $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
+            
+
+
+
 
             $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todaysletech = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('board', 'board.id', '=', 'batches.board_id')
+                ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->whereIN('timetables.batch_id', $batchids)
@@ -737,6 +743,10 @@ class TeacherController extends Controller
                     'timetables.end_time',
                     'batches.id as batch_id',
                     'batches.batch_name',
+                    'board.id as board_id',
+                    'board.name as board_name',
+                    'medium.id as medium_id',
+                    'medium.name as medium_name',
                 )
                 ->orderBy('timetables.start_time', 'asc')
                 ->get();
@@ -749,6 +759,10 @@ class TeacherController extends Controller
                     'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('profile/no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
                     'batch_name'=>$todaysDT->batch_name,
+                    'board_id' => $todaysDT->board_id,
+                    'board_name' => $todaysDT->board_name,
+                    'medium_id' => $todaysDT->medium_id,
+                    'medium_name' => $todaysDT->medium_name,
                     'class_room'=>$todaysDT->class_room,
                     'start_time' => $todaysDT->start_time,
                     'end_time' => $todaysDT->end_time,
