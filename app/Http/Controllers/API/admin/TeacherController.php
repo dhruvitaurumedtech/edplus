@@ -530,9 +530,9 @@ class TeacherController extends Controller
            
             foreach ($todayslect as $todayslecDT) {
                 $dateTime = Carbon::parse($todayslecDT->start_time);
-                $start_time = $dateTime->format('Y-m-d h:i:s A');
+                $start_time = $dateTime->format('h:i:s A');
                 $dateTime1 = Carbon::parse($todayslecDT->end_time);
-                $end_time = $dateTime1->format('Y-m-d h:i:s A');
+                $end_time = $dateTime1->format('h:i:s A');
 
 
                 $todays_lecture[] = array(
