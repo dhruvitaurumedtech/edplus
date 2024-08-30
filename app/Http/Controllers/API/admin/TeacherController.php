@@ -553,31 +553,32 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            $teacher_data = Teacher_model::Join('board', 'board.id', '=', 'teacher_detail.board_id')
-                ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->where('teacher_detail.teacher_id', $teacher_id)
-                ->where('teacher_detail.institute_id', $institute_id)
-                ->whereNotNull('teacher_detail.batch_id')
-                ->groupBy(
-                    'teacher_detail.standard_id',
-                    'board.name',
-                    'standard.id',
-                    'standard.name',
-                    'medium.name',
-                    'teacher_detail.batch_id',
-                )
+            $teacher_data = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
+                    ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                    ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->where('teacher_detail.institute_id', $institute_id)
+                    ->whereNotNull('teacher_detail.batch_id')
+                    ->groupBy(
+                        'teacher_detail.standard_id',
+                        'board.name',
+                        'standard.id',
+                        'standard.name',
+                        'medium.name',
+                        'teacher_detail.batch_id',
+                        'board.icon'  // Add board.image to the groupBy
+                    )
+                    ->select(
+                        'standard.id as standard_id',
+                        'teacher_detail.batch_id',
+                        'standard.name as standard_name',
+                        DB::raw('MAX(board.name) as board_name'),
+                        DB::raw('MAX(medium.name) as medium_name'),
+                        DB::raw('MAX(board.icon) as board_image')  // Select the board image
+                    )
+                    ->get()
+                    ->toArray();
 
-                ->select(
-                    'standard.id as standard_id',
-                    'teacher_detail.batch_id',
-                   
-                    'standard.name as standard_name',
-                    DB::raw('MAX(board.name) as board_name'),
-                    DB::raw('MAX(medium.name) as medium_name')
-                )
-                ->get()
-                ->toArray();
 
             $teacher_response = [];
             $processed_batches = [];
@@ -592,6 +593,7 @@ class TeacherController extends Controller
                     if (!isset($processed_batches[$unique_key])) {
                     $teacher_response[] = [
                         'board' => $value['board_name'],
+                        'board_image' => !empty($value['board_image'])?asset($value['board_image']):asset('profile/no-image.png'),
                         'standard_id' => $value['standard_id'],
                         'standard' => $value['standard_name'],
                         'medium' => $value['medium_name'],
