@@ -755,6 +755,12 @@ class TeacherController extends Controller
                 ->get();
 
             foreach ($todaysletech as $todaysDT) {
+                    $dateTime = Carbon::parse($todaysDT->start_time);
+                    $start_time = $dateTime->format('h:i:s A');
+                    $dateTime1 = Carbon::parse($todaysDT->end_time);
+                    $end_time = $dateTime1->format('h:i:s A');
+
+
                 $lectures[] = array(
                     'subject' => $todaysDT->subject,
                     'standard' => $todaysDT->standard,
@@ -767,8 +773,8 @@ class TeacherController extends Controller
                     'medium_id' => $todaysDT->medium_id,
                     'medium_name' => $todaysDT->medium_name,
                     'class_room'=>$todaysDT->class_room,
-                    'start_time' => $todaysDT->start_time,
-                    'end_time' => $todaysDT->end_time,
+                    'start_time' => $start_time,
+                    'end_time' => $end_time,
                 );
             }
 
