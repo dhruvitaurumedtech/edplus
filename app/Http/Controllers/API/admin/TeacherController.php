@@ -529,12 +529,9 @@ class TeacherController extends Controller
                 ->get();
            
             foreach ($todayslect as $todayslecDT) {
-                $dateTime = Carbon::parse($todayslecDT->start_time);
-                $start_time = $dateTime->format('h:i:s A');
-                $dateTime1 = Carbon::parse($todayslecDT->end_time);
-                $end_time = $dateTime1->format('h:i:s A');
 
 
+                
                 $todays_lecture[] = array(
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'subject' => $todayslecDT->subject,
@@ -545,8 +542,8 @@ class TeacherController extends Controller
                     'medium_name'=>$todayslecDT->mediumdname,
                     'classroom'=>$todayslecDT->classroom,
                     'lecture_type' => $todayslecDT->lecture_type_name,
-                    'start_time' => $start_time,
-                    'end_time' => $end_time,
+                    'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
+                    'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
                 );
             }
 
