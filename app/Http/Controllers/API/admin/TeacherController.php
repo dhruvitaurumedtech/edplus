@@ -503,7 +503,10 @@ class TeacherController extends Controller
             $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('board', 'board.id', '=', 'batches.board_id')
+                ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('timetables.teacher_id', $user_id)
                 ->whereIn('timetables.batch_id', $batchesid)
@@ -518,6 +521,9 @@ class TeacherController extends Controller
                     'batches.batch_name',
                     'timetables.day',
                     'users.image',
+                    'board.name as boardname',
+                    'medium.name as mediumdname',
+                    'class_room.name as classroom'
                 )
                 ->orderBy('timetables.start_time', 'asc')
                 ->get();
@@ -529,6 +535,9 @@ class TeacherController extends Controller
                     'standard' => $todayslecDT->standard,
                     'batch_id'=>$todayslecDT->batch_id,
                     'batch_name'=>$todayslecDT->batch_name,
+                    'board_name'=>$todayslecDT->boardname,
+                    'medium_name'=>$todayslecDT->mediumdname,
+                    'classroom'=>$todayslecDT->classroom,
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
