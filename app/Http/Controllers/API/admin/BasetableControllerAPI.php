@@ -778,7 +778,9 @@ foreach ($base_medium as $basemedium) {
                            'medium.name as medium_name',
                            'board.name as board_name',
                            'subject.id as subject_id',
-                           'subject.name as subject_name'
+                           'subject.name as subject_name',
+                           'subject.status as subject_status',
+                           'standard.status as standard_status',
                        )
                        ->get();
 
@@ -827,6 +829,8 @@ foreach ($base_medium as $basemedium) {
                                    $class['std_data'][] = [
                                        'id' => $base_standard->id,
                                        'standard_name' => $base_standard->name,
+                                       'is_active' => $base_standard->standard_status,
+                                       'is_added' => ($base_standard->standard_status == 'active')?'true':'false',
                                        'subject_data' => [], 
                                    ];
                                }
@@ -842,6 +846,8 @@ foreach ($base_medium as $basemedium) {
                                            $std['subject_data'][] = [
                                                'subject_id' => $base_standard->subject_id,
                                                'subject_name' => $base_standard->subject_name,
+                                               'is_active' => $base_standard->subject_status,
+                                               'is_added' => ($base_standard->subject_status=='active')?'true':'false',
                                            ];
                                        }
 
