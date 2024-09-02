@@ -1496,7 +1496,9 @@ class InstituteApiController extends Controller
                                 'contact_no' => $prdetail->contact_no,
                                 'website_link' => $prdetail->website_link,
                                 'year' => $syear . '-' . $eyear,
-                                'subjects' => $sujids
+                                'subjects' => $sujids,
+                                'subject_id' => $request->subject_id,
+                                'institute_id' => $request->institute_id
                             ];
                            
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
