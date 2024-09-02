@@ -70,6 +70,7 @@ class AuthController extends Controller
                 $user->mobile = $request->mobile;
                 $user->role_type = $request->role_type;
                 $user->device_key = $request->device_key;
+                $user->status = 1;
                 $user->social_id = $ssoUser->user['id'];
                 $user->save();
             }
