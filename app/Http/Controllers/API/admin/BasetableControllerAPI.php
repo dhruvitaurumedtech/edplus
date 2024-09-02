@@ -22,6 +22,8 @@ use Illuminate\Http\Request;
 use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
+
 
 class BasetableControllerAPI extends Controller
 {
@@ -829,8 +831,8 @@ foreach ($base_medium as $basemedium) {
                                    $class['std_data'][] = [
                                        'id' => $base_standard->id,
                                        'standard_name' => $base_standard->name,
-                                       'is_active' => $base_standard->standard_status,
-                                       'is_added' => ($base_standard->standard_status == 'active')?'true':'false',
+                                       'is_active' => $base_standard->standard_status === 'active' ? 'active' : 'inactive',
+                                       'is_added' => ($base_standard->standard_status == 'active')?true:false,
                                        'subject_data' => [], 
                                    ];
                                }
@@ -846,8 +848,8 @@ foreach ($base_medium as $basemedium) {
                                            $std['subject_data'][] = [
                                                'subject_id' => $base_standard->subject_id,
                                                'subject_name' => $base_standard->subject_name,
-                                               'is_active' => $base_standard->subject_status,
-                                               'is_added' => ($base_standard->subject_status=='active')?'true':'false',
+                                               'is_active' => $base_standard->subject_status === 'active' ? 'active' : 'inactive',
+                                               'is_added' => ($base_standard->subject_status=='active')?true:false,
                                            ];
                                        }
 
