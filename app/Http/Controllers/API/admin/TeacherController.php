@@ -1232,6 +1232,7 @@ class TeacherController extends Controller
         $user->dob = (!empty($request['dob'])) ? date('d-m-Y', strtotime($request['dob'])) : '';
         $user->address = $request['address'];
         $user->pincode = $request['pincode'];
+        $user->mobile = $request['phone_no'];
         if ($request->file('image')) {
             $iconFile = $request->file('image');
             $imagePath = $iconFile->store('profile', 'public');
