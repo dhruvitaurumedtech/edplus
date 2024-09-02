@@ -1498,7 +1498,7 @@ class InstituteApiController extends Controller
                                 'year' => $syear . '-' . $eyear,
                                 'subjects' => $sujids
                             ];
-
+                           
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 
