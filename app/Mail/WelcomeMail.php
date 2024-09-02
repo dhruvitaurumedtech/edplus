@@ -27,7 +27,8 @@ class WelcomeMail extends Mailable
             ->get();
         }else
         {
-         $subject="";        }
+         $subject="";        
+        }
         
         return $this->subject("Verification of Enrollment")
         ->view('emails.parentsverify')
@@ -35,5 +36,5 @@ class WelcomeMail extends Mailable
                 'data' => $this->data,
                 'subjects' => $subject
             ]);
-            }
+        }
 }
