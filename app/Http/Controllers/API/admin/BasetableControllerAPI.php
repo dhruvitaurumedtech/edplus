@@ -757,34 +757,75 @@ foreach ($base_medium as $basemedium) {
 
                // Example data processing logic (assuming $request->data is an array of input parameters)
                foreach ($request->data as $datas) {
+
+
+
+                $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                ->join('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
+                ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+                ->join('medium', 'base_table.medium', '=', 'medium.id')
+                ->join('board', 'base_table.board', '=', 'board.id')
+                ->join('subject', 'subject.base_table_id', '=', 'base_table.id')
+                ->where('base_table.institute_for', $datas['institute_for_id'])
+                ->where('base_table.board', $datas['board_id'])
+                ->where('base_table.medium', $datas['medium_id'])
+                ->whereIN('base_table.institute_for_class', $datas['class_id'])
+                // ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+                ->select(
+                    'standard.id',
+                    'standard.name',
+                    'institute_for.id as institute_for_id',
+                    'institute_for.name as institute_for_name',
+                    'class.id as class_id',
+                    'medium.id as medium_id',
+                    'board.id as board_id',
+                    'class.name as class_name',
+                    'medium.name as medium_name',
+                    'board.name as board_name',
+                    'subject.id as subject_id',
+                    'subject.name as subject_name',
+                    'subject.status as subject_status',
+                    'standard.status as standard_status',
+                )
+            
+                ->distinct()
+                ->get();
+                // print_r($base_standards);exit;
                    // Query to get the base standards
-                   $base_standards = Base_table::join('standard', 'standard.id', '=', 'base_table.standard')
-                       ->join('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-                       ->join('class', 'class.id', '=', 'base_table.institute_for_class')
-                       ->join('medium', 'medium.id', '=', 'base_table.medium')
-                       ->join('board', 'board.id', '=', 'base_table.board')
-                       ->join('subject', 'subject.base_table_id', '=', 'base_table.id')
-                       ->where('base_table.institute_for', $datas['institute_for_id'])
-                       ->where('base_table.board', $datas['board_id'])
-                       ->where('base_table.medium', $datas['medium_id'])
-                       ->whereIn('base_table.institute_for_class', $datas['class_id'])
-                       ->select(
-                           'standard.id',
-                           'standard.name',
-                           'institute_for.id as institute_for_id',
-                           'institute_for.name as institute_for_name',
-                           'class.id as class_id',
-                           'medium.id as medium_id',
-                           'board.id as board_id',
-                           'class.name as class_name',
-                           'medium.name as medium_name',
-                           'board.name as board_name',
-                           'subject.id as subject_id',
-                           'subject.name as subject_name',
-                           'subject.status as subject_status',
-                           'standard.status as standard_status',
-                       )
-                       ->get();
+                //    $base_standards = Base_table::join('standard', 'standard.id', '=', 'base_table.standard')
+                //        ->join('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
+                //        ->join('class', 'class.id', '=', 'base_table.institute_for_class')
+                //        ->join('medium', 'medium.id', '=', 'base_table.medium')
+                //        ->join('board', 'board.id', '=', 'base_table.board')
+                //        ->join('subject', 'subject.base_table_id', '=', 'base_table.id')
+                //        ->where('base_table.institute_for', $datas['institute_for_id'])
+                //        ->where('base_table.board', $datas['board_id'])
+                //        ->where('base_table.medium', $datas['medium_id'])
+                //        ->whereIn('base_table.institute_for_class', $datas['class_id'])
+                //        ->select(
+                //            'standard.id',
+                //            'standard.name',
+                //            'institute_for.id as institute_for_id',
+                //            'institute_for.name as institute_for_name',
+                //            'class.id as class_id',
+                //            'medium.id as medium_id',
+                //            'board.id as board_id',
+                //            'class.name as class_name',
+                //            'medium.name as medium_name',
+                //            'board.name as board_name',
+                //            'subject.id as subject_id',
+                //            'subject.name as subject_name',
+                //            'subject.status as subject_status',
+                //            'standard.status as standard_status',
+                //        )
+                //        ->get();
+                $institute_standard_id = Standard_sub::where('institute_id', $request->institute_id)
+                ->where('institute_for_id', $datas['institute_for_id'])
+                ->where('board_id', $datas['board_id'])
+                ->where('medium_id', $datas['medium_id'])
+                ->whereIn('class_id', $datas['class_id'])
+                ->pluck('standard_id')
+                ->toArray(); 
 
                    foreach ($base_standards as $base_standard) {
                        $key = $base_standard->institute_for_id . '_' . $base_standard->medium_id . '_' . $base_standard->board_id;
@@ -828,11 +869,12 @@ foreach ($base_medium as $basemedium) {
 
                                // Check if the standard already exists
                                if (!in_array($base_standard->id, $added_standards)) {
+                                $isAdded = in_array($base_standard->id, $institute_standard_id);
                                    $class['std_data'][] = [
                                        'id' => $base_standard->id,
                                        'standard_name' => $base_standard->name,
-                                       'is_active' => $base_standard->standard_status === 'active' ? 'active' : 'inactive',
-                                       'is_added' => ($base_standard->standard_status == 'active')?true:false,
+                                       'is_active' => $isAdded === true ? 'active' : 'inactive',
+                                       'is_added' => $isAdded,
                                        'subject_data' => [], 
                                    ];
                                }
@@ -842,14 +884,18 @@ foreach ($base_medium as $basemedium) {
                                    if ($std['id'] === $base_standard->id) {
                                        // Initialize an array to keep track of added subjects
                                        $added_subjects = array_column($std['subject_data'], 'subject_id');
-
+                                       $institute_subject_id = Subject_sub::where('institute_id', $request->institute_id)
+                                       ->where('subject_id', $base_standard->subject_id)
+                                       ->pluck('subject_id')
+                                       ->toArray();     
                                        // Check if the subject already exists
                                        if (!in_array($base_standard->subject_id, $added_subjects)) {
+                                        $isAdded = in_array($base_standard->subject_id, $institute_subject_id);
                                            $std['subject_data'][] = [
                                                'subject_id' => $base_standard->subject_id,
                                                'subject_name' => $base_standard->subject_name,
-                                               'is_active' => $base_standard->subject_status === 'active' ? 'active' : 'inactive',
-                                               'is_added' => ($base_standard->subject_status=='active')?true:false,
+                                               'is_active' => $isAdded === true ? 'active' : 'inactive',
+                                               'is_added' => $isAdded,
                                            ];
                                        }
 
