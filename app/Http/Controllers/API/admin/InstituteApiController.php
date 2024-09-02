@@ -4037,4 +4037,42 @@ class InstituteApiController extends Controller
         }
     }
     
+    public function parents_list(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $studentdata = Student_detail::join('users','users.id','=','students_details.student_id')
+            ->where('students_details.institute_id',$request->institute_id)->get();
+            $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
+                ->where('parents.student_id', $request->student_id)
+                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 
+                'users.email', 'users.country_code', 'users.country_code_name',
+                 'users.mobile', 'parents.relation','parents.verify')
+                ->distinct()
+                ->get();
+            $parents_dt = [];
+            foreach ($parentsQY as $parentsDT) {
+                $fullName = $parentsDT->firstname . ' ' . $parentsDT->lastname;
+                $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
+                $parents_dt[] = array(
+                    'id'=>$parentsDT->parent_id,
+                    'name' => $cleanFullName,
+                    'email' => $parentsDT->email,
+                    'country_code' => $parentsDT->country_code,
+                    'country_code_name'=>$parentsDT->country_code_name,
+                    'mobile' => $parentsDT->mobile,
+                    'relation' => $parentsDT->relation,
+                    'verify'=>$parentsDT->verify,
+                );
+            }
+            return $this->response($parents_dt, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }
