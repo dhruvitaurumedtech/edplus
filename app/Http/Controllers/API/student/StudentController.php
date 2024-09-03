@@ -277,12 +277,52 @@ class StudentController extends Controller
                         }
                         User::where('id', $parentData['upid'])->update($updateData);
 
-                        $parnsad = Parents::where('student_id',auth()->id())
-                        ->where('parent_id',$parentData['upid'])
-                        ->where('verify','0')
+                        // $parnsad = Parents::where('student_id',auth()->id())
+                        // ->where('parent_id',$parentData['upid'])
+                        // ->where('verify','0')
+                        $parnsad = Parents::where('parent_id',$parentData['upid'])
                         ->update([
                             'relation' => $parentData['relation'],
                         ]);
+
+                        if (!empty($parentData['email'])) {
+                            $parntsdt = Parents::join('users','users.id','=','parents.parent_id')
+                            ->join('institute_detail','institute_detail.id','=','parents.institute_id')
+                            ->where('parents.parent_id',$parentData['upid'])
+                            ->select('users.firstname','users.lastname','users.email','institute_detail.institute_name','institute_detail.address','institute_detail.email as Iemail','parents.*')
+                            ->get();
+
+                            foreach($parntsdt as $prtsDTLS){
+
+                                $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
+                                ->join('standard', 'standard.id', 'students_details.standard_id')
+                                ->where('students_details.institute_id', $prtsDTLS->institute_id)
+                                ->where('students_details.student_id', $prtsDTLS->student_id)
+                                ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardn')
+                                ->first();
+                                $subcts = Subject_model::whereIN('id', explode(",", $response->subject_id))->get();
+                                $sujids = [];
+                                $suhids = [];
+                                foreach ($subcts as $subnames) {
+                                    $suhids[] = $subnames->id;
+                                    $sujids[] = ['id'=>$subnames->id,'subname' => $subnames->name, 'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('profile/no-image.png'),];
+                                }
+                                
+                                $parDT[] = [
+                                'institute'=>'',
+                                'institutes' => $prtsDTLS->institute_name,
+                                'institute_id' => $prtsDTLS->institute_id,
+                                'address' => $prtsDTLS->address,
+                                'Iemail' => $prtsDTLS->Iemail,
+                                'firstname'=>$prtsDTLS->firstname,
+                                'lastname'=>$prtsDTLS->lastname,
+                                'subjects'=>$sujids,
+                                'subjects'=>implode(",",$suhids)
+                                ];
+                            }
+                            
+                            Mail::to($parentData['email'])->send(new WelcomeMail($parDT));
+                        }
                     }else{
                         if ($emilfin && $emilfin->role_type != 5) {
                             return $this->response([], "Someone else has already used this email.", false, 400);

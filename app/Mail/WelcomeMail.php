@@ -20,7 +20,7 @@ class WelcomeMail extends Mailable
 
     public function build()
     {
-        if(!empty($this->data['subject_id']) && $this->data['institute_id']){
+        if(!empty($this->data['subjects']) && $this->data['institute_id']){
             $subject=Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
             ->whereIn('subject_sub.subject_id', explode(',', $this->data['subject_id']))
             ->where('subject_sub.institute_id', $this->data['institute_id'])
