@@ -36,7 +36,6 @@
 <body>
     <form >
         @csrf
-        {$data['institutes']}
         @if($data['institute'] && $data['institute'] !='')
             <p>Dear {{$data['name']}},</p>
             <p>We are writing to inform you that {{$data['sname']}} has expressed interest in enrolling at {{$data['institute']}} for the upcoming academic term. </p>
@@ -69,8 +68,7 @@
             <p>{{$data['Iemail']}}</p>
             <p>{{$data['contact_no']}}</p>
             <p>{{$data['website_link']}}</p>
-            @elseif(!empty($data['institutes']))
-            <h>Hello</h>
+            
             @else
             <p>Email : <b>{{$data['email']}}</b></p>
             <p>Password : <b>{{$data['password']}}</b></p>

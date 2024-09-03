@@ -8,6 +8,7 @@ use App\Models\Banner_model;
 use App\Models\board;
 use App\Models\Institute_for_model;
 use App\Mail\DirectMessage;
+use App\Mail\EditParentMail;
 use App\Models\announcements_model;
 use App\Models\Attendance_model;
 use App\Models\Base_table;
@@ -289,39 +290,54 @@ class StudentController extends Controller
                             $parntsdt = Parents::join('users','users.id','=','parents.parent_id')
                             ->join('institute_detail','institute_detail.id','=','parents.institute_id')
                             ->where('parents.parent_id',$parentData['upid'])
-                            ->select('users.firstname','users.lastname','users.email','institute_detail.institute_name','institute_detail.address','institute_detail.email as Iemail','parents.*')
+                            ->select('users.firstname','users.lastname','users.email','institute_detail.contact_no',
+                                'institute_detail.website_link', 'institute_detail.start_academic_year',
+                                'institute_detail.end_academic_year','institute_detail.institute_name','institute_detail.address','institute_detail.email as Iemail','parents.*')
                             ->get();
 
                             foreach($parntsdt as $prtsDTLS){
-
+                                $startAcademicYear = $prtsDTLS->start_academic_year;
+                                $startDate = Carbon::parse($startAcademicYear);
+                                $syear = $startDate->year;
+    
+                                $endAcademicYear = $prtsDTLS->end_academic_year;
+                                $endtDate = Carbon::parse($endAcademicYear);
+                                $eyear = $endtDate->year;
                                 $response = Student_detail::join('users', 'users.id', 'students_details.student_id')
                                 ->join('standard', 'standard.id', 'students_details.standard_id')
                                 ->where('students_details.institute_id', $prtsDTLS->institute_id)
                                 ->where('students_details.student_id', $prtsDTLS->student_id)
-                                ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standardn')
+                                ->select('students_details.*', 'users.firstname', 'users.lastname', 'standard.name as standard')
                                 ->first();
-                                $subcts = Subject_model::whereIN('id', explode(",", $response->subject_id))->get();
+                                // $subcts = Subject_model::whereIN('id', explode(",", $response->subject_id))->get();
+                                $subcts=Subject_sub::join('subject','subject.id','=','subject_sub.subject_id')
+                                                    ->whereIn('subject_sub.subject_id', explode(',', $response->subject_id))
+                                                    ->where('subject_sub.institute_id', $prtsDTLS->institute_id)
+                                                    ->get();
                                 $sujids = [];
-                                $suhids = [];
                                 foreach ($subcts as $subnames) {
-                                    $suhids[] = $subnames->id;
-                                    $sujids[] = ['id'=>$subnames->id,'subname' => $subnames->name, 'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('profile/no-image.png'),];
+                                    $sujids[] = ['id'=>$subnames->id,'subname' => $subnames->name, 'amount' => $subnames->amount ,'image' => (!empty($subnames->image)) ? url($subnames->image) : asset('profile/no-image.png'),];
+
                                 }
                                 
                                 $parDT[] = [
-                                'institute'=>'',
+                                'institute'=>'dhruvit',
                                 'institutes' => $prtsDTLS->institute_name,
                                 'institute_id' => $prtsDTLS->institute_id,
                                 'address' => $prtsDTLS->address,
                                 'Iemail' => $prtsDTLS->Iemail,
                                 'firstname'=>$prtsDTLS->firstname,
                                 'lastname'=>$prtsDTLS->lastname,
+                                'standard'=>$prtsDTLS->standard,
+                                'contact_no' => $prtsDTLS->contact_no,
+                                'website_link' => $prtsDTLS->website_link,
+                                'year' => $syear . '-' . $eyear,
                                 'subjects'=>$sujids,
-                                'subjects'=>implode(",",$suhids)
+                                'id'=>$prtsDTLS->id
                                 ];
                             }
                             
-                            Mail::to($parentData['email'])->send(new WelcomeMail($parDT));
+                            Mail::to($parentData['email'])->send(new EditParentMail($parDT));
                         }
                     }else{
                         if ($emilfin && $emilfin->role_type != 5) {
