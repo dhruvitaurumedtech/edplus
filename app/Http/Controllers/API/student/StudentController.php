@@ -796,9 +796,20 @@ class StudentController extends Controller
                     ->orderByDesc('topic.created_at')
                     ->get()
                     ->toarray();
+
+
                     if(!empty($topics))  {
                         $topicsArray = [];
                         foreach ($topics as $topval) {
+
+                            $additional_Data=Base_table::join('board','board.id','=','base_table.board')
+                                       ->join('medium','medium.id','=','base_table.medium')
+                                       ->join('standard','standard.id','=','base_table.standard')
+                                       ->select('standard.name as standard_name','board.name as board_name','medium.name as medium_name')
+                                       ->where('base_table.id',$topval['base_table_id'])
+                                       ->first();
+
+
                                 $reponse_video = VideoAssignToBatch::join('batches', 'batches.id', '=', 'video_assignbatch.batch_id')
                                     ->where('video_assignbatch.video_id', $topval['id'])
                                     ->where('video_assignbatch.standard_id', $topval['standard_id'])
@@ -836,6 +847,9 @@ class StudentController extends Controller
                                 "chapter_id" => $topval['chapter_id'],
                                 "chapter_name" => $topval['chname'],
                                 "status" => $final_status,
+                                'board_name'=> $additional_Data->board_name,
+                                'standard_name'=> $additional_Data->standard_name,
+                                'medium_name'=>$additional_Data->medium_name,
                                 "batch_list" => $batch_list,
                             ];
                         }
