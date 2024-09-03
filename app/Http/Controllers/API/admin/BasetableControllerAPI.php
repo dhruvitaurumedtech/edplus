@@ -676,60 +676,87 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
 
             // Fetching distinct medium IDs based on provided criteria
-            $getMediumIds = Base_table::whereIn('institute_for', $institute_for_ids)
-                ->whereIn('board', $board_ids)
+            $getMediumIds = Base_table::join('board', 'board.id', '=', 'base_table.board')
+                ->join('medium', 'medium.id', '=', 'base_table.medium')
+                ->whereIn('base_table.institute_for', $institute_for_ids)
+                ->whereIn('base_table.board', $board_ids)
+                ->whereIN('base_table.medium', $medium_ids)
+                ->select(
+                    'board.name as boardname',
+                    'medium.name as mediumname',
+                    'medium.icon as mediumicon',
+                    'medium.status as mediumstatus',
+                    'base_table.board',
+                    'base_table.medium'
+                )
                 ->distinct()
-                ->pluck('medium');
+                ->get();
 
-            // Fetching all relevant mediums
-            $base_medium = Medium_model::whereIn('id', $getMediumIds)->get();
+            // Fetching class IDs already associated with the institute
+            // $institute_base_class_id = Class_sub::where('institute_id', $request->institute_id)
+            //     ->whereIn('board_id', $board_ids)
+            //     ->whereIn('medium_id', $medium_ids)
+            //     ->pluck('class_id')
+            //     ->toArray();
 
             // Initialize an array to store the final data
             $data = [];
 
-            // Fetching class IDs already associated with the institute
-            $institute_base_class_id = Class_sub::where('institute_id', $request->institute_id)
-                ->whereIn('board_id', $board_ids)
-                ->whereIn('medium_id', $medium_ids)
-                ->pluck('class_id')
-                ->toArray();
+            // Initialize a set to track processed mediums
+            $processedMediums = [];
 
             // Loop through each medium
-            foreach ($base_medium as $basemedium) {
-                // Fetching distinct class IDs for this medium based on criteria
-                $getClassId = Base_table::whereIn('institute_for', $institute_for_ids)
-                    ->whereIn('board', $board_ids)
-                    ->where('medium', $basemedium->id)
-                    ->distinct()
-                    ->pluck('institute_for_class');
+            foreach ($getMediumIds as $basemedium) {
+                // Check if this medium has already been processed
+                if (!isset($processedMediums[$basemedium->medium])) {
 
-                // Fetching classes based on the class IDs
-                $base_class = Class_model::whereIn('id', $getClassId)->get();
+                    $institute_base_class_id = Class_sub::where('institute_id', $request->institute_id)
+                    ->where('board_id', $basemedium->board)
+                    ->where('medium_id', $basemedium->medium)
+                    ->pluck('class_id')
+                    ->toArray();
 
-                // Initialize an array to store the classes data for the current medium
-                $classes = [];
+                    // Fetching distinct class IDs for this medium based on criteria
+                    $getClassId = Base_table::whereIn('institute_for', $institute_for_ids)
+                        ->where('board', $basemedium->board)
+                        ->where('medium', $basemedium->medium)
+                        ->distinct()
+                        ->pluck('institute_for_class');
 
-                // Loop through each class to build the classes array for the medium
-                foreach ($base_class as $baseclass) {
-                    $isAdded = in_array($baseclass->id, $institute_base_class_id);
-                    $classes[] = [
-                        'id' => $baseclass->id,
-                        'name' => $baseclass->name,
-                        'icon' => url($baseclass->icon),
-                        'is_added' => $isAdded,
-                        'is_active' => $baseclass->status // Adding is_active field
+                    // Fetching classes based on the class IDs
+                    $base_class = Class_model::whereIn('id', $getClassId)->get();
+
+                    // Initialize an array to store the classes data for the current medium
+                    $classes = [];
+
+                    // Loop through each class to build the classes array for the medium
+                    foreach ($base_class as $baseclass) {
+                        $isAdded = in_array($baseclass->id, $institute_base_class_id);
+                        $classes[] = [
+                            'id' => $baseclass->id,
+                            'name' => $baseclass->name,
+                            'icon' => url($baseclass->icon),
+                            'is_added' => $isAdded,
+                            'is_active' => $baseclass->status, // Adding is_active field
+                        ];
+                    }
+
+                    // Add medium and its associated classes to the final data array
+                    $data[] = [
+                        'id' => $basemedium->medium,
+                        'name' => $basemedium->mediumname,
+                        'icon' => url($basemedium->mediumicon),
+                        'is_active' => $basemedium->mediumstatus, // Adding is_active field
+                        'classes' => $classes, // Nested classes array
                     ];
-                }
 
-                // Add medium and its associated classes to the final data array
-                $data[] = [
-                    'id' => $basemedium->id,
-                    'name' => $basemedium->name,
-                    'icon' => url($basemedium->icon),
-                    'is_active' => $basemedium->status, // Adding is_active field
-                    'classes' => $classes // Nested classes array
-                ];
+                    // Mark this medium as processed
+                    $processedMediums[$basemedium->medium] = true;
+                }
             }
+
+return response()->json(['data' => $data]);
+
 
 
             
