@@ -525,6 +525,8 @@ class InstituteApiController extends Controller
             $bannerad->user_id = Auth::id();
             $bannerad->institute_id = $lastInsertedId;
             $bannerad->banner_image = 'banner_image/defaultbanner.jpg';
+            $bannerad->status = 'active';
+
             $bannerad->save();
 
             DB::commit();
