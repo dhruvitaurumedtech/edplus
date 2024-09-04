@@ -521,6 +521,12 @@ class InstituteApiController extends Controller
                 'institute_name' => $institute_name,
                 'logo' => asset($imagePath)
             ];
+            $bannerad = new Banner_model();
+            $bannerad->user_id = Auth::id();
+            $bannerad->institute_id = $lastInsertedId;
+            $bannerad->banner_image = asset('banner_image/defaultbanner.jpg');
+            $bannerad->save();
+
             DB::commit();
             return $this->response($data, "institute create Successfully");
         } catch (Exception $e) {
