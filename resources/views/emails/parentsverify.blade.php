@@ -9,6 +9,28 @@
         p {
             color: black;
         }
+            .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        text-align: center;
+        white-space: nowrap;
+        vertical-align: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+    }
     </style>
 </head>
 <body>
@@ -32,7 +54,7 @@
             <p> I acknowledge that I have reviewed the enrollment details and agree to the terms and conditions outlined by the institute."
             </p>
 
-            <b><p>Please Click Here to <a href="{{ url('/update-value/' . $id) }}" class="btn btn-success"><button>Verify</button></a></p></b>
+            <b><p>Please Click Here to <a href="{{ url('/update-value/' . $id) }}"  style="  color: #fff;  background-color: #007bff;  border-color: #007bff;  display: inline-block; font-weight: 400; text-align: center; white-space: nowrap; vertical-align: middle;   -webkit-user-select: none;      -moz-user-select: none;  -ms-user-select: none;    user-select: none;     border: 1px solid transparent;   padding: .375rem .75rem;      font-size: 1rem;         line-height: 1.5;    border-radius: .25rem;  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;" class="btn btn-primary">Verify</a></p></b>
             
             <br>
             <p>Thank you for your prompt attention to this matter. We look forward to welcoming {{$sname}} to our institute.</p>
