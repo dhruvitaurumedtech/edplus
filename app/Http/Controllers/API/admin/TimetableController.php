@@ -129,8 +129,8 @@ class TimetableController extends Controller
             'subject_id'=>'required|exists:subject,id',
             'teacher_id'=>'required|exists:users,id',
             'lecture_type'=>'required',
-            'start_time'=>'required',
-            'end_time'=>'required|after:start_time',
+            'start_time'=>'required|date_format:H:i:s',
+            'end_time'=>'required|after:start_time|date_format:H:i:s',
             'day'=>'required|exists:days,id',
             'class_room_id'=>'required'
             ]);
