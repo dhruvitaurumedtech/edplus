@@ -23,6 +23,7 @@ use App\Http\Controllers\API\admin\FeesController;
 use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
+use App\Http\Controllers\API\admin\PDFController as AdminPDFController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\staff\StaffController;
@@ -277,6 +278,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-standard-teacher', [TeacherController::class, 'add_standard']);
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
     Route::post('/institute/parents-list', [InstituteApiController::class, 'parents_list']);
+
+    Route::post('/institute/pdf', [AdminPDFController::class, 'index']);
+
 });
     //token without use 
    
