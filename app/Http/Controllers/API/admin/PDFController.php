@@ -24,13 +24,33 @@ class PDFController extends Controller
         
         $data=Student_detail::join('users','users.id','=','students_details.student_id')
                       ->join('standard','standard.id','=','students_details.standard_id')
+                      ->join('class','class.id','=','students_details.class_id')
                       ->join('board','board.id','=','students_details.board_id')
+                      ->join('batches','batches.id','=','students_details.batch_id')
                       ->join('medium','medium.id','=','students_details.medium_id')
-                      ->select('users.*','board.name as board_name','standard.name as standard_name','medium.name as medium_name')
-                      ->where('institute_id',$request->institute_id)
+                      ->select('users.*','board.name as board_name','standard.name as standard_name','medium.name as medium_name','class.name as class_name')
+                      ->when(!empty($request->institute_id), function ($query) use ($request) {
+                        return $query->where('students_details.institute_id', $request->institute_id);
+                        })
+                        ->when(!empty($request->class_id), function ($query) use ($request) {
+                            return $query->where('students_details.class_id', $request->class_id);
+                        })
+                        ->when(!empty($request->medium_id), function ($query) use ($request) {
+                            return $query->where('students_details.medium_id', $request->medium_id);
+                        })
+                        ->when(!empty($request->board_id), function ($query) use ($request) {
+                            return $query->where('students_details.board_id', $request->board_id);
+                        })
+                        ->when(!empty($request->batch_id), function ($query) use ($request) {
+                            return $query->where('students_details.batch_id', $request->batch_id);
+                        })
+                        ->when(!empty($request->subject_id), function ($query) use ($request) {
+                            return $query->where('students_details.subject_id', 'LIKE', '%' . $request->subject_id . '%');
+                        })
+                        
                       ->get()->toarray();
         
-        $pdf = PDF::loadView('pdf.studentlist', ['data' => $data]);
+        $pdf = PDF::loadView('pdf.studentlist', ['data' => $data])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
 
         $folderPath = public_path('pdfs');
 
