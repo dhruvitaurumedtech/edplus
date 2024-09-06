@@ -281,6 +281,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
 
+
 });
     //token without use 
    
