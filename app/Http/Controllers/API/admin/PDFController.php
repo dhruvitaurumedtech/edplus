@@ -84,6 +84,7 @@ class PDFController extends Controller
      */
     public function teacher_reports(Request $request)
     {
+        
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -91,6 +92,7 @@ class PDFController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
+            
             $data=Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
             ->join('standard','standard.id','=','teacher_detail.standard_id')
             ->join('board','board.id','=','teacher_detail.board_id')
@@ -98,9 +100,23 @@ class PDFController extends Controller
             ->join('subject','subject.id','=','teacher_detail.subject_id')
             ->select('users.*','board.name as board_name',
             'standard.name as standard_name','medium.name as medium_name','subject.name as subjectname')
-            ->where('institute_id',$request->institute_id)
+            ->where('teacher_detail.institute_id',$request->institute_id)
+            ->when(!empty($request->subject_id) ,function ($query) use ($request){
+                return $query->where('teacher_detail.subject_id', $request->subject_id);
+            })
+            ->when(!empty($request->class_id) ,function ($query) use ($request){
+                return $query->where('teacher_detail.class_id', $request->class_id);
+            })
+            ->when(!empty($request->board_id), function ($query) use ($request){
+                return $query->where('teacher_detail.board_id', $request->board_id);
+            })
+            ->when(!empty($request->medium_id) ,function ($query) use ($request){
+                return $query->where('teacher_detail.medium_id', $request->medium_id);
+            })
+            ->when(!empty($request->creatdate) ,function ($query) use ($request){
+                return $query->where('teacher_detail.created_at', $request->creatdate);
+            })
             ->get()->toarray();
-
                 $pdf = PDF::loadView('pdf.teacherlist', ['data' => $data]);
 
                 $folderPath = public_path('pdfs');
@@ -120,7 +136,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
-        }catch(Exeption $e){
+        }catch(Exception $e){
             return $this->response([], "Something want wrong!.", false, 400);
         }
     }
