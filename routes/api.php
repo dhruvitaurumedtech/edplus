@@ -279,7 +279,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
     Route::post('/institute/parents-list', [InstituteApiController::class, 'parents_list']);
 
-    Route::post('/institute/pdf', [AdminPDFController::class, 'index']);
+    Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
 
 });
     //token without use 
