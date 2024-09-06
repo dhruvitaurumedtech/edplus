@@ -218,6 +218,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
     Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student'])->middleware('check.permission:7,4');
     Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student'])->middleware('check.permission:7,1');
+    Route::post('/institute/pending-paid-fees-student', [FeesController::class, 'pending_paid_fees_student'])->middleware('check.permission:7,1');
 
 
 
