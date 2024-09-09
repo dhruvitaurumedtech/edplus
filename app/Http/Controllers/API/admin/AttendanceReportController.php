@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Attendance_model;
 use App\Models\Student_detail;
 use App\Traits\ApiTrait;
+use PDF;
+use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,6 +31,7 @@ class AttendanceReportController extends Controller
             ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
             ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
             ->leftJoin('batches', 'batches.id', '=', 'students_details.batch_id')
+            ->leftJoin('users','users.id','=','students_details.student_id')
             ->select(
                 'attendance.*', 
                 'class.name as class_name', 
@@ -36,6 +39,9 @@ class AttendanceReportController extends Controller
                 'medium.name as medium_name', 
                 'standard.name as standard_name', 
                 'batches.batch_name', 
+                'users.firstname',
+                'users.lastname',
+                'users.email',
             )
             ->where('students_details.status','1')
             ->when(!empty($request->institute_id), function ($query) use ($request) {
@@ -61,11 +67,29 @@ class AttendanceReportController extends Controller
             })
             ->get()->toArray();
 
-           print_r($attendance);exit;
-                     
-        } catch (Exception $e) {
-            return $this->response([], "Something want wrong!.", false, 400);
-        }
+            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $attendance]);
+
+            $folderPath = public_path('pdfs');
+
+            if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+            }
+
+            $baseFileName = 'attendance_report.pdf';
+            $pdfPath = $folderPath . '/' . $baseFileName;
+
+            $counter = 1;
+            while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/attendance_report' . $counter . '.pdf'; 
+                $counter++;
+            }
+            
+            file_put_contents($pdfPath, $pdf->output());
+            $pdfUrl = asset('pdfs/' . basename($pdfPath));
+            return $this->response($pdfUrl);
+            } catch (Exception $e) {
+                return $this->response([], "Something want wrong!.", false, 400);
+            }
 
     }
 }
