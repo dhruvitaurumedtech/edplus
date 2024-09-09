@@ -79,7 +79,8 @@
                 <th>Standard</th>
             </tr>
         </thead>
-        <tbody><?php $i=1;?>
+        <tbody>@php $i = 1; @endphp
+          @if(!empty($data))
             @foreach ($data as $item)
             <tr>
                 <td>{{ $i }}</td>
@@ -91,8 +92,13 @@
                 <td>{{ $item['medium_name'] }}</td>
                 <td>{{ $item['standard_name'] }}</td>
             </tr>
-            <?php $i++ ?>
-            @endforeach
+            @php $i++; @endphp
+                    @endforeach
+                @else
+                    <tr>
+                        <td colspan="9">No data available</td>
+                    </tr>
+                @endif
         </tbody>
     </table>
     </div>
