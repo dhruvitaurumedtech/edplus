@@ -74,7 +74,6 @@
                 <th>Full Name</th>
                 <th>Email</th>
                 <th>Board</th>
-                <th>Class</th>
                 <th>Medium</th>
                 <th>Standard</th>
             </tr>
@@ -87,7 +86,6 @@
                 <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
                 <td>{{ $item['email'] }}</td>
                 <td>{{ $item['board_name'] }}</td>
-                <td>{{ $item['class_name'] }}</td>
                 <td>{{ $item['medium_name'] }}</td>
                 <td>{{ $item['standard_name'] }}</td>
             </tr>

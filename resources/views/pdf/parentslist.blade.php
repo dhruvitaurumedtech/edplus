@@ -70,13 +70,11 @@
         <thead>
             <tr>
                 <th>No</th>
-                <th>Stud_ID</th>
+                <th>ID</th>
                 <th>Full Name</th>
                 <th>Email</th>
-                <th>Board</th>
-                <th>Class</th>
-                <th>Medium</th>
-                <th>Standard</th>
+                <th>Address</th>
+                <th>Mobile</th>
             </tr>
         </thead>
         <tbody><?php $i=1;?>
@@ -86,10 +84,8 @@
                 <td>{{ $item['id'] }}</td>
                 <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
                 <td>{{ $item['email'] }}</td>
-                <td>{{ $item['board_name'] }}</td>
-                <td>{{ $item['class_name'] }}</td>
-                <td>{{ $item['medium_name'] }}</td>
-                <td>{{ $item['standard_name'] }}</td>
+                <td>{{ $item['address'] }}</td>
+                <td>{{ $item['mobile'] }}</td>
             </tr>
             <?php $i++ ?>
             @endforeach
