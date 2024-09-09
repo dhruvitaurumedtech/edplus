@@ -65,7 +65,17 @@ class AttendanceReportController extends Controller
             ->when(!empty($request->subject_id), function ($query) use ($request) {
                 return $query->where('students_details.subject_id', 'LIKE', '%' . $request->subject_id . '%');
             })
+            ->when(!empty($request->start_date) && !empty($request->end_date), function($query) use ($request) {
+                return $query->whereBetween('attendance.date', [$request->start_date, $request->end_date]);
+            })
+            ->when(!empty($request->date), function ($query) use ($request) {
+                return $query->whereDate('attendance.date', $request->date);
+            })
+            ->when(!empty($request->attendance_status), function ($query) use ($request) {
+                return $query->where('attendance.attendance', $request->attendance_status);
+            })
             ->get()->toArray();
+            // print_r($attendance);exit;
 
             $pdf = PDF::loadView('pdf.attendance_report', ['data' => $attendance]);
 
