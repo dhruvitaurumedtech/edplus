@@ -40,7 +40,7 @@
     @elseif($data == 3)
     <p>Record not found.</p>
     @else
-    <p>Somthing went wrong.</p>
+    <p>Something went wrong.</p>
     @endif
     </div>
 </body>

@@ -1351,7 +1351,7 @@ class TeacherController extends Controller
             }
             return $this->response([], "Successfully Update data.");
         } catch (Exception $e) { 
-            return $this->response([], "Somthing went wrong.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
     public function teacher_profile(Request $request)
@@ -1468,7 +1468,7 @@ class TeacherController extends Controller
 
             return $this->response($userdetail, "Successfully fetch data.");
         } catch (Exception $e) {
-            return $this->response([], "Somthing went wrong!!", false, 400);
+            return $this->response([], "Something went wrong!!", false, 400);
         }
     }
 
@@ -1514,7 +1514,7 @@ class TeacherController extends Controller
           Teacher_model::where('id',$request->teacher_detail_id)->delete();
           return $this->response([], "deleted");
         }catch(Exception $e){
-            return $this->response($e, "Somthing went wrong", false, 400);
+            return $this->response($e, "Something went wrong", false, 400);
         }
 
     }
@@ -1702,7 +1702,7 @@ class TeacherController extends Controller
             
             return $this->response([], "Standard Add successfully");
         } catch (\Exception $e) {
-            return $this->response($e, "Somthing went wrong.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 }

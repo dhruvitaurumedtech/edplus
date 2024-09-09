@@ -254,7 +254,7 @@ class VideoController extends Controller
                 return $this->response([], "Record Not Found.");
             }
         }catch (Exception $e) {
-            return $this->response($e, "Somthing went wrong.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
 
     }

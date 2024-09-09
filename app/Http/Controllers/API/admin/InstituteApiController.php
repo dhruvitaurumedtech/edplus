@@ -1193,7 +1193,7 @@ class InstituteApiController extends Controller
             return $this->response([], "Successfully Reject Request.");
         }
         } catch (Exception $e) {
-            return $this->response([], "Somthing went wrong.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -2149,7 +2149,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "Announcement $msg successfully.");
             }
         } catch (Exception $e) {
-            return $this->response([], "Somthing went wrong.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -2240,7 +2240,7 @@ class InstituteApiController extends Controller
             });
             return $this->response($announcementDT, "Successfully fetch Data.");
         } catch (Exception $e) {
-            return $this->response([], "Somthing went wrong.", false, 400);
+            return $this->response([], "Something went wrong.", false, 400);
         }
     }
 
@@ -2263,7 +2263,7 @@ class InstituteApiController extends Controller
                 return $this->response([], "Record Not Found.");
             }
         } catch (Exception $e) {
-            return $this->response($e, "Somthing went wrong.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
 
@@ -4043,7 +4043,7 @@ class InstituteApiController extends Controller
             return $this->response([], "Replaced successfully");
         } catch (\Exception $e) {
             return $e;
-            return $this->response($e, "Somthing went wrong.", false, 400);
+            return $this->response($e, "Something went wrong.", false, 400);
         }
     }
     
