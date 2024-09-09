@@ -65,7 +65,6 @@ class StudentListController extends Controller
                     $pdfPath = $folderPath . '/studentlist' . $counter . '.pdf'; 
                     $counter++;
                 }
-
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
                 
