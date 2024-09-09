@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Parents;
 use App\Models\Student_detail;
 use App\Models\Teacher_model;
 use App\Traits\ApiTrait;
@@ -131,6 +132,55 @@ class PDFController extends Controller
                 $counter = 1;
                 while (File::exists($pdfPath)) {
                 $pdfPath = $folderPath . '/teacherlist' . $counter . '.pdf'; 
+                $counter++;
+                }
+
+                file_put_contents($pdfPath, $pdf->output());
+                $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        }catch(Exception $e){
+            return $this->response([], "Something want wrong!.", false, 400);
+        }
+    }
+
+    public function parents_reports(Request $request)
+    {
+        
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            
+            $data=Parents::join('users','users.id','=','parents.parent_id')
+            //->join('subject','subject.id','=','teacher_detail.subject_id')
+            ->select('users.*')
+            ->where('parents.institute_id',$request->institute_id)
+            ->when(!empty($request->mobile) ,function ($query) use ($request){
+                return $query->where('users.mobile', $request->mobile);
+            })
+            ->when(!empty($request->email) ,function ($query) use ($request){
+                return $query->where('users.email', $request->email);
+            })
+            ->when(!empty($request->name), function ($query) use ($request){
+                return $query->where('users.firstname', $request->name);
+            })
+            ->get()->toarray();
+                $pdf = PDF::loadView('pdf.parentslist', ['data' => $data]);
+
+                $folderPath = public_path('pdfs');
+
+                if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $baseFileName = 'parentslist.pdf';
+                $pdfPath = $folderPath . '/' . $baseFileName;
+
+                $counter = 1;
+                while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/parentslist' . $counter . '.pdf'; 
                 $counter++;
                 }
 
