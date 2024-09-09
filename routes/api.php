@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
+use App\Http\Controllers\API\admin\AttendanceReportController;
 use App\Http\Controllers\API\admin\BasetableControllerAPI;
 use App\Http\Controllers\API\admin\DeadstockController;
 use Illuminate\Http\Request;
@@ -281,6 +282,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/parents-list', [InstituteApiController::class, 'parents_list']);
 
     Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
+    Route::post('/institute/attendance-report-pdf', [AttendanceReportController::class, 'attendance_report_pdf']);
 
 });
     //token without use 
