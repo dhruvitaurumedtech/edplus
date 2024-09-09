@@ -65,6 +65,11 @@
 <body>
 
     <h2>Attendance List</h2>
+    <hr>
+    <p> <b>Board_name :</b> {{$data[0]['board_name']}} </p>
+    <p><b>Class_name :</b> {{$data[0]['class_name']}} </p>
+    <p><b>Medium_name :</b> {{$data[0]['medium_name']}} </p>
+    <p><b>Standard_name :</b> {{$data[0]['standard_name']}} </p>
     <div class="content">
     <table>
         <thead>
@@ -73,9 +78,6 @@
                 <th>Stud_ID</th>
                 <th>Name</th>
                 <th>Email</th>
-                <th>Board</th>
-                <th>Medium</th>
-                <th>Standard</th>
                 <th>Attendance</th>
                 <th>Date</th>
             </tr>
@@ -89,9 +91,6 @@
                             <td>{{ $item['id'] }}</td>
                             <td>{{ $item['firstname'] . ' ' . $item['lastname'] }}</td>
                             <td>{{ $item['email'] }}</td>
-                            <td>{{ $item['board_name'] }}</td>
-                            <td>{{ $item['medium_name'] }}</td>
-                            <td>{{ $item['standard_name'] }}</td>
                             <td>{{ $item['attendance'] }}</td>
                             <td>{{ $item['date'] }}</td>
                         </tr>
