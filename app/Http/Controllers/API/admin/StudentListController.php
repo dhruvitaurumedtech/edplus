@@ -28,7 +28,7 @@ class StudentListController extends Controller
               ->leftjoin('board','board.id','=','students_details.board_id')
               ->leftjoin('batches','batches.id','=','students_details.batch_id')
               ->leftjoin('medium','medium.id','=','students_details.medium_id')
-              ->select('users.*','board.name as board_name','standard.name as standard_name','medium.name as medium_name','class.name as class_name')
+              ->select('users.*','board.name as board_name','standard.name as standard_name','medium.name as medium_name','class.name as class_name','batches.batch_name')
               ->when(!empty($request->institute_id), function ($query) use ($request) {
                 return $query->where('students_details.institute_id', $request->institute_id);
                 })
@@ -49,7 +49,7 @@ class StudentListController extends Controller
                 })
                 
               ->get()->toarray();
-
+                $data = ['student_list'=>$data,'request_data'=>$request];
                 $pdf = PDF::loadView('pdf.studentlist', ['data' => $data])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
 
                 $folderPath = public_path('pdfs');
