@@ -8,6 +8,7 @@ use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use PDF;
+use Illuminate\Support\Facades\Validator;
 
 class StudentListController extends Controller
 {
@@ -59,7 +60,6 @@ class StudentListController extends Controller
 
                 $baseFileName = 'studentlist.pdf';
                 $pdfPath = $folderPath . '/' . $baseFileName;
-
                 $counter = 1;
                 while (File::exists($pdfPath)) {
                     $pdfPath = $folderPath . '/studentlist' . $counter . '.pdf'; 
@@ -68,6 +68,7 @@ class StudentListController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                
                 return $this->response($pdfUrl);
                 } catch (Exception $e) {
                     return $this->response([], "Something want wrong!.", false, 400);
