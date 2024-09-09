@@ -66,6 +66,8 @@
 
     <h2>Result List</h2>
     <hr>
+    @if(!empty($data['result_report']))
+
     @if(!empty($data['request_data']['board_id']))
     <p><b>Board_name:</b> {{ $data['result_report'][0]['board_name'] }}</p>
     @endif
@@ -85,6 +87,8 @@
     @if(!empty($data['request_data']['standard_id']))
         <p><b>Standard_name:</b> {{ $data['result_report'][0]['standard_name'] }}</p>
     @endif
+    @endif
+
 
    
 
