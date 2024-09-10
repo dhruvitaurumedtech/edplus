@@ -37,6 +37,8 @@ class FeesPDFController extends Controller
                 'users.firstname',
                 'users.lastname',
                 'users.image',
+                'users.mobile',
+               
                 'students_details.student_id',
                 'batches.batch_name as batch_name',
                 'board.name as board_name',
@@ -52,6 +54,7 @@ class FeesPDFController extends Controller
                 'users.firstname',
                 'users.lastname',
                 'users.image',
+               
                 'students_details.student_id',
                 'batches.batch_name',
                 'board.name',
@@ -67,12 +70,19 @@ class FeesPDFController extends Controller
             })
             ->when(!empty($request->institute_id), function ($query) use ($request) { 
                 return $query->where('students_details.institute_id', $request->institute_id);
+            })
+            ->when(!empty($request->mobile), function ($query) use ($request) { 
+                return $query->where('users.mobile', $request->mobile);
+            })
+            ->when(!empty($request->student_id), function ($query) use ($request) { 
+                return $query->where('students_details.student_id', $request->student_id);
             });
         
         
       
         
         $student_response = $query->get()->toArray();
+        // print_r($student_response);exit;
         $students = [];
         
         foreach ($student_response as $value) {
@@ -80,10 +90,11 @@ class FeesPDFController extends Controller
             // Fetch the total payment amount
             $fees_detail = Fees_colletion_model::where('student_id', $value['student_id'])
                 ->where('institute_id', $request->institute_id)
+                ->where('date', date('Y-m-d', strtotime($request->date)))
                 ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
                 ->first();
             $total_payment_amount = $fees_detail ? $fees_detail->total_payment_amount : 0;
-        
+           
             // Fetch the total fees and discount
             $student_fees = Student_fees_model::where('student_id', $value['id'])
                 ->where('institute_id', $request->institute_id)
@@ -92,52 +103,81 @@ class FeesPDFController extends Controller
                 ->where('student_id', $value['id'])
                 ->first();
                
-            // Calculate the total fees after applying discount
             $total_fees = !empty($student_fees) ? $student_fees->total_fees : 0;
             $due_amount = $total_fees;
             if ($discount) {
                 if ($discount->discount_by == 'Rupee') {
-                    $due_amount = $total_fees - $discount->discount_amount;
+                    $due_amounts = $total_fees - $discount->discount_amount;
                 } elseif ($discount->discount_by == 'Percentage') {
-                    $due_amount = $total_fees - ($total_fees * ($discount->discount_amount / 100));
+                    $due_amounts = $total_fees - ($total_fees * ($discount->discount_amount / 100));
                 }
             }
         
             // Calculate due amount
-            $due_amount = $due_amount - $total_payment_amount;
-        
+            // print_r($due_amount);
+            if(!empty($due_amount)){
+                $due_amounts = $due_amount - $total_payment_amount;
+            }
+            
             // Determine status and append to students array
-            if ($request->status == 'paid' && $due_amount <= 0) {
+            if ($request->status == 'paid' && $due_amounts <= 0) {
                 // Paid status
                 $students[] = [
                     'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
                     'status' => 'paid',
                     'discount' => (!empty($discount->discount_amonut)) ? $discount->discount_amonut : '',
-                    'paid_amount' => !empty($total_fees) ? $total_fees : '',
+                    'total_fees' => !empty($total_fees) ? $total_fees : '',
+                    'paid_amount' => !empty($total_payment_amount) ? $total_payment_amount : '',
                     'discount_by' => !empty($discount->discount_by) ? $discount->discount_by : '',
                     'board_name' =>$value['board_name'],
                     'batch_name' =>$value['batch_name'],
                     'medium_name' =>$value['medium_name'],
-                    'standard_name' =>$value['standard_name']
+                    'standard_name' =>$value['standard_name'],
+                    'mobile' =>$value['mobile'],
+
                 ];
-            } elseif ($request->status == 'pending' && $due_amount > 0) {
+            } elseif ($request->status == 'pending' && $due_amounts > 0) {
                 // Pending status
                 $students[] = [
-                   'student_id' => $value['id'],
+                    'student_id' => $value['id'],
                     'student_name' => $value['firstname'] . ' ' . $value['lastname'],
                     'status' => 'pending',
-                    'due_amount' => $due_amount,
-                    'paid_amount' => '',
+                    'due_amount' => $due_amounts,
+                    'total_fees' => !empty($total_fees) ? $total_fees : '',
+                    'paid_amount' => !empty($total_payment_amount) ? $total_payment_amount : '',
                     'discount' => (!empty($discount->discount_amonut)) ? $discount->discount_amonut : '',
                     'discount_by' => !empty($discount->discount_by) ? $discount->discount_by : '',
                     'board_name' =>$value['board_name'],
                     'batch_name' =>$value['batch_name'],
                     'medium_name' =>$value['medium_name'],
-                    'standard_name' =>$value['standard_name']
+                    'standard_name' =>$value['standard_name'],
+                    'mobile' =>$value['mobile'],
+
                 ];
             
             }
+         elseif ($request->status == '') {
+            // Pending status
+            $students[] = [
+                'student_id' => $value['id'],
+                'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                'status' => (!empty($due_amount))?'pending':'paid',
+                'due_amount' => (!empty($due_amounts))?$due_amounts:0,
+                'total_fees' => !empty($total_fees) ? $total_fees : '',
+                'paid_amount' => !empty($total_payment_amount) ? $total_payment_amount : 0,
+                'discount' => (!empty($discount->discount_amonut)) ? $discount->discount_amonut : '',
+                'discount_by' => !empty($discount->discount_by) ? $discount->discount_by : '',
+                'board_name' =>$value['board_name'],
+                'batch_name' =>$value['batch_name'],
+                'medium_name' =>$value['medium_name'],
+                'standard_name' =>$value['standard_name'],
+                'mobile' =>$value['mobile'],
+
+            ];
+        
+        }
+            
         }
         $data = ['students'=>$students,'request_data'=>$request];
                 

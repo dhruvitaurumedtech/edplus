@@ -76,33 +76,43 @@
 @if(!empty($data['request_data']['status']))
     <p><b>Fees_Status:</b> {{ $data['students'][0]['status'] }}</p>
 @endif
+@if(!empty($data['request_data']['mobile']))
+    <p><b>Mobile No:</b> {{ $data['students'][0]['mobile'] }}</p>
+@endif
+@if(!empty($data['students'][0]['student_name']))
+    <p><b>Student_name :</b> {{ $data['students'][0]['student_name'] }}</p>
+@endif
+@if(!empty($data['request_data']['date']))
+    <p><b>Date :</b> {{ $data['request_data']['date'] }}</p>
+@endif
 @endif
   <div class="content">
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>Name</th>
+                @if(empty($data['students'][0]['student_name']))<th>Name</th>@endif
                 @if(empty($data['request_data']['batch_id'])) <th>Batch</th>@endif
                 @if(empty($data['request_data']['standard_id'])) <th>Standard</th>@endif
+                <th>Total Fees</th>
+                <th>Paid Amount</th>
+                <th>Due Amount</th>
                 <th>Discount</th>
-                @if(isset($data['request_data']['status']) && $data['request_data']['status'] == 'paid')
-                    <th>Paid Amount</th>
-                @else
-                    <th>Due Amount</th>
-                @endif
-            </tr>
+        </tr>
         </thead>
         <tbody>@php $i = 1; @endphp
           @if(!empty($data['students']))
             @foreach ($data['students'] as $item)
             <tr>
                 <td>{{ $i }}</td>
-                <td>{{ $item['student_name'] }}</td>
+                @if(empty($data['students'][0]['student_name']))<td>{{ $item['student_name'] }}</td>@endif
                         @if(empty($data['request_data']['batch_id'])) <td> {{ $item['batch_name'] }}</td>@endif
                         @if(empty($data['request_data']['standard_id'])) <td> {{ $item['standard_name'] }}</td>@endif
+                        <td>  {{ !empty($item['total_fees']) ? $item['total_fees'] : 0 }}</td>
+                        <td>  {{ !empty($item['paid_amount']) ? $item['paid_amount'] : 0 }}</td>
+                        <td>  {{ !empty($item['due_amount']) ? $item['due_amount'] : 0 }}</td>
+                       
                         <td> {{ (!empty($item['discount'])) ? $item['discount'] : '0' }}</td>
-                        <td> {{ !empty($item['paid_amount']) ? $item['paid_amount'] : $item['due_amount'] }}</td>
             </tr>
             @php $i++; @endphp
                     @endforeach
