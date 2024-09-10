@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\File;
 class FeesPDFController extends Controller
 {
     use ApiTrait;
-    function fees_report_pdf(Request $request){
+    function paid_fees_report_pdf(Request $request){
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             
@@ -58,8 +58,11 @@ class FeesPDFController extends Controller
             ->when(!empty($request->batch_id), function ($query) use ($request) {
                 return $query->where('students_details.batch_id', $request->batch_id);
             })
-            ->when(!empty($request->standard_id), function ($query) use ($request) { // Corrected this part
+            ->when(!empty($request->standard_id), function ($query) use ($request) { 
                 return $query->where('students_details.standard_id', $request->standard_id);
+            })
+            ->when(!empty($request->institute_id), function ($query) use ($request) { 
+                return $query->where('students_details.institute_id', $request->institute_id);
             });
         
         $student_response = $query->get()->toArray();
@@ -136,4 +139,5 @@ class FeesPDFController extends Controller
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
+   
 }
