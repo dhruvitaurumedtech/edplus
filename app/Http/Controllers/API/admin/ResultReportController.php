@@ -71,7 +71,7 @@ class ResultReportController extends Controller
             })
             ->get()->toarray();
             $data = ['result_report'=>$data,'request_data'=>$request]; 
-           $pdf = PDF::loadView('pdf.result_report', ['data' => $data])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
+            $pdf = PDF::loadView('pdf.result_report', ['data' => $data])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
             
             $folderPath = public_path('pdfs');
     
