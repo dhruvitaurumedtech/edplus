@@ -81,14 +81,11 @@
                 <th>No</th>
                 <th>Stud_ID</th>
                 <th>Name</th>
-                <th>Board</th>
                 @if(empty($data['request_data']['batch_id'])) <th>Batch</th>@endif
-                <th>Medium</th>
                 @if(empty($data['request_data']['standard_id'])) <th>Standard</th>@endif
                 <th>(%)</th>
                 <th>Paid</th>
-                <th>Disc_by</th> 
-            
+             
             </tr>
         </thead>
         <tbody>@php $i = 1; @endphp
@@ -98,19 +95,16 @@
                 <td>{{ $i }}</td>
                 <td>{{ $item['student_id'] }}</td>
                 <td>{{ $item['student_name'] }}</td>
-                        <td> {{ $item['board_name'] }}</td>
                         @if(empty($data['request_data']['batch_id'])) <td> {{ $item['batch_name'] }}</td>@endif
-                        <td> {{ $item['medium_name'] }}</td>
                         @if(empty($data['request_data']['standard_id'])) <td> {{ $item['standard_name'] }}</td>@endif
                         <td> {{ (!empty($item['discount']))?$item['discount']:'0' }}</td>
                         <td> {{ $item['paid_amount'] }}</td>
-                        <td> {{ (!empty($item['discount_by']))?$item['discount_by']:'empty' }}</td>
             </tr>
             @php $i++; @endphp
                     @endforeach
                 @else
                     <tr>
-                        <td colspan="10">No data available</td>
+                        <td colspan="7">No data available</td>
                     </tr>
                 @endif
         </tbody>
