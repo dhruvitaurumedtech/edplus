@@ -25,6 +25,7 @@ use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\PDFController as AdminPDFController;
+use App\Http\Controllers\API\admin\StudentListController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\staff\StaffController;
@@ -287,6 +288,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     
 
     Route::post('/institute/attendance-report-pdf', [AttendanceReportController::class, 'attendance_report_pdf']);
+    Route::post('/institute/studentlist-pdf', [StudentListController::class, 'studentlist_pdf']);
 
 });
     //token without use 

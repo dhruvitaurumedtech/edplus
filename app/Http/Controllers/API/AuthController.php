@@ -69,6 +69,7 @@ class AuthController extends Controller
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
                 $user->role_type = $request->role_type;
+                $user->status = 1;
                 $user->device_key = $request->device_key;
                 $user->status = 1;
                 $user->social_id = $ssoUser->user['id'];
