@@ -167,7 +167,11 @@ class PDFController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            
+            if(!empty($request->batch_id)){
+                $batchids = Student_detail::where('institute_id',$request->institute_id)
+                ->where('batch_id',$request->batch_id)->pluck('student_id');
+            }
+
             $parentsdata = Parents::join('users as parents_users', function($join) {
                 $join->on('parents_users.id', '=', 'parents.parent_id');
             })
@@ -184,6 +188,9 @@ class PDFController extends Controller
             })
             ->when(!empty($request->name), function ($query) use ($request) {
                 return $query->where('parents_users.firstname', $request->name);
+            })
+            ->when(!empty($request->batch_id), function ($query) use ($batchids) {
+                return $query->whereIN('parents.student_id', $batchids);
             })
             ->get()
             ->toArray();
