@@ -24,6 +24,7 @@ class ContentListVideoPdfController extends Controller
         }
         try{
             $base_table_response=Base_table::leftjoin('subject','subject.base_table_id','=','base_table.id')
+                         ->leftjoin('topic','topic.base_table_id','=','base_table.id')
                          ->leftjoin('subject_sub','subject_sub.subject_id','=','subject.id')
                          ->leftjoin('standard','standard.id','=','base_table.standard')
                          ->leftjoin('board','board.id','=','base_table.board')
