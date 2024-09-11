@@ -4046,6 +4046,40 @@ class InstituteApiController extends Controller
             return $this->response($e, "Something went wrong.", false, 400);
         }
     }
+
+    public function institute_board_standard_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+
+        try {
+            $boarddata=[];
+            $standarddata=[];
+            $boards = Institute_board_sub::join('board','board.id','=','board_sub.board_id')
+            ->where('board_sub.institute_id', $request->institute_id)
+            ->select('board.*')->get();
+            foreach ($boards as $insboard) {
+                $boarddata[] = array('id' => $insboard->id, 'name' => $insboard->name, 'icon' => url($insboard->icon));
+            }
+
+            $standards = Standard_sub::join('standard','standard.id','=','standard_sub.standard_id')
+            ->where('standard_sub.institute_id', $request->institute_id)
+            ->select('standard.*')->get();
+            foreach ($standards as $insstandard) {
+                $standarddata[] = array('id' => $insstandard->id, 'name' => $insstandard->name);
+            }
+
+            $data = ['board'=>$boarddata,'standard'=>$standarddata];
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exception $e) {
+            return $e;
+            return $this->response($e, "Something went wrong!!", false, 400);
+        }
+    }
     
     public function parents_list(Request $request){
 

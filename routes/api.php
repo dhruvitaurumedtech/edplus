@@ -289,6 +289,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
     Route::post('/institute/attendance-report-pdf', [AttendanceReportController::class, 'attendance_report_pdf']);
     Route::post('/institute/studentlist-pdf', [StudentListController::class, 'studentlist_pdf']);
+    
+    Route::post('/institute/institute-board-standard-list', [InstituteApiController::class, 'institute_board_standard_list']);
 
 });
     //token without use 
