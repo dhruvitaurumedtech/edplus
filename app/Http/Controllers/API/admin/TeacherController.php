@@ -48,7 +48,7 @@ class TeacherController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'teacher_id' => 'required|integer',
-            'per_page' => 'required|integer',
+            //'per_page' => 'required|integer',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -68,7 +68,6 @@ class TeacherController extends Controller
                     'banner_image' => $imgpath,
                 );
             }
-            $perPage = 10;
             $allinstitute = Institute_detail::where('status', 'active')
                 ->where(function ($query) use ($search_keyword) {
                     $query->where('unique_id', 'like', '%' . $search_keyword . '%')
@@ -84,7 +83,9 @@ class TeacherController extends Controller
                 );
             }
             //student search history
-            $searchhistory = Search_history::where('user_id', $teacher_id)->paginate($perPage);
+            $searchhistory = Search_history::where('user_id', $teacher_id)
+            //->paginate($perPage);
+            ->get();
             $searchhistory_list = [];
             foreach ($searchhistory as $value) {
                 // Check if the title already exists in the $searchhistory_list array
@@ -122,10 +123,24 @@ class TeacherController extends Controller
 
             $requested_institute = [];
             foreach ($requestInstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status','!=', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')
+                ->select('board.name')
+                ->distinct()
+                ->get();
+                $boards = [];
+                foreach($teachrboarddt as $tchbd){
+                    $boards[]=['name'=>$tchbd->name];
+                }
+
                 $requested_institute[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name,
                     'address' => $value->address,
+                    'board'=>$boards,
                     'logo' => asset($value->logo),
                     'status' => $value->sstatus,
                 );
@@ -145,11 +160,25 @@ class TeacherController extends Controller
                 ->paginate($perPage);
 
             $join_with = [];
+            
             foreach ($joininstitute as $value) {
+                $teachrboarddt = board::join('teacher_detail','teacher_detail.board_id','=','board.id')
+                ->where('teacher_detail.teacher_id', $teacher_id)
+                ->where('teacher_detail.status', '1')
+                ->where('teacher_detail.institute_id', $value->id)
+                ->whereNull('teacher_detail.deleted_at')
+                ->select('board.name')
+                ->distinct()
+                ->get();
+                $jboards = [];
+                foreach($teachrboarddt as $tchbd){
+                    $jboards[]=['name'=>$tchbd->name];
+                }
                 $join_with[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                     'address' => $value->address,
+                    'board'=>$jboards,
                     'logo' => asset($value->logo),
                 );
             }
@@ -474,7 +503,10 @@ class TeacherController extends Controller
             $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
+                ->join('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('board', 'board.id', '=', 'batches.board_id')
+                ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->where('timetables.teacher_id', $user_id)
                 ->whereIn('timetables.batch_id', $batchesid)
@@ -489,17 +521,26 @@ class TeacherController extends Controller
                     'batches.batch_name',
                     'timetables.day',
                     'users.image',
+                    'board.name as boardname',
+                    'medium.name as mediumdname',
+                    'class_room.name as classroom'
                 )
                 ->orderBy('timetables.start_time', 'asc')
                 ->get();
            
             foreach ($todayslect as $todayslecDT) {
+
+
+                
                 $todays_lecture[] = array(
                     'profile' => (!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'subject' => $todayslecDT->subject,
                     'standard' => $todayslecDT->standard,
                     'batch_id'=>$todayslecDT->batch_id,
                     'batch_name'=>$todayslecDT->batch_name,
+                    'board_name'=>$todayslecDT->boardname,
+                    'medium_name'=>$todayslecDT->mediumdname,
+                    'classroom'=>$todayslecDT->classroom,
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
@@ -524,31 +565,32 @@ class TeacherController extends Controller
                     'time' => $announcDT->created_at
                 );
             }
-            $teacher_data = Teacher_model::Join('board', 'board.id', '=', 'teacher_detail.board_id')
-                ->Join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
-                ->Join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
-                ->where('teacher_detail.teacher_id', $teacher_id)
-                ->where('teacher_detail.institute_id', $institute_id)
-                ->whereNotNull('teacher_detail.batch_id')
-                ->groupBy(
-                    'teacher_detail.standard_id',
-                    'board.name',
-                    'standard.id',
-                    'standard.name',
-                    'medium.name',
-                    'teacher_detail.batch_id',
-                )
+            $teacher_data = Teacher_model::join('board', 'board.id', '=', 'teacher_detail.board_id')
+                    ->join('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+                    ->join('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+                    ->where('teacher_detail.teacher_id', $teacher_id)
+                    ->where('teacher_detail.institute_id', $institute_id)
+                    ->whereNotNull('teacher_detail.batch_id')
+                    ->groupBy(
+                        'teacher_detail.standard_id',
+                        'board.name',
+                        'standard.id',
+                        'standard.name',
+                        'medium.name',
+                        'teacher_detail.batch_id',
+                        'board.icon'  // Add board.image to the groupBy
+                    )
+                    ->select(
+                        'standard.id as standard_id',
+                        'teacher_detail.batch_id',
+                        'standard.name as standard_name',
+                        DB::raw('MAX(board.name) as board_name'),
+                        DB::raw('MAX(medium.name) as medium_name'),
+                        DB::raw('MAX(board.icon) as board_image')  // Select the board image
+                    )
+                    ->get()
+                    ->toArray();
 
-                ->select(
-                    'standard.id as standard_id',
-                    'teacher_detail.batch_id',
-                   
-                    'standard.name as standard_name',
-                    DB::raw('MAX(board.name) as board_name'),
-                    DB::raw('MAX(medium.name) as medium_name')
-                )
-                ->get()
-                ->toArray();
 
             $teacher_response = [];
             $processed_batches = [];
@@ -563,6 +605,7 @@ class TeacherController extends Controller
                     if (!isset($processed_batches[$unique_key])) {
                     $teacher_response[] = [
                         'board' => $value['board_name'],
+                        'board_image' => !empty($value['board_image'])?asset($value['board_image']):asset('profile/no-image.png'),
                         'standard_id' => $value['standard_id'],
                         'standard' => $value['standard_name'],
                         'medium' => $value['medium_name'],
@@ -676,12 +719,18 @@ class TeacherController extends Controller
             $dateTime = new DateTime($request->date);
             $day = $dateTime->format('l');
             $daysidg = DB::table('days')->where('day',$day)->select('id')->first();
+            
+
+
+
 
             $batchids = Batches_model::where('institute_id',$request->institute_id)->pluck('id');
             $todaysletech = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('board', 'board.id', '=', 'batches.board_id')
+                ->join('medium', 'medium.id', '=', 'batches.medium_id')
                 ->join('standard', 'standard.id', '=', 'batches.standard_id')
                 ->leftjoin('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->whereIN('timetables.batch_id', $batchids)
@@ -697,11 +746,21 @@ class TeacherController extends Controller
                     'timetables.end_time',
                     'batches.id as batch_id',
                     'batches.batch_name',
+                    'board.id as board_id',
+                    'board.name as board_name',
+                    'medium.id as medium_id',
+                    'medium.name as medium_name',
                 )
                 ->orderBy('timetables.start_time', 'asc')
                 ->get();
 
             foreach ($todaysletech as $todaysDT) {
+                    $dateTime = Carbon::parse($todaysDT->start_time);
+                    $start_time = $dateTime->format('h:i:s A');
+                    $dateTime1 = Carbon::parse($todaysDT->end_time);
+                    $end_time = $dateTime1->format('h:i:s A');
+
+
                 $lectures[] = array(
                     'subject' => $todaysDT->subject,
                     'standard' => $todaysDT->standard,
@@ -709,9 +768,13 @@ class TeacherController extends Controller
                     'teacher_image' =>(!empty($todaysDT->image)) ? asset($todaysDT->image) : asset('profile/no-image.png'),
                     'batch_id' => $todaysDT->batch_id,
                     'batch_name'=>$todaysDT->batch_name,
+                    'board_id' => $todaysDT->board_id,
+                    'board_name' => $todaysDT->board_name,
+                    'medium_id' => $todaysDT->medium_id,
+                    'medium_name' => $todaysDT->medium_name,
                     'class_room'=>$todaysDT->class_room,
-                    'start_time' => $todaysDT->start_time,
-                    'end_time' => $todaysDT->end_time,
+                    'start_time' => $start_time,
+                    'end_time' => $end_time,
                 );
             }
 

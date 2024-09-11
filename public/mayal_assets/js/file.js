@@ -181,17 +181,16 @@ document.querySelectorAll('.institute_list_editButton').forEach(function (button
     button.addEventListener('click', function () {
         var user_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
-        axios.post(baseUrl + '/admin/edit', {
+        axios.post(baseUrl + '/institute_list_admin/edit', {
             user_id: user_id
         })
             .then(response => {
                 var reponse_data = response.data.userDT;
                 console.log(reponse_data);
                 $('#user_id').val(reponse_data.id);
-                $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.firstname);
+                $('#name').val(reponse_data.institute_name);
                 $('#email').val(reponse_data.email);
-                $('#mobile').val(reponse_data.mobile);
+                $('#mobile').val(reponse_data.contact_no);
                 $('#usereditModal').modal('show');
             })
             .catch(error => {
@@ -992,4 +991,65 @@ document.querySelectorAll('.video_limit_editButton').forEach(function (button) {
                 console.error(error);
             });
     });
+});
+document.querySelectorAll('.video_limit_deletebutton').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var video_time_limit_id = this.getAttribute('data-user-id');
+       
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('video-timelimit-delete', {
+                    video_time_limit_id: video_time_limit_id
+                })
+                    .then(response => {
+                        location.reload(true);
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+    });
+});
+document.addEventListener('DOMContentLoaded', function() {
+    const buttons = document.querySelectorAll('[id^="status-button-"]'); 
+
+    buttons.forEach(function(button) {
+        button.addEventListener('click', function() {
+            const userId = button.getAttribute('data-user-id');
+            const name = button.getAttribute('data-name-id');
+
+
+    axios.post('list-institute-for-/toggle-status', {
+        user_id: userId,
+        name : name ,
+    })
+    .then(function(response) {
+        const status = response.data.status;
+        if (status === 'active') {
+            button.classList.remove('btn-inactive');
+            button.classList.add('btn-active');
+            button.textContent = 'Active';
+        } else {
+            button.classList.remove('btn-active');
+            button.classList.add('btn-inactive');
+            button.textContent = 'Inactive';
+        }
+    })
+    .catch(function(error) {
+        console.error('Error:', error);
+    });
+});
+});
 });

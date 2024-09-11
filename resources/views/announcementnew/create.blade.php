@@ -15,9 +15,7 @@
                 <ul>
                     <li><a href="{{url('dashboard')}}">Home</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)">Institute</a></li>
-                    <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="{{url('announcement-create-new')}}" class="active-link-dir">Announcement</a></li>
+                   <li><a href="javascript:void(0)" class="active-link-dir">Announcement</a></li>
                 </ul>
             </div>
             @include('layouts/alert')

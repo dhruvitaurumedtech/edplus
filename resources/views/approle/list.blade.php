@@ -18,9 +18,7 @@
                 <ul>
                     <li><a href="{{ url('dashboard') }}">Home</a></li>
                     <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)">ACL</a></li>
-                    <li><a href="javascript:void(0)">/</a></li>
-                    <li><a href="javascript:void(0)" class="active-link-dir">Role</a></li>
+                   <li><a href="javascript:void(0)" class="active-link-dir">Role</a></li>
                 </ul>
             </div>
             @include('layouts.alert')

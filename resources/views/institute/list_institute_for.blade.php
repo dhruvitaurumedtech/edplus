@@ -10,10 +10,8 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('institute-admin')}}" class="active-link-dir">Institute For</a></li>
-        </ul>
+          <li><a href="{{url('institute-for-list')}}" class="active-link-dir">Institute For</a></li>
+          </ul>
       </div>
       @include('layouts/alert')
       <div class="dashboard-content side-content">
@@ -25,8 +23,8 @@
                 @csrf
                 <div class="row">
                   <div class="col-md-12">
-                    <label for="exampleInputEmail1">Name : </label>
-                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Name" value="{{old('name')}}">
+                    <label for="exampleInputEmail1">Institute For Name : </label>
+                    <input type="text" name="name" class="form-control search-box" placeholder="Enter Institute For Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -96,12 +94,19 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td><img src="{{asset($value->icon) }}" alt="Icon" class="img-resize"></td>
-                    <td>@if($value->status == 'active')
+                    <td><img src="{{ !empty($value->icon) ? asset($value->icon) : asset('no-image.png') }}" 
+                                alt="{{ !empty($value->icon) ? 'Icon' : 'No image available' }}" 
+                                class="img-resize" ></td>
+                    
+                      <!-- @if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
-                      @endif
+                      @endif -->
+                      <td>
+                      <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="institute_for" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                          {{ ucfirst($value->status) }}
+                      </button>
                     </td>
 
                     <td>
@@ -150,15 +155,16 @@
                         @enderror
                       </div>
                       <div class="col-md-8">
-                        <label for="exampleInputEmail1">Icon : </label>
-                        <input type="hidden" name="old_icon" id="old_icon">
-                        <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
-                        @error('icon')
-                        <div class="text-danger">{{ $message }}</div>
-                        @enderror
+                          <label for="exampleInputEmail1">Icon:</label>
+                          <input type="hidden" name="old_icon" id="old_icon">
+                          <input type="file" onchange="previewFile_update(this)" name="icon" class="form-control">
+                          @error('icon')
+                          <div class="text-danger">{{ $message }}</div>
+                          @enderror
                       </div>
                       <div class="col-md-4">
-                        <img src="" id="icon_update" alt="Icon" class="img-resize mt-3">
+                          <!-- Set default src to 'no-image.png' initially -->
+                          <img src="{{ asset('no-image.png') }}" id="icon_update" alt="Icon" class="img-resize mt-3">
                       </div>
 
                       <div class="col-md-12">
@@ -204,18 +210,35 @@
     };
 
 
-    function previewFile_update(inputElement) {
-      const preview = document.getElementById("icon_update");
-      const file = inputElement.files[0];
-      const reader = new FileReader();
+    function previewFile_update(input) {
+        var file = input.files[0]; 
+        var preview = document.getElementById('icon_update'); 
 
-      reader.addEventListener("load", () => {
-        preview.src = reader.result;
-      }, false);
+        if (file) {
+            var reader = new FileReader();
+           
+            reader.onload = function(e) {
+                preview.src = e.target.result; 
+            }
 
-      if (file) {
-        reader.readAsDataURL(file);
-      }
+            reader.readAsDataURL(file); 
+        } else {
+          
+            preview.src = "{{ asset('no-image.png') }}";  
+        }
     }
+
   </script>
+  <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
+ 
   @include('layouts/footer_new')

@@ -10,9 +10,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('class-list')}}" class="active-link-dir">Standard</a></li>
+         <li><a href="{{url('standard-list')}}" class="active-link-dir">Standard</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -25,7 +23,7 @@
                 <div class="row">
                   <div class="col-md-12">
                     <label for="exampleInputEmail1">Standard Name : </label>
-                    <input type="text" name="name" class="form-control" placeholder="Enter Board Name" value="{{old('name')}}">
+                    <input type="text" name="name" class="form-control" placeholder="Enter Standard Name" value="{{old('name')}}">
                     @error('name')
                     <div class="text-danger">{{ $message }}</div>
                     @enderror
@@ -77,12 +75,17 @@
                   <tr>
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
+                    </td> -->
+                    <td>
+                        <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="standard_list" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                            {{ ucfirst($value->status) }}
+                        </button>
                     </td>
 
                     <td>
@@ -159,3 +162,14 @@
     @include('layouts/footer_new')
   </div>
 </body>
+<style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
