@@ -269,6 +269,15 @@ class FeesController extends Controller
             if (!empty($request->batch_id)) {
                 $query->where('students_details.batch_id', $request->batch_id);
             }
+            $query->when(!empty($request->search), function ($query) use ($request) {
+                return $query->where(function($query) use ($request) {
+                    $search = '%' . $request->search . '%';
+                    $query->where('users.firstname', 'like', $search)
+                          ->orWhere('users.lastname', 'like', $search)
+                          ->orWhere(\Illuminate\Support\Facades\DB::raw("CONCAT(users.firstname, ' ', users.lastname)"), 'like', $search);
+                });
+            });
+            
             
             if (!empty($subjectIds)) {
                 $query->where(function ($query) use ($subjectIds) {
