@@ -62,7 +62,7 @@
 <body>
 <h2>Content List</h2>
 <hr>
-@php $i = 1; @endphp
+
 @if(!empty($data))
     @foreach ($data['base_table_response'] as $item)
         <p><b>Board Name:</b> {{ $item['board_name'] }}</p>
@@ -74,27 +74,33 @@
             <table>
                 <thead>
                     <tr>
-                        <th>Sr. No</th>
+                        <th style="width:50px">No</th>
                         <th>Topic Name</th>
                         <th>Topic Description</th>
-                        <th>Video</th>
+                        <th>chapter No</th>
+                        <th>chapter Name</th>
+                  
                     </tr>
                 </thead>
                 <tbody>
+                @php $i = 1; @endphp
                 @foreach ($data['topic_response'] as $item2)
                    @if($item2['subject_id'] == $item['id'])
                     <tr>
                         <td>{{ $i }}</td>
                         <td>{{ !empty($item2['topic_name']) ? $item2['topic_name'] : '' }}</td>
                         <td>{{ !empty($item2['topic_description']) ? $item2['topic_description'] : '' }}</td>
-                        <td>{{ !empty($item2['topic_video']) ? $item2['topic_video'] : '' }}</td>
+                        <td>{{ !empty($item2['chapter_no']) ? $item2['chapter_no'] : '' }}</td>
+                        <td>{{ !empty($item2['chapter_name']) ? $item2['chapter_name'] : '' }}</td>
+                  
                     </tr>
                     @endif
+                    @php $i++; @endphp
                     @endforeach
                 </tbody>
             </table>
         </div>
-        @php $i++; @endphp
+       
     @endforeach
 @else
     <div class="content">
