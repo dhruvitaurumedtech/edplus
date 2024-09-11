@@ -221,6 +221,144 @@ class FeesController extends Controller
             return $this->response($e, "Something went wrong!!", false, 400);
         }
     }
+    public function pending_paid_fees_student(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required|integer',
+            'batch_id' => 'required|exists:batches,id',
+            'board_id' => 'required|exists:board,id',
+            'medium_id' => 'required|exists:medium,id',
+            'standard_id' => 'required|exists:standard,id',
+            'status' => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $subjectIds = [];
+            if (!empty($request->subject_id)) {
+                $subjectIds = explode(',', $request->subject_id);
+            }
+            
+            $query = Student_detail::join('board', 'board.id', '=', 'students_details.board_id')
+                ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                ->leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                ->select(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'students_details.student_id'
+                )
+                ->where('students_details.institute_id', $request->institute_id)
+                ->where('students_details.board_id', $request->board_id)
+                ->where('students_details.medium_id', $request->medium_id)
+                ->where('students_details.standard_id', $request->standard_id)
+                ->where('students_details.status', '1')
+                ->whereNull('users.deleted_at')
+                ->whereNull('students_details.deleted_at')
+                ->groupBy(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'students_details.student_id'
+                );
+            
+            if (!empty($request->batch_id)) {
+                $query->where('students_details.batch_id', $request->batch_id);
+            }
+            
+            if (!empty($subjectIds)) {
+                $query->where(function ($query) use ($subjectIds) {
+                    foreach ($subjectIds as $subjectId) {
+                        $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                    }
+                });
+            }
+            
+            $student_response = $query->get()->toArray();
+            // print_r($student_response);exit;
+            $students = [];
+            
+            foreach ($student_response as $value) {
+            
+                // Fetch the total payment amount
+                $fees_detail = Fees_colletion_model::where('student_id', $value['student_id'])
+                    ->where('institute_id', $request->institute_id)
+                    ->select(DB::raw('SUM(payment_amount) as total_payment_amount'))
+                    ->first();
+                $total_payment_amount = $fees_detail ? $fees_detail->total_payment_amount : 0;
+            
+                // Fetch the total fees and discount
+                $student_fees = Student_fees_model::where('student_id', $value['id'])
+                    ->where('institute_id', $request->institute_id)
+                    ->first();
+                $discount = Discount_model::where('institute_id', $request->institute_id)
+                    ->where('student_id', $value['id'])
+                    ->first();
+            
+                // Calculate the total fees after applying discount
+                $total_fees = !empty($student_fees) ? $student_fees->total_fees : 0;
+                $due_amount = $total_fees;
+                if ($discount) {
+                    if ($discount->discount_by == 'Rupee') {
+                        $due_amount = $total_fees - $discount->discount_amount;
+                    } elseif ($discount->discount_by == 'Percentage') {
+                        $due_amount = $total_fees - ($total_fees * ($discount->discount_amount / 100));
+                    }
+                }
+            
+                // Calculate due amount
+                $due_amount = $due_amount - $total_payment_amount;
+            
+                // Determine status and append to students array
+                if ($request->status == 'paid' && $due_amount <= 0) {
+                    // Paid status
+                    $students[] = [
+                        'student_id' => $value['id'],
+                        'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                        'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                        'status' => 'paid',
+                        'due_amount' => 0
+                    ];
+                } elseif ($request->status == 'pending' && $due_amount > 0) {
+                    // Pending status
+                    $students[] = [
+                        'student_id' => $value['id'],
+                        'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                        'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                        'status' => 'pending',
+                        'due_amount' => $due_amount
+                    ];
+                } elseif ($request->status == 'all') {
+                    // Fetch all students regardless of status
+                    if ($due_amount > 0) {
+                        $students[] = [
+                            'student_id' => $value['id'],
+                            'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                            'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                            'status' => 'pending',
+                            'due_amount' => $due_amount
+                        ];
+                    } else {
+                        $students[] = [
+                            'student_id' => $value['id'],
+                            'student_name' => $value['firstname'] . ' ' . $value['lastname'],
+                            'profile' => !empty($value['image']) ? asset($value['image']) : asset('profile/no-image.png'),
+                            'status' => 'paid',
+                            'due_amount' => 0
+                        ];
+                    }
+                }
+            }
+            return $this->response($students, "Data fetched successfully", true, 200);
+        }catch(Exception $e){
+            return $this->response($e, "Something went wrong!!", false, 400);
+
+        }
+    }
     public function pending_fees_student(Request $request)
     {
         $validator = Validator::make($request->all(), [

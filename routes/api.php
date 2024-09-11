@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
+use App\Http\Controllers\API\admin\AttendanceReportController;
 use App\Http\Controllers\API\admin\BasetableControllerAPI;
 use App\Http\Controllers\API\admin\DeadstockController;
 use Illuminate\Http\Request;
@@ -25,7 +26,6 @@ use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
 
 use App\Http\Controllers\API\admin\PDFController as AdminPDFController;
-use App\Http\Controllers\API\admin\StudentListController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\staff\StaffController;
@@ -126,6 +126,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/base-board', [BasetableControllerAPI::class, 'board']);
     Route::post('/institute/base-medium', [BasetableControllerAPI::class, 'medium']);
     Route::post('/institute/base-class', [BasetableControllerAPI::class, 'class']);
+    Route::post('/institute/with-class-medium', [BasetableControllerAPI::class, 'with_class_medium']);
+    Route::post('/institute/with-class-medium-subject', [BasetableControllerAPI::class, 'with_class_medium_subject']);
     Route::post('/institute/base-standard', [BasetableControllerAPI::class, 'standard']);
     Route::post('/institute/base-stream', [BasetableControllerAPI::class, 'stream']);
     Route::post('/institute/base-subject', [BasetableControllerAPI::class, 'subject']);
@@ -143,6 +145,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-edit-board', [BasetableControllerAPI::class, 'get_edit_board']);
     Route::post('/institute/get-edit-medium', [BasetableControllerAPI::class, 'get_edit_medium']);
     Route::post('/institute/get-edit-class', [BasetableControllerAPI::class, 'get_edit_class']);
+    Route::post('/institute/get-with-class-medium', [BasetableControllerAPI::class, 'get_with_class_medium']);
     Route::post('/institute/get-edit-standard', [BasetableControllerAPI::class, 'get_edit_standard']);
     Route::post('/institute/get-edit-subject', [BasetableControllerAPI::class, 'get_edit_subject']);
     Route::post('/institute/add-feedback', [FeedbackController::class, 'addfeedbackforstudent']);
@@ -158,6 +161,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/parents/edit-profile', [ParentsController::class, 'edit_profile']);
     // Student Api 
     Route::post('/student/add-search-history-student', [StudentController::class, 'student_searchhistory_add']);
+    Route::post('/student/clear-search-history', [StudentController::class, 'clear_search_history']);
     Route::post('/student/add-institute-request-student', [StudentController::class, 'student_add_institute_request']);
     Route::post('/student/institute-detail-student', [StudentController::class, 'institute_detail']);
     Route::post('/student/subjectwise-chapters-student', [StudentController::class, 'subject_chapers'])->middleware('check.permission:29,4');
@@ -216,6 +220,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     // Route::post('/institute/view-fees-detail', [FeesController::class, 'view_fees_detail']);
     Route::post('/institute/paid-fees-student', [FeesController::class, 'paid_fees_student'])->middleware('check.permission:7,4');
     Route::post('/institute/pending-fees-student', [FeesController::class, 'pending_fees_student'])->middleware('check.permission:7,1');
+    Route::post('/institute/pending-paid-fees-student', [FeesController::class, 'pending_paid_fees_student'])->middleware('check.permission:7,1');
 
 
 
@@ -239,6 +244,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/inventory-status', [ProductAndInventoryController::class, 'inventory_status']);
     Route::post('/institute/add-inventory', [ProductAndInventoryController::class, 'add_inventory']);
     Route::post('/institute/product-list', [ProductAndInventoryController::class, 'product_list']);
+    Route::post('/institute/product-assign', [ProductAndInventoryController::class, 'product_assign']);
+    Route::post('/institute/product-assign-history', [ProductAndInventoryController::class, 'product_assign_history']);
+    
 
     //remainder
     Route::post('/institute/create-remainder', [InstituteApiController::class, 'create_remainder']);
@@ -278,6 +286,10 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
     Route::post('/institute/parents-reports', [AdminPDFController::class, 'parents_reports']);
     Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+
+    Route::post('/institute/parents-list', [InstituteApiController::class, 'parents_list']);
+
+    Route::post('/institute/attendance-report-pdf', [AttendanceReportController::class, 'attendance_report_pdf']);
 
 });
     //token without use 

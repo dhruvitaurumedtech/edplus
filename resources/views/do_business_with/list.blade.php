@@ -8,9 +8,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('class-list')}}" class="active-link-dir">Do Business With</a></li>
+          <li><a href="{{url('do-business-with-list')}}" class="active-link-dir">Do Business With</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -92,14 +90,18 @@
                     <td>{{$i}}</td>
                     <td>{{$value->name}}</td>
                     <td>{{$value->category}}</td>
-                    <td>@if($value->status == 'active')
+                    <!-- <td>@if($value->status == 'active')
                       <input type="button" value="Active" class="btn btn-success">
                       @else
                       <input type="button" value="Inactive" class="btn btn-danger">
 
                       @endif
-                    </td>
-
+                    </td> -->
+                    <td>
+    <button id="status-button-{{ $value->id }}" data-user-id="{{ $value->id }}" data-name-id="do-businesss-with" class="{{ $value->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+        {{ ucfirst($value->status) }}
+    </button>
+</td>
                     <td>
                       <div class="d-flex">
                         <input type="submit" class="btn text-white btn-rmv2 business_editButton" data-user-id="{{ $value->id }}" value="Edit">&nbsp;&nbsp;
@@ -181,4 +183,14 @@
 
       </div>
     </div>
-  </div>
+  </div><style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>

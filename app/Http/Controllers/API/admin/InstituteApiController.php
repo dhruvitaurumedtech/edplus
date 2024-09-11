@@ -521,6 +521,14 @@ class InstituteApiController extends Controller
                 'institute_name' => $institute_name,
                 'logo' => asset($imagePath)
             ];
+            $bannerad = new Banner_model();
+            $bannerad->user_id = Auth::id();
+            $bannerad->institute_id = $lastInsertedId;
+            $bannerad->banner_image = 'banner_image/defaultbanner.jpg';
+            $bannerad->status = 'inactive';
+
+            $bannerad->save();
+
             DB::commit();
             return $this->response($data, "institute create Successfully");
         } catch (Exception $e) {
@@ -1012,6 +1020,8 @@ class InstituteApiController extends Controller
                         'id' => $batDT->id,
                         'batch_name' => $batDT->batch_name,
                         'board' => $batDT->board,
+                        'board_image' => (!empty($batDT->icon))?asset($batDT->icon): asset('profile/no-image.png'),
+                       
                         'medium' => $batDT->medium,
                         'stream' => $batDT->stream,
                         'subjects' => $subects
@@ -1494,9 +1504,11 @@ class InstituteApiController extends Controller
                                 'contact_no' => $prdetail->contact_no,
                                 'website_link' => $prdetail->website_link,
                                 'year' => $syear . '-' . $eyear,
-                                'subjects' => $sujids
+                                'subjects' => $sujids,
+                                'subject_id' => $request->subject_id,
+                                'institute_id' => $request->institute_id
                             ];
-
+                           
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
 
@@ -1632,6 +1644,7 @@ class InstituteApiController extends Controller
                         }
 
                         $serverKey = env('SERVER_KEY');
+                        // print_r($serverKey);exit;
 
                         $url = "https://fcm.googleapis.com/fcm/send";
                         $user_detail = User::where('id', $student_id)->first();
@@ -4045,4 +4058,42 @@ class InstituteApiController extends Controller
         }
     }
     
+    public function parents_list(Request $request){
+
+        $validator = Validator::make($request->all(), [
+            'institute_id'=>'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $studentdata = Student_detail::join('users','users.id','=','students_details.student_id')
+            ->where('students_details.institute_id',$request->institute_id)->get();
+            $parentsQY = Parents::join('users', 'parents.parent_id', '=', 'users.id')
+                ->where('parents.student_id', $request->student_id)
+                ->select('parents.parent_id', 'users.firstname', 'users.lastname', 
+                'users.email', 'users.country_code', 'users.country_code_name',
+                 'users.mobile', 'parents.relation','parents.verify')
+                ->distinct()
+                ->get();
+            $parents_dt = [];
+            foreach ($parentsQY as $parentsDT) {
+                $fullName = $parentsDT->firstname . ' ' . $parentsDT->lastname;
+                $cleanFullName = preg_replace('/\b(\w+)\b\s*(?=.*\b\1\b)/i', '', $fullName);
+                $parents_dt[] = array(
+                    'id'=>$parentsDT->parent_id,
+                    'name' => $cleanFullName,
+                    'email' => $parentsDT->email,
+                    'country_code' => $parentsDT->country_code,
+                    'country_code_name'=>$parentsDT->country_code_name,
+                    'mobile' => $parentsDT->mobile,
+                    'relation' => $parentsDT->relation,
+                    'verify'=>$parentsDT->verify,
+                );
+            }
+            return $this->response($parents_dt, "Successfully fetch data.");
+        } catch (Exception $e) {
+            return $this->response($e, "Invalid token.", false, 400);
+        }
+    }
 }

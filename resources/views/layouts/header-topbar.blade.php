@@ -15,17 +15,15 @@
                             </div>
                         </a>
                         <div class="pro-icon-dropdown-menu pro-icon-navbar-dropdown" id="pro-icon-dropdownMenu" aria-labelledby="pro-icon-profileDropdown">
-                            <a class="pro-icon-dropdown-item" href="profile.php"><i class="fa fa-user pro-icon text-info"></i>&nbsp; Profile</a>
-                            <div class="pro-icon-dropdown-divider m-0"></div>
-                            <a class="pro-icon-dropdown-item" href="change-password.php">
-                                <i class="fas fa-sync-alt pro-icon text-success"></i>&nbsp; Change Password</a>
-                            <div class="pro-icon-dropdown-divider m-0"></div>
+                            <a class="pro-icon-dropdown-item" href="change-password">
+                                &nbsp; Change Password</a>
                             <form method="POST" action="{{ route('logout') }}">
                                 @csrf
-                    <li><a class="dropdown-item" href="{{route('logout')}}" onclick="event.preventDefault();
-                                  this.closest('form').submit();">Log Out</a>
-                    </li>
-                    </form>
+                                
+                                <li><a class="dropdown-item" href="{{route('logout')}}" onclick="event.preventDefault();
+                                            this.closest('form').submit();"> Log Out</a>
+                                </li>
+                            </form>
             </div>
             </li>
             </ul>

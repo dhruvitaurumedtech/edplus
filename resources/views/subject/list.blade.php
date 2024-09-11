@@ -8,9 +8,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('class-list')}}" class="active-link-dir">subject</a></li>
+          <li><a href="{{url('subject-list')}}" class="active-link-dir">subject</a></li>
         </ul>
       </div>
       @include('layouts/alert')
@@ -35,42 +33,55 @@
                 <th style="width: 200px">Board/Medium</th>
                 <th style="width: 200px">Stream</th>
                 <th style="width: 200px">Subjects</th>
-                <th style="width: 500px">Status</th>
+                <!-- <th style="width: 500px">Status</th> -->
                 <th>Action</th>
               </tr>
             </thead>
             <tbody class="myTable">
-              @php $i=1 @endphp
-              @foreach($addsubstandard as $value)
-              <tr>
-                <td>{{$i}}</td>
-                <td>{{$value->standard}}</td>
-                <td>{{$value->board.'-'.$value->medium}}</td>
-                <td>{{($value->sname)? $value->sname : 'empty'}}</td>
-                <td>
-                  @foreach($subject_list as $subvalue)
-                  @if($value->base_id == $subvalue->baset_id)
-                  {{$subvalue->name}}<br>
-                  @endif
-                  @endforeach
-                </td>
-                <td>
-                  @if($value->status == 'active')
-                  <button type="button" class="btn btn-success">Active</button>
-                  @else
-                  <button type="button" class="btn btn-secondary">Inactive</button>
-                  @endif
-                </td>
-                <td>
-                  <div class="d-flex">
-                    <a href="{{url('subject/edit/'.$value->base_id)}}" class="btn text-white blue-button" data-base-id="{{ $value->base_id }}" value="">Edit</a>&nbsp;&nbsp;
-                    &nbsp;&nbsp;
-                   <a href="{{url('subject/delete/'.$value->base_id)}}" class="btn text-white btn-danger" data-base-id="{{ $value->base_id }}" value="">Delete</a>
-                  </div>
-                </td>
-              </tr>
-              @php $i++ @endphp
-              @endforeach
+            @php $i = 1; @endphp
+@foreach($addsubstandard as $value)
+    <tr>
+        <td>{{ $i }}</td>
+        <td>{{ $value->standard }}</td>
+        <td>{{ $value->board . '-' . $value->medium }}</td>
+        <td>{{ $value->sname ? $value->sname : 'empty' }}</td>
+        <td>
+            @php $hasSubjects = false; @endphp
+            @foreach($subject_list as $subvalue)
+                @if($value->base_id == $subvalue->baset_id)
+                    @if(!$hasSubjects)
+                        <table class="table table-js table-responsive-sm ">
+                            <tr><th>Subject</th><th>Status</th></tr>
+                        @php $hasSubjects = true; @endphp
+                    @endif
+
+                    <tr>
+                        <td>{{ $subvalue->name }}</td>
+                        <td>
+                            <button id="status-button-{{ $subvalue->id }}"
+                                    data-user-id="{{ $subvalue->id }}" data-name-id="subject_list"
+                                    class="{{ $subvalue->status === 'active' ? 'btn btn-active' : 'btn btn-inactive' }}">
+                                {{ ucfirst($subvalue->status) }}
+                            </button>
+                        </td>
+                    </tr>
+                @endif
+            @endforeach
+
+            @if($hasSubjects)
+                </table>
+            @endif
+        </td>
+        <td>
+            <div class="d-flex">
+                <a href="{{ url('subject/edit/' . $value->base_id) }}" class="btn text-white blue-button" data-base-id="{{ $value->base_id }}">Edit</a>&nbsp;&nbsp;
+                <a href="{{ url('subject/delete/' . $value->base_id) }}" class="btn text-white btn-danger" data-base-id="{{ $value->base_id }}">Delete</a>
+            </div>
+        </td>
+    </tr>
+    @php $i++; @endphp
+@endforeach
+
             </tbody>
           </table>
           <div class="d-flex justify-content-end">
@@ -80,6 +91,17 @@
       </div>
     </div>
   </div>
+  <style>
+.btn-active {
+    background-color: green;
+    color: white;
+}
+
+.btn-inactive {
+    background-color: red;
+    color: white;
+}
+  </style>
   @include('layouts/footer_new')
   <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
   <script>

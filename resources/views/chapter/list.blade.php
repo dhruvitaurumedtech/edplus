@@ -13,9 +13,7 @@
         <ul>
           <li><a href="{{url('dashboard')}}">Home</a></li>
           <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="javascript:void(0)">Institute</a></li>
-          <li><a href="javascript:void(0)">/</a></li>
-          <li><a href="{{url('class-list')}}" class="active-link-dir">Chapter List</a></li>
+         <li><a href="{{url('chapter-list')}}" class="active-link-dir">Chapter List</a></li>
         </ul>
       </div>
       <script>
