@@ -63,7 +63,7 @@
 <h2>Content List</h2>
 <hr>
 
-@if(!empty($data))
+@if(!empty($data['base_table_response']))
     @foreach ($data['base_table_response'] as $item)
         <p><b>Board Name:</b> {{ $item['board_name'] }}</p>
         <p><b>Medium Name:</b> {{ $item['medium_name'] }}</p>
@@ -92,7 +92,6 @@
                         <td>{{ !empty($item2['topic_description']) ? $item2['topic_description'] : '' }}</td>
                         <td>{{ !empty($item2['chapter_no']) ? $item2['chapter_no'] : '' }}</td>
                         <td>{{ !empty($item2['chapter_name']) ? $item2['chapter_name'] : '' }}</td>
-                  
                     </tr>
                     @endif
                     @php $i++; @endphp

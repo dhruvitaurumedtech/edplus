@@ -40,6 +40,7 @@ class ContentListVideoPdfController extends Controller
                             'subject.name'
                          )
                          ->get()->toarray();
+                        //  print_r($base_table_response);exit;
                         
                          $topic_response=Topic_model::leftjoin('chapters','chapters.id','=','topic.chapter_id')->when(!empty($request->institute_id), function ($query) use ($request) {
                             return $query->where('institute_id', $request->institute_id);
