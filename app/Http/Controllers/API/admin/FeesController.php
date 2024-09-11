@@ -706,13 +706,14 @@ class FeesController extends Controller
             if (!empty($request->stream_id)) {
                 $query->whereIn('base_table.stream', explode(',', $request->stream_id));
             }
-            if (!empty($request->subject_id)) {
-                $query->whereIn('subject_sub.subject_id', explode(',', $request->subject_id));
+            if (!empty($request->search)) {
+                $query->where('subject.name', 'like', '%' . $request->search . '%');
             }
+            
             if (!empty($request->sort_by)) {
-                if ($request->sort_by == 'added') {
+                if ($request->sort_by == 'Fees Added') {
                     $query->whereNotNull('subject_sub.amount')->orderBy('subject_sub.amount', 'asc')->get()->toArray();
-                } elseif ($request->sort_by == 'none') {
+                } elseif ($request->sort_by == 'Fees Not Added') {
                     $query->whereNull('subject_sub.amount')->get()->toArray();
                 }
             }
