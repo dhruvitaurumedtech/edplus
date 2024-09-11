@@ -106,7 +106,13 @@
                     <!-- If an entry exists, display it; otherwise, display an empty cell -->
                     <td>
                         @if($entry)
-                            {{ $entry['subjectname'] }} <br> {{ $entry['start_time'] }} - {{ $entry['end_time'] }}
+                            {{ $entry['subjectname'] }} 
+                            
+                            <br> {{ $entry['start_time'] }} - {{ $entry['end_time'] }}
+                            <br>
+                            @if($data['requestdata']['teacher_id'] == '')
+                                {{ $entry['firstname'] }} {{ $entry['lastname'] }} 
+                            @endif
                         @else
                             N/A
                         @endif
