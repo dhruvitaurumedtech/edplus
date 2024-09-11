@@ -74,9 +74,9 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width:50px">No</th>
+                        <th>No</th>
                         <th>Topic Name</th>
-                        <th>Topic Description</th>
+                        <th>Description</th>
                         <th>chapter No</th>
                         <th>chapter Name</th>
                   
