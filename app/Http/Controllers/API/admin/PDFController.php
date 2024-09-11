@@ -13,11 +13,14 @@ use App\Models\Standard_sub;
 use App\Models\Student_detail;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
+use App\Models\Timetables;
 use App\Traits\ApiTrait;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Days;
+
 class PDFController extends Controller
 {
     use ApiTrait;
@@ -305,21 +308,26 @@ class PDFController extends Controller
         }
         try{
             
-            $data=Parents::join('users','users.id','=','parents.parent_id')
-            //->join('subject','subject.id','=','teacher_detail.subject_id')
-            ->select('users.*')
-            ->where('parents.institute_id',$request->institute_id)
-            ->when(!empty($request->mobile) ,function ($query) use ($request){
-                return $query->where('users.mobile', $request->mobile);
+            $timetable=Timetables::join('batches','batches.id','=','timetables.batch_id')
+            ->join('users','users.id','=','timetables.teacher_id')
+            ->join('standard','standard.id','=','batches.standard_id')
+            ->select('batches.batch_name','users.firstname','users.lastname','standard.name as standardname')
+            ->where('timetables.*','batches.institute_id',$request->institute_id)
+            ->when(!empty($request->batch_id) ,function ($query) use ($request){
+                return $query->where('batches.id', $request->batch_id);
             })
-            ->when(!empty($request->email) ,function ($query) use ($request){
-                return $query->where('users.email', $request->email);
+            ->when(!empty($request->standard_id) ,function ($query) use ($request){
+                return $query->where('batches.standard_id', $request->standard_id);
             })
-            ->when(!empty($request->name), function ($query) use ($request){
-                return $query->where('users.firstname', $request->name);
+            ->when(!empty($request->teacher_id) ,function ($query) use ($request){
+                return $query->where('timetables.teacher_id', $request->teacher_id);
             })
+            
             ->get()->toarray();
-                $pdf = PDF::loadView('pdf.parentslist', ['data' => $data]);
+
+                $dayslt = Days::get()->toarray();
+                $data = ['timetable'=>$timetable,'requestdata'=>$request,'days'=>$dayslt]; 
+                $pdf = PDF::loadView('pdf.timetablereport', ['data' => $data]);
 
                 $folderPath = public_path('pdfs');
 
@@ -327,12 +335,12 @@ class PDFController extends Controller
                 File::makeDirectory($folderPath, 0755, true);
                 }
 
-                $baseFileName = 'parentslist.pdf';
+                $baseFileName = 'timetablereport.pdf';
                 $pdfPath = $folderPath . '/' . $baseFileName;
 
                 $counter = 1;
                 while (File::exists($pdfPath)) {
-                $pdfPath = $folderPath . '/parentslist' . $counter . '.pdf'; 
+                $pdfPath = $folderPath . '/timetablereport' . $counter . '.pdf'; 
                 $counter++;
                 }
 
