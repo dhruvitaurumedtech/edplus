@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student List PDF</title>
+    <title>Student List PDF </title>
     <style>
         body {
             margin: 0mm;
