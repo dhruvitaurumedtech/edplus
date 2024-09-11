@@ -733,7 +733,7 @@ class FeesController extends Controller
                     'medium_name' => $value['medium_name'],
                     'stream_id' => $value['stream_id'],
                     'stream_name' => $value['stream_name'],
-                    'amount' => (!empty($value['amount'])) ? $value['amount'] . '.00' : '00.00',
+                    'amount' => (!empty($value['amount'])) ? $value['amount'] . '.00' : '',
                 ];
             }
             return $this->response($student, "Data Fetch Successfully");
