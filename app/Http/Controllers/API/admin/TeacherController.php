@@ -1181,16 +1181,16 @@ class TeacherController extends Controller
             if (!empty($userSub)) {
 
                 $userSub->update([
-                    'phone_no' => $request['phone_no'],
-                    'about_us' => $request['about_us'],
+                    'phone_no' => (!empty($request['phone_no']))?$request['phone_no']:'',
+                    'about_us' => (!empty($request['about_us']))?$request['about_us']:'',
                 ]);
             } else {
 
 
                 Users_sub_model::create([
                     'user_id' => $teacher_id,
-                    'phone_no' => $request['phone_no'],
-                    'about_us' => $request['about_us'],
+                    'phone_no' => (!empty($request['phone_no']))?$request['phone_no']:'',
+                    'about_us' => (!empty($request['about_us']))?$request['about_us']:'',
                 ]);
             }
             
@@ -1482,26 +1482,41 @@ class TeacherController extends Controller
                 ->get()
                 ->toArray();
 
-                function serializeArrayElements($array) {
-                    return array_map('serialize', $array);
-                }
-                $serialized_subject_with_batch = serializeArrayElements($subject_with_batch);
-                $serialized_teacherdt = serializeArrayElements($teacherdt);
-                
-                $diff2 = array_diff($serialized_teacherdt, $serialized_subject_with_batch);
-                $difference2 = array_map('unserialize', $diff2);
-                
-                foreach($difference2 as $validationde){
-                $batex = explode(",",$validationde['batch_id']);
-                $timdt = Timetables::join('subject','subject.id','=','timetables.subject_id')
-                ->where('timetables.teacher_id',$request->teacher_id)
-                ->where('timetables.subject_id',$validationde['subject_id'])
-                ->whereIN('timetables.batch_id',$batex)
-                ->pluck('subject.name')
-                ->first();
-                if(!empty($timdt)){
-                    return $this->response([], "Please first replace teacher of ".$timdt." subject", false, 400); 
-                }
+                // function serializeArrayElements($array) {
+                //     return array_map('serialize', $array);
+                // }
+                // $serialized_subject_with_batch = serializeArrayElements($subject_with_batch);
+                // $serialized_teacherdt = serializeArrayElements($teacherdt);
+                // $diff2 = array_diff($serialized_teacherdt, $serialized_subject_with_batch);
+                // $difference2 = array_map('unserialize', $diff2);
+            
+                foreach($teacherdt as $validationde){
+                    $subjectIds = array_column($subject_with_batch, 'subject_id');
+                    if(!in_array($validationde['subject_id'],$subjectIds)){
+                        foreach($subject_with_batch as $subwisdt){
+                            $timdt = Timetables::join('subject','subject.id','=','timetables.subject_id')
+                            ->where('timetables.teacher_id',$request->teacher_id)
+                            ->where('timetables.subject_id',$validationde['subject_id'])
+                            //->where('timetables.batch_id',$subwisdt['batch_id'])
+                            ->pluck('subject.name')
+                            ->first();
+                            if(!empty($timdt)){
+                                return $this->response([], "Please first replace teacher of ".$timdt." subject", false, 400); 
+                            } 
+                        }
+                    }
+                    
+                // $arrmtch =  
+                // $batex = explode(",",$validationde['batch_id']);
+                // $timdt = Timetables::join('subject','subject.id','=','timetables.subject_id')
+                // ->where('timetables.teacher_id',$request->teacher_id)
+                // ->where('timetables.subject_id',$validationde['subject_id'])
+                // //->whereIN('timetables.batch_id',$batex)
+                // ->pluck('subject.name')
+                // ->first();
+                // if(!empty($timdt)){
+                //     return $this->response([], "Please first replace teacher of ".$timdt." subject", false, 400); 
+                // }
             }
             
             Teacher_model::where('institute_id', $request->institute_id)

@@ -24,6 +24,9 @@ use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
 use App\Http\Controllers\API\admin\ResultReportController;
+
+use App\Http\Controllers\API\admin\PDFController as AdminPDFController;
+use App\Http\Controllers\API\admin\StudentListController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
 use App\Http\Controllers\API\staff\StaffController;
@@ -271,6 +274,13 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-standard-teacher', [TeacherController::class, 'add_standard']);
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
     Route::post('/institute/result-report-pdf', [ResultReportController::class, 'result_report_pdf']);
+
+
+    Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
+    Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
+    Route::post('/institute/parents-reports', [AdminPDFController::class, 'parents_reports']);
+    Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+
 });
     //token without use 
    
