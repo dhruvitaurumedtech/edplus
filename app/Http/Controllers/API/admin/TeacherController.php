@@ -1244,16 +1244,16 @@ class TeacherController extends Controller
             if (!empty($userSub)) {
 
                 $userSub->update([
-                    'phone_no' => $request['phone_no'],
-                    'about_us' => !empty($request['about_us'])?$request['about_us']:'',
+                    'phone_no' => (!empty($request['phone_no']))?$request['phone_no']:'',
+                    'about_us' => (!empty($request['about_us']))?$request['about_us']:'',
                 ]);
             } else {
 
 
                 Users_sub_model::create([
                     'user_id' => $teacher_id,
-                    'phone_no' => $request['phone_no'],
-                    'about_us' => !empty($request['about_us'])?$request['about_us']:'',
+                    'phone_no' => (!empty($request['phone_no']))?$request['phone_no']:'',
+                    'about_us' => (!empty($request['about_us']))?$request['about_us']:'',
                 ]);
             }
             
