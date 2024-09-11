@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Base_table;
 use App\Models\Topic_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
@@ -22,18 +23,32 @@ class ContentListVideoPdfController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $topic_response=Topic_model::leftjoin('base_table','base_table.id','=','topic.base_table_id')
-                         ->leftjoin('subject','subject.id','=','topic.subject_id')
-                         ->leftjoin('standard','standard.id','=','topic.standard_id')
+            $base_table_response=Base_table::leftjoin('subject','subject.base_table_id','=','base_table.id')
+                         ->leftjoin('subject_sub','subject_sub.subject_id','=','subject.id')
+                         ->leftjoin('standard','standard.id','=','base_table.standard')
                          ->leftjoin('board','board.id','=','base_table.board')
                          ->leftjoin('medium','medium.id','=','base_table.medium')
-                         ->select('topic.*','board.name as board_name','standard.name as standard_name','medium.name as medium_name','subject.name as subject_name')
+                         ->select('subject.id','board.name as board_name','standard.name as standard_name','medium.name as medium_name','subject.name as subject_name')
                          ->when(!empty($request->institute_id), function ($query) use ($request) {
-                            return $query->where('topic.institute_id', $request->institute_id);
+                            return $query->where('subject_sub.institute_id', $request->institute_id);
                             })
-                         ->where('topic.institute_id',$request->institute_id)  
+                         ->groupBy(
+                            'subject.id',
+                            'board.name', 
+                            'standard.name', 
+                            'medium.name', 
+                            'subject.name'
+                         )
                          ->get()->toarray();
-                $pdf = PDF::loadView('pdf.topicvideopdf', ['data' => $topic_response])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
+                        
+                         $topic_response=Topic_model::leftjoin('chapters','chapters.id','=','topic.chapter_id')->when(!empty($request->institute_id), function ($query) use ($request) {
+                            return $query->where('institute_id', $request->institute_id);
+                            })
+                         ->select('topic.*','chapters.chapter_name','chapters.chapter_no','chapters.chapter_image')
+                         ->get()->toarray();
+                         $data = ['base_table_response'=>$base_table_response,'topic_response'=>$topic_response];
+                         
+                $pdf = PDF::loadView('pdf.topicvideopdf', ['data' => $data])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
                 $folderPath = public_path('pdfs');
 
                 if (!File::exists($folderPath)) {

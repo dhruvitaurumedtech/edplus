@@ -64,30 +64,33 @@
 <hr>
 @php $i = 1; @endphp
 @if(!empty($data))
-    @foreach ($data as $item)
+    @foreach ($data['base_table_response'] as $item)
         <p><b>Board Name:</b> {{ $item['board_name'] }}</p>
         <p><b>Medium Name:</b> {{ $item['medium_name'] }}</p>
         <p><b>Standard Name:</b> {{ $item['standard_name'] }}</p>
-
+        <p><b>Subject name:</b> {{ $item['subject_name'] }}</p>
+        
         <div class="content">
             <table>
                 <thead>
                     <tr>
                         <th>Sr. No</th>
-                        <th>Subject</th>
-                        <th>Name</th>
-                        <th>Description</th>
+                        <th>Topic Name</th>
+                        <th>Topic Description</th>
                         <th>Video</th>
                     </tr>
                 </thead>
                 <tbody>
+                @foreach ($data['topic_response'] as $item2)
+                   @if($item2['subject_id'] == $item['id'])
                     <tr>
                         <td>{{ $i }}</td>
-                        <td>{{ !empty($item['subject_name']) ? $item['subject_name'] : '' }}</td>
-                        <td>{{ !empty($item['topic_name']) ? $item['topic_name'] : '' }}</td>
-                        <td>{{ !empty($item['topic_description']) ? $item['topic_description'] : '' }}</td>
-                        <td>{{ !empty($item['topic_video']) ? $item['topic_video'] : '' }}</td>
+                        <td>{{ !empty($item2['topic_name']) ? $item2['topic_name'] : '' }}</td>
+                        <td>{{ !empty($item2['topic_description']) ? $item2['topic_description'] : '' }}</td>
+                        <td>{{ !empty($item2['topic_video']) ? $item2['topic_video'] : '' }}</td>
                     </tr>
+                    @endif
+                    @endforeach
                 </tbody>
             </table>
         </div>
