@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\BannerController;
 use App\Http\Controllers\API\admin\TeacherController;
 use App\Http\Controllers\API\admin\AttendanceController;
 use App\Http\Controllers\API\admin\BasetableControllerAPI;
+use App\Http\Controllers\API\admin\ContentListVideoPdfController;
 use App\Http\Controllers\API\admin\DeadstockController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -271,6 +272,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/add-standard-teacher', [TeacherController::class, 'add_standard']);
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
     Route::post('/institute/studentlist-pdf', [StudentListController::class, 'studentlist_pdf']);
+    Route::post('/institute/content-list-video-pdf', [ContentListVideoPdfController::class, 'content_list_video_pdf']);
 
 });
     //token without use 
