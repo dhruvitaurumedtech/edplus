@@ -11,7 +11,7 @@
             width: 100%;
             border-collapse: collapse;
             word-wrap: break-word;
-            table-layout: fixed; /* Ensure even distribution of content */
+            table-layout: fixed; / Ensure even distribution of content /
         }
         table, th, td {
             border: 1px solid black;
@@ -25,28 +25,28 @@
             white-space: nowrap;
         }
 
-        /* Set specific width for each column */
-        th:nth-child(1) { width: 40px; }   /* No column */
-        th:nth-child(2) { width: 100px; }  /* Student_ID column */
-        th:nth-child(3) { width: 150px; }  /* Full Name column */
-        th:nth-child(4) { width: 200px; }  /* Email column */
-        th:nth-child(5) { width: 100px; }  /* Board column */
-        th:nth-child(6) { width: 80px; }   /* Class column */
-        th:nth-child(7) { width: 80px; }   /* Medium column */
-        th:nth-child(8) { width: 80px; }   /* Standard column */
+        / Set specific width for each column /
+        th:nth-child(1) { width: 40px; }   / No column /
+        th:nth-child(2) { width: 100px; }  / Student_ID column /
+        th:nth-child(3) { width: 150px; }  / Full Name column /
+        th:nth-child(4) { width: 200px; }  / Email column /
+        th:nth-child(5) { width: 100px; }  / Board column /
+        th:nth-child(6) { width: 80px; }   / Class column /
+        th:nth-child(7) { width: 80px; }   / Medium column /
+        th:nth-child(8) { width: 80px; }   / Standard column /
 
-        /* Prevent rows from breaking */
+        / Prevent rows from breaking /
         tr {
             page-break-inside: avoid;
         }
 
-        /* Scale down table if needed */
+        / Scale down table if needed /
         table {
             transform: scale(0.95);
             transform-origin: top left;
         }
 
-        /* Specific print styles for better layout */
+        / Specific print styles for better layout /
         @media print {
             body {
                 margin: 0mm;

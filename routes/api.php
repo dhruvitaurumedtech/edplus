@@ -24,6 +24,8 @@ use App\Http\Controllers\API\admin\FeesPDFController;
 use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
+
+use App\Http\Controllers\API\admin\PDFController as AdminPDFController;
 use App\Http\Controllers\API\admin\StudentListController;
 use App\Http\Controllers\API\admin\TimetableController;
 use App\Http\Controllers\API\BannerApiController;
@@ -271,7 +273,13 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/teacher-profile-delete-institute', [TeacherController::class, 'teacher_profile_delete_institute']);
     Route::post('/institute/add-standard-teacher', [TeacherController::class, 'add_standard']);
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
-    Route::post('/institute/studentlist-pdf', [StudentListController::class, 'studentlist_pdf']);
+
+
+    Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
+    Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
+    Route::post('/institute/parents-reports', [AdminPDFController::class, 'parents_reports']);
+    Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+ 
     Route::post('/institute/fees-report-pdf', [FeesPDFController::class, 'fees_report_pdf']);
     
 });
