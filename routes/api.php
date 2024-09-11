@@ -20,6 +20,7 @@ use App\Http\Controllers\API\student\StudentController;
 use App\Http\Controllers\API\admin\ExamController;
 use App\Http\Controllers\API\admin\FeedbackController;
 use App\Http\Controllers\API\admin\FeesController;
+use App\Http\Controllers\API\admin\FeesPDFController;
 use App\Http\Controllers\API\admin\General_timetableController;
 use App\Http\Controllers\API\admin\HomeworkController;
 use App\Http\Controllers\API\admin\ParentsController;
@@ -278,7 +279,9 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
     Route::post('/institute/parents-reports', [AdminPDFController::class, 'parents_reports']);
     Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
-
+ 
+    Route::post('/institute/fees-report-pdf', [FeesPDFController::class, 'fees_report_pdf']);
+    
 });
     //token without use 
    
