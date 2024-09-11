@@ -18,6 +18,7 @@ use App\Traits\ApiTrait;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Days;
 
@@ -310,9 +311,10 @@ class PDFController extends Controller
             
             $timetable=Timetables::join('batches','batches.id','=','timetables.batch_id')
             ->join('users','users.id','=','timetables.teacher_id')
+            ->join('subject','subject.id','=','timetables.subject_id')
             ->join('standard','standard.id','=','batches.standard_id')
-            ->select('batches.batch_name','users.firstname','users.lastname','standard.name as standardname')
-            ->where('timetables.*','batches.institute_id',$request->institute_id)
+            ->select('timetables.*','batches.batch_name','users.firstname','users.lastname','standard.name as standardname','subject.name as subjectname')
+            ->where('batches.institute_id',$request->institute_id)
             ->when(!empty($request->batch_id) ,function ($query) use ($request){
                 return $query->where('batches.id', $request->batch_id);
             })
@@ -322,10 +324,13 @@ class PDFController extends Controller
             ->when(!empty($request->teacher_id) ,function ($query) use ($request){
                 return $query->where('timetables.teacher_id', $request->teacher_id);
             })
-            
             ->get()->toarray();
-
-                $dayslt = Days::get()->toarray();
+                $dayslt = DB::table('days')->get()->map(function($day) {
+                    return [
+                        'id' => $day->id,
+                        'day' => $day->day,
+                    ];
+                })->toArray();
                 $data = ['timetable'=>$timetable,'requestdata'=>$request,'days'=>$dayslt]; 
                 $pdf = PDF::loadView('pdf.timetablereport', ['data' => $data]);
 

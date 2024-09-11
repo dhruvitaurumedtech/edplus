@@ -64,10 +64,10 @@
 </head>
 <body>
 
-    <h2>Teacher List</h2>
+    <h2>Timetable</h2>
     <hr>
     @if($data['requestdata']['standard_id'])
-        <p><b>Medium Name: </b>{{$data['timetable'][0]['standardname']}}</p>
+        <p><b>Standard Name: </b>{{$data['timetable'][0]['standardname']}}</p>
     @endif
     @if($data['requestdata']['batch_id'])
         <p><b>Batch Name: </b>{{$data['timetable'][0]['batch_name']}}</p>
@@ -78,38 +78,47 @@
 
     <div class="content">
     <table>
-        <thead>
-            <tr>
-                <th>Monday</th>
-                <th>Tuesday</th>
-                <th>Wednesday</th>
-                <th>Thursday</th>
-                <th>Friday</th>
-                <th>Saturday</th>
-                <th>Sunday</th>
-            </tr>
-        </thead>
-        <tbody><?php $i=1;?>
-            @foreach ($data['timetable'] as $item)
-            <tr>
-                <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
-                @if($data['requestdata']['board_id'] == '')
-                <td>{{ $item['board_name'] }}</td>
-                @endif
-                @if($data['requestdata']['medium_id'] == '')
-                <td>{{ $item['medium_name'] }}</td>
-                @endif
-                @if($data['requestdata']['standard_id'] == '')
-                <td>{{ $item['standard_name'] }}</td>
-                @endif
-                @if($data['requestdata']['standard_id'] == '')
-                <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
-                @endif
-            </tr>
-            <?php $i++ ?>
+    
+    <thead>
+        <tr>
+            @foreach ($data['days'] as $days)
+                <th>{{ $days['day'] }}</th>
             @endforeach
-        </tbody>
-    </table>
+        </tr>
+    </thead>
+    <tbody>
+        <!-- Determine the unique time slots across all days -->
+        @php
+            $timeSlots = collect($data['timetable'])->unique('start_time')->pluck('start_time')->sort();
+        @endphp
+
+        <!-- Loop through each unique time slot -->
+        @foreach ($timeSlots as $timeSlot)
+            <tr>
+                @foreach ($data['days'] as $day)
+                    <!-- Check if there's a timetable entry for this day and time slot -->
+                    @php
+                        $entry = collect($data['timetable'])->firstWhere(function ($item) use ($day, $timeSlot) {
+                            return $item['day'] == $day['id'] && $item['start_time'] == $timeSlot;
+                        });
+                    @endphp
+
+                    <!-- If an entry exists, display it; otherwise, display an empty cell -->
+                    <td>
+                        @if($entry)
+                            {{ $entry['subjectname'] }} <br> {{ $entry['start_time'] }} - {{ $entry['end_time'] }}
+                        @else
+                            N/A
+                        @endif
+                    </td>
+                @endforeach
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+    
+
     </div>
 
 </body>
