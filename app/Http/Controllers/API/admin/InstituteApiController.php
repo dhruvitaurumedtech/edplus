@@ -3116,8 +3116,18 @@ class InstituteApiController extends Controller
                         ->where('teacher_detail.institute_id', $request->institute_id)
                         ->where('teacher_detail.teacher_id', $value['teacher_id'])
                         ->where('teacher_detail.status', '1')
-                        ->select('standard.name as standard_name')
-                        ->get()
+                        ->select('standard.name as standard_name');
+                        if (!empty($request->board_id)) {
+                            $standard_list->where(function ($query) use ($request) {
+                                $query->where('teacher_detail.board_id', $request->board_id);
+                            });
+                        }
+                        if (!empty($request->standard_id)) {
+                            $standard_list->where(function ($query) use ($request) {
+                                $query->where('teacher_detail.standard_id', $request->standard_id);
+                            });
+                        }
+                        $standard_list = $standard_list->get()
                         ->toArray();
                     $standard_array = [];
                     foreach ($standard_list as $standard_value) {
