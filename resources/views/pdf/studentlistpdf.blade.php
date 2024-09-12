@@ -61,45 +61,52 @@
 </head>
 <body>
 
-    <h2>Teacher List</h2>
+    <h2>Student List</h2>
     <hr>
 
-    @foreach ($data['teacherdata'] as $item)
+    @foreach ($data as $item)
     <p><b>Board Name: </b>{{$item['board_name']}}</p>
         @foreach ($item['medium'] as $mediumDT)
         <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
             @foreach ($mediumDT['class'] as $classDT)
+            <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
                 @foreach ($classDT['standard'] as $standardDT)
-                <p><b>Standard Name: </b>{{$standardDT['standard_name'] . ' (' . $classDT['class_name'] . ') '}}</p>
-                    @foreach ($standardDT['subject'] as $subjectDT)
-                    <p><b>Subject Name: </b>{{$subjectDT['subject_name'] }}</p>
-                        
-                        <div class="content">
-                            <table>
-                                    
-                                <thead>
-                                <tr><th>Teachers</th></tr>
-                                </thead>
-                                <tbody>
-                                @foreach ($subjectDT['teachers'] as $teachersDT)
-                                <tr>
-                                    <td>{{$teachersDT['name'] }}</td>
-                                </tr>
-                                @endforeach    
-                                </tbody>
-                            </table>
-                        </div>
-
-                        
-                        
-                    @endforeach
-                @endforeach
+                <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
+                    @foreach ($standardDT['batch'] as $batchDT)
+                    <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+                       @foreach ($batchDT['student'] as $studentDT)
+                            <p><b>Student Name: </b></p>
+                            <div class="content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Student Name</th>
+                                            <th>Subject Name</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @php $i=1; @endphp  
+                                        @foreach ($studentDT['subject'] as $key => $subjectDT)
+                                        <tr>
+                                            @if ($key == 0)
+                                                <td>{{ $i }}</td>
+                                                <td rowspan="{{ count($studentDT['subject']) }}">{{ $studentDT['student_name'] }}</td>
+                                            @endif
+                                            <td>{{ $subjectDT['subject_name'] }}</td>
+                                        </tr>
+                                        @php $i++; @endphp
+                                        @endforeach    
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endforeach
+                    @endforeach 
+                @endforeach 
             @endforeach
         @endforeach
     @endforeach
 
-    
-    
     
     
 </body>

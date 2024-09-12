@@ -309,7 +309,7 @@ class PDFController extends Controller
                     'medium' => $medium_result,
                 ];
             }
-            
+            // print_r($board_result);exit;
             $pdf = PDF::loadView('pdf.studentlistpdf', ['data' => $board_result])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
 
             $folderPath = public_path('pdfs');
