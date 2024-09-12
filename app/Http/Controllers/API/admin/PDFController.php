@@ -7,13 +7,17 @@ use App\Models\Class_sub;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
 use App\Models\Institute_for_sub;
+use App\Models\Medium_model;
 use App\Models\Medium_sub;
 use App\Models\Parents;
+use App\Models\Standard_model;
 use App\Models\Standard_sub;
 use App\Models\Student_detail;
+use App\Models\Subject_model;
 use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\Timetables;
+use App\Models\User;
 use App\Traits\ApiTrait;
 use PDF;
 use Illuminate\Support\Facades\File;
@@ -104,17 +108,13 @@ class PDFController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            
-            $teacherdata=Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
-            ->join('standard','standard.id','=','teacher_detail.standard_id')
-            ->join('board','board.id','=','teacher_detail.board_id')
-            ->join('medium','medium.id','=','teacher_detail.medium_id')
-            ->join('class','class.id','=','teacher_detail.class_id')
-            ->join('subject','subject.id','=','teacher_detail.subject_id')
-            ->select('users.*','board.name as board_name',
-            'standard.name as standard_name','medium.name as medium_name','subject.name as subjectname',
-            'class.name as class_name','teacher_detail.created_at')
-            ->where('teacher_detail.institute_id',$request->institute_id)
+            $teacherDetails = Teacher_model::leftJoin('board', 'board.id', '=', 'teacher_detail.board_id')
+            ->leftJoin('medium', 'medium.id', '=', 'teacher_detail.medium_id')
+            ->leftJoin('class', 'class.id', '=', 'teacher_detail.class_id')
+            ->leftJoin('standard', 'standard.id', '=', 'teacher_detail.standard_id')
+            ->leftJoin('subject', 'subject.id', '=', 'teacher_detail.subject_id')
+            ->leftJoin('users', 'users.id', '=', 'teacher_detail.teacher_id')
+            ->where('teacher_detail.institute_id', $request->institute_id)
             ->when(!empty($request->subject_id) ,function ($query) use ($request){
                 return $query->where('teacher_detail.subject_id', $request->subject_id);
             })
@@ -133,9 +133,116 @@ class PDFController extends Controller
             ->when(!empty($request->standard_id) ,function ($query) use ($request){
                 return $query->where('teacher_detail.standard_id', $request->standard_id);
             })
-            ->get()->toarray();
+            ->select(
+                'board.id as board_id', 'board.name as board_name',
+                'medium.id as medium_id', 'medium.name as medium_name',
+                'class.id as class_id', 'class.name as class_name',
+                'standard.id as standard_id', 'standard.name as standard_name',
+                'subject.id as subject_id', 'subject.name as subject_name',
+                'users.id as teacher_id', 'users.firstname', 'users.lastname'
+            )
+            ->distinct()
+            ->get()
+            ->toArray();
 
-             $data = ['teacherdata'=>$teacherdata,'requestdata'=>$request];
+            $board_result = [];
+
+            foreach ($teacherDetails as $detail) {
+                $boardIndex = array_search($detail['board_id'], array_column($board_result, 'board_id'));
+                
+                if ($boardIndex === false) {
+                    $boardIndex = count($board_result);
+                    $board_result[$boardIndex] = [
+                        'board_id' => $detail['board_id'],
+                        'board_name' => $detail['board_name'],
+                        'medium' => []
+                    ];
+                }
+
+                $mediumIndex = array_search($detail['medium_id'], array_column($board_result[$boardIndex]['medium'], 'medium_id'));
+
+                if ($mediumIndex === false) {
+                    $mediumIndex = count($board_result[$boardIndex]['medium']);
+                    $board_result[$boardIndex]['medium'][$mediumIndex] = [
+                        'medium_id' => $detail['medium_id'],
+                        'medium_name' => $detail['medium_name'],
+                        'class' => []
+                    ];
+                }
+
+                $classIndex = array_search($detail['class_id'], array_column($board_result[$boardIndex]['medium'][$mediumIndex]['class'], 'class_id'));
+
+                if ($classIndex === false) {
+                    $classIndex = count($board_result[$boardIndex]['medium'][$mediumIndex]['class']);
+                    $board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex] = [
+                        'class_id' => $detail['class_id'],
+                        'class_name' => $detail['class_name'],
+                        'standard' => []
+                    ];
+                }
+
+                $standardIndex = array_search($detail['standard_id'], array_column($board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard'], 'standard_id'));
+
+                if ($standardIndex === false) {
+                    $standardIndex = count($board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard']);
+                    $board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard'][$standardIndex] = [
+                        'standard_id' => $detail['standard_id'],
+                        'standard_name' => $detail['standard_name'],
+                        'subject' => []
+                    ];
+                }
+
+                $subjectIndex = array_search($detail['subject_id'], array_column($board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard'][$standardIndex]['subject'], 'subject_id'));
+
+                if ($subjectIndex === false) {
+                    $board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard'][$standardIndex]['subject'][] = [
+                        'subject_id' => $detail['subject_id'],
+                        'subject_name' => $detail['subject_name'],
+                        'teachers' => [[
+                            'id' => $detail['teacher_id'],
+                            'name' => $detail['firstname'] . ' ' . $detail['lastname']
+                        ]]
+                    ];
+                } else {
+                    $board_result[$boardIndex]['medium'][$mediumIndex]['class'][$classIndex]['standard'][$standardIndex]['subject'][$subjectIndex]['teachers'][] = [
+                        'id' => $detail['teacher_id'],
+                        'name' => $detail['firstname'] . ' ' . $detail['lastname']
+                    ];
+                }
+            }
+
+            
+            // $teacherdata=Teacher_model::join('users','users.id','=','teacher_detail.teacher_id')
+            // ->join('standard','standard.id','=','teacher_detail.standard_id')
+            // ->join('board','board.id','=','teacher_detail.board_id')
+            // ->join('medium','medium.id','=','teacher_detail.medium_id')
+            // ->join('class','class.id','=','teacher_detail.class_id')
+            // ->join('subject','subject.id','=','teacher_detail.subject_id')
+            // ->select('users.*','board.name as board_name',
+            // 'standard.name as standard_name','medium.name as medium_name','subject.name as subjectname',
+            // 'class.name as class_name','teacher_detail.created_at')
+            // ->where('teacher_detail.institute_id',$request->institute_id)
+            // ->when(!empty($request->subject_id) ,function ($query) use ($request){
+            //     return $query->where('teacher_detail.subject_id', $request->subject_id);
+            // })
+            // ->when(!empty($request->class_id) ,function ($query) use ($request){
+            //     return $query->where('teacher_detail.class_id', $request->class_id);
+            // })
+            // ->when(!empty($request->board_id), function ($query) use ($request){
+            //     return $query->where('teacher_detail.board_id', $request->board_id);
+            // })
+            // ->when(!empty($request->medium_id) ,function ($query) use ($request){
+            //     return $query->where('teacher_detail.medium_id', $request->medium_id);
+            // })
+            // ->when(!empty($request->creatdate) ,function ($query) use ($request){
+            //     return $query->where('teacher_detail.created_at', $request->creatdate);
+            // })
+            // ->when(!empty($request->standard_id) ,function ($query) use ($request){
+            //     return $query->where('teacher_detail.standard_id', $request->standard_id);
+            // })
+            // ->get()->toarray();
+
+             $data = ['teacherdata'=>$board_result,'requestdata'=>$request];
 
                 $pdf = PDF::loadView('pdf.teacherlist', ['data' => $data]);
 
