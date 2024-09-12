@@ -310,7 +310,7 @@ class PDFController extends Controller
                 ];
             }
             
-            $pdf = PDF::loadView('pdf.studentlist', ['data' => $board_result])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
+            $pdf = PDF::loadView('pdf.studentlistpdf', ['data' => $board_result])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
 
             $folderPath = public_path('pdfs');
 
@@ -318,12 +318,12 @@ class PDFController extends Controller
                 File::makeDirectory($folderPath, 0755, true);
             }
 
-            $baseFileName = 'studentlist.pdf';
+            $baseFileName = 'studentlistpdf.pdf';
             $pdfPath = $folderPath . '/' . $baseFileName;
 
             $counter = 1;
             while (File::exists($pdfPath)) {
-                $pdfPath = $folderPath . '/studentlist' . $counter . '.pdf';
+                $pdfPath = $folderPath . '/studentlistpdf' . $counter . '.pdf';
                 $counter++;
             }
 
