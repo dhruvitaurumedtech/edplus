@@ -785,12 +785,16 @@ class FeesController extends Controller
             $query = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->leftjoin('stream', 'stream.id', '=', 'students_details.stream_id')
+                ->leftjoin('board', 'board.id', '=', 'students_details.board_id')
+                ->leftjoin('medium', 'medium.id', '=', 'students_details.medium_id')
                 ->where('students_details.institute_id', $request->institute_id)
                 ->where('students_details.status', '1')
                 ->whereNull('students_details.deleted_at')
                 ->whereNull('users.deleted_at')
                     
-                ->select('users.*', 'standard.name as standard_name', 'students_details.standard_id', 'students_details.stream_id', 'stream.name as streamname', 'students_details.subject_id');
+                ->select('users.*', 'standard.name as standard_name', 'students_details.standard_id','board.id as board_id','board.name as board_name',
+                     'medium.id as medium_id','medium.name as medium_name',  
+                     'students_details.stream_id', 'stream.name as streamname', 'students_details.subject_id');
             if (!empty($request->board_id)) {
                 $query->whereIn('students_details.board_id', explode(',', $request->board_id));
             }
@@ -826,6 +830,7 @@ class FeesController extends Controller
                             ->on('discount.institute_id', '=', 'students_details.institute_id');
                     })
                     ->leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                    
                     ->where('students_details.student_id', $value->id)
                     ->where('students_details.institute_id', $request->institute_id)
                     ->whereNull('students_details.deleted_at')
@@ -867,6 +872,10 @@ class FeesController extends Controller
                     'student_id' => $value->id,
                     'student_name' => $value->firstname . ' ' . $value->lastname,
                     'profile' => (!empty($value->image)) ? asset($value->image) : asset('profile/no-image.png'),
+                    'board_id' => $value->board_id,
+                    'board_name' => $value->board_name,
+                    'medium_id' => $value->medium_id,
+                    'medium_name' => $value->medium_name,
                     'standard_id' => $value->standard_id,
                     'standard_name' => $value->standard_name,
                     'stream_id' => $value->stream_id,
