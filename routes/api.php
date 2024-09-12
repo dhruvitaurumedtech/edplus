@@ -280,7 +280,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
 
    
-    Route::post('/institute/testing', [StudentController::class, 'testing']);
+    // Route::post('/institute/testing', [StudentController::class, 'testing']);
 
     // Route::post('test', [InstituteApiController::class, 'test']);
 
@@ -290,3 +290,4 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
 
 // Route::post('/institute/delete-account', [InstituteApiController::class, 'delete_account']);
 // Route::post('/child-detail', [StudentController::class, 'child_detail']);
+});
