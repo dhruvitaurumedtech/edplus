@@ -26,37 +26,7 @@
         }
 
         
-        th:nth-child(1) { width: 40px; }   
-        th:nth-child(2) { width: 100px; }  
-        th:nth-child(3) { width: 150px; }   
-        th:nth-child(4) { width: 200px; }  
-        th:nth-child(5) { width: 100px; }  
-        th:nth-child(6) { width: 80px; }   
-        th:nth-child(7) { width: 80px; }   
-        th:nth-child(8) { width: 80px; }   
-
-        tr {
-            page-break-inside: avoid;
-        }
-
-        table {
-            transform: scale(0.95);
-            transform-origin: top left;
-        }
-
-        @media print {
-            body {
-                margin: 0mm;
-            }
-            table {
-                width: 100%;
-                word-wrap: break-word;
-            }
-            tr {
-                page-break-inside: avoid;
-            }
-        }
-
+      
     </style>
 </head>
 <body>
