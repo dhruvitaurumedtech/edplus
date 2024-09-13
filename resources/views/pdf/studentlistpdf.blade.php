@@ -74,8 +74,7 @@
                 <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
                     @foreach ($standardDT['batch'] as $batchDT)
                     <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
-                       @foreach ($batchDT['student'] as $studentDT)
-                            <p><b>Student Name: </b></p>
+                       
                             <div class="content">
                                 <table>
                                     <thead>
@@ -86,20 +85,23 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @php $i=1; @endphp  
+                                    @php $i=1; @endphp  
+                                    @foreach ($batchDT['student'] as $studentDT)
+                                       
                                        
                                         <tr>
                                            
                                                 <td>{{ $i }}</td>
-                                                <td rowspan="{{ count($studentDT['subject_name']) }}">{{ $studentDT['student_name'] }}</td>
+                                                <td>{{ $studentDT['student_name'] }}</td>
                                                 <td> @foreach ($studentDT['subject'] as $key => $subjectDT) {{ $subjectDT['subject_name'] }} @endforeach    </td>
                                         </tr>
                                         @php $i++; @endphp
+                                    @endforeach
                                         
                                     </tbody>
                                 </table>
                             </div>
-                        @endforeach
+                        
                     @endforeach 
                 @endforeach 
             @endforeach

@@ -125,9 +125,7 @@ class PDFController extends Controller
                             // print_r($standard_id);exit;
                             $batch_id = !empty($request->batch_id) ? $request->batch_id : '';
                             $batch_response = Student_detail::leftjoin('batches', 'batches.id', '=', 'students_details.batch_id')
-                            ->when(!empty($request->institute_id), function ($query) use ($request) {
-                                return $query->where('students_details.institute_id', $request->institute_id);
-                              })
+                              ->where('students_details.institute_id', $request->institute_id)
                               ->when(!empty($board_id), function ($query) use ($board_id) {
                                 return $query->where('students_details.board_id', $board_id);
                                 })
@@ -149,12 +147,13 @@ class PDFController extends Controller
                             // ->where('students_details.class_id', $class_id)
                             // ->where('students_details.standard_id', $standard_id)
                             // ->orwhere('students_details.batch_id', $batch_id)
-                            ->distinct()
+                            
                             ->select('batches.id as batch_id', 'batches.batch_name as batch_name')
+                            ->distinct()
                             ->get()->toarray(); 
                             $batch_result=[];
                              foreach($batch_response as $batch_value){
-                                
+                                $student_id = !empty($request->student_id) ? $request->student_id : '';
                                 $batch_id = !empty($request->batch_id) ? $request->batch_id : $batch_value['batch_id'];
                                 
                                 $subject_get=Student_detail::leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
@@ -176,6 +175,7 @@ class PDFController extends Controller
                                   ->when(!empty($batch_id), function ($query) use ($batch_id) {
                                     return $query->where('students_details.batch_id', $batch_id);
                                   }) 
+                                  
                                 // ->where('students_details.institute_id', $request->institute_id)
                                 // ->where('students_details.board_id', $board_id)
                                 // ->where('students_details.medium_id', $medium_id)
@@ -186,23 +186,17 @@ class PDFController extends Controller
                                 ->select('students_details.subject_id')
                                 ->distinct()
                                 ->pluck('students_details.subject_id'); 
-                                $allValues = [];
-                                foreach($subject_get as $subject_value)
-                                {
-                                    $items = explode(',', $subject_value);
-                                    $allValues = array_merge($allValues, $items);
-                                } 
-                                $uniqueValues = array_unique($allValues);
-                                sort($uniqueValues);
-                                $commaSeparatedValues = implode(',', $uniqueValues);
                                 
-                                $subjectIds = explode(',', $commaSeparatedValues);
-
+                                // print_r($commaSeparatedValues);
+                                // $uniqueValues = array_unique($allValues);
+                                // sort($uniqueValues);
+                                // $commaSeparatedValues = implode(',', $items);
                                 
-                                $student_id = !empty($request->student_id) ? $request->student_id : '';
+                                // $subjectIds = explode(',', $commaSeparatedValues);
                                  
-                                $final_subject_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : $subjectIds;
-                                   
+                               
+                                 
+                               
                                     $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
                                     ->when(!empty($request->institute_id), function ($query) use ($request) {
                                         return $query->where('students_details.institute_id', $request->institute_id);
@@ -232,19 +226,28 @@ class PDFController extends Controller
                                     // ->where('students_details.standard_id', $standard_id)
                                     // ->orwhere('students_details.batch_id', $batch_id)
                                     // ->orwhere('students_details.student_id', $student_id)
-                                    ->where(function($query) use ($final_subject_get) {
-                                        foreach ($final_subject_get as $subjectId) {
-                                            $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
-                                        }
-                                    })
+                                    // ->where(function($query) use ($final_subject_get) {
+                                    //     foreach ($final_subject_get as $subjectId) {
+                                    //         $query->orWhereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subjectId]);
+                                    //     }
+                                    // })
                                     ->whereNull('students_details.deleted_at')
-                                    ->select('users.*')
+                                    ->select('users.*','students_details.subject_id')
                                     ->distinct()
                                     ->get()->toarray();
+
+                                    // $commaSeparatedValues = [];
+                                    // foreach($student_response as $subject_value)
+                                    // {
+                                        // $commaSeparatedValues[] = explode(',', $subject_value);
+                                        // $allValues = array_merge($allValues, $items);
+                                    // } 
                                     $student_result=[];
                                     foreach($student_response as $student_value){
-
-                                        $subject_response = Subject_model::whereIn('id', explode(',',$commaSeparatedValues))
+                                        $subject_all_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : explode(',',$student_value['subject_id']);
+                                  
+                                        // $subject_idf=Student_detail::where('institute_id',$request['institute_id'])->where('student_id',$student_value['id'])->pluck('subject_id');
+                                        $subject_response = Subject_model::whereIn('id', $subject_all_get)
                                         ->select('subject.id as subject_id', 'subject.name as subject_name')
                                         ->get()->toarray();  
                                         $subject_result= [];
@@ -309,7 +312,6 @@ class PDFController extends Controller
                     'medium' => $medium_result,
                 ];
             }
-            // print_r($board_result);exit;
             $pdf = PDF::loadView('pdf.studentlistpdf', ['data' => $board_result])->setPaper('A4', 'portrait')->setOptions(['isHtml5ParserEnabled' => true, 'isRemoteEnabled' => true]);;
 
             $folderPath = public_path('pdfs');
