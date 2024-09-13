@@ -352,8 +352,14 @@ class StaffController extends Controller
         $userdata = user::join('staff_detail', 'staff_detail.user_id', '=', 'users.id')
             ->join('roles', 'roles.id', '=', 'users.role_type')
             ->where('staff_detail.institute_id', $request->institute_id)
-            ->select('users.*', 'roles.role_name')
-            ->get();
+            ->select('users.*', 'roles.role_name');
+            if (!empty($request->search)) {
+                $searchTerm = '%' . $request->search . '%';
+                $$userdata->where(function ($query) use ($searchTerm) {
+                    $query->where(DB::raw("CONCAT(users.firstname, ' ', users.lastname)"), 'like', $searchTerm);
+                });
+            }
+            $userdata->get();
         try {
             $data = [];
             foreach ($userdata as $value) {
