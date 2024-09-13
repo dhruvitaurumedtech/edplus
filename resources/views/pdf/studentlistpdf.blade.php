@@ -87,16 +87,15 @@
                                     </thead>
                                     <tbody>
                                         @php $i=1; @endphp  
-                                        @foreach ($studentDT['subject'] as $key => $subjectDT)
+                                       
                                         <tr>
-                                            @if ($key == 0)
+                                           
                                                 <td>{{ $i }}</td>
-                                                <td rowspan="{{ count($studentDT['subject']) }}">{{ $studentDT['student_name'] }}</td>
-                                            @endif
-                                            <td>{{ $subjectDT['subject_name'] }}</td>
+                                                <td rowspan="{{ count($studentDT['subject_name']) }}">{{ $studentDT['student_name'] }}</td>
+                                                <td> @foreach ($studentDT['subject'] as $key => $subjectDT) {{ $subjectDT['subject_name'] }} @endforeach    </td>
                                         </tr>
                                         @php $i++; @endphp
-                                        @endforeach    
+                                        
                                     </tbody>
                                 </table>
                             </div>
