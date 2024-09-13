@@ -24,41 +24,7 @@
             background-color: #f2f2f2;
             white-space: nowrap;
         }
-
-        /* Set specific width for each column */
-        th:nth-child(1) { width: 40px; }   /* No column */
-        th:nth-child(2) { width: 100px; }  /* Student_ID column */
-        th:nth-child(3) { width: 150px; }  /* Full Name column */
-        th:nth-child(4) { width: 200px; }  /* Email column */
-        th:nth-child(5) { width: 100px; }  /* Board column */
-        th:nth-child(6) { width: 80px; }   /* Class column */
-        th:nth-child(7) { width: 80px; }   /* Medium column */
-        th:nth-child(8) { width: 80px; }   /* Standard column */
-
-        /* Prevent rows from breaking */
-        tr {
-            page-break-inside: avoid;
-        }
-
-        /* Scale down table if needed */
-        table {
-            transform: scale(0.95);
-            transform-origin: top left;
-        }
-
-        /* Specific print styles for better layout */
-        @media print {
-            body {
-                margin: 0mm;
-            }
-            table {
-                width: 100%;
-                word-wrap: break-word;
-            }
-            tr {
-                page-break-inside: avoid;
-            }
-        }
+        
 
     </style>
 </head>
@@ -67,13 +33,13 @@
     <h2>Timetable</h2>
     <hr>
     @if($data['requestdata']['standard_id'])
-        <p><b>Standard Name: </b>{{$data['timetable'][0]['standardname']}}</p>
+        <p><b>Standard Name: </b>{{$data['timetable'][0]['standardname'] ?? 'N/A' }}</p>
     @endif
     @if($data['requestdata']['batch_id'])
-        <p><b>Batch Name: </b>{{$data['timetable'][0]['batch_name']}}</p>
+        <p><b>Batch Name: </b>{{$data['timetable'][0]['batch_name'] ?? 'N/A' }}</p>
     @endif
     @if($data['requestdata']['teacher_id'])
-        <p><b>Teacher Name: </b>{{$data['timetable'][0]['firstname']}} {{$data['timetable'][0]['lastname']}}</p>
+        <p><b>Teacher Name: </b>{{$data['timetable'][0]['firstname'] ?? '' }} {{$data['timetable'][0]['lastname'] ?? 'N/A'}}</p>
     @endif
 
     <div class="content">
@@ -106,15 +72,20 @@
                     <!-- If an entry exists, display it; otherwise, display an empty cell -->
                     <td>
                         @if($entry)
-                            {{ $entry['subjectname'] }} 
-                            
-                            <br> {{ $entry['start_time'] }} - {{ $entry['end_time'] }}
+                            {{ $entry['start_time'] }} - {{ $entry['end_time'] }}
+                            <br>{{ $entry['subjectname'] }} 
+                            <br> {{ $entry['lecturtype'] }}
+                            <br> {{ $entry['classroom'] }}
                             <br>
                             @if($data['requestdata']['teacher_id'] == '')
                                 {{ $entry['firstname'] }} {{ $entry['lastname'] }} 
                             @endif
                         @else
                             N/A
+                        @endif
+                        
+                        @if($data['requestdata']['batch_id'] == '')
+                        <p><b>Batch Name: </b>{{$data['timetable'][0]['batch_name'] ?? 'N/A' }}</p>
                         @endif
                     </td>
                 @endforeach

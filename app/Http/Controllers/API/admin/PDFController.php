@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\board;
 use App\Models\Class_sub;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
@@ -18,6 +19,10 @@ use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\Timetables;
 use App\Models\User;
+use App\Models\Users_sub_emergency;
+use App\Models\Users_sub_experience;
+use App\Models\Users_sub_model;
+use App\Models\Users_sub_qualification;
 use App\Traits\ApiTrait;
 use PDF;
 use Illuminate\Support\Facades\File;
@@ -407,7 +412,6 @@ class PDFController extends Controller
 
     public function timetable_reports(Request $request)
     {
-        
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
         ]);
@@ -419,8 +423,10 @@ class PDFController extends Controller
             $timetable=Timetables::join('batches','batches.id','=','timetables.batch_id')
             ->join('users','users.id','=','timetables.teacher_id')
             ->join('subject','subject.id','=','timetables.subject_id')
+            ->leftjoin('class_room','class_room.id','=','timetables.class_room_id')
+            ->leftjoin('lecture_type','lecture_type.id','=','timetables.lecture_type')
             ->join('standard','standard.id','=','batches.standard_id')
-            ->select('timetables.*','batches.batch_name','users.firstname','users.lastname','standard.name as standardname','subject.name as subjectname')
+            ->select('timetables.*','batches.batch_name','users.firstname','users.lastname','standard.name as standardname','subject.name as subjectname','lecture_type.name as lecturtype','class_room.name as classroom')
             ->where('batches.institute_id',$request->institute_id)
             ->when(!empty($request->batch_id) ,function ($query) use ($request){
                 return $query->where('batches.id', $request->batch_id);
@@ -463,12 +469,166 @@ class PDFController extends Controller
         }
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    
+    public function teacher_profile_report(Request $request)
     {
-        //
+        
+        $validator = Validator::make($request->all(), [
+            'teacher_id' => 'required',
+        ]);
+
+        if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
+
+        try {
+            $teacher_id = $request->teacher_id;            
+            $userdetl = user::where('id', $teacher_id)->first();
+            $user_sub=Users_sub_model::where('user_id', $teacher_id)->first();
+            
+            if ($userdetl->image) {
+                $img = $userdetl->image;
+            } else {
+                $img = asset('profile/no-image.png');
+            }
+
+            $standardids = Teacher_model::where('teacher_id', $teacher_id)
+                ->whereNull('deleted_at')->pluck('standard_id');
+
+            $standards = Standard_model::whereIN('id', $standardids)->get();
+            $stds = [];
+            foreach ($standards as $stddata) {
+                $stds[] = ['id' => $stddata->id, 'name' => $stddata->name];
+            }
+            
+          $educationds = Users_sub_qualification::where('user_id',$teacher_id)->get();
+          $education = [];
+          foreach($educationds as $edudata){
+            $education[] = ['id'=>$edudata->id,'qualification'=>$edudata->qualification];
+          }
+
+          $experiences = Users_sub_experience::where('user_id',$teacher_id)->get();
+          $experience = [];
+          foreach($experiences as $expdata){
+            $experience[] = ['id'=>$expdata->id,
+            'institute_name'=>$expdata->institute_name,
+            'experience'=>$expdata->experience];
+          }
+          $emergency = Users_sub_emergency::where('user_id',$teacher_id)->get();
+          $emergency_contacts = [];
+          foreach($emergency as $emergencydata){
+            $emergency_contacts[] = ['id'=>$emergencydata->id,
+            'name'=>$emergencydata->name,
+            'relation_with'=>$emergencydata->relation_with,
+            'mobile_no'=>$emergencydata->mobile_no,
+            'country_code'=>$emergencydata->country_code,
+            'country_code_name'=>$emergencydata->country_code_name];
+          }
+
+           $userdetail = array(
+            'id' => $userdetl->id,
+            'unique_id' => $userdetl->unique_id . '',
+            'firstname' => $userdetl->firstname . '',
+            'lastname' => $userdetl->lastname.'',
+            'email' => $userdetl->email,
+            'country_code' => $userdetl->country_code,
+            'country_code_name'=>$userdetl->country_code_name,
+            'mobile' => $userdetl->mobile . '',
+            'image' => $img . '',
+            'dob' => $userdetl->dob,
+            'address' => $userdetl->address,
+            'country' => $userdetl ? $userdetl->country . '' : '',
+            'state' => $userdetl ? $userdetl->state . '' : '',
+            'city' => $userdetl ? $userdetl->city . '' : '',
+            'pincode' => $userdetl ? $userdetl->pincode . '' : '',
+            'about_us' => $user_sub ? $user_sub->about_us .'' : '',
+            'standard' => $stds,
+            'education' => $education,
+            'experience'=>$experience,
+            'emergency_contacts' => $emergency_contacts
+        );
+
+        $pdf = PDF::loadView('pdf.teacher_profile', ['data' => $userdetail]);
+
+        $folderPath = public_path('pdfs');
+
+        if (!File::exists($folderPath)) {
+        File::makeDirectory($folderPath, 0755, true);
+        }
+
+        $baseFileName = 'teacher_profile.pdf';
+        $pdfPath = $folderPath . '/' . $baseFileName;
+
+        $counter = 1;
+        while (File::exists($pdfPath)) {
+        $pdfPath = $folderPath . '/teacher_profile' . $counter . '.pdf'; 
+        $counter++;
+        }
+
+        file_put_contents($pdfPath, $pdf->output());
+        $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        } catch (Exception $e) {
+            return $this->response([], "Somthing went wrong!!", false, 400);
+        }
+    
+    }
+
+    public function general_timetable_reports(REquest $request){
+        
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            
+            $timetable=Timetables::join('batches','batches.id','=','timetables.batch_id')
+            ->join('users','users.id','=','timetables.teacher_id')
+            ->join('subject','subject.id','=','timetables.subject_id')
+            ->leftjoin('class_room','class_room.id','=','timetables.class_room_id')
+            ->leftjoin('lecture_type','lecture_type.id','=','timetables.lecture_type')
+            ->join('standard','standard.id','=','batches.standard_id')
+            ->select('timetables.*','batches.batch_name','users.firstname','users.lastname','standard.name as standardname','subject.name as subjectname','lecture_type.name as lecturtype','class_room.name as classroom')
+            ->where('batches.institute_id',$request->institute_id)
+            ->when(!empty($request->batch_id) ,function ($query) use ($request){
+                return $query->where('batches.id', $request->batch_id);
+            })
+            ->when(!empty($request->standard_id) ,function ($query) use ($request){
+                return $query->where('batches.standard_id', $request->standard_id);
+            })
+            ->when(!empty($request->teacher_id) ,function ($query) use ($request){
+                return $query->where('timetables.teacher_id', $request->teacher_id);
+            })
+            ->get()->toarray();
+                $dayslt = DB::table('days')->get()->map(function($day) {
+                    return [
+                        'id' => $day->id,
+                        'day' => $day->day,
+                    ];
+                })->toArray();
+                $data = ['timetable'=>$timetable,'requestdata'=>$request,'days'=>$dayslt]; 
+                $pdf = PDF::loadView('pdf.timetablereport', ['data' => $data]);
+
+                $folderPath = public_path('pdfs');
+
+                if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $baseFileName = 'timetablereport.pdf';
+                $pdfPath = $folderPath . '/' . $baseFileName;
+
+                $counter = 1;
+                while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/timetablereport' . $counter . '.pdf'; 
+                $counter++;
+                }
+
+                file_put_contents($pdfPath, $pdf->output());
+                $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        }catch(Exception $e){
+            return $this->response([], "Something want wrong!.", false, 400);
+        }
+    
     }
 
     /**
