@@ -10,6 +10,7 @@ use App\Traits\ApiTrait;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class AttendanceReportController extends Controller
@@ -148,62 +149,140 @@ class AttendanceReportController extends Controller
                                 ->select('students_details.subject_id')
                                 ->distinct()
                                 ->pluck('students_details.subject_id'); 
-                                    $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
-                                    ->when(!empty($request->institute_id), function ($query) use ($request) {
-                                        return $query->where('students_details.institute_id', $request->institute_id);
-                                      })
-                                      ->when(!empty($board_id), function ($query) use ($board_id) {
-                                        return $query->where('students_details.board_id', $board_id);
-                                        })
-                                      ->when(!empty($medium_id), function ($query) use ($medium_id) {
-                                        return $query->where('students_details.medium_id', $medium_id);
-                                      })
-                                      ->when(!empty($class_id), function ($query) use ($class_id) {
-                                        return $query->where('students_details.class_id', $class_id);
-                                      })
-                                      ->when(!empty($standard_id), function ($query) use ($standard_id) {
-                                        return $query->where('students_details.standard_id', $standard_id);
-                                      }) 
-                                      ->when(!empty($batch_id), function ($query) use ($batch_id) {
-                                        return $query->where('students_details.batch_id', $batch_id);
-                                      }) 
-                                      ->when(!empty($student_id), function ($query) use ($student_id) {
-                                        return $query->where('students_details.student_id', $student_id);
-                                      }) 
-                                    ->whereNull('students_details.deleted_at')
-                                    ->select('users.*','students_details.subject_id')
-                                    ->distinct()
-                                    ->get()->toarray();
-
-                                    $student_result=[];
-                                    foreach($student_response as $student_value){
-                                        $subject_all_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : explode(',',$student_value['subject_id']);
-                                  
+                               
+                                $mergedArray = [];
+                                foreach ($subject_get as $item) {
+                                    $mergedArray = array_merge($mergedArray, explode(',', $item));
+                                }
+                                
+                                $uniqueArray = array_unique($mergedArray);
+                                
+                                $uniqueArray = array_values($uniqueArray);
+                                
+                                $subject_all_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : $uniqueArray;
+                                         
                                         $subject_response = Subject_model::whereIn('id', $subject_all_get)
                                         ->select('subject.id as subject_id', 'subject.name as subject_name')
                                         ->get()->toarray();  
                                         $subject_result= [];
-                                        foreach($subject_response as $subject_value){
+                                       
+                                          foreach($subject_response as $key=> $subject_value){
+                                $subject_id=!empty($request->subject_id) ? explode(',',$request->subject_id) : $subject_value['subject_id'];
+
+
+                                            $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
+                                            ->when(!empty($request->institute_id), function ($query) use ($request) {
+                                                return $query->where('students_details.institute_id', $request->institute_id);
+                                              })
+                                              ->when(!empty($board_id), function ($query) use ($board_id) {
+                                                return $query->where('students_details.board_id', $board_id);
+                                                })
+                                              ->when(!empty($medium_id), function ($query) use ($medium_id) {
+                                                return $query->where('students_details.medium_id', $medium_id);
+                                              })
+                                              ->when(!empty($class_id), function ($query) use ($class_id) {
+                                                return $query->where('students_details.class_id', $class_id);
+                                              })
+                                              ->when(!empty($standard_id), function ($query) use ($standard_id) {
+                                                return $query->where('students_details.standard_id', $standard_id);
+                                              }) 
+                                              ->when(!empty($batch_id), function ($query) use ($batch_id) {
+                                                return $query->where('students_details.batch_id', $batch_id);
+                                            })
+
+                                            ->whereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subject_id]) 
+                                            
+                                            
+                                              ->when(!empty($student_id), function ($query) use ($student_id) {
+                                                return $query->where('students_details.student_id', $student_id);
+                                              }) 
+                                            ->whereNull('students_details.deleted_at')
+                                            ->select('users.*','students_details.subject_id')
+                                            ->distinct()
+                                            ->get()->toarray();
+        
+                                            $student_result=[];
+                                            foreach($student_response as $student_value){
+                                                
+
+                                                 $student_id = !empty($request->student_id) ? $request->student_id : $student_value['id'];
+                                                
+                                                $attendance_response = Student_detail::join('attendance', function($join) {
+                                                    $join->on('attendance.student_id', '=', 'students_details.student_id')
+                                                         ->on('attendance.institute_id', '=', 'students_details.institute_id');
+                                                })
+                                                ->when(!empty($request->institute_id), function ($query) use ($request) {
+                                                    return $query->where('students_details.institute_id', $request->institute_id);
+                                                })
+                                                ->when(!empty($student_id), function ($query) use ($student_id) {
+                                                    return $query->where('students_details.student_id', $student_id);
+                                                })
+                                                ->when(!empty($class_id), function ($query) use ($class_id) {
+                                                    return $query->where('students_details.class_id', $class_id);
+                                                })
+                                                ->when(!empty($medium_id), function ($query) use ($medium_id) {
+                                                    return $query->where('students_details.medium_id', $medium_id);
+                                                })
+                                                ->when(!empty($board_id), function ($query) use ($board_id) {
+                                                    return $query->where('students_details.board_id', $board_id);
+                                                })
+                                                ->when(!empty($batch_id), function ($query) use ($batch_id) {
+                                                    return $query->where('students_details.batch_id', $batch_id);
+                                                })
+                                                ->when(!empty($subject_id), function ($query) use ($subject_id) {
+                                                    return $query->where('attendance.subject_id', $subject_id);
+                                                })
+                                                ->when(!empty($request->start_date) && !empty($request->end_date), function($query) use ($request) {
+                                                    return $query->whereBetween('attendance.date', [$request->start_date, $request->end_date]);
+                                                })
+                                                ->when(!empty($request->date), function ($query) use ($request) {
+                                                    return $query->whereDate('attendance.date', $request->date);
+                                                })
+                                                ->when(!empty($request->attendance_status), function ($query) use ($request) {
+                                                    return $query->where('attendance.attendance', $request->attendance_status);
+                                                })
+                                                ->where('students_details.status','1')
+                                                ->where('students_details.status', '1')
+                                                ->select('students_details.student_id', 
+                                                        DB::raw('COUNT(attendance.id) as total_attendance'),
+                                                        DB::raw('SUM(CASE WHEN attendance.attendance = "P" THEN 1 ELSE 0 END) as present_count'),
+                                                        DB::raw('SUM(CASE WHEN attendance.attendance = "A" THEN 1 ELSE 0 END) as absent_count')
+                                                )
+                                                ->groupBy('students_details.student_id')
+                                                ->get()->toArray();
+                                                $attendance_result=[];
+                                                foreach($attendance_response as $attendance_value){
+                                                    
+                                                   
+                                                    $attendance_result[] = [
+                                                        'student_id' => $attendance_value['student_id'],
+                                                        'total_attendance' => $attendance_value['total_attendance'],
+                                                        'present_count' => $attendance_value['present_count'],
+                                                        'absent_count' => $attendance_value['absent_count']
+                                                       
+                                                      
+                                                    ];
+                                                }
+                                             
+                                                $student_result[] = [
+                                                    'student_id' => $student_value['id'],
+                                                    'student_name' => $student_value['firstname'].' '.$student_value['lastname'],
+                                                    'attendance'=>$attendance_result
+                                                  
+                                                ];
+                                            
+                                           }  
                                             $subject_result[] = [
                                                 'subject_id' => $subject_value['subject_id'],
                                                 'subject_name' => $subject_value['subject_name'],
-                                                
+                                                'student' => $student_result
                                             ];
-                                            
-                                       
                                     }
-                                    $student_result[] = [
-                                        'student_id' => $student_value['id'],
-                                        'student_name' => $student_value['firstname'].' '.$student_value['lastname'],
-                                        'subject' => $subject_result
-                                    ];
-                                    
-                                    
-                                }  
+                                
                                 $batch_result[] = [
                                     'batch_id' => $batch_value['batch_id'],
                                     'batch_name' => $batch_value['batch_name'],
-                                    'student'=>$student_result
+                                    'subject' => $subject_result
                                 ];
                              }
                             
@@ -220,12 +299,14 @@ class AttendanceReportController extends Controller
                             
                         ];
                     }
-                   $medium_result[] = [
+
+                    $medium_result[] = [
                         'medium_id' => $medium_value['medium_id'],
                         'medium_name' => $medium_value['medium_name'],
                         'class' =>$class_result,
                         
                     ];
+
                 }
                 $board_result[] = [
                     'board_id' => $board_value['board_id'],
@@ -233,8 +314,9 @@ class AttendanceReportController extends Controller
                     'medium' => $medium_result,
                 ];
             }
+            print_r($board_result);exit;
             $pdf = PDF::loadView('pdf.attendance_report', ['data' => $board_result]);
-
+          
             $folderPath = public_path('pdfs');
 
             if (!File::exists($folderPath)) {

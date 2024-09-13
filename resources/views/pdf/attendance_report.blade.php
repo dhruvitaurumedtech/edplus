@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student List PDF </title>
+    <title>Student List PDF</title>
     <style>
         body {
             margin: 0mm;
@@ -11,7 +11,7 @@
             width: 100%;
             border-collapse: collapse;
             word-wrap: break-word;
-            table-layout: fixed; /* Ensure even distribution of content */
+            table-layout: fixed; / Ensure even distribution of content /
         }
         table, th, td {
             border: 1px solid black;
@@ -25,137 +25,79 @@
             white-space: nowrap;
         }
 
-        /* Set specific width for each column */
-        th:nth-child(1) { width: 40px; }   /* No column */
-        th:nth-child(2) { width: 100px; }  /* Student_ID column */
-        th:nth-child(3) { width: 150px; }  /* Full Name column */
-        th:nth-child(4) { width: 200px; }  /* Email column */
-        th:nth-child(5) { width: 100px; }  /* Board column */
-        th:nth-child(6) { width: 80px; }   /* Class column */
-        th:nth-child(7) { width: 80px; }   /* Medium column */
-        th:nth-child(8) { width: 80px; }   /* Standard column */
-
-        /* Prevent rows from breaking */
-        tr {
-            page-break-inside: avoid;
-        }
-
-        /* Scale down table if needed */
-        table {
-            transform: scale(0.95);
-            transform-origin: top left;
-        }
-
-        /* Specific print styles for better layout */
-        @media print {
-            body {
-                margin: 0mm;
-            }
-            table {
-                width: 100%;
-                word-wrap: break-word;
-            }
-            tr {
-                page-break-inside: avoid;
-            }
-        }
-
+        
+      
     </style>
 </head>
 <body>
 
     <h2>Attendance List</h2>
     <hr>
-    @if(!empty($data['attendance_data']))
-    @if(!empty($data['request_data']['board_id']))
-    <p><b>Board_name:</b> {{ $data['attendance_data'][0]['board_name'] }}</p>
-    @endif
 
-    @if(!empty($data['request_data']['batch_id']))
-        <p><b>Batch_name:</b> {{ $data['attendance_data'][0]['batch_name'] }}</p>
-    @endif
+    @foreach ($data as $item)
+    <p><b>Board Name: </b>{{$item['board_name']}}</p>
+        @foreach ($item['medium'] as $mediumDT)
+        <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
+            @foreach ($mediumDT['class'] as $classDT)
+            <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
+                @foreach ($classDT['standard'] as $standardDT)
+                <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
+                    @foreach ($standardDT['batch'] as $batchDT)
+                    <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+                    @foreach ($batchDT['subject'] as $key => $subjectDT)
+                     <p><b>Subject Name: </b>{{$subjectDT['subject_name']}}</p>
+                       
+                            <div class="content">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>iD</th>
+                                            <th>Student Name</th>
+                                            <th>Attendance</th>
+                                            
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    @php $i=1; @endphp  
+                                    @foreach ($subjectDT['student'] as $studentDT)
+                                        <tr>
+                                           
+                                                <td>{{ $i }}</td>
+                                                <td>{{ $studentDT['student_id'] }}</td>
+                                                <td>{{ $studentDT['student_name'] }}</td>
+                                               
+                                                <td>
+                                                <table>
+                                                    <tr><th>Total</th><th>Present</th><th>Absent</th></tr>
+                                                    @if(!empty($studentDT['attendance']))
+                                                <tr> @foreach ($studentDT['attendance'] as $attendanceDT)
+                                                         <td>{{ $attendanceDT['total_attendance'] }}</td>
+                                                         <td>{{ $attendanceDT['present_count'] }}</td>
+                                                         <td>{{ $attendanceDT['absent_count'] }}</td>
+                                                     @endforeach 
+                                                     @else
+                                                        <td colspan="3">No Data Available</td>
+                                                     @endif
+                                                 </tr>
+                                                 </table>
+                                                 </td>
+                                               
+                                        </tr>
+                                        @php $i++; @endphp
+                                    @endforeach
+                                        
+                                    </tbody>
+                                </table>
+                            </div>
+                        @endforeach
+                    @endforeach 
+                @endforeach 
+            @endforeach
+        @endforeach
+    @endforeach
 
-    @if(!empty($data['request_data']['class_id']))
-        <p><b>Class_name:</b> {{ $data['attendance_data'][0]['class_name'] }}</p>
-    @endif
-
-    @if(!empty($data['request_data']['medium_id']))
-        <p><b>Medium_name:</b> {{ $data['attendance_data'][0]['medium_name'] }}</p>
-    @endif
-
-    @if(!empty($data['request_data']['standard_id']))
-        <p><b>Standard_name:</b> {{ $data['attendance_data'][0]['standard_name'] }}</p>
-    @endif
-    @endif
-    <div class="content">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Stud_ID</th>
-                <th>Name</th>
-                <th>Email</th>
-                <th>Attendance</th>
-                <th>Date</th>
-                @if(empty($data['request_data']['board_id']))
-                <th>Board</th>
-                @endif
-                @if(empty($data['request_data']['batch_id']))
-                <th>Batch</th>
-                @endif
-                @if(empty($data['request_data']['class_id']))
-                <th>Class</th>
-                @endif
-                @if(empty($data['request_data']['medium_id']))
-                <th>Medium</th>
-                @endif
-                @if(empty($data['request_data']['standard_id']))
-                <th>Standard</th>
-                @endif
-            </tr>
-        </thead>
-        <tbody>
-                @php $i = 1; @endphp
-                @if(!empty($data['attendance_data']))
-                    @foreach($data['attendance_data'] as $item)
-                        <tr>
-                            <td>{{ $i }}</td>
-                            <td>{{ $item['id'] }}</td>
-                            <td>{{ $item['firstname'] . ' ' . $item['lastname'] }}</td>
-                            <td>{{ $item['email'] }}</td>
-                            <td>{{ $item['attendance'] }}</td>
-                            <td>{{ $item['date'] }}</td>
-                            @if(empty($data['request_data']['board_id']))
-                             <td> {{ $item['board_name'] }}</td>
-                            @endif
-
-                            @if(empty($data['request_data']['batch_id']))
-                                <td> {{ $item['batch_name'] }}</td>
-                            @endif
-
-                            @if(empty($data['request_data']['class_id']))
-                                <td> {{ $item['class_name'] }}</td>
-                            @endif
-
-                            @if(empty($data['request_data']['medium_id']))
-                                <td> {{ $item['medium_name'] }}</td>
-                            @endif
-
-                            @if(empty($data['request_data']['standard_id']))
-                                <td> {{ $item['standard_name'] }}</td>
-                            @endif
-                        </tr>
-                        @php $i++; @endphp
-                    @endforeach
-                @else
-                    <tr>
-                        <td colspan="11">No data available</td>
-                    </tr>
-                @endif
-            </tbody>
-
-    </table>
-    </div>
-
+    
+    
 </body>
 </html>
