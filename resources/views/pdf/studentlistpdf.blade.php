@@ -63,7 +63,14 @@
                                            
                                                 <td>{{ $i }}</td>
                                                 <td>{{ $studentDT['student_name'] }}</td>
-                                                <td> @foreach ($studentDT['subject'] as $key => $subjectDT) {{ $subjectDT['subject_name'] }} @endforeach    </td>
+                                                <td>
+                                                    @foreach ($studentDT['subject'] as $key => $subjectDT)
+                                                        {{ $subjectDT['subject_name'] }}
+                                                        @if ($key != count($studentDT['subject']) - 1)
+                                                            |
+                                                        @endif
+                                                    @endforeach
+                                                </td>
                                         </tr>
                                         @php $i++; @endphp
                                     @endforeach
