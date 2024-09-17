@@ -5,12 +5,15 @@ namespace App\Http\Controllers\API\admin;
 use App\Http\Controllers\Controller;
 use App\Models\board;
 use App\Models\Class_sub;
+use App\Models\DeadStock;
 use App\Models\Institute_board_sub;
 use App\Models\Institute_detail;
 use App\Models\Institute_for_sub;
 use App\Models\Medium_model;
 use App\Models\Medium_sub;
 use App\Models\Parents;
+use App\Models\RoleHasPermission;
+use App\Models\Roles;
 use App\Models\Standard_model;
 use App\Models\Standard_sub;
 use App\Models\Student_detail;
@@ -19,6 +22,7 @@ use App\Models\Subject_sub;
 use App\Models\Teacher_model;
 use App\Models\Timetables;
 use App\Models\User;
+use App\Models\UserHasRole;
 use App\Models\Users_sub_emergency;
 use App\Models\Users_sub_experience;
 use App\Models\Users_sub_model;
@@ -92,7 +96,7 @@ class PDFController extends Controller
         $pdfUrl = asset('pdfs/' . basename($pdfPath));
         return $this->response($pdfUrl);
         } catch (Exception $e) {
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     }
      public function create()
@@ -269,7 +273,7 @@ class PDFController extends Controller
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
         }catch(Exception $e){
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     }
 
@@ -332,7 +336,7 @@ class PDFController extends Controller
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
         }catch(Exception $e){
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     }
 
@@ -406,7 +410,7 @@ class PDFController extends Controller
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
         }catch(Exception $e){
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     }
 
@@ -465,7 +469,7 @@ class PDFController extends Controller
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
         }catch(Exception $e){
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     }
 
@@ -571,7 +575,7 @@ class PDFController extends Controller
     
     }
 
-    public function general_timetable_reports(REquest $request){
+    public function general_timetable_reports(REquest $request){    
         
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
@@ -626,11 +630,139 @@ class PDFController extends Controller
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
         }catch(Exception $e){
-            return $this->response([], "Something want wrong!.", false, 400);
+            return $this->response([], "Something went wrong!.", false, 400);
         }
     
     }
 
+    public function dead_stock(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            
+            $deastockqy=DeadStock::where('institute_id',$request->institute_id)
+            ->when(!empty($request->teacher_id) ,function ($query) use ($request){
+                return $query->where('deadstocks.item_name', $request->item_name);
+            })
+            ->get()->toarray();
+                
+                $data = ['deastock'=>$deastockqy,'requestdata'=>$request]; 
+                $pdf = PDF::loadView('pdf.deadstockreport', ['data' => $data]);
+
+                $folderPath = public_path('pdfs');
+
+                if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $baseFileName = 'deadstockreport.pdf';
+                $pdfPath = $folderPath . '/' . $baseFileName;
+
+                $counter = 1;
+                while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/deadstockreport' . $counter . '.pdf'; 
+                $counter++;
+                }
+
+                file_put_contents($pdfPath, $pdf->output());
+                $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        }catch(Exception $e){
+            return $this->response([], "Something went wrong!.", false, 400);
+        }
+    }
+
+    public function staff_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $useid = Institute_detail::where('id',$request->institute_id)->select('user_id','institute_name')->first();
+            $stafflistqy=Roles::join('user_has_roles','user_has_roles.role_id','=','roles.id')
+            ->join('users','users.role_type','=','user_has_roles.role_id')
+            ->where('user_has_roles.user_id',$useid->user_id)
+            ->whereNotBetween('users.role_type', [1, 6])
+            ->get()->toarray();
+                $data = ['stafflist'=>$stafflistqy,'requestdata'=>$request,'institute_data'=>$useid]; 
+                $pdf = PDF::loadView('pdf.stafflist', ['data' => $data]);
+
+                $folderPath = public_path('pdfs');
+
+                if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $baseFileName = 'stafflist.pdf';
+                $pdfPath = $folderPath . '/' . $baseFileName;
+
+                $counter = 1;
+                while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/stafflist' . $counter . '.pdf'; 
+                $counter++;
+                }
+
+                file_put_contents($pdfPath, $pdf->output());
+                $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        }catch(Exception $e){
+            return $this->response([], "Something went wrong!.", false, 400);
+        }
+    }
+
+    public function rolewisepermission(Request $request){
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try{
+            $useid = Institute_detail::where('id',$request->institute_id)->select('user_id','institute_name')->first();
+            
+            $user_has_role = UserHasRole::join('roles','roles.id','=','user_has_roles.role_id')
+            ->where('user_has_roles.user_id', $useid->user_id)->get();
+            $roleswisepermission = [];
+            $permissionsIds = [];
+            foreach($user_has_role as $userroles){
+                $permissionsIds = RoleHasPermission::join('features','features.id','=','role_has_permissions.feature_id')
+                ->join('actions','actions.id','=','role_has_permissions.feature_id')
+                ->where('role_has_permissions.user_has_role_id', $userroles->id)
+                ->get();
+                $roleswisepermission[] = ['role_id'=>$userroles->role_id,
+                'role_name'=>$userroles->role_name,
+                'permissions'=>$permissionsIds];
+            }
+               
+
+                $data = ['roleandpermission'=>$roleswisepermission,'requestdata'=>$request,'institute_data'=>$useid]; 
+                $pdf = PDF::loadView('pdf.roleswisepermission', ['data' => $data]);
+
+                $folderPath = public_path('pdfs');
+
+                if (!File::exists($folderPath)) {
+                File::makeDirectory($folderPath, 0755, true);
+                }
+
+                $baseFileName = 'roleswisepermission.pdf';
+                $pdfPath = $folderPath . '/' . $baseFileName;
+
+                $counter = 1;
+                while (File::exists($pdfPath)) {
+                $pdfPath = $folderPath . '/roleswisepermission' . $counter . '.pdf'; 
+                $counter++;
+                }
+
+                file_put_contents($pdfPath, $pdf->output());
+                $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        }catch(Exception $e){
+            return $this->response([], "Something went wrong!.", false, 400);
+        }
+    }
     /**
      * Show the form for editing the specified resource.
      */

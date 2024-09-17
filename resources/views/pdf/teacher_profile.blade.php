@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student List PDF</title>
+    <title>Teacher Profile PDF</title>
     <style>
         body {
             margin: 0mm;

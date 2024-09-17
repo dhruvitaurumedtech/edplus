@@ -86,6 +86,7 @@
 @if(!empty($data['request_data']['standard_id']))
     <p><b>Standard_name:</b> {{ $data['student_list'][0]['standard_name'] }}</p>
 @endif
+
 @endif
 
      
