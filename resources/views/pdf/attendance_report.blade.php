@@ -18,11 +18,12 @@
         }
         th, td {
             padding: 10px;
-            text-align: left;
+            text-align: center;
         }
         th {
             background-color: #f2f2f2;
             white-space: nowrap;
+            text-align: center;
         }
 
         
@@ -51,9 +52,9 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th>No</th>
-                                            <th>Student Name</th>
-                                            <th>Attendance</th>
+                                            <th width="10%" >No</th>
+                                            <th >Student Name</th>
+                                            <th >Attendance</th>
                                             
                                         </tr>
                                     </thead>
@@ -63,7 +64,7 @@
                                         <tr>
                                            
                                                 <td>{{ $i }}</td>
-                                                <td>{{ $studentDT['student_name'] }}</td>
+                                                <td style="text-align: left;">{{ $studentDT['student_name'] }}</td>
                                                
                                                 <td>
                                                 <table>
