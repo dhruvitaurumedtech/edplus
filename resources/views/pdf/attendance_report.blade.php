@@ -53,8 +53,9 @@
                                     <thead>
                                         <tr>
                                             <th width="10%" >No</th>
-                                            <th >Student Name</th>
-                                            <th >Attendance</th>
+                                            <th width="65%">Student Name</th>
+                                            <th> Present</th>
+                                            <th> Absent </th>
                                             
                                         </tr>
                                     </thead>
@@ -66,20 +67,15 @@
                                                 <td>{{ $i }}</td>
                                                 <td style="text-align: left;">{{ $studentDT['student_name'] }}</td>
                                                
-                                                <td>
-                                                <table>
-                                                    <tr><th>Total</th><th>Present</th><th>Absent</th></tr>
+                                                
                                                     @if(!empty($studentDT['attendance']))
-                                                <tr> @foreach ($studentDT['attendance'] as $attendanceDT)
-                                                         <td>{{ $attendanceDT['total_attendance'] }}</td>
+                                                     @foreach ($studentDT['attendance'] as $attendanceDT)
                                                          <td>{{ $attendanceDT['present_count'] }}</td>
                                                          <td>{{ $attendanceDT['absent_count'] }}</td>
                                                      @endforeach 
                                                      @else
-                                                        <td colspan="3">No Data Available</td>
+                                                        <td colspan="5">No Data Available</td>
                                                      @endif
-                                                 </tr>
-                                                 </table>
                                                  </td>
                                                
                                         </tr>
