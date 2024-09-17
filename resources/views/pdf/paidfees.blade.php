@@ -45,29 +45,7 @@
                     @foreach ($standardDT['batch'] as $batchDT)
                     <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
                        
-                            <div class="content">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>No</th>
-                                            <th>Student Name</th>
-                                            <th>Attendance</th>
-                                            
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                    @php $i=1; @endphp  
-                                    @foreach ($batchDT['student'] as $studentDT)
-                                        <tr>
-                                                <td>{{ $i }}</td>
-                                                <td>{{ $studentDT['student_name'] }}</td>
-                                        </tr>
-                                        @php $i++; @endphp
-                                    @endforeach
-                                        
-                                    </tbody>
-                                </table>
-                            </div>
+                           
                        
                     @endforeach 
                 @endforeach 

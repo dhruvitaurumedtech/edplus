@@ -313,99 +313,14 @@ class FeesPDFController extends Controller
                             ->select('batches.id as batch_id', 'batches.batch_name as batch_name')
                             ->distinct()
                             ->get()->toarray(); 
+                            // print_r($batch_response);exit;
                             $batch_result=[];
                              foreach($batch_response as $batch_value){
-                                $student_id = !empty($request->student_id) ? $request->student_id : '';
-                                $batch_id = !empty($request->batch_id) ? $request->batch_id : $batch_value['batch_id'];
-                                
-                                $subject_get=Student_detail::leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                                ->when(!empty($request->institute_id), function ($query) use ($request) {
-                                    return $query->where('students_details.institute_id', $request->institute_id);
-                                  })
-                                  ->when(!empty($board_id), function ($query) use ($board_id) {
-                                    return $query->where('students_details.board_id', $board_id);
-                                    })
-                                  ->when(!empty($medium_id), function ($query) use ($medium_id) {
-                                    return $query->where('students_details.medium_id', $medium_id);
-                                  })
-                                  ->when(!empty($class_id), function ($query) use ($class_id) {
-                                    return $query->where('students_details.class_id', $class_id);
-                                  })
-                                  ->when(!empty($standard_id), function ($query) use ($standard_id) {
-                                    return $query->where('students_details.standard_id', $standard_id);
-                                  }) 
-                                  ->when(!empty($batch_id), function ($query) use ($batch_id) {
-                                    return $query->where('students_details.batch_id', $batch_id);
-                                  }) 
-                                  
-                                ->select('students_details.subject_id')
-                                ->distinct()
-                                ->pluck('students_details.subject_id'); 
-                               
-                                $mergedArray = [];
-                                foreach ($subject_get as $item) {
-                                    $mergedArray = array_merge($mergedArray, explode(',', $item));
-                                }
-                                
-                                $uniqueArray = array_unique($mergedArray);
-                                
-                                $uniqueArray = array_values($uniqueArray);
-                                
-                                $subject_all_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : $uniqueArray;
-                                         
-                                      
-
-                                            $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
-                                            ->when(!empty($request->institute_id), function ($query) use ($request) {
-                                                return $query->where('students_details.institute_id', $request->institute_id);
-                                              })
-                                              ->when(!empty($board_id), function ($query) use ($board_id) {
-                                                return $query->where('students_details.board_id', $board_id);
-                                                })
-                                              ->when(!empty($medium_id), function ($query) use ($medium_id) {
-                                                return $query->where('students_details.medium_id', $medium_id);
-                                              })
-                                              ->when(!empty($class_id), function ($query) use ($class_id) {
-                                                return $query->where('students_details.class_id', $class_id);
-                                              })
-                                              ->when(!empty($standard_id), function ($query) use ($standard_id) {
-                                                return $query->where('students_details.standard_id', $standard_id);
-                                              }) 
-                                              ->when(!empty($batch_id), function ($query) use ($batch_id) {
-                                                return $query->where('students_details.batch_id', $batch_id);
-                                            })
-
-                                              ->whereRaw("FIND_IN_SET(?,students_details.subject_id)", [$subject_all_get]) 
-                                          
-                                              ->where('students_details.reject_count','0')
-                                            
-                                              // ->when(!empty($student_id), function ($query) use ($student_id) {
-                                              //   return $query->where('students_details.student_id', $student_id);
-                                              // }) 
-                                            ->whereNull('students_details.deleted_at')
-                                            ->select('users.*','students_details.subject_id')
-                                            ->distinct()
-                                            ->get()->toarray();
-        
-                                            $student_result=[];
-                                            foreach($student_response as $student_value){
-                                           
-
-                                             
-                                             
-                                                $student_result[] = [
-                                                    'student_id' => $student_value['id'],
-                                                    'student_name' => $student_value['firstname'].' '.$student_value['lastname'],
-                                                   
-                                                ];
-                                            
-                                           }  
-                                          
-                                
+                                                               
                                 $batch_result[] = [
                                     'batch_id' => $batch_value['batch_id'],
                                     'batch_name' => $batch_value['batch_name'],
-                                    'student' => $student_result
+                                    
                                 ];
                              }
                             
