@@ -280,6 +280,12 @@ class ResultReportController extends Controller
                                                             ->when(!empty($subject_id), function ($query) use ($subject_id) {
                                                                 return $query->whereIn('exam.subject_id', $subject_id);
                                                             })
+                                                            ->when(!empty($request->exam_name) ,function ($query) use ($request){
+                                                                return $query->where('exam.exam_title', $request->exam_name);
+                                                            })
+                                                            ->when(!empty($request->exam_date) ,function ($query) use ($request){
+                                                                return $query->where('exam.exam_date', $request->exam_date);
+                                                            })
                                                            ->where('students_details.reject_count', '0')
                                                             ->whereNull('students_details.deleted_at')
                                                             ->select('exam.*','subject.name as subject_name') 
