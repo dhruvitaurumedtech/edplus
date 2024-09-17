@@ -353,16 +353,7 @@ class FeesPDFController extends Controller
                                 
                                 $subject_all_get=!empty($request->subject_id) ? explode(',',$request->subject_id) : $uniqueArray;
                                          
-                                        $subject_response = Subject_model::whereIn('id', $subject_all_get)
-                                        ->select('subject.id as subject_id', 'subject.name as subject_name')
-                                        ->get()->toarray();  
-                                        $subject_result= [];
-                                       
-                                          foreach($subject_response as  $subject_value){
-                                $subject_id=!empty($request->subject_id) ? $request->subject_id : $subject_value['subject_id'];
-                                
-                                // $subject_id_array = explode(',',$subject_ids);
-                                // print_r($subject_id);
+                                      
 
                                             $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
                                             ->when(!empty($request->institute_id), function ($query) use ($request) {
@@ -384,7 +375,7 @@ class FeesPDFController extends Controller
                                                 return $query->where('students_details.batch_id', $batch_id);
                                             })
 
-                                              ->whereRaw("FIND_IN_SET(?,students_details.subject_id)", [$subject_id]) 
+                                              ->whereRaw("FIND_IN_SET(?,students_details.subject_id)", [$subject_all_get]) 
                                           
                                               ->where('students_details.reject_count','0')
                                             
@@ -398,7 +389,7 @@ class FeesPDFController extends Controller
         
                                             $student_result=[];
                                             foreach($student_response as $student_value){
-                                                
+                                           
 
                                              
                                              
@@ -409,17 +400,12 @@ class FeesPDFController extends Controller
                                                 ];
                                             
                                            }  
-                                            $subject_result[] = [
-                                                'subject_id' => $subject_value['subject_id'],
-                                                'subject_name' => $subject_value['subject_name'],
-                                                'student' => $student_result
-                                            ];
-                                    }
+                                          
                                 
                                 $batch_result[] = [
                                     'batch_id' => $batch_value['batch_id'],
                                     'batch_name' => $batch_value['batch_name'],
-                                    'subject' => $subject_result
+                                    'student' => $student_result
                                 ];
                              }
                             
@@ -452,7 +438,7 @@ class FeesPDFController extends Controller
                 ];
             }
             // print_r($board_result);exit;
-            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $board_result]);
+            $pdf = PDF::loadView('pdf.paidfees', ['data' => $board_result]);
           
             $folderPath = public_path('pdfs');
 
@@ -460,12 +446,12 @@ class FeesPDFController extends Controller
                 File::makeDirectory($folderPath, 0755, true);
             }
 
-            $baseFileName = 'attendance_report.pdf';
+            $baseFileName = 'paidfees.pdf';
             $pdfPath = $folderPath . '/' . $baseFileName;
 
             $counter = 1;
             while (File::exists($pdfPath)) {
-                $pdfPath = $folderPath . '/attendance_report' . $counter . '.pdf'; 
+                $pdfPath = $folderPath . '/paidfees' . $counter . '.pdf'; 
                 $counter++;
             }
             
