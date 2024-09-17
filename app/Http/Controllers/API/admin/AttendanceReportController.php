@@ -166,9 +166,11 @@ class AttendanceReportController extends Controller
                                         ->get()->toarray();  
                                         $subject_result= [];
                                        
-                                          foreach($subject_response as $key=> $subject_value){
-                                $subject_id=!empty($request->subject_id) ? explode(',',$request->subject_id) : $subject_value['subject_id'];
-
+                                          foreach($subject_response as  $subject_value){
+                                $subject_id=!empty($request->subject_id) ? $request->subject_id : $subject_value['subject_id'];
+                                
+                                // $subject_id_array = explode(',',$subject_ids);
+                                // print_r($subject_id);
 
                                             $student_response=Student_detail::leftjoin('users', 'users.id', '=', 'students_details.student_id')
                                             ->when(!empty($request->institute_id), function ($query) use ($request) {
@@ -190,12 +192,13 @@ class AttendanceReportController extends Controller
                                                 return $query->where('students_details.batch_id', $batch_id);
                                             })
 
-                                            ->whereRaw("FIND_IN_SET(?, students_details.subject_id)", [$subject_id]) 
+                                              ->whereRaw("FIND_IN_SET(?,students_details.subject_id)", [$subject_id]) 
+                                          
+                                              ->where('students_details.reject_count','0')
                                             
-                                            
-                                              ->when(!empty($student_id), function ($query) use ($student_id) {
-                                                return $query->where('students_details.student_id', $student_id);
-                                              }) 
+                                              // ->when(!empty($student_id), function ($query) use ($student_id) {
+                                              //   return $query->where('students_details.student_id', $student_id);
+                                              // }) 
                                             ->whereNull('students_details.deleted_at')
                                             ->select('users.*','students_details.subject_id')
                                             ->distinct()
@@ -314,7 +317,7 @@ class AttendanceReportController extends Controller
                     'medium' => $medium_result,
                 ];
             }
-            print_r($board_result);exit;
+            // print_r($board_result);exit;
             $pdf = PDF::loadView('pdf.attendance_report', ['data' => $board_result]);
           
             $folderPath = public_path('pdfs');

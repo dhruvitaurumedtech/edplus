@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student List PDF</title>
+    <title>Attendance Report</title>
     <style>
         body {
             margin: 0mm;
@@ -11,7 +11,7 @@
             width: 100%;
             border-collapse: collapse;
             word-wrap: break-word;
-            table-layout: fixed; / Ensure even distribution of content /
+            table-layout: fixed; 
         }
         table, th, td {
             border: 1px solid black;
@@ -31,7 +31,7 @@
 </head>
 <body>
 
-    <h2>Attendance List</h2>
+    <h2>Attendance Report</h2>
     <hr>
 
     @foreach ($data as $item)
@@ -52,7 +52,6 @@
                                     <thead>
                                         <tr>
                                             <th>No</th>
-                                            <th>iD</th>
                                             <th>Student Name</th>
                                             <th>Attendance</th>
                                             
@@ -64,7 +63,6 @@
                                         <tr>
                                            
                                                 <td>{{ $i }}</td>
-                                                <td>{{ $studentDT['student_id'] }}</td>
                                                 <td>{{ $studentDT['student_name'] }}</td>
                                                
                                                 <td>
