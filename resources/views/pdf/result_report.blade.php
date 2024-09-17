@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Student List PDF</title>
+    <title>Result Report</title>
     <style>
         body {
             margin: 0mm;
@@ -11,7 +11,7 @@
             width: 100%;
             border-collapse: collapse;
             word-wrap: break-word;
-            table-layout: fixed; /* Ensure even distribution of content */
+            table-layout: fixed; 
         }
         table, th, td {
             border: 1px solid black;
@@ -24,113 +24,103 @@
             background-color: #f2f2f2;
             white-space: nowrap;
         }
-
-        /* Set specific width for each column */
-        th:nth-child(1) { width: 40px; }   /* No column */
-        th:nth-child(2) { width: 100px; }  /* Student_ID column */
-        th:nth-child(3) { width: 150px; }  /* Full Name column */
-        th:nth-child(4) { width: 200px; }  /* Email column */
-        th:nth-child(5) { width: 100px; }  /* Board column */
-        th:nth-child(6) { width: 80px; }   /* Class column */
-        th:nth-child(7) { width: 80px; }   /* Medium column */
-        th:nth-child(8) { width: 80px; }   /* Standard column */
-
-        /* Prevent rows from breaking */
-        tr {
-            page-break-inside: avoid;
-        }
-
-        /* Scale down table if needed */
-        table {
-            transform: scale(0.95);
-            transform-origin: top left;
-        }
-
-        /* Specific print styles for better layout */
-        @media print {
-            body {
-                margin: 0mm;
-            }
-            table {
-                width: 100%;
-                word-wrap: break-word;
-            }
-            tr {
-                page-break-inside: avoid;
-            }
-        }
-
+      
     </style>
 </head>
 <body>
 
-    <h2>Result List</h2>
+    <h2>Result Report</h2>
     <hr>
-    @if(!empty($data['result_report']))
 
-    @if(!empty($data['request_data']['board_id']))
-    <p><b>Board_name:</b> {{ $data['result_report'][0]['board_name'] }}</p>
-    @endif
+    @foreach ($data as $item)
+    <p><b>Board Name: </b>{{$item['board_name']}}</p>
+        @foreach ($item['medium'] as $mediumDT)
+        <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
+            @foreach ($mediumDT['class'] as $classDT)
+             <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
+                @foreach ($classDT['standard'] as $standardDT)
+                <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
+                    @foreach ($standardDT['batch'] as $batchDT)
+                    <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+                        @foreach ($batchDT['exam'] as $examDT)
+                        @php
+                                $startTime = !empty($examDT['start_time']) ? new DateTime($examDT['start_time']) : null;
+                                $endTime = !empty($examDT['end_time']) ? new DateTime($examDT['end_time']) : null;
+                                $duration = '';
 
-    @if(!empty($data['request_data']['batch_id']))
-        <p><b>Batch_name:</b> {{ $data['result_report'][0]['batch_name'] }}</p>
-    @endif
+                                if ($startTime && $endTime) {
+                                    $interval = $startTime->diff($endTime);
+                                    $duration = $interval->format('%H:%I'); // Format as hours:minutes
+                                }
+                            @endphp
 
-    @if(!empty($data['request_data']['class_id']))
-        <p><b>Class_name:</b> {{ $data['result_report'][0]['class_name'] }}</p>
-    @endif
+                            <p><b>Date:</b> {{ !empty($examDT['exam_date']) ? date('d-m-Y', strtotime($examDT['exam_date'])) : '' }} 
+                            @if($duration)
+                                (Duration: {{ $duration }})
+                            @endif
+                            </p>
 
-    @if(!empty($data['request_data']['medium_id']))
-        <p><b>Medium_name:</b> {{ $data['result_report'][0]['medium_name'] }}</p>
-    @endif
+                            @php $i = 1 @endphp
 
-    @if(!empty($data['request_data']['standard_id']))
-        <p><b>Standard_name:</b> {{ $data['result_report'][0]['standard_name'] }}</p>
-    @endif
-    @endif
+                       <table>
+                            @if(!empty($batchDT['exam']))
+                            <tr>
+                                <th width="10%" style="text-align: center;">No</th>
+                                <th style="text-align: center;">Exam</th>
+                                <th style="text-align: center;">Subject</th>
+                                <th style="text-align: center;">Total Mark</th>
+                            </tr>
 
-
-   
-
-    <div class="content">
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Stud_ID</th>
-                <th>Full Name</th>
-                <th>Subject</th>
-                <th>Name</th>
-                <th>Total_Mark</th>
-                <th>Mark</th>
-                <th>Date</th>
-
-              
-            </tr>
-        </thead>
-        <tbody>@php $i = 1; @endphp
-          @if(!empty($data['result_report']))
-            @foreach ($data['result_report'] as $item)
-            <tr>
-                <td>{{ $i }}</td>
-                <td>{{ $item['id'] }}</td>
-                <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
-                <td>{{ $item['subject_name'] }}</td>
-                <td>{{ $item['exam_name']}}</td>
-                <td>{{ $item['total_mark']}}</td>
-                <td>{{ $item['mark']}}     </td>
-                <td>{{ $item['exam_date']}}</td>
-            </tr>
-            @php $i++; @endphp
-                    @endforeach
-                @else
-                    <tr>
-                        <td colspan="9">No data available</td>
-                    </tr>
-                @endif
-        </tbody>
-    </table>
-    </div>
-
+                                        
+                                           
+                                                <tr>
+                                                    <td  style="text-align: center;">{{ $i }}</td>
+                                                    <td  style="text-align: center;">{{ !empty($examDT['exam_name']) ? $examDT['exam_name'] : '' }}</td>
+                                                    <td  style="text-align: center;">{{ !empty($examDT['subject_name']) ? $examDT['subject_name'] : '' }}</td>
+                                                    <td  style="text-align: center;">{{ !empty($examDT['total_mark']) ? $examDT['total_mark'] : '' }}</td>
+                                                </tr>
+                                                @if(!empty($examDT['exam_wise_student']))
+                                                    <tr>
+                                                        <td colspan="4">
+                                                            <table >
+                                                                <tr>
+                                                                    <th width="8.5%">No</th>
+                                                                    <th width="62%">Student Name</th>
+                                                                    <th >Mark</th>
+                                                                </tr>
+                                                                @php $j=1 @endphp 
+                                                                @if(!empty($examDT['exam_wise_student']))
+                                                                @foreach ($examDT['exam_wise_student'] as $exam_wise_studentDT)
+                                                                    <tr>
+                                                                        <td >{{ $j }}</td>
+                                                                        <td>{{ $exam_wise_studentDT['student_name'] }}</td>
+                                                                        <td>{{ $exam_wise_studentDT['marks'] }}</td>
+                                                                        </tr>
+                                                                    @php $j++ @endphp 
+                                                                @endforeach
+                                                                @else
+                                                                <tr>
+                                                                    <td colspan="3">No Data Found!</td>
+                                                                </tr>
+                                                                @endif
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                                
+                                            
+                                        @else
+                                            <tr>
+                                                <td colspan="4">No Data Found!</td>
+                                            </tr>
+                                        @endif
+                                    </table>
+                                    @php $i++ @endphp 
+                        @endforeach
+                        @endforeach
+                    @endforeach 
+                @endforeach 
+            @endforeach
+        @endforeach
 </body>
 </html>
