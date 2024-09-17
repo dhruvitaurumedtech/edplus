@@ -7,6 +7,7 @@ use App\Models\Attendance_model;
 use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Traits\ApiTrait;
+use Exception;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
@@ -317,8 +318,9 @@ class AttendanceReportController extends Controller
                     'medium' => $medium_result,
                 ];
             }
+            $data = ['board_result'=>$board_result,'request_Data'=>$request];
             // print_r($board_result);exit;
-            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $board_result]);
+            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $data]);
           
             $folderPath = public_path('pdfs');
 

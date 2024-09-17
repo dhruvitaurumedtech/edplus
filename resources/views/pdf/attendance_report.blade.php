@@ -35,7 +35,7 @@
     <h2>Attendance Report</h2>
     <hr>
 
-    @foreach ($data as $item)
+    @foreach ($data['board_result'] as $item)
     <p><b>Board Name: </b>{{$item['board_name']}}</p>
         @foreach ($item['medium'] as $mediumDT)
         <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
@@ -45,8 +45,16 @@
                 <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
                     @foreach ($standardDT['batch'] as $batchDT)
                     <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
-                    @foreach ($batchDT['subject'] as $key => $subjectDT)
-                     <p><b>Subject Name: </b>{{$subjectDT['subject_name']}}</p>
+                        @foreach ($batchDT['subject'] as $key => $subjectDT)
+                        <p><b>Subject Name: </b>{{$subjectDT['subject_name']}}</p>
+                    <p>
+                        <b>
+                            @if(!empty($data['request_Data']['start_date']) || !empty($data['request_Data']['end_date']))
+                                Start && End Date:
+                            @endif
+                        </b>
+                        {{ (!empty($data['request_Data']['start_date']) || !empty($data['request_Data']['end_date'])) ? date('d-m-20y',strtotime($data['request_Data']['start_date'])).' - '.date('d-m-20y',strtotime($data['request_Data']['end_date'])) : '' }}
+                    </p>
                        
                             <div class="content">
                                 <table>
@@ -54,6 +62,7 @@
                                         <tr>
                                             <th width="10%" >No</th>
                                             <th width="65%">Student Name</th>
+                                            
                                             <th> Present</th>
                                             <th> Absent </th>
                                             
@@ -67,14 +76,14 @@
                                                 <td>{{ $i }}</td>
                                                 <td style="text-align: left;">{{ $studentDT['student_name'] }}</td>
                                                
-                                                
-                                                    @if(!empty($studentDT['attendance']))
+                                                     
+                                                     @if(!empty($studentDT['attendance']))
                                                      @foreach ($studentDT['attendance'] as $attendanceDT)
                                                          <td>{{ $attendanceDT['present_count'] }}</td>
                                                          <td>{{ $attendanceDT['absent_count'] }}</td>
                                                      @endforeach 
                                                      @else
-                                                        <td colspan="5">No Data Available</td>
+                                                        <td colspan="2">No Data Available</td>
                                                      @endif
                                                  </td>
                                                
