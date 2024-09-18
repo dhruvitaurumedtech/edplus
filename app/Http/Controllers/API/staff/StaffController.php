@@ -122,7 +122,7 @@ class StaffController extends Controller
             $userHasRole = UserHasRole::where('role_id', '!=', 3)
                 ->where('user_id', Auth::id())
                 ->pluck('role_id');
-            $roles = Roles::whereIn('id', $userHasRole)->get();
+            $roles = Roles::whereIn('id', $userHasRole)->whereNull('deleted_at')->get();
             $data = [];
             foreach ($roles as $value) {
                 $isEditable = !in_array($value->id, [4, 5, 6]);
