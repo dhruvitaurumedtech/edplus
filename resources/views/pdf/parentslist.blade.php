@@ -64,28 +64,44 @@
 </head>
 <body>
 
-    <h2>Student List</h2>
+    <h2>Parents List</h2>
+    <hr>
+    @if($data['requestdata']['mobile'])
+        <p><b>Mobile: </b>{{$data['parents'][0]['mobile']}}</p>
+    @endif
+    @if($data['requestdata']['address'])
+        <p><b>Address: </b>{{$data['parents'][0]['address']}}</p>
+    @endif
+    
     <div class="content">
     <table>
         <thead>
             <tr>
                 <th>No</th>
-                <th>ID</th>
-                <th>Full Name</th>
-                <th>Email</th>
+                <th>Parent Name</th>
+                <th>Student Name</th>
+                <!-- <th>Email</th> -->
+                @if($data['requestdata']['address'] == '')
                 <th>Address</th>
+                @endif
+                @if($data['requestdata']['mobile'] == '')
                 <th>Mobile</th>
+                @endif
             </tr>
         </thead>
         <tbody><?php $i=1;?>
-            @foreach ($data as $item)
+            @foreach ($data['parents'] as $item)
             <tr>
                 <td>{{ $i }}</td>
-                <td>{{ $item['id'] }}</td>
                 <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
-                <td>{{ $item['email'] }}</td>
+                <td>{{ $item['student_name'] }}</td>
+                <!-- <td>{{ $item['email'] }}</td> -->
+                @if($data['requestdata']['address'] == '')
                 <td>{{ $item['address'] }}</td>
+                @endif
+                @if($data['requestdata']['mobile'] == '')
                 <td>{{ $item['mobile'] }}</td>
+                @endif
             </tr>
             <?php $i++ ?>
             @endforeach

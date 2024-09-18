@@ -64,30 +64,63 @@
 </head>
 <body>
 
-    <h2>Student List</h2>
+    <h2>Teacher List</h2>
+    <hr>
+    @if($data['requestdata']['board_id'])
+        <p><b>Board Name: </b>{{$data['teacherdata'][0]['board_name']}}</p>
+    @endif
+    @if($data['requestdata']['medium_id'])
+        <p><b>Medium Name: </b>{{$data['teacherdata'][0]['medium_name']}}</p>
+    @endif
+    @if($data['requestdata']['class_id'])
+        <p><b>Class Name: </b>{{$data['teacherdata'][0]['class_name']}}</p>
+    @endif
+    @if($data['requestdata']['standard_id'])
+        <p><b>Standard: </b>{{$data['teacherdata'][0]['standard_id']}}</p>
+    @endif
+    @if($data['requestdata']['subject_id'])
+        <p><b>Subject Name: </b>{{$data['teacherdata'][0]['subjectname']}}</p>
+    @endif
+    @if($data['requestdata']['creatdate'])
+        <p><b>Date: </b>{{$data['teacherdata'][0]['created_at']}}</p>
+    @endif
+    
+    
     <div class="content">
     <table>
+          
+            
         <thead>
             <tr>
                 <th>No</th>
-                <th>Stud_ID</th>
                 <th>Full Name</th>
-                <th>Email</th>
+                <!-- <th>Email</th> -->
+                @if($data['requestdata']['board_id'] == '')
                 <th>Board</th>
+                @endif
+                @if($data['requestdata']['medium_id'] == '')
                 <th>Medium</th>
+                @endif
+                @if($data['requestdata']['standard_id'] == '')
                 <th>Standard</th>
+                @endif
             </tr>
         </thead>
         <tbody><?php $i=1;?>
-            @foreach ($data as $item)
+            @foreach ($data['teacherdata'] as $item)
             <tr>
                 <td>{{ $i }}</td>
-                <td>{{ $item['id'] }}</td>
                 <td>{{ $item['firstname'].' '.$item['lastname'] }}</td>
-                <td>{{ $item['email'] }}</td>
+                <!-- <td>{{ $item['email'] }}</td> -->
+                @if($data['requestdata']['board_id'] == '')
                 <td>{{ $item['board_name'] }}</td>
+                @endif
+                @if($data['requestdata']['medium_id'] == '')
                 <td>{{ $item['medium_name'] }}</td>
+                @endif
+                @if($data['requestdata']['standard_id'] == '')
                 <td>{{ $item['standard_name'] }}</td>
+                @endif
             </tr>
             <?php $i++ ?>
             @endforeach
