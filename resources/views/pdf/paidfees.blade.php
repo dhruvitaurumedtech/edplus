@@ -44,7 +44,36 @@
                 <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
                     @foreach ($standardDT['batch'] as $batchDT)
                     <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
-                       
+                       <table>
+                          <tr>
+                            <th>No</th>
+                            <th>Name</th>
+                            <th>Status</th>
+                            <th>Total Fees</th>
+                            <th>Due Fees</th>
+                            <th>paid Fees</th>
+                            <th>Mobile</th>
+                          </tr>
+                          @php $i=1 @endphp
+                          @foreach ($batchDT['students'] as $studentDT)
+                              <tr>
+                                <td>{{$i}}</td>
+                                <td>{{$studentDT['student_name']}}</td>
+                                <td>@if($studentDT['status'] === 'paid')
+                                            <button class="btn btn-success">Paid</button>
+                                        @elseif($studentDT['status'] === 'pending')
+                                            <button class="btn btn-warning">Pending</button>
+                                        @endif</td>
+                                <td>{{$studentDT['total_fees']}}</td>
+                                <td>{{$studentDT['due_amount']}}</td>
+                                <td>{{$studentDT['paid_amount']}}</td>
+                                <td>{{$studentDT['mobile']}}</td>
+
+                              </tr>
+                              @php $i++ @endphp
+                          @endforeach 
+
+                       </table>
                            
                        
                     @endforeach 
