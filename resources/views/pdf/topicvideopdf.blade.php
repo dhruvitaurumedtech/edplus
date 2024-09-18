@@ -71,6 +71,7 @@
         <p><b>Subject name:</b> {{ $item['subject_name'] }}</p>
         
         <div class="content">
+            @if(!empty($data['topic_response']))
             <table>
                 <thead>
                     <tr>
@@ -98,9 +99,13 @@
                     @endforeach
                 </tbody>
             </table>
+            @else
+            No Video and PDF available
+            @endif
         </div>
        
     @endforeach
+  
 @else
     <div class="content">
         <table>
