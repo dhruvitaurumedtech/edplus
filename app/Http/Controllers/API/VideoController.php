@@ -298,35 +298,40 @@ class VideoController extends Controller
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
         try {
-            $batch_ids=[];
+            $batch_ids = $request->batch_id ? explode(",", $request->batch_id) : [];
 
-            if($request->batch_id)
-            $batch_ids= explode(",", $request->batch_id);
-            foreach ($batch_ids as $batch_id_value) { 
+            // Delete any existing records that match the given criteria for the specified batches
+            VideoAssignToBatch::where('standard_id', $request->standard_id)
+                ->where('subject_id', $request->subject_id)
+                ->where('chapter_id', $request->chapter_id)
+                ->where('video_id', $request->video_id)
+                //->whereIn('batch_id', $batch_ids)
+                ->where('assign_status', 1)
+                ->forceDelete();
+
+            // Now iterate over each batch to insert only if the constraint of 4 records is not violated
+            foreach ($batch_ids as $batch_id_value) {
+                // Check the number of existing records for the subject in this batch
                 $existingRecordsCount = VideoAssignToBatch::where('batch_id', $batch_id_value)
                     ->where('subject_id', $request->subject_id)
                     ->count();
+
+                // If the batch already has 4 records, skip inserting a new one
                 if ($existingRecordsCount >= 4) {
-                    return $this->response([], 'Four records with the same Batch and Subject already exist', false, 400);
+                    return $this->response([], 'Four records with the same Batch and Subject already exist for batch: ' . $batch_id_value, false, 400);
                 }
+
+                // Insert new record for the batch
+                VideoAssignToBatch::create([
+                    'video_id' => $request->video_id,
+                    'batch_id' => $batch_id_value,
+                    'standard_id' => $request->standard_id,
+                    'chapter_id' => $request->chapter_id,
+                    'subject_id' => $request->subject_id,
+                    'assign_status' => $request->assign_status,
+                ]);
             }
 
-            VideoAssignToBatch::where('standard_id', $request->standard_id)
-            ->where('subject_id', $request->subject_id)
-            ->where('chapter_id', $request->chapter_id) 
-            ->where('video_id', $request->video_id)
-            ->where('assign_status', 1)->forcedelete(); 
-
-            foreach ($batch_ids as $batch_id_value) {
-            $VideoAssignToBatch = VideoAssignToBatch::create([
-                'video_id' => $request->video_id,
-                'batch_id' => $batch_id_value,
-                'standard_id' => $request->standard_id,
-                'chapter_id' => $request->chapter_id,
-                'subject_id' => $request->subject_id,
-                'assign_status' => $request->assign_status,
-            ]);
-        }
             return $this->response([], "Video Assign Batch Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Invalid token.", false, 400);
