@@ -44,7 +44,8 @@
         @if($data['requestdata']['name'] == '')
            <th>Name</th>
         @endif
-           <th>Mobile</th>
+        <th>Role Name</th>   
+        <th>Mobile</th>
         </tr>
     </thead>
     <tbody>
@@ -53,6 +54,7 @@
             @if($data['requestdata']['name'] == '')
             <td>{{$stafflist['firstname'] .' '. $stafflist['lastname']}}</td>
             @endif    
+            <td>{{$stafflist['role_name']}}</td>
             <td>{{$stafflist['mobile']}}</td>
         </tr>
         @endforeach

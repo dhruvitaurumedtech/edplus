@@ -36,12 +36,13 @@
     <table>
     
     <thead>
+       
         <tr>
-            <th>Image</th>
-            <td><img src="{{$data['image']}}"></td>
-        </tr>
-        <tr>
-            <th>Name</th>
+            <th>
+            @if(!empty($data['image']))
+            <img src="{{ $data['image'] }}"  style="border-radius: 50%; width: 100px; height: 100px;">
+            @endif  
+            </th>
             <td>{{$data['firstname'] .' '.$data['lastname']}}</td>
         </tr>            
         <tr>

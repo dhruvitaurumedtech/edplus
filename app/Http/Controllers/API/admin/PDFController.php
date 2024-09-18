@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Action;
 use App\Models\board;
 use App\Models\Class_sub;
 use App\Models\DeadStock;
@@ -11,6 +12,7 @@ use App\Models\Institute_detail;
 use App\Models\Institute_for_sub;
 use App\Models\Medium_model;
 use App\Models\Medium_sub;
+use App\Models\Module;
 use App\Models\Parents;
 use App\Models\RoleHasPermission;
 use App\Models\Roles;
@@ -28,9 +30,11 @@ use App\Models\Users_sub_experience;
 use App\Models\Users_sub_model;
 use App\Models\Users_sub_qualification;
 use App\Traits\ApiTrait;
+use Exception;
 use PDF;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Days;
@@ -722,28 +726,85 @@ class PDFController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try{
-            $useid = Institute_detail::where('id',$request->institute_id)->select('user_id','institute_name')->first();
-            
-            $user_has_role = UserHasRole::join('roles','roles.id','=','user_has_roles.role_id')
-            ->where('user_has_roles.user_id', $useid->user_id)->get();
-            $roleswisepermission = [];
-            $permissionsIds = [];
-            foreach($user_has_role as $userroles){
-                $permissionsIds = RoleHasPermission::join('features','features.id','=','role_has_permissions.feature_id')
-                ->join('actions','actions.id','=','role_has_permissions.feature_id')
-                ->where('role_has_permissions.user_has_role_id', $userroles->id)
-                ->get();
-                $roleswisepermission[] = ['role_id'=>$userroles->role_id,
-                'role_name'=>$userroles->role_name,
-                'permissions'=>$permissionsIds];
+            $userole = [];
+            if($request->user_id){
+                $userole = user::where('id',$request->user_id)->select('role_type')->first();
             }
-               
-
-                $data = ['roleandpermission'=>$roleswisepermission,'requestdata'=>$request,'institute_data'=>$useid]; 
+            $useid = Institute_detail::where('id', $request->institute_id)
+            ->select('user_id', 'institute_name')
+            ->first();
+        
+        $actions = Action::select('id', 'name')->get();
+        $modules = Module::where('type', 2)
+            ->with(['Features' => function ($query) {
+                $query->select('id', 'module_id', 'feature_name');
+            }])
+            ->select('id', 'module_name')
+            ->where('status', 1)
+            ->get();
+        
+        $user_has_role = UserHasRole::join('roles', 'roles.id', '=', 'user_has_roles.role_id')
+            ->where('user_has_roles.user_id', $useid->user_id) 
+            ->when(!empty($userole) ,function ($query) use ($userole){ //user wise role and permission
+                return $query->where('user_has_roles.role_id',$userole->role_type);
+            })
+            ->get();
+            
+        $permissiondata = [];
+        
+        foreach ($user_has_role as $userroles) {
+            $permissionsIds = RoleHasPermission::where('user_has_role_id', $userroles->id)
+                ->get(['feature_id', 'action_id']);
+        
+            $modulesDT = []; // Initialize array for each role
+        
+            foreach ($modules as $module) {
+                $featureActions = [];
+                foreach ($module->Features as $feature) {
+                    $actionsDT = []; // Initialize array for each feature
+        
+                    foreach ($actions as $action) {
+                        $hasPermission = $permissionsIds->contains(function ($permission) use ($feature, $action) {
+                            return $permission->feature_id == $feature->id && $permission->action_id == $action->id;
+                        });
+        
+                        $actionsDT[] = [
+                            'id' => $action->id,
+                            'name' => $action->name,
+                            'has_permission' => $hasPermission
+                        ];
+                    }
+        
+                    $featureActions[] = [
+                        'feature_id' => $feature->id,
+                        'feature_name' => $feature->feature_name,
+                        'actions' => $actionsDT
+                    ];
+                }
+        
+                $modulesDT[] = [
+                    'module_id' => $module->id,
+                    'module_name' => $module->module_name,
+                    'permissions' => $featureActions
+                ];
+            }
+        
+            $permissiondata[] = [
+                'role_id' => $userroles->role_id,
+                'role_name' => $userroles->role_name,
+                'modules' => $modulesDT
+            ];
+        }
+        
+        $data = [
+            'roleandpermission' => $permissiondata,
+            'requestdata' => $request,
+            'institute_data' => $useid
+        ];
                 $pdf = PDF::loadView('pdf.roleswisepermission', ['data' => $data]);
 
                 $folderPath = public_path('pdfs');
-
+             
                 if (!File::exists($folderPath)) {
                 File::makeDirectory($folderPath, 0755, true);
                 }
@@ -759,6 +820,8 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                // print_r()
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
