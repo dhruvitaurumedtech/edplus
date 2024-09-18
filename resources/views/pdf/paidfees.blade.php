@@ -18,6 +18,7 @@
         }
         th, td {
             padding: 10px;
+            text-align: left;
             text-align: center;
 
         }
@@ -87,6 +88,42 @@
                                                                 @endif
                                                             </td>
                                                         </tr>
+                                                        <tr>
+                                                        <td colspan="6">
+                                                            @if(!empty($studentDT['history']))
+                                                           
+                                                                
+                                                            <table class="table" style="border: none;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>No</th>
+                                                                        <th>Paid Amount</th>
+                                                                        <th>Date</th>
+                                                                        <th>Mode</th>
+                                                                        <th>Invoice No</th>
+                                                                        <th>Transaction ID</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @php $j = 1 @endphp
+                                                                    @foreach ($studentDT['history'] as $historyDT)
+                                                                        <tr>
+                                                                            <td>{{$j}}</td>
+                                                                            <td>{{$historyDT['paid_amount']}}</td>
+                                                                            <td>{{$historyDT['date']}}</td>
+                                                                            <td>{{$historyDT['payment_mode']}}</td>
+                                                                            <td>{{$historyDT['invoice_no']}}</td>
+                                                                            <td>{{$historyDT['transaction_id']}}</td>
+                                                                        </tr>
+                                                                        @php $j++ @endphp
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+
+                                                            @endif
+                                                            </td>
+                                                        </tr>
+                                                        
                                                        @php $i++ @endphp
                                                     @endforeach
                                                 </table>
