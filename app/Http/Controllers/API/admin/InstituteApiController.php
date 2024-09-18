@@ -3527,6 +3527,7 @@ class InstituteApiController extends Controller
                              ->where('institute_detail.id',$institute_id)
                              ->distinct('roles.id')
                              ->whereNotIn('role_name', ['institute','superadmin'])
+                             ->whereNull('roles.deleted_at')
                              ->get();  
                            
            return $this->response($role_list, "Fetch successfully.");
