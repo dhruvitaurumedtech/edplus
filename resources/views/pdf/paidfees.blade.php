@@ -18,15 +18,21 @@
         }
         th, td {
             padding: 10px;
-            text-align: left;
+            text-align: center;
+
         }
         th {
             background-color: #f2f2f2;
             white-space: nowrap;
+            text-align: center;
+        }
+        .custom-btn {
+           color: #28a745;
+        }
+        .custom-btn-danger {
+            color: #FF0000;
         }
 
-        
-      
     </style>
 </head>
 <body>
@@ -34,55 +40,68 @@
     <h2>Fees Report</h2>
     <hr>
 
-    @foreach ($data as $item)
-    <p><b>Board Name: </b>{{$item['board_name']}}</p>
-        @foreach ($item['medium'] as $mediumDT)
-        <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
-            @foreach ($mediumDT['class'] as $classDT)
-            <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
-                @foreach ($classDT['standard'] as $standardDT)
-                <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
-                    @foreach ($standardDT['batch'] as $batchDT)
-                    <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
-                       <table>
-                          <tr>
-                            <th>No</th>
-                            <th>Name</th>
-                            <th>Status</th>
-                            <th>Total Fees</th>
-                            <th>Due Fees</th>
-                            <th>paid Fees</th>
-                            <th>Mobile</th>
-                          </tr>
-                          @php $i=1 @endphp
-                          @foreach ($batchDT['students'] as $studentDT)
-                              <tr>
-                                <td>{{$i}}</td>
-                                <td>{{$studentDT['student_name']}}</td>
-                                <td>@if($studentDT['status'] === 'paid')
-                                            <button class="btn btn-success">Paid</button>
-                                        @elseif($studentDT['status'] === 'pending')
-                                            <button class="btn btn-warning">Pending</button>
-                                        @endif</td>
-                                <td>{{$studentDT['total_fees']}}</td>
-                                <td>{{$studentDT['due_amount']}}</td>
-                                <td>{{$studentDT['paid_amount']}}</td>
-                                <td>{{$studentDT['mobile']}}</td>
+    <!-- Check if $data is not empty -->
+    @if (!empty($data['board_result']) && is_array($data))
+        @foreach ($data['board_result'] as $item)
+            <p><b>Board Name: </b>{{$item['board_name']}}</p>
 
-                              </tr>
-                              @php $i++ @endphp
-                          @endforeach 
+            @if (!empty($item['medium']) && is_array($item['medium']))
+                @foreach ($item['medium'] as $mediumDT)
+                    <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
 
-                       </table>
-                           
-                       
-                    @endforeach 
-                @endforeach 
-            @endforeach
+                    @if (!empty($mediumDT['class']) && is_array($mediumDT['class']))
+                        @foreach ($mediumDT['class'] as $classDT)
+                            <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
+
+                            @if (!empty($classDT['standard']) && is_array($classDT['standard']))
+                                @foreach ($classDT['standard'] as $standardDT)
+                                    <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
+
+                                    @if (!empty($standardDT['batch']) && is_array($standardDT['batch']))
+                                        @foreach ($standardDT['batch'] as $batchDT)
+                                            <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+
+                                            
+                                                <table>
+                                                    <tr>
+                                                        <th width="10%" >No</th>
+                                                        <th>Student Name</th>
+                                                        <th>Total Fees</th>
+                                                        <th>Due Fees</th>
+                                                        <th>Paid Fees</th>
+                                                        <th>Status</th>
+                                                    </tr>
+
+                                                    @php $i = 1 @endphp
+                                                    @foreach ($batchDT['student'] as $studentDT)
+                                                        <tr>
+                                                            <td width="10%">{{$i}}</td>
+                                                            <td>{{$studentDT['student_name']}}</td>
+                                                            <td>{{$studentDT['student_fees']}}</td>
+                                                            <td>{{$studentDT['remaing_amount']}}</td>
+                                                            <td>{{$studentDT['paid_amount']}}</td>
+                                                            <td> @if($studentDT['status']=='paid')
+                                                                    <span class="custom-btn">Paid</span>
+                                                                @else
+                                                                    <span class="custom-btn-danger">Pending</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                       @php $i++ @endphp
+                                                    @endforeach
+                                                </table>
+                                           @endforeach
+                                    @endif
+                                @endforeach
+                            @endif
+                        @endforeach
+                    @endif
+                @endforeach
+            @endif
         @endforeach
-    @endforeach
+    @else
+        <p>No data available.</p>
+    @endif
 
-    
-    
 </body>
 </html>
