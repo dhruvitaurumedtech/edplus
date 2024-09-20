@@ -35,15 +35,7 @@
         .custom-btn-danger {
             color: #FF0000;
         }
-        #chartContainer {
-            width: 600px;
-            height: 400px;
-            margin: 0 auto;
-        }
-        canvas {
-            width: 100% !important;
-            height: 100% !important;
-        }
+       
         body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -82,105 +74,133 @@
                                             @foreach ($batchDT['student'] as $studentIndex => $studentDT)
                                                 <p><b>Student Name: </b>{{ $studentDT['student_name'] }}</p>
                                                 <!DOCTYPE html>
-                                                <html lang="en">
-                                                <head>
-                                                    <meta charset="UTF-8">
-                                                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                                                    <title>Static Vertical Line Graph with Dots</title>
-                                                    <style>
-                                                           body {
-                                                            font-family: Arial, sans-serif;
-                                                            display: flex;
-                                                            flex-direction: column;
-                                                            align-items: center;
-                                                            height: 100vh;
-                                                            margin: 0;
-                                                            background-color: #f4f4f4;
-                                                        }
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Vertical Line Graph</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
 
-                                                        h1 {
-                                                            text-align: center;
-                                                            margin-bottom: 20px;
-                                                        }
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-                                                        .chart-container {
-                                                            display: flex;
-                                                            align-items: flex-end;
-                                                            height: 300px;
-                                                            width: 600px;
-                                                            position: relative;
-                                                            margin: 20px;
-                                                            border-left: 2px solid #333;
-                                                            border-bottom: 2px solid #333;
-                                                        }
+        .chart-container {
+            display: flex;
+            align-items: flex-end;
+            height: 300px;
+            width: 600px;
+            position: relative;
+            margin: 20px;
+            border-left: 2px solid #333;
+            border-bottom: 2px solid #333;
+            background-color: #fff;
+        }
 
-                                                    
+       
 
-                                                        .line {
-                                                            position: absolute;
-                                                            bottom: 0;
-                                                            width: 50px;
-                                                            background-color: #4CAF50;
-                                                        }
+        .line {
+            position: absolute;
+            bottom: 0;
+            width: 50px; /* Adjusted line width */
+            background-color: #4CAF50;
+        }
 
-                                                        .point-Italy { left: 50px; bottom: 55%; }
-                                                        .point-France { left: 150px; bottom: 49%; }
-                                                        .point-Spain { left: 250px; bottom: 44%; }
-                                                        .point-USA { left: 350px; bottom: 24%; }
-                                                        .point-Argentina { left: 450px; bottom: 15%; }
+        /* Heights for the points */
+        .point-Italy { left: 50px; bottom: 55%; }
+        .point-France { left: 150px; bottom: 49%; }
+        .point-Spain { left: 250px; bottom: 44%; }
+        .point-USA { left: 350px; bottom: 24%; }
+        .point-Argentina { left: 450px; bottom: 15%; }
 
-                                                        .line-Italy { height: 55%; left: 50px; }
-                                                        .line-France { height: 49%; left: 150px; }
-                                                        .line-Spain { height: 44%; left: 250px; }
-                                                        .line-USA { height: 24%; left: 350px; }
-                                                        .line-Argentina { height: 15%; left: 450px; }
+        /* Dynamic line heights based on points */
+        .line-Italy { height: 55%; left: 50px; }
+        .line-France { height: 49%; left: 150px; }
+        .line-Spain { height: 44%; left: 250px; }
+        .line-USA { height: 24%; left: 350px; }
+        .line-Argentina { height: 15%; left: 450px; }
 
-                                                        .labels {
-                                                            display: flex;
-                                                            justify-content: space-between;
-                                                            width: 100%;
-                                                            position: relative;
-                                                            margin-top: 10px;
-                                                        }
+        .labels {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            position: relative;
+            margin-top: 10px;
+        }
 
-                                                        .label {
-                                                            text-align: center;
-                                                            position: relative;
-                                                            width: 50px; 
-                                                            top: 5px; 
-                                                        }
-                                                    </style>
-                                                </head>
-                                                <body>
+        .label {
+            text-align: center;
+            position: relative;
+            width: 50px; /* Set width for proper alignment */
+            top: 5px; /* Adjust to position label closer to the chart */
+        }
 
-                                                    <h1>World Wine Production 2018</h1>
-                                                    <div class="chart-container">
-                                                        <div class="line line-Italy"></div>
-                                                        <div class="point point-Italy"></div>
+        /* Y-axis labels */
+        .y-axis-labels {
+            position: absolute;
+            left: -40px; /* Positioning for Y-axis labels */
+            top: 0;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+        }
 
-                                                        <div class="line line-France"></div>
-                                                        <div class="point point-France"></div>
+        .y-label {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
 
-                                                        <div class="line line-Spain"></div>
-                                                        <div class="point point-Spain"></div>
+    <h1>World Wine Production 2018</h1>
+    <div class="chart-container">
+        <div class="y-axis-labels">
+            <div class="y-label">60</div>
+            <div class="y-label">50</div>
+            <div class="y-label">40</div>
+            <div class="y-label">30</div>
+            <div class="y-label">20</div>
+            <div class="y-label">10</div>
+        </div>
 
-                                                        <div class="line line-USA"></div>
-                                                        <div class="point point-USA"></div>
+        <div class="line line-Italy"></div>
+        <div class="point point-Italy"></div>
 
-                                                        <div class="line line-Argentina"></div>
-                                                        <div class="point point-Argentina"></div>
-                                                    </div>
+        <div class="line line-France"></div>
+        <div class="point point-France"></div>
 
-                                                    <div class="labels">
-                                                        <div class="label" >Italy</div>
-                                                        <div class="label" >France</div>
-                                                        <div class="label" >Spain</div>
-                                                        <div class="label" >USA</div>
-                                                        <div class="label" >Argentina</div>
-                                                    </div>
+        <div class="line line-Spain"></div>
+        <div class="point point-Spain"></div>
 
-                                                </body>
-                                                </html>
+        <div class="line line-USA"></div>
+        <div class="point point-USA"></div>
+
+        <div class="line line-Argentina"></div>
+        <div class="point point-Argentina"></div>
+    </div>
+
+    <div class="labels">
+        <div class="label" style="left: 50px;">Italy</div>
+        <div class="label" style="left: 150px;">France</div>
+        <div class="label" style="left: 250px;">Spain</div>
+        <div class="label" style="left: 350px;">USA</div>
+        <div class="label" style="left: 450px;">Argentina</div>
+    </div>
+
+</body>
+</html>
 
 
 
