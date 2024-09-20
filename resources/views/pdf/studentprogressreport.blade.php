@@ -2,6 +2,8 @@
 <html>
 <head>
     <title>Fees Report</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
         body {
             margin: 0mm;
@@ -61,7 +63,38 @@
                                     @if (!empty($standardDT['batch']) && is_array($standardDT['batch']))
                                         @foreach ($standardDT['batch'] as $batchDT)
                                             <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+                                            @foreach ($batchDT['student'] as $studentIndex => $studentDT)
+                                                <p><b>Student Name: </b>{{ $studentDT['student_name'] }}</p>
+                                                
+                                                <!-- Generate a unique canvas ID using the $studentIndex -->
+                                                <div style="width: 80%; margin: auto;">
+        <canvas id="barChart"></canvas>
+    </div>
 
+    <script>
+        var ctx = document.getElementById('barChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: @json($studentDT['exam']),
+                datasets: [{
+                    label: 'Data',
+                    data: @json($studentDT['exam']),
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+                                            @endforeach
                                            @endforeach
                                     @endif
                                 @endforeach
