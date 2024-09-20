@@ -12,6 +12,9 @@ use Illuminate\Support\Facades\DB;
 use PDF;
 use Illuminate\Support\Facades\Validator;
 
+use ConsoleTVs\Charts\Facades\Charts;
+
+
 class StudentProgressPdfController extends Controller
 {
   use ApiTrait;
@@ -259,18 +262,17 @@ class StudentProgressPdfController extends Controller
                       'percentage' => round($percentage, 2),
                       'exam_date'  => $exam_value['exam_date'],
                     ];
+
+                   
                   }
-
-
-                  $exam_student_result[] = [
-                    'student_id' => $exam_student_value['id'],
-                    'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
-                    'exam' => $exam_result,
-
-
-                  ];
-                }
-
+                  
+                
+                      $exam_student_result[] = [
+                        'student_id' => $exam_student_value['id'],
+                        'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
+                      ];
+                    }
+                 
                 $batch_result[] = [
                   'batch_id' => $batch_value['batch_id'],
                   'batch_name' => $batch_value['batch_name'],
