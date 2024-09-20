@@ -745,7 +745,8 @@ class InstituteApiController extends Controller
                     $standard_medium_check = Standard_sub::where('institute_id', $institute->id)
                         ->where('standard_id', $standard)
                         ->where('board_id', $board)
-                        ->where('medium_id', $medium)->first();
+                        ->where('medium_id', $medium)
+                        ->where('class_id', $institute_for_class)->first();
                     $standardewArray = explode(',', $request->standard_id);
                     if (!$standard_medium_check) {
                         if (in_array($standard, $standardewArray)) {
