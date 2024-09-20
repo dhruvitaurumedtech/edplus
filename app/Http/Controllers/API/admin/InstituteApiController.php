@@ -711,6 +711,9 @@ class InstituteApiController extends Controller
 
                     //class
                     $class_medium_check = Class_sub::where('institute_id', $institute->id)
+                        ->where('standard_id', $standard)
+                        ->where('board_id', $board)
+                        ->where('medium_id', $medium)
                         ->where('class_id', $institute_for_class)->get();
                     $classtewArray = explode(',', $request->institute_for_class_id);
                     if ($class_medium_check->isEmpty()) {
