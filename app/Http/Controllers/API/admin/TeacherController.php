@@ -827,7 +827,7 @@ class TeacherController extends Controller
            
             $response = Teacher_model::where('institute_id', $request->institute_id)
             ->where('teacher_id', $request->teacher_id)
-            ->update(['status' => '2']);
+            ->update(['status' => '2', 'reject_date' => Carbon::now()->format('Y-m-d')]);
 
             if ($response) {
                 Teacher_model::where('institute_id', $request->institute_id)
@@ -913,7 +913,7 @@ class TeacherController extends Controller
         try {
             $teacher_id = Teacher_model::where('institute_id', $request->institute_id)
                 ->where('status', '2')
-                ->where('created_at', '>=', Carbon::now()->subDays(15))
+                ->where('reject_date', '>=', Carbon::now()->subDays(15))
                 ->pluck('teacher_id');
             if (!empty($teacher_id)) {
                 $response = User::whereIn('id', $teacher_id)
