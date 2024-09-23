@@ -69,7 +69,6 @@ class AuthController extends Controller
                 $user->email_verified_at = Carbon::now();
                 $user->mobile = $request->mobile;
                 $user->role_type = $request->role_type;
-                $user->status = 1;
                 $user->device_key = $request->device_key;
                 $user->social_id = $ssoUser->user['id'];
                 $user->save();
@@ -89,6 +88,7 @@ class AuthController extends Controller
     {
         $token = JWTAuth::fromUser($user);
         $user->token = $token;
+        $user->status = '1';
         $user->save();
         $userdata = user::join('institute_detail', 'institute_detail.user_id', '=', 'users.id')
             ->where('users.email', $user->email)
