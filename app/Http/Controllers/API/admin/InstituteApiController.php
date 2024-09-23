@@ -729,7 +729,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        //if (!in_array($institute_for_class, $classtewArray)) {
+                        if (!in_array($institute_for_class, $classtewArray)) {
                             $student_check = Student_detail::where('class_id', $institute_for_class)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -745,7 +745,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        //}
+                        }
                     }
 
                     //standard
@@ -768,7 +768,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        //if (!in_array($standard, $standardewArray)) {
+                        if (!in_array($standard, $standardewArray)) {
                             $student_check = Student_detail::where('standard_id', $standard)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -790,7 +790,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        //}
+                        }
                     }
 
                     //stream
@@ -842,7 +842,7 @@ class InstituteApiController extends Controller
                     }
                 } else {
                     $subjewArray = explode(',', $request->subject_id);
-                    //if (!in_array($institute_subject_check, $subjewArray)) {
+                    if (!in_array($institute_subject_check, $subjewArray)) {
                         $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                         $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                         if (!empty($student_check) || !empty($teacher_check)) {
@@ -855,7 +855,7 @@ class InstituteApiController extends Controller
                                 }
                             }
                         }
-                    //}
+                    }
                 }
             }
 
