@@ -717,6 +717,7 @@ class InstituteApiController extends Controller
                         }
                     }
 
+                   
                     //class
                     $class_medium_check = Class_sub::where('institute_id', $institute->id)
                         ->where('board_id', $board)
@@ -724,6 +725,7 @@ class InstituteApiController extends Controller
                         ->where('class_id', $institute_for_class)->get();
                     $classtewArray = explode(',', $request->institute_for_class_id);
                     if ($class_medium_check->isEmpty()) {
+                       
                         if (in_array($institute_for_class, $classtewArray)) {
                             Class_sub::create([
                                 'user_id' => $institute->user_id,
@@ -735,8 +737,11 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        if (!in_array($institute_for_class, $classtewArray)) {
-                            $student_check = Student_detail::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
+                        //if (!in_array($institute_for_class, $classtewArray)) {
+                            $student_check = Student_detail::where('class_id', $institute_for_class)
+                            ->where('board_id', $board)
+                            ->where('medium_id', $medium)
+                            ->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
                             if (!empty($student_check) || !empty($teacher_check)) {
                                 return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
@@ -748,7 +753,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
 
                     //standard
@@ -771,8 +776,12 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        if (!in_array($standard, $standardewArray)) {
-                            $student_check = Student_detail::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
+                        //if (!in_array($standard, $standardewArray)) {
+                            $student_check = Student_detail::where('standard_id', $standard)
+                            ->where('board_id', $board)
+                            ->where('medium_id', $medium)
+                            ->where('class_id', $institute_for_class)
+                            ->where('institute_id', $institute->id)->first();
                             $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
                             if (!empty($student_check) || !empty($teacher_check)) {
                                 return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
@@ -781,6 +790,7 @@ class InstituteApiController extends Controller
                                     ->where('institute_id', $institute->id)
                                     ->where('board_id', $board)
                                     ->where('medium_id', $medium)
+                                    ->where('class_id', $institute_for_class)
                                     ->get();
                                 if (!empty($delete_sub)) {
                                     foreach ($delete_sub as $did) {
@@ -788,7 +798,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
 
                     //stream
@@ -840,7 +850,7 @@ class InstituteApiController extends Controller
                     }
                 } else {
                     $subjewArray = explode(',', $request->subject_id);
-                    if (!in_array($institute_subject_check, $subjewArray)) {
+                    //if (!in_array($institute_subject_check, $subjewArray)) {
                         $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                         $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
                         if (!empty($student_check) || !empty($teacher_check)) {
@@ -853,7 +863,7 @@ class InstituteApiController extends Controller
                                 }
                             }
                         }
-                    }
+                    //}
                 }
             }
 
