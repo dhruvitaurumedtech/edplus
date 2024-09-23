@@ -13,6 +13,8 @@ use PDF;
 use Illuminate\Support\Facades\Validator;
 
 use ConsoleTVs\Charts\Facades\Charts;
+use Chartisan\PHP\Chartisan;
+
 
 
 class StudentProgressPdfController extends Controller
@@ -254,6 +256,9 @@ class StudentProgressPdfController extends Controller
 
                   $exam_result = [];
                   foreach ($exam_response as $exam_value) {
+
+
+
                     $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
                     $exam_result[] = [
                       'exam_name'  => $exam_value['exam_title'],
@@ -263,13 +268,15 @@ class StudentProgressPdfController extends Controller
                       'exam_date'  => $exam_value['exam_date'],
                     ];
 
-                   
+                 
+
                   }
                   
                 
                       $exam_student_result[] = [
                         'student_id' => $exam_student_value['id'],
                         'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
+                        'exam'=>$exam_result,
                       ];
                     }
                  
@@ -312,7 +319,15 @@ class StudentProgressPdfController extends Controller
       // print_r($board_result);
       // exit;
       $data = ['board_result' => $board_result, 'request_data' => $request];
-      $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
+      return view('pdf.studentprogressreport',compact('data'));
+      // $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
+      
+      // $pdf->setOption('enable-javascript',true);
+      // $pdf->setOption('javascript-delay',1000);
+      // $pdf->setOption('no-stop-slow-scripts',true);
+      // $pdf->setOption('enable-smart-shrinking',true);
+
+      // return $pdf->stream();
 
       $folderPath = public_path('pdfs');
 

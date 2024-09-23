@@ -10,8 +10,9 @@
     "require": {
         "php": "^8.1",
         "barryvdh/laravel-dompdf": "^3.0",
+        "barryvdh/laravel-snappy": "*",
         "chartisan/php": "*",
-        "consoletvs/charts": "*",
+        "consoletvs/charts": "6.*",
         "guzzlehttp/guzzle": "^7.2",
         "icehouse-ventures/laravel-chartjs": "^4.1",
         "illuminate/support": "10.17",
