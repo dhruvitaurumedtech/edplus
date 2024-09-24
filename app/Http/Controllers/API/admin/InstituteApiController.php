@@ -927,7 +927,7 @@ class InstituteApiController extends Controller
 
             // Fetch announcements
             $announcement_list = Common_announcement::whereRaw("FIND_IN_SET($institute_id, institute_id)")
-                ->where('created_at', '>=', now()->subDays(15))
+                ->where('created_at', '>=', now()->subDays(150))
                 ->orderBy('created_at', 'desc')
                 ->paginate($perPage, ['title', 'announcement', 'created_at']);
 
