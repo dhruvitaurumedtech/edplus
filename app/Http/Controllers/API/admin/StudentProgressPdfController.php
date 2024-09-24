@@ -319,15 +319,15 @@ class StudentProgressPdfController extends Controller
       // print_r($board_result);
       // exit;
       $data = ['board_result' => $board_result, 'request_data' => $request];
-      return view('pdf.studentprogressreport',compact('data'));
-      // $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
+      // return view('pdf.studentprogressreport',compact('data'));
+      $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
       
       // $pdf->setOption('enable-javascript',true);
       // $pdf->setOption('javascript-delay',1000);
       // $pdf->setOption('no-stop-slow-scripts',true);
       // $pdf->setOption('enable-smart-shrinking',true);
 
-      // return $pdf->stream();
+      return $pdf->stream();
 
       $folderPath = public_path('pdfs');
 

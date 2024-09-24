@@ -282,7 +282,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
    
 });
     //token without use 
-    Route::get('/institute/studentprogress-report', [StudentProgressPdfController::class, 'studentprogress_report']);
+    Route::post('/institute/studentprogress-report', [StudentProgressPdfController::class, 'studentprogress_report']);
 
     Route::post('/institute/testing', [StudentController::class, 'testing']);
 
