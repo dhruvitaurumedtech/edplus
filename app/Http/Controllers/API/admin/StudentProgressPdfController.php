@@ -177,7 +177,7 @@ class StudentProgressPdfController extends Controller
                 // print_r($subject_id);
 
 
-              
+
 
                 $exam_wise_student_response = Student_detail::leftJoin('users', 'users.id', '=', 'students_details.student_id')
                   ->when(!empty($request->institute_id), function ($query) use ($request) {
@@ -256,9 +256,6 @@ class StudentProgressPdfController extends Controller
 
                   $exam_result = [];
                   foreach ($exam_response as $exam_value) {
-
-
-
                     $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
                     $exam_result[] = [
                       'exam_name'  => $exam_value['exam_title'],
@@ -267,19 +264,16 @@ class StudentProgressPdfController extends Controller
                       'percentage' => round($percentage, 2),
                       'exam_date'  => $exam_value['exam_date'],
                     ];
-
-                 
-
                   }
-                  
-                
-                      $exam_student_result[] = [
-                        'student_id' => $exam_student_value['id'],
-                        'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
-                        'exam'=>$exam_result,
-                      ];
-                    }
-                 
+
+
+                  $exam_student_result[] = [
+                    'student_id' => $exam_student_value['id'],
+                    'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
+                    'exam' => $exam_result,
+                  ];
+                }
+
                 $batch_result[] = [
                   'batch_id' => $batch_value['batch_id'],
                   'batch_name' => $batch_value['batch_name'],
@@ -319,15 +313,15 @@ class StudentProgressPdfController extends Controller
       // print_r($board_result);
       // exit;
       $data = ['board_result' => $board_result, 'request_data' => $request];
-      // return view('pdf.studentprogressreport',compact('data'));
-      $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
-      
+      return view('pdf.studentprogressreport',compact('data'));
+      // $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
+
       // $pdf->setOption('enable-javascript',true);
       // $pdf->setOption('javascript-delay',1000);
       // $pdf->setOption('no-stop-slow-scripts',true);
       // $pdf->setOption('enable-smart-shrinking',true);
 
-      return $pdf->stream();
+      // return $pdf->stream();
 
       $folderPath = public_path('pdfs');
 
