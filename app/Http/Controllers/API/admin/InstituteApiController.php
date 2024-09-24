@@ -729,7 +729,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        if (!in_array($institute_for_class, $classtewArray)) {
+                        //if (!in_array($institute_for_class, $classtewArray)) {
                             $student_check = Student_detail::where('class_id', $institute_for_class)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -748,7 +748,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
 
                     //standard
@@ -771,7 +771,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        if (!in_array($standard, $standardewArray)) {
+                        //if (!in_array($standard, $standardewArray)) {
                             $student_check = Student_detail::where('standard_id', $standard)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -793,7 +793,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        }
+                        //}
                     }
 
                     //stream
