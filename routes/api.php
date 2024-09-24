@@ -149,6 +149,8 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/get-feedback', [FeedbackController::class, 'get_feedback']);
     Route::post('/institute/add-deadstock', [DeadstockController::class, 'add_deadstock'])->middleware('check.permission:25,1');
     Route::post('/institute/list-deadstock', [DeadstockController::class, 'list_deadstock'])->middleware('check.permission:25,4');
+    Route::post('/institute/get-with-class-medium', [BasetableControllerAPI::class, 'get_with_class_medium']);
+
 
 
     // parent api
