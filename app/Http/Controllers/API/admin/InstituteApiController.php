@@ -71,9 +71,13 @@ class InstituteApiController extends Controller
 
     private function array_symmetric_diff(array $array1, array $array2)
     {
-        $diff1 = array_diff($array1, $array2);
-        $diff2 = array_diff($array2, $array1);
-        return array_merge($diff1, $diff2);
+        // $diff1 = array_diff($array1, $array2);
+        // $diff2 = array_diff($array2, $array1);
+        // return array_merge($diff1, $diff2);
+        return array_merge(
+            array_diff($array1, $array2), // Elements in $array1 not in $array2
+            array_diff($array2, $array1)  // Elements in $array2 not in $array1
+        );
     }
     
     public function get_institute_reponse(Request $request)
