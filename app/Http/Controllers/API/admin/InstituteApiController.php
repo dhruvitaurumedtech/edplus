@@ -729,7 +729,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        //if (!in_array($institute_for_class, $classtewArray)) {
+                        if (!in_array($institute_for_class, $classtewArray)) {
                             $student_check = Student_detail::where('class_id', $institute_for_class)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -739,6 +739,7 @@ class InstituteApiController extends Controller
                                 return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
                             } else {
                                 $delete_sub = Class_sub::where('class_id', $institute_for_class)
+                                ->where('institute_for_id', $institute_for)
                                 ->where('board_id', $board)
                                 ->where('medium_id', $medium)
                                 ->where('institute_id', $institute->id)->get();
@@ -748,7 +749,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        //}
+                        }
                     }
 
                     //standard
@@ -771,7 +772,7 @@ class InstituteApiController extends Controller
                             ]);
                         }
                     } else {
-                        //if (!in_array($standard, $standardewArray)) {
+                        if (!in_array($standard, $standardewArray)) {
                             $student_check = Student_detail::where('standard_id', $standard)
                             ->where('board_id', $board)
                             ->where('medium_id', $medium)
@@ -793,7 +794,7 @@ class InstituteApiController extends Controller
                                     }
                                 }
                             }
-                        //}
+                        }
                     }
 
                     //stream
