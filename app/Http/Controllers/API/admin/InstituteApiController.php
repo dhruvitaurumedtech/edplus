@@ -69,16 +69,7 @@ class InstituteApiController extends Controller
 
     use ApiTrait;
 
-    private function array_symmetric_diff(array $array1, array $array2)
-    {
-        // $diff1 = array_diff($array1, $array2);
-        // $diff2 = array_diff($array2, $array1);
-        // return array_merge($diff1, $diff2);
-        return array_merge(
-            array_diff($array1, $array2), // Elements in $array1 not in $array2
-            array_diff($array2, $array1)  // Elements in $array2 not in $array1
-        );
-    }
+   
     
     public function get_institute_reponse(Request $request)
     {
@@ -532,6 +523,20 @@ class InstituteApiController extends Controller
             return $this->response($e, "Something went wrong.", false, 400);
         }
     }
+    private function array_symmetric_diff(array $array1, array $array2)
+    {
+        // $diff1 = array_diff($array1, $array2);
+        // $diff2 = array_diff($array2, $array1);
+        // return array_merge($diff1, $diff2);
+        // return array_merge(
+        //     array_diff($array1, $array2), // Elements in $array1 not in $array2
+        //     array_diff($array2, $array1)  // Elements in $array2 not in $array1
+        // );
+        $combined = array_merge($array1, $array2);
+        return array_filter($combined, function($value) use ($array1, $array2) {
+            return (in_array($value, $array1) && !in_array($value, $array2)) || (!in_array($value, $array1) && in_array($value, $array2));
+        });
+    }
     public function update_institute(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -600,6 +605,7 @@ class InstituteApiController extends Controller
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
             $institute_subject_ids = explode(',', $request->subject_id);
             $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
+            // print_r($differenceInstituteSubjectArray);exit;
             if (!empty($differenceInstituteSubjectArray)) {
 
                 $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
