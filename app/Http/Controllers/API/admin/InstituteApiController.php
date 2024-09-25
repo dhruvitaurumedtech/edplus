@@ -738,11 +738,7 @@ class InstituteApiController extends Controller
                             if (!empty($student_check) || !empty($teacher_check)) {
                                 return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
                             } else {
-                                $delete_sub = Class_sub::where('class_id', $institute_for_class)
-                                ->where('institute_for_id', $institute_for)
-                                ->where('board_id', $board)
-                                ->where('medium_id', $medium)
-                                ->where('institute_id', $institute->id)->get();
+                                $delete_sub = Class_sub::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
                                 if (!empty($delete_sub)) {
                                     foreach ($delete_sub as $did) {
                                         $did->delete();
@@ -784,9 +780,6 @@ class InstituteApiController extends Controller
                             } else {
                                 $delete_sub = Standard_sub::where('standard_id', $standard)
                                     ->where('institute_id', $institute->id)
-                                    ->where('board_id', $board)
-                                    ->where('medium_id', $medium)
-                                    ->where('class_id', $institute_for_class)
                                     ->get();
                                 if (!empty($delete_sub)) {
                                     foreach ($delete_sub as $did) {
