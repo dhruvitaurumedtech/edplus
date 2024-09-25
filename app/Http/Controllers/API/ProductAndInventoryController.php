@@ -61,7 +61,7 @@ class ProductAndInventoryController extends Controller
                 $product->save();
                 $product_id = $product->id;
             }else{
-                $product_id = $request->product_id;
+                $product_id = $productinventory['product_id'];;
             }
             if($productinventory['quantity']){
                 $product = new Products_inventory();

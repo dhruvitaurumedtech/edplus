@@ -913,7 +913,7 @@ class TeacherController extends Controller
         try {
             $teacher_id = Teacher_model::where('institute_id', $request->institute_id)
                 ->where('status', '2')
-                ->where('created_at', '>=', Carbon::now()->subDays(15))
+                // ->where('created_at', '>=', Carbon::now()->subDays(15))
                 ->pluck('teacher_id');
             if (!empty($teacher_id)) {
                 $response = User::whereIn('id', $teacher_id)
