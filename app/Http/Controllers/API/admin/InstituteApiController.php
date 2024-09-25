@@ -604,267 +604,277 @@ class InstituteApiController extends Controller
             //start by priyanka
             $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
             $institute_subject_ids = explode(',', $request->subject_id);
-            $differenceInstituteSubjectArray = $this->array_symmetric_diff($institute_subjects, $institute_subject_ids);
+            
+
+
+
+            $removedSubject = array_diff($institute_subjects, $institute_subject_ids); 
+            $addSubject= array_diff($institute_subject_ids,$institute_subjects);
+            $this->addsubject($addSubject,$institute);
+            
+
+            $this->deletesubject($removedSubject,$institute);
+
             // print_r($differenceInstituteSubjectArray);exit;
-            if (!empty($differenceInstituteSubjectArray)) {
+            // if (!empty($differenceInstituteSubjectArray)) {
 
-                $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
-                $uniqueArray = array_unique($sectsbbsiqy);
-                $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
-                foreach ($basedtqy as $svaluee) {
+            //     $sectsbbsiqy = Subject_model::whereIN('id', $differenceInstituteSubjectArray)->pluck('base_table_id')->toArray();
+            //     $uniqueArray = array_unique($sectsbbsiqy);
+            //     $basedtqy = Base_table::whereIN('id', $uniqueArray)->get();
+            //     foreach ($basedtqy as $svaluee) {
 
-                    $institute_for = $svaluee->institute_for;
-                    $board = $svaluee->board;
-                    $medium = $svaluee->medium;
-                    $institute_for_class = $svaluee->institute_for_class;
-                    $standard = $svaluee->standard;
-                    $stream = $svaluee->stream;
+            //         $institute_for = $svaluee->institute_for;
+            //         $board = $svaluee->board;
+            //         $medium = $svaluee->medium;
+            //         $institute_for_class = $svaluee->institute_for_class;
+            //         $standard = $svaluee->standard;
+            //         $stream = $svaluee->stream;
 
 
-                    //institute
+            //         //institute
 
-                    $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)
-                        ->where('institute_for_id', $institute_for)->get();
-                    $instiyutewArray = explode(',', $request->institute_for_id);
-                    if ($institute_for_check->isEmpty()) {
-                        if (in_array($institute_for, $instiyutewArray)) {
-                            Institute_for_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'institute_for_id' => $institute_for
-                            ]);
-                        }
-                    } else {
-                        if (!in_array($institute_for, $instiyutewArray)) {
-                            $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
-                            $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
-                            if (!empty($student_check) && !empty($teacher_check)) {
-                                return $this->response([], "Cannot remove institute_for. Already exist student and teacher this institute_for.", false, 400);
-                            } else {
-                                $delete_sub = Institute_for_sub::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
-                                if (!empty($delete_sub)) {
-                                    foreach ($delete_sub as $did) {
-                                        $did->delete();
-                                    }
-                                }
-                            }
-                        }
-                    }
+            //         $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)
+            //             ->where('institute_for_id', $institute_for)->get();
+            //         $instiyutewArray = explode(',', $request->institute_for_id);
+            //         if ($institute_for_check->isEmpty()) {
+            //             if (in_array($institute_for, $instiyutewArray)) {
+            //                 Institute_for_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'institute_for_id' => $institute_for
+            //                 ]);
+            //             }
+            //         } else {
+            //             if (!in_array($institute_for, $instiyutewArray)) {
+            //                 $student_check = Student_detail::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
+            //                 $teacher_check = Teacher_model::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
+            //                 if (!empty($student_check) && !empty($teacher_check)) {
+            //                     return $this->response([], "Cannot remove institute_for. Already exist student and teacher this institute_for.", false, 400);
+            //                 } else {
+            //                     $delete_sub = Institute_for_sub::where('institute_for_id', $institute_for)->where('institute_id', $institute->id)->get();
+            //                     if (!empty($delete_sub)) {
+            //                         foreach ($delete_sub as $did) {
+            //                             $did->delete();
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
 
-                    //board
-                    $boardtewArray = explode(',', $request->institute_board_id);
-                    $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
-                        ->where('board_id', $board)->get();
-                    $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
+            //         //board
+            //         $boardtewArray = explode(',', $request->institute_board_id);
+            //         $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
+            //             ->where('board_id', $board)->get();
+            //         $institute_subjects = Subject_sub::where('institute_id', $institute->id)->pluck('subject_id')->toArray();
 
-                    if ($institute_board_check->isEmpty()) {
-                        if (in_array($board, $boardtewArray)) {
-                            Institute_board_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'board_id' => $board,
-                                'institute_for_id' => $institute_for
-                            ]);
-                        }
-                    } else {
-                        $boardIds = Institute_board_sub::where('institute_id', $institute->id)->pluck('board_id')->toArray();
-                        $boarddif = $this->array_symmetric_diff($boardtewArray, $boardIds);
-                        if (!empty($boarddif)) {
-                            if (!in_array($boarddif, $boardtewArray)) {
-                                $student_check = Student_detail::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
-                                $teacher_check = Teacher_model::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
-                                if (!empty($student_check) || !empty($teacher_check)) {
-                                    return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
-                                } else {
-                                    $delete_sub = Institute_board_sub::wherein('board_id', $boarddif)
-                                        ->where('institute_id', $institute->id)->get();
-                                    if (!empty($delete_sub)) {
-                                        foreach ($delete_sub as $did) {
-                                            $did->delete();
-                                        }
-                                    }
-                                }
-                            }
-                        }
+            //         if ($institute_board_check->isEmpty()) {
+            //             if (in_array($board, $boardtewArray)) {
+            //                 Institute_board_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'board_id' => $board,
+            //                     'institute_for_id' => $institute_for
+            //                 ]);
+            //             }
+            //         } else {
+            //             $boardIds = Institute_board_sub::where('institute_id', $institute->id)->pluck('board_id')->toArray();
+            //             $boarddif = $this->array_symmetric_diff($boardtewArray, $boardIds);
+            //             if (!empty($boarddif)) {
+            //                 if (!in_array($boarddif, $boardtewArray)) {
+            //                     $student_check = Student_detail::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
+            //                     $teacher_check = Teacher_model::wherein('board_id', $boarddif)->where('institute_id', $institute->id)->first();
+            //                     if (!empty($student_check) || !empty($teacher_check)) {
+            //                         return $this->response([], "Cannot remove institute_board. Already exist student and teacher this institute_board.", false, 400);
+            //                     } else {
+            //                         $delete_sub = Institute_board_sub::wherein('board_id', $boarddif)
+            //                             ->where('institute_id', $institute->id)->get();
+            //                         if (!empty($delete_sub)) {
+            //                             foreach ($delete_sub as $did) {
+            //                                 $did->delete();
+            //                             }
+            //                         }
+            //                     }
+            //                 }
+            //             }
                         
-                    }
+            //         }
 
-                    //medium
-                    $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->where('board_id', $board)->where('medium_id', $medium)->get();
-                    $mediumtewArray = explode(',', $request->institute_medium_id);
-                    if ($institute_medium_check->isEmpty()) {
-                        if (in_array($medium, $mediumtewArray)) {
-                            Medium_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'medium_id' => $medium,
-                                'institute_for_id' => $institute_for,
-                                'board_id' => $board
-                            ]);
-                        }
-                    } else {
-                        if (!in_array($medium, $mediumtewArray)) {
-                            $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
-                            $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
-                            if (!empty($student_check) || !empty($teacher_check)) {
-                                return $this->response([], "Cannot remove institute_medium. Already exist student or teacher in this institute_medium.", false, 400);
-                            } else {
-                                $delete_sub = Medium_sub::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
-                                if (!empty($delete_sub)) {
-                                    foreach ($delete_sub as $did) {
-                                        $did->delete();
-                                    }
-                                }
-                            }
-                        }
-                    }
+            //         //medium
+            //         $institute_medium_check = Medium_sub::where('institute_id', $institute->id)->where('board_id', $board)->where('medium_id', $medium)->get();
+            //         $mediumtewArray = explode(',', $request->institute_medium_id);
+            //         if ($institute_medium_check->isEmpty()) {
+            //             if (in_array($medium, $mediumtewArray)) {
+            //                 Medium_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'medium_id' => $medium,
+            //                     'institute_for_id' => $institute_for,
+            //                     'board_id' => $board
+            //                 ]);
+            //             }
+            //         } else {
+            //             if (!in_array($medium, $mediumtewArray)) {
+            //                 $student_check = Student_detail::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
+            //                 $teacher_check = Teacher_model::where('medium_id', $medium)->where('institute_id', $institute->id)->first();
+            //                 if (!empty($student_check) || !empty($teacher_check)) {
+            //                     return $this->response([], "Cannot remove institute_medium. Already exist student or teacher in this institute_medium.", false, 400);
+            //                 } else {
+            //                     $delete_sub = Medium_sub::where('medium_id', $medium)->where('institute_id', $institute->id)->get();
+            //                     if (!empty($delete_sub)) {
+            //                         foreach ($delete_sub as $did) {
+            //                             $did->delete();
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
 
                    
-                    //class
-                    $class_medium_check = Class_sub::where('institute_id', $institute->id)
-                        ->where('board_id', $board)
-                        ->where('medium_id', $medium)
-                        ->where('class_id', $institute_for_class)->get();
-                    $classtewArray = explode(',', $request->institute_for_class_id);
-                    if ($class_medium_check->isEmpty()) {
+            //         //class
+            //         $class_medium_check = Class_sub::where('institute_id', $institute->id)
+            //             ->where('board_id', $board)
+            //             ->where('medium_id', $medium)
+            //             ->where('class_id', $institute_for_class)->get();
+            //         $classtewArray = explode(',', $request->institute_for_class_id);
+            //         if ($class_medium_check->isEmpty()) {
                        
-                        if (in_array($institute_for_class, $classtewArray)) {
-                            Class_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'class_id' => $institute_for_class,
-                                'institute_for_id' => $institute_for,
-                                'board_id' => $board,
-                                'medium_id' => $medium
-                            ]);
-                        }
-                    } else {
-                        if (!in_array($institute_for_class, $classtewArray)) {
-                            $student_check = Student_detail::where('class_id', $institute_for_class)
-                            ->where('board_id', $board)
-                            ->where('medium_id', $medium)
-                            ->where('institute_id', $institute->id)->first();
-                            $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
-                            if (!empty($student_check) || !empty($teacher_check)) {
-                                return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
-                            } else {
-                                $delete_sub = Class_sub::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
-                                if (!empty($delete_sub)) {
-                                    foreach ($delete_sub as $did) {
-                                        $did->delete();
-                                    }
-                                }
-                            }
-                        }
-                    }
+            //             if (in_array($institute_for_class, $classtewArray)) {
+            //                 Class_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'class_id' => $institute_for_class,
+            //                     'institute_for_id' => $institute_for,
+            //                     'board_id' => $board,
+            //                     'medium_id' => $medium
+            //                 ]);
+            //             }
+            //         } else {
+            //             if (!in_array($institute_for_class, $classtewArray)) {
+            //                 $student_check = Student_detail::where('class_id', $institute_for_class)
+            //                 ->where('board_id', $board)
+            //                 ->where('medium_id', $medium)
+            //                 ->where('institute_id', $institute->id)->first();
+            //                 $teacher_check = Teacher_model::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->first();
+            //                 if (!empty($student_check) || !empty($teacher_check)) {
+            //                     return $this->response([], "Cannot remove class_medium. Already exist student or teacher in this class_medium.", false, 400);
+            //                 } else {
+            //                     $delete_sub = Class_sub::where('class_id', $institute_for_class)->where('institute_id', $institute->id)->get();
+            //                     if (!empty($delete_sub)) {
+            //                         foreach ($delete_sub as $did) {
+            //                             $did->delete();
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
 
-                    //standard
-                    $standard_medium_check = Standard_sub::where('institute_id', $institute->id)
-                        ->where('standard_id', $standard)
-                        ->where('board_id', $board)
-                        ->where('medium_id', $medium)
-                        ->where('class_id', $institute_for_class)->first();
-                    $standardewArray = explode(',', $request->standard_id);
-                    if (!$standard_medium_check) {
-                        if (in_array($standard, $standardewArray)) {
-                            Standard_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'standard_id' => $standard,
-                                'institute_for_id' => $institute_for,
-                                'board_id' => $board,
-                                'medium_id' => $medium,
-                                'class_id' => $institute_for_class
-                            ]);
-                        }
-                    } else {
-                        if (!in_array($standard, $standardewArray)) {
-                            $student_check = Student_detail::where('standard_id', $standard)
-                            ->where('board_id', $board)
-                            ->where('medium_id', $medium)
-                            ->where('class_id', $institute_for_class)
-                            ->where('institute_id', $institute->id)->first();
-                            $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
-                            if (!empty($student_check) || !empty($teacher_check)) {
-                                return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
-                            } else {
-                                $delete_sub = Standard_sub::where('standard_id', $standard)
-                                    ->where('institute_id', $institute->id)
-                                    ->get();
-                                if (!empty($delete_sub)) {
-                                    foreach ($delete_sub as $did) {
-                                        $did->delete();
-                                    }
-                                }
-                            }
-                        }
-                    }
+            //         //standard
+            //         $standard_medium_check = Standard_sub::where('institute_id', $institute->id)
+            //             ->where('standard_id', $standard)
+            //             ->where('board_id', $board)
+            //             ->where('medium_id', $medium)
+            //             ->where('class_id', $institute_for_class)->first();
+            //         $standardewArray = explode(',', $request->standard_id);
+            //         if (!$standard_medium_check) {
+            //             if (in_array($standard, $standardewArray)) {
+            //                 Standard_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'standard_id' => $standard,
+            //                     'institute_for_id' => $institute_for,
+            //                     'board_id' => $board,
+            //                     'medium_id' => $medium,
+            //                     'class_id' => $institute_for_class
+            //                 ]);
+            //             }
+            //         } else {
+            //             if (!in_array($standard, $standardewArray)) {
+            //                 $student_check = Student_detail::where('standard_id', $standard)
+            //                 ->where('board_id', $board)
+            //                 ->where('medium_id', $medium)
+            //                 ->where('class_id', $institute_for_class)
+            //                 ->where('institute_id', $institute->id)->first();
+            //                 $teacher_check = Teacher_model::where('standard_id', $standard)->where('institute_id', $institute->id)->first();
+            //                 if (!empty($student_check) || !empty($teacher_check)) {
+            //                     return $this->response([], "Cannot remove standard. Already exist student or teacher in this standard_medium.", false, 400);
+            //                 } else {
+            //                     $delete_sub = Standard_sub::where('standard_id', $standard)
+            //                         ->where('institute_id', $institute->id)
+            //                         ->get();
+            //                     if (!empty($delete_sub)) {
+            //                         foreach ($delete_sub as $did) {
+            //                             $did->delete();
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
 
-                    //stream
-                    if (!empty($stream) || $stream != '') {
-                        $stream_medium_check = Stream_sub::where('institute_id', $institute->id)->where('stream_id', $stream)->get();
-                        if ($stream_medium_check->isEmpty()) {
-                            Stream_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'stream_id' => $stream,
-                                'institute_for_id' => $institute_for,
-                                'board_id' => $board,
-                                'medium_id' => $medium,
-                                'class_id' => $institute_for_class,
-                                'standard_id' => $standard
-                            ]);
-                        } else {
-                            $streamewArray = explode(',', $request->stream_id);
-                            if (!in_array($stream, $streamewArray)) {
-                                $student_check = Student_detail::where('stream_id', $stream)->where('institute_id', $institute->id)->first();
-                                $teacher_check = Teacher_model::where('stream_id', $stream)->where('institute_id', $institute->id)->first();
-                                if (!empty($student_check) || !empty($teacher_check)) {
-                                    return $this->response([], "Cannot remove stream_medium. Already exist student or teacher in this stream_medium.", false, 400);
-                                } else {
-                                    $delete_sub = Stream_sub::where('stream_id', $stream)->where('institute_id', $institute->id)->get();
-                                    if (!empty($delete_sub)) {
-                                        foreach ($delete_sub as $did) {
-                                            $did->delete();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+            //         //stream
+            //         if (!empty($stream) || $stream != '') {
+            //             $stream_medium_check = Stream_sub::where('institute_id', $institute->id)->where('stream_id', $stream)->get();
+            //             if ($stream_medium_check->isEmpty()) {
+            //                 Stream_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'stream_id' => $stream,
+            //                     'institute_for_id' => $institute_for,
+            //                     'board_id' => $board,
+            //                     'medium_id' => $medium,
+            //                     'class_id' => $institute_for_class,
+            //                     'standard_id' => $standard
+            //                 ]);
+            //             } else {
+            //                 $streamewArray = explode(',', $request->stream_id);
+            //                 if (!in_array($stream, $streamewArray)) {
+            //                     $student_check = Student_detail::where('stream_id', $stream)->where('institute_id', $institute->id)->first();
+            //                     $teacher_check = Teacher_model::where('stream_id', $stream)->where('institute_id', $institute->id)->first();
+            //                     if (!empty($student_check) || !empty($teacher_check)) {
+            //                         return $this->response([], "Cannot remove stream_medium. Already exist student or teacher in this stream_medium.", false, 400);
+            //                     } else {
+            //                         $delete_sub = Stream_sub::where('stream_id', $stream)->where('institute_id', $institute->id)->get();
+            //                         if (!empty($delete_sub)) {
+            //                             foreach ($delete_sub as $did) {
+            //                                 $did->delete();
+            //                             }
+            //                         }
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
 
-                //subject
-                $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
-                if ($institute_subject_check->isEmpty()) {
-                    foreach ($institute_subject_ids as $institute_subject_id) {
-                        $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
-                        if (!$sub_instboard_exists) {
-                            Subject_sub::create([
-                                'user_id' => $institute->user_id,
-                                'institute_id' => $institute->id,
-                                'subject_id' => $institute_subject_id,
-                            ]);
-                        }
-                    }
-                } else {
-                    $subjewArray = explode(',', $request->subject_id);
-                    if (!in_array($institute_subject_check, $subjewArray)) {
-                        $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
-                        $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
-                        if (!empty($student_check) || !empty($teacher_check)) {
-                            return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
-                        } else {
-                            $delete_sub = Subject_sub::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->get();
-                            if (!empty($delete_sub)) {
-                                foreach ($delete_sub as $did) {
-                                    $did->delete();
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+            //     //subject
+            //     $institute_subject_check = Subject_sub::where('institute_id', $institute->id)->whereIn('subject_id', $differenceInstituteSubjectArray)->pluck('subject_id');
+            //     if ($institute_subject_check->isEmpty()) {
+            //         foreach ($institute_subject_ids as $institute_subject_id) {
+            //             $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
+            //             if (!$sub_instboard_exists) {
+            //                 Subject_sub::create([
+            //                     'user_id' => $institute->user_id,
+            //                     'institute_id' => $institute->id,
+            //                     'subject_id' => $institute_subject_id,
+            //                 ]);
+            //             }
+            //         }
+            //     } else {
+            //         $subjewArray = explode(',', $request->subject_id);
+            //         if (!in_array($institute_subject_check, $subjewArray)) {
+            //             $student_check = Student_detail::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+            //             $teacher_check = Teacher_model::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->first();
+            //             if (!empty($student_check) || !empty($teacher_check)) {
+            //                 return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
+            //             } else {
+            //                 $delete_sub = Subject_sub::whereIn('subject_id', $institute_subject_check)->where('institute_id', $institute->id)->get();
+            //                 if (!empty($delete_sub)) {
+            //                     foreach ($delete_sub as $did) {
+            //                         $did->delete();
+            //                     }
+            //                 }
+            //             }
+            //         }
+            //     }
+            // }
 
             //end
         return $this->response([], "institute Update Successfully");
@@ -873,6 +883,184 @@ class InstituteApiController extends Controller
         }
     }
 
+    private function addsubject($addSubject,$institute){
+        
+            foreach ($addSubject as $institute_subject_id) {
+                //base data
+                $basedata = Base_table::join('subject','subject.base_table_id','=','base_table.id')
+                ->where('subject.id',$institute_subject_id)->first();
+
+                $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
+                if (!$sub_instboard_exists) {
+                    Subject_sub::create([
+                        'user_id' => $institute->user_id,
+                        'institute_id' => $institute->id,
+                        'subject_id' => $institute_subject_id,
+                    ]);
+
+                    //standard
+                    $standard_medium_check = Standard_sub::where('institute_id', $institute->id)
+                        ->where('institute_for_id',$basedata->institute_for)
+                        ->where('standard_id', $basedata->standard)
+                        ->where('board_id', $basedata->board)
+                        ->where('medium_id', $basedata->medium)
+                        ->where('class_id', $basedata->institute_for_class)->first();
+                    if (!$standard_medium_check) {
+                        Standard_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'standard_id' => $basedata->standard,
+                            'institute_for_id' => $basedata->institute_for,
+                            'board_id' => $basedata->board,
+                            'medium_id' => $basedata->medium,
+                            'class_id' => $basedata->institute_for_class
+                        ]);
+                    }
+
+                    //class
+                    $class_medium_check = Class_sub::where('institute_id', $institute->id)
+                    ->where('institute_for_id',$basedata->institute_for)
+                    ->where('board_id', $basedata->board)
+                    ->where('medium_id', $basedata->medium)
+                    ->where('class_id', $basedata->institute_for_class)->first();
+                    if (!$class_medium_check) {
+                        Class_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'class_id' => $basedata->institute_for_class,
+                            'institute_for_id' => $basedata->institute_for,
+                            'board_id' => $basedata->board,
+                            'medium_id' => $basedata->medium
+                        ]);
+                    }
+
+                    //medium
+                    $institute_medium_check = Medium_sub::where('institute_id', $institute->id)
+                    ->where('institute_for_id',$basedata->institute_for)
+                    ->where('board_id', $basedata->board)
+                    ->where('medium_id', $basedata->medium)->first();
+                    if (!$institute_medium_check) {
+                        Medium_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'medium_id' => $basedata->medium,
+                            'institute_for_id' => $basedata->institute_for,
+                            'board_id' => $basedata->board
+                        ]);
+                    }
+
+                    //board
+                    $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
+                        ->where('institute_for_id',$basedata->institute_for)
+                        ->where('board_id', $basedata->board)->first();
+
+                    if (!$institute_board_check) {
+                        Institute_board_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'board_id' => $basedata->board,
+                            'institute_for_id' => $basedata->institute_for
+                        ]);
+                    }
+
+                    //institute for
+                    $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)
+                        ->where('institute_for_id', $basedata->institute_for)->get();
+                    if (!$institute_for_check) {
+                        Institute_for_sub::create([
+                            'user_id' => $institute->user_id,
+                            'institute_id' => $institute->id,
+                            'institute_for_id' => $basedata->institute_for
+                        ]);
+                    }
+                }
+            }
+            return 1;
+    }
+
+    private function deletesubject($removedSubject,$institute){
+        
+        foreach ($removedSubject as $institute_subject_id) {
+            //base data
+            $basedata = Base_table::join('subject','subject.base_table_id','=','base_table.id')
+            ->where('subject.id',$institute_subject_id)->first();
+
+            $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first(); 
+            
+            if ($sub_instboard_exists) {
+                $student_check = Student_detail::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->first();
+                $teacher_check = Teacher_model::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->first();
+                if (!empty($student_check) || !empty($teacher_check)) {
+                    return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
+                } else {
+                    $delete_sub = Subject_sub::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->delete();
+                } 
+            }
+
+            //standard
+            $baseTableIds=Base_table::where("standard",$basedata->standard)
+                        ->where("institute_for_class",$basedata->institute_for_class) 
+                        ->where("medium",$basedata->medium) 
+                        ->where("board",$basedata->board) 
+                        ->where("institute_for",$basedata->institute_for)->pluck("id"); 
+            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
+            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->get();
+            if(!$subjectSub)
+            {
+                Standard_sub::where("id",$basedata->standard)->where('institute_id', $institute->id)->delete();
+            }
+
+            // Class
+            $baseTableIds=Base_table::where("institute_for_class",$basedata->institute_for_class) 
+            ->where("medium",$basedata->medium) 
+            ->where("board",$basedata->board) 
+            ->where("institute_for",$basedata->institute_for)->pluck("id");
+
+            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
+            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->get();
+            if(!$subjectSub)
+            {
+                Class_sub::where("id",$basedata->institute_for_class)->where('institute_id', $institute->id)->delete();
+            }
+
+            // medium
+            $baseTableIds=Base_table::where("medium",$basedata->medium) 
+            ->where("board",$basedata->board) 
+            ->where("institute_for",$basedata->institute_for)->pluck("id");
+
+            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
+            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->get();
+            if(!$subjectSub)
+            {
+                Medium_sub::where("id",$basedata->medium)->where('institute_id', $institute->id)->delete();
+            }
+            
+ 
+            // board
+            $baseTableIds=Base_table::where("board",$basedata->board) 
+            ->where("institute_for",$basedata->institute_for)->pluck("id");
+
+            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
+            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->get();
+            if(!$subjectSub)
+            {
+                Institute_board_sub::where("id",$basedata->board)->where('institute_id', $institute->id)->delete();
+            }
+
+            
+            // institute_for
+            $baseTableIds=Base_table:: where("institute_for",$basedata->institute_for)->pluck("id");
+
+            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
+            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->get();
+            if(!$subjectSub)
+            {
+                Institute_for_sub::where("id",$basedata->institute_for)->where('institute_id', $institute->id)->delete();
+            }
+
+        }
+        return 1;
+    }
 
     public function get_homescreen_first(Request $request)
     {
