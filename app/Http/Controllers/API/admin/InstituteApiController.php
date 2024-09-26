@@ -1001,8 +1001,8 @@ class InstituteApiController extends Controller
             }
 
             //standard
-            $standardSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
-                                        ->where("Subject_sub.institute_id",$institute->id) 
+            $standardSub= Subject_sub::join("subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+                                        ->where("subject_sub.institute_id",$institute->id) 
                                         ->where("base_table.standard",$basedata->standard)
                                         ->where("base_table.institute_for_class",$basedata->institute_for_class) 
                                         ->where("base_table.medium",$basedata->medium) 
@@ -1020,8 +1020,8 @@ class InstituteApiController extends Controller
             }
 
             // Class
-            $classSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
-            ->where("Subject_sub.institute_id",$institute->id)  
+            $classSub= Subject_sub::join("subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("subject_sub.institute_id",$institute->id)  
             ->where("base_table.institute_for_class",$basedata->institute_for_class) 
             ->where("base_table.medium",$basedata->medium) 
             ->where("base_table.board",$basedata->board) 
@@ -1036,8 +1036,8 @@ class InstituteApiController extends Controller
             }
 
             // medium
-            $mediumSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
-            ->where("Subject_sub.institute_id",$institute->id)   
+            $mediumSub= Subject_sub::join("subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("subject_sub.institute_id",$institute->id)   
             ->where("base_table.medium",$basedata->medium) 
             ->where("base_table.board",$basedata->board) 
             ->where("base_table.institute_for",$basedata->institute_for)->exists();    
@@ -1051,8 +1051,8 @@ class InstituteApiController extends Controller
             
  
             // board
-            $boardSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
-            ->where("Subject_sub.institute_id",$institute->id)  
+            $boardSub= Subject_sub::join("subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("subject_sub.institute_id",$institute->id)  
             ->where("base_table.board",$basedata->board) 
             ->where("base_table.institute_for",$basedata->institute_for)->exists();    
             if(!$boardSub)
@@ -1064,8 +1064,8 @@ class InstituteApiController extends Controller
 
             
             // institute_for
-            $instituteForSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
-            ->where("Subject_sub.institute_id",$institute->id)   
+            $instituteForSub= Subject_sub::join("subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("subject_sub.institute_id",$institute->id)   
             ->where("base_table.institute_for",$basedata->institute_for)->exists();   
             if(!$instituteForSub)
             {
