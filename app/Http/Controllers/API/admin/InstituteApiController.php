@@ -890,8 +890,9 @@ class InstituteApiController extends Controller
                 $basedata = Base_table::join('subject','subject.base_table_id','=','base_table.id')
                 ->where('subject.id',$institute_subject_id)->first();
 
-                $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first();
-                if (!$sub_instboard_exists) {
+                $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->exists();
+                
+                if (!$sub_instboard_exists) { 
                     Subject_sub::create([
                         'user_id' => $institute->user_id,
                         'institute_id' => $institute->id,
@@ -904,7 +905,7 @@ class InstituteApiController extends Controller
                         ->where('standard_id', $basedata->standard)
                         ->where('board_id', $basedata->board)
                         ->where('medium_id', $basedata->medium)
-                        ->where('class_id', $basedata->institute_for_class)->first();
+                        ->where('class_id', $basedata->institute_for_class)->exists();
                     if (!$standard_medium_check) {
                         Standard_sub::create([
                             'user_id' => $institute->user_id,
@@ -922,7 +923,7 @@ class InstituteApiController extends Controller
                     ->where('institute_for_id',$basedata->institute_for)
                     ->where('board_id', $basedata->board)
                     ->where('medium_id', $basedata->medium)
-                    ->where('class_id', $basedata->institute_for_class)->first();
+                    ->where('class_id', $basedata->institute_for_class)->exists();
                     if (!$class_medium_check) {
                         Class_sub::create([
                             'user_id' => $institute->user_id,
@@ -938,7 +939,7 @@ class InstituteApiController extends Controller
                     $institute_medium_check = Medium_sub::where('institute_id', $institute->id)
                     ->where('institute_for_id',$basedata->institute_for)
                     ->where('board_id', $basedata->board)
-                    ->where('medium_id', $basedata->medium)->first();
+                    ->where('medium_id', $basedata->medium)->exists();
                     if (!$institute_medium_check) {
                         Medium_sub::create([
                             'user_id' => $institute->user_id,
@@ -952,7 +953,7 @@ class InstituteApiController extends Controller
                     //board
                     $institute_board_check = Institute_board_sub::where('institute_id', $institute->id)
                         ->where('institute_for_id',$basedata->institute_for)
-                        ->where('board_id', $basedata->board)->first();
+                        ->where('board_id', $basedata->board)->exists();
 
                     if (!$institute_board_check) {
                         Institute_board_sub::create([
@@ -961,11 +962,10 @@ class InstituteApiController extends Controller
                             'board_id' => $basedata->board,
                             'institute_for_id' => $basedata->institute_for
                         ]);
-                    }
-
+                    } 
                     //institute for
                     $institute_for_check = Institute_for_sub::where('institute_id', $institute->id)
-                        ->where('institute_for_id', $basedata->institute_for)->get();
+                        ->where('institute_for_id', $basedata->institute_for)->exists();
                     if (!$institute_for_check) {
                         Institute_for_sub::create([
                             'user_id' => $institute->user_id,
@@ -974,7 +974,7 @@ class InstituteApiController extends Controller
                         ]);
                     }
                 }
-            }
+            } 
             return 1;
     }
 
