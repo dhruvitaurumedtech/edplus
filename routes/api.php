@@ -272,7 +272,7 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/teacher-profile-delete-institute', [TeacherController::class, 'teacher_profile_delete_institute']);
     Route::post('/institute/add-standard-teacher', [TeacherController::class, 'add_standard']);
     Route::post('/institute/replace-teacher', [InstituteApiController::class, 'replace_teacher']);
-
+    Route::post('/institute/institute-board-standard-list', [InstituteApiController::class, 'institute_board_standard_list']);
 
     Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
     Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
