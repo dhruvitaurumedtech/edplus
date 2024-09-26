@@ -1008,10 +1008,10 @@ class InstituteApiController extends Controller
             if(!$subjectSub)
             {
                 Standard_sub::where("standard_id",$basedata->standard)
-                    ->where("institute_for_class",$basedata->institute_for_class) 
-                    ->where("medium",$basedata->medium) 
-                    ->where("board",$basedata->board) 
-                    ->where("institute_for",$basedata->institute_for)
+                    ->where("class_id",$basedata->institute_for_class) 
+                    ->where("medium_id",$basedata->medium) 
+                    ->where("board_id",$basedata->board) 
+                    ->where("institute_for_id",$basedata->institute_for)
                     ->where('institute_id', $institute->id)->delete();
             }
 
@@ -1026,9 +1026,9 @@ class InstituteApiController extends Controller
             if(!$subjectSub)
             {
                 Class_sub::where("class_id",$basedata->institute_for_class)
-                ->where("medium",$basedata->medium) 
-                ->where("board",$basedata->board) 
-                ->where("institute_for",$basedata->institute_for)
+                ->where("medium_id",$basedata->medium) 
+                ->where("board_id",$basedata->board) 
+                ->where("institute_for_id",$basedata->institute_for)
                 ->where('institute_id', $institute->id)->delete();
             }
 
@@ -1042,8 +1042,8 @@ class InstituteApiController extends Controller
             if(!$subjectSub)
             {
                 Medium_sub::where("medium_id",$basedata->medium)
-                ->where("board",$basedata->board) 
-                ->where("institute_for",$basedata->institute_for)
+                ->where("board_id",$basedata->board) 
+                ->where("institute_for_id",$basedata->institute_for)
                 ->where('institute_id', $institute->id)->delete();
             }
             
@@ -1057,7 +1057,7 @@ class InstituteApiController extends Controller
             if(!$subjectSub)
             {
                 Institute_board_sub::where("board_id",$basedata->board)
-                ->where("institute_for",$basedata->institute_for)
+                ->where("institute_for_id",$basedata->institute_for)
                 ->where('institute_id', $institute->id)->delete();
             }
 
