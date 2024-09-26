@@ -608,12 +608,15 @@ class InstituteApiController extends Controller
 
 
 
-            $removedSubject = array_diff($institute_subjects, $institute_subject_ids); 
+            $removedSubject = array_diff($institute_subjects, $institute_subject_ids);
             $addSubject= array_diff($institute_subject_ids,$institute_subjects);
-            $this->addsubject($addSubject,$institute);
+            if($addSubject){
+                $this->addsubject($addSubject,$institute);
+            }
+            if($removedSubject){
+                $this->deletesubject($removedSubject,$institute);
+            }
             
-
-            $this->deletesubject($removedSubject,$institute);
 
             // print_r($differenceInstituteSubjectArray);exit;
             // if (!empty($differenceInstituteSubjectArray)) {
@@ -993,19 +996,20 @@ class InstituteApiController extends Controller
                 if (!empty($student_check) || !empty($teacher_check)) {
                     return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
                 } else {
-                    $delete_sub = Subject_sub::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->delete();
+                    $delete_sub = Subject_sub::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->delete(); 
                 } 
             }
 
             //standard
-            $baseTableIds=Base_table::where("standard",$basedata->standard)
-                        ->where("institute_for_class",$basedata->institute_for_class) 
-                        ->where("medium",$basedata->medium) 
-                        ->where("board",$basedata->board) 
-                        ->where("institute_for",$basedata->institute_for)->pluck("id"); 
-            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
-            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->where('institute_id', $institute->id)->get();
-            if(!$subjectSub)
+            $standardSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+                                        ->where("Subject_sub.institute_id",$institute->id) 
+                                        ->where("base_table.standard",$basedata->standard)
+                                        ->where("base_table.institute_for_class",$basedata->institute_for_class) 
+                                        ->where("base_table.medium",$basedata->medium) 
+                                        ->where("base_table.board",$basedata->board) 
+                                        ->where("base_table.institute_for",$basedata->institute_for)->exists();
+ 
+            if(!$standardSub)
             {
                 Standard_sub::where("standard_id",$basedata->standard)
                     ->where("class_id",$basedata->institute_for_class) 
@@ -1016,14 +1020,13 @@ class InstituteApiController extends Controller
             }
 
             // Class
-            $baseTableIds=Base_table::where("institute_for_class",$basedata->institute_for_class) 
-            ->where("medium",$basedata->medium) 
-            ->where("board",$basedata->board) 
-            ->where("institute_for",$basedata->institute_for)->pluck("id");
-
-            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
-            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->where('institute_id', $institute->id)->get();
-            if(!$subjectSub)
+            $classSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("Subject_sub.institute_id",$institute->id)  
+            ->where("base_table.institute_for_class",$basedata->institute_for_class) 
+            ->where("base_table.medium",$basedata->medium) 
+            ->where("base_table.board",$basedata->board) 
+            ->where("base_table.institute_for",$basedata->institute_for)->exists();   
+            if(!$classSub)
             {
                 Class_sub::where("class_id",$basedata->institute_for_class)
                 ->where("medium_id",$basedata->medium) 
@@ -1033,13 +1036,12 @@ class InstituteApiController extends Controller
             }
 
             // medium
-            $baseTableIds=Base_table::where("medium",$basedata->medium) 
-            ->where("board",$basedata->board) 
-            ->where("institute_for",$basedata->institute_for)->pluck("id");
-
-            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
-            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->where('institute_id', $institute->id)->get();
-            if(!$subjectSub)
+            $mediumSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("Subject_sub.institute_id",$institute->id)   
+            ->where("base_table.medium",$basedata->medium) 
+            ->where("base_table.board",$basedata->board) 
+            ->where("base_table.institute_for",$basedata->institute_for)->exists();    
+            if(!$mediumSub)
             {
                 Medium_sub::where("medium_id",$basedata->medium)
                 ->where("board_id",$basedata->board) 
@@ -1049,12 +1051,11 @@ class InstituteApiController extends Controller
             
  
             // board
-            $baseTableIds=Base_table::where("board",$basedata->board) 
-            ->where("institute_for",$basedata->institute_for)->pluck("id");
-
-            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
-            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->where('institute_id', $institute->id)->get();
-            if(!$subjectSub)
+            $boardSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("Subject_sub.institute_id",$institute->id)  
+            ->where("base_table.board",$basedata->board) 
+            ->where("base_table.institute_for",$basedata->institute_for)->exists();    
+            if(!$boardSub)
             {
                 Institute_board_sub::where("board_id",$basedata->board)
                 ->where("institute_for_id",$basedata->institute_for)
@@ -1063,11 +1064,10 @@ class InstituteApiController extends Controller
 
             
             // institute_for
-            $baseTableIds=Base_table:: where("institute_for",$basedata->institute_for)->pluck("id");
-
-            $subjectIds=Subject_model::wherein("base_table_id",$baseTableIds)->pluck("id");
-            $subjectSub=Subject_sub::wherein("subject_id",$subjectIds)->where('institute_id', $institute->id)->get();
-            if(!$subjectSub)
+            $instituteForSub= Subject_sub::join("Subject","subject.id","=","subject_sub.subject_id")->join("base_table","base_table.id","=","subject.base_table_id")
+            ->where("Subject_sub.institute_id",$institute->id)   
+            ->where("base_table.institute_for",$basedata->institute_for)->exists();   
+            if(!$instituteForSub)
             {
                 Institute_for_sub::where("institute_for_id",$basedata->institute_for)->where('institute_id', $institute->id)->delete();
             }
