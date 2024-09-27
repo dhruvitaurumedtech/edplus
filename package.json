@@ -17,6 +17,7 @@
     },
     "dependencies": {
         "chart.js": "^4.4.4",
-        "chartjs-node-canvas": "^4.1.6"
+        "chartjs-node-canvas": "^4.1.6",
+        "puppeteer": "^23.4.1"
     }
 }

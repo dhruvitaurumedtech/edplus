@@ -104,35 +104,46 @@
 
 <body>
 
-    <h2>Fees Report</h2>
-    <hr>
-
+   
     @if (!empty($data['board_result']) && is_array($data))
-    @foreach ($data['board_result'] as $board_index=>$item)
-    <p><b>Board Name: </b>{{$item['board_name']}}</p>
-
+    @foreach ($data['board_result'] as $item)
+   
     @if (!empty($item['medium']) && is_array($item['medium']))
-    @foreach ($item['medium'] as $medium_index=>$mediumDT)
-    <p><b>Medium Name: </b>{{$mediumDT['medium_name']}}</p>
-
+    @foreach ($item['medium'] as $mediumDT)
+   
     @if (!empty($mediumDT['class']) && is_array($mediumDT['class']))
-    @foreach ($mediumDT['class'] as $class_index=>$classDT)
-    <p><b>Class Name: </b>{{$classDT['class_name']}}</p>
-
+    @foreach ($mediumDT['class'] as $classDT)
+   
     @if (!empty($classDT['standard']) && is_array($classDT['standard']))
-    @foreach ($classDT['standard'] as $standard_index=>$standardDT)
-    <p><b>Standard Name: </b>{{$standardDT['standard_name']}}</p>
-
+    @foreach ($classDT['standard'] as $standardDT)
+   
     @if (!empty($standardDT['batch']) && is_array($standardDT['batch']))
-    @foreach ($standardDT['batch'] as $batch_index=>$batchDT)
-    <p><b>Batch Name: </b>{{$batchDT['batch_name']}}</p>
+    @foreach ($standardDT['batch'] as $batchDT)
     @foreach ($batchDT['student'] as $studentIndex => $studentDT)
     
 
 
-    <center><h1><p><b>Student Name: </b>{{ $studentDT['student_name'] }}</p> </h1></center>
-    <img src="{{ asset('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex . '.png') }}" alt="Student Image">
+    <div class="chart-container">
+        <div class="y-axis-labels">
+            @for ($i = 100; $i >= 0; $i -= 10)
+            <div class="y-label">{{ $i }}</div>
+            @endfor
+        </div>
+        <div style="display:flex !important;gap:160px !important;margin-left: 100px;position: relative;height:100%;align-items: end;">
+            @foreach($studentDT['exam'] as $index => $examDT)
+            <div class="test-{{$index}}" style="height: {{ $examDT['percentage'] }}%; width: 70px; background-color: #4CAF50;text-align:center;color:#fff">{{$examDT['percentage'].'%'}}<br>{{$examDT['mark'].'/'.$examDT['total_mark']}}</div>
+            @endforeach
+        </div>
 
+    </div>
+    <div style="display:flex;gap:45px;justify-content: left;margin-left: 100px;">
+        
+        @foreach($studentDT['exam'] as $examDT)
+        <div class="label" style="left: 10px;width:165px;display: flex; padding: 10px;">
+        {{date('d-m-20y',strtotime($examDT['exam_date']))}}
+        </div>
+        @endforeach
+    </div>
     @endforeach
     @endforeach
     @endif
@@ -144,7 +155,6 @@
     @endif
     @endforeach
     @else
-    <p>No data available.</p>
     @endif
 
 </body>

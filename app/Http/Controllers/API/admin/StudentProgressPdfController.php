@@ -11,11 +11,14 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use PDF;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Storage;
+
+
 
 use ConsoleTVs\Charts\Facades\Charts;
 use Chartisan\PHP\Chartisan;
-
-
+use Illuminate\Support\Facades\Log;
+use Spatie\Browsershot\Browsershot;
 
 class StudentProgressPdfController extends Controller
 {
@@ -41,7 +44,7 @@ class StudentProgressPdfController extends Controller
         ->select('board.id as board_id', 'board.name as board_name')
         ->get()->toarray();
       $board_result = [];
-      foreach ($board_response as $board_value) {
+      foreach ($board_response as $board_index=>$board_value) {
         $board_id = !empty($request->board_id) ? $request->board_id : $board_value['board_id'];
         $medium_id = !empty($request->medium_id) ? $request->medium_id : '';
         $medium_response = Student_detail::leftjoin('medium', 'medium.id', '=', 'students_details.medium_id')
@@ -58,7 +61,7 @@ class StudentProgressPdfController extends Controller
           ->select('medium.id as medium_id', 'medium.name as medium_name')
           ->get()->toarray();
         $medium_result = [];
-        foreach ($medium_response as $medium_value) {
+        foreach ($medium_response as $medium_index=>$medium_value) {
           $medium_id = !empty($request->medium_id) ? $request->medium_id : $medium_value['medium_id'];
           $class_id = !empty($request->class_id) ? $request->class_id : '';
           $class_response = Student_detail::leftjoin('class', 'class.id', '=', 'students_details.class_id')
@@ -78,7 +81,7 @@ class StudentProgressPdfController extends Controller
             ->select('class.id as class_id', 'class.name as class_name')
             ->get()->toarray();
           $class_result = [];
-          foreach ($class_response as $class_value) {
+          foreach ($class_response as $class_index=>$class_value) {
             $class_id = !empty($request->class_id) ? $request->class_id : $class_value['class_id'];
             $standard_id = !empty($request->standard_id) ? $request->standard_id : '';
             $standard_response = Student_detail::leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
@@ -102,7 +105,7 @@ class StudentProgressPdfController extends Controller
               ->get()->toarray();
 
             $standard_result = [];
-            foreach ($standard_response as $standard_value) {
+            foreach ($standard_response as $standard_index=>$standard_value) {
 
               $standard_id = !empty($request->standard_id) ? $request->standard_id : $standard_value['standard_id'];
               $batch_id = !empty($request->batch_id) ? $request->batch_id : '';
@@ -127,7 +130,7 @@ class StudentProgressPdfController extends Controller
                 ->distinct()
                 ->get()->toarray();
               $batch_result = [];
-              foreach ($batch_response as $batch_value) {
+              foreach ($batch_response as $batch_index=>$batch_value) {
                 $batch_id = !empty($request->batch_id) ? $request->batch_id : $batch_value['batch_id'];
 
                 $subject_get = Student_detail::leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
@@ -208,7 +211,8 @@ class StudentProgressPdfController extends Controller
 
 
                 $exam_student_result = [];
-                foreach ($exam_wise_student_response as $exam_student_value) {
+              
+                foreach ($exam_wise_student_response as $student_index=>$exam_student_value) {
 
                   $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
                     ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
@@ -255,25 +259,108 @@ class StudentProgressPdfController extends Controller
                     ->toArray();
 
                   $exam_result = [];
-                  foreach ($exam_response as $exam_value) {
+                  $chartBars = '';
+                  foreach ($exam_response as $exam_index => $exam_value) {
                     $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
+                    
+                   
+                    $yAxisLabels = '';
+                    for ($i = 100; $i >= 0; $i -= 10) {
+                        $yAxisLabels .= "<div class='y-label'>{$i}</div>";
+                    }
+                    $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
+                
+                    // Prepare chart bars
+                   
+                
+                    // Set the image path
+                    
+                    
+                    // Generate image from HTML content using Browsershot
+                    // print_r($htmlContent);exit;
+                   
                     $exam_result[] = [
                       'exam_name'  => $exam_value['exam_title'],
                       'mark'       => $exam_value['marks_obtained'],
                       'total_mark' => $exam_value['total_marks'],
                       'percentage' => round($percentage, 2),
                       'exam_date'  => $exam_value['exam_date'],
+                     
                     ];
+                    
+
                   }
+                 
+                  // Render the chart and labels
+                  $chartContainer = "
+                      <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
+                          <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
+                          <div style='display:flex; gap: 160px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                      </div>
+                  ";
+              
+                  // Create complete HTML content
+                  $htmlContent = "
+                      <html>
+                      <head>
+                          <style>
+                              body {
+                                  font-family: Arial, sans-serif;
+                                  margin: 0;
+                                  padding: 20px;
+                                  background-color: #f4f4f4;
+                              }
+                              .chart-container {
+                                  display: flex;
+                                  align-items: flex-end;
+                                  height: 300px;
+                                  position: relative;
+                                  margin: 20px;
+                                  border-left: 2px solid #333;
+                                  border-bottom: 2px solid #333;
+                                  background-color: #fff;
+                              }
+                              .y-label {
+                                  text-align: right;
+                              }
+                          </style>
+                      </head>
+                      <body>
+                          $chartContainer
+                      </body>
+                      </html>
+                  ";
 
+                 
+                    
+                   $imagePath = public_path('student_report_graph/student_image_report_'.$board_index.$medium_index.$class_index.$standard_index.$batch_index.$student_index.'.png');
+                   $directoryPath = public_path('student_report_graph');
+                        if (!file_exists($directoryPath)) {
+                            mkdir($directoryPath, 0755, true);
+                        }
 
+                        try {
+                            Browsershot::html($htmlContent)
+                                ->windowSize(800, 400)
+                                ->save($imagePath);
+
+                            // return response()->download($imagePath);
+                        } catch (\Exception $e) {
+                            return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+                        }
+// Generate the image
+                  
+                
                   $exam_student_result[] = [
                     'student_id' => $exam_student_value['id'],
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
                     'exam' => $exam_result,
-                  ];
-                }
+                    'imagePath' => $imagePath,
 
+                  ];
+                  
+                }
+                
                 $batch_result[] = [
                   'batch_id' => $batch_value['batch_id'],
                   'batch_name' => $batch_value['batch_name'],
@@ -310,18 +397,17 @@ class StudentProgressPdfController extends Controller
           'medium' => $medium_result,
         ];
       }
-      // print_r($board_result);
-      // exit;
       $data = ['board_result' => $board_result, 'request_data' => $request];
-      return view('pdf.studentprogressreport',compact('data'));
-      // $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
+      
+      // return view('pdf.studentprogressreport',compact('data'));
+      $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
 
       // $pdf->setOption('enable-javascript',true);
       // $pdf->setOption('javascript-delay',1000);
       // $pdf->setOption('no-stop-slow-scripts',true);
       // $pdf->setOption('enable-smart-shrinking',true);
 
-      // return $pdf->stream();
+      return $pdf->stream();
 
       $folderPath = public_path('pdfs');
 
