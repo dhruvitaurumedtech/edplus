@@ -61,7 +61,10 @@ class BasetableControllerAPI extends Controller
             $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->distinct()->pluck('board');
             $base_board = board::whereIn('id', $getBoardsId)->get();
             foreach ($base_board as $baseboard) {
-                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon));
+                $data[] = array('id' => $baseboard->id,
+                 'name' => $baseboard->name,
+                 'institute_for_id'=>$baseboard->institute_for,
+                 'icon' => url($baseboard->icon));
             }
 
             return $this->response($data, "Fetch Data Successfully");
