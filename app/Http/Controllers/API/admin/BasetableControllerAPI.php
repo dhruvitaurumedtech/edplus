@@ -296,14 +296,18 @@ class BasetableControllerAPI extends Controller
         }
         try {
             $base_institutfor = Institute_for_model::join('base_table', 'base_table.institute_for', '=', 'institute_for.id')
-                ->select('institute_for.id', 'institute_for.name', 'institute_for.icon')
+                ->select('institute_for.id', 'institute_for.name', 'institute_for.icon','institute_for.status')
                 ->distinct()
                 ->get();
-            $institute_base_for_ids = Institute_for_sub::where('institute_id', $request->institute_id)->pluck('institute_for_id')->toArray();;
+            $institute_base_for_ids = Institute_for_sub::where('institute_id', $request->institute_id)->pluck('institute_for_id')->toArray();
             $data = [];
             foreach ($base_institutfor as $basedata) {
                 $isAdded = in_array($basedata->id, $institute_base_for_ids);
-                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon), 'is_added' => $isAdded);
+                $data[] = array('id' => $basedata->id,
+                'name' => $basedata->name,
+                'icon' => url($basedata->icon),
+                'is_active' => $basedata->status,
+                'is_added' => $isAdded);
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
@@ -322,12 +326,20 @@ class BasetableControllerAPI extends Controller
         }
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
-            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->distinct()->pluck('board');
-            $base_board = board::whereIn('id', $getBoardsId)->get();
+            $base_board = board::join('base_table','base_table.board','=','board.id')
+            ->whereIn('base_table.institute_for', $institute_for_ids)
+            ->select('board.id', 'board.name','board.status','board.icon', DB::raw('MAX(base_table.institute_for) as institute_for'))
+            ->groupBy('board.id', 'board.name')->get();
+            
             $institute_base_board_id = Institute_board_sub::where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
             foreach ($base_board as $baseboard) {
                 $isAdded = in_array($baseboard->id, $institute_base_board_id);
-                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon), 'is_added' => $isAdded);
+                $data[] = array('id' => $baseboard->id,
+                'name' => $baseboard->name,
+                'icon' => url($baseboard->icon),
+                'institute_for_id' => $baseboard->institute_for,
+                'is_active' => $baseboard->status,
+                'is_added' => $isAdded);
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
