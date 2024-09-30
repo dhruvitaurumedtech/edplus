@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Institute_detail;
 use App\Models\Student_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
@@ -215,6 +216,41 @@ class StudentProgressPdfController extends Controller
                 $exam_student_result = [];
               
                 foreach ($exam_wise_student_response as $student_index=>$exam_student_value) {
+                  $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
+            ->when(!empty($request->institute_id), function ($query) use ($request) {
+                return $query->where('students_details.institute_id', $request->institute_id);
+            })
+            ->when(!empty($request->student_id), function ($query) use ($request) {
+                return $query->where('attendance.student_id', $request->student_id);
+            })
+            ->when(!empty($request->date), function ($query) use ($request) {
+              return $query->where('attendance.date', $request->date);
+          })
+            ->select(
+                DB::raw('SUM(CASE WHEN attendance.attendance = "P" THEN 1 ELSE 0 END) as total_present'),
+                DB::raw('SUM(CASE WHEN attendance.attendance = "A" THEN 1 ELSE 0 END) as total_absent')
+            )
+            ->get()->toarray();
+            // print_r($attendance_data);exit;
+        // Calculate total and percentages
+     
+        // $imagePath2 = public_path('student_report_graph/student_attendance_report_'.$board_index.$medium_index.$class_index.$standard_index.$batch_index.$student_index.'.png');
+        // $directoryPath = public_path('student_report_graph');
+        //      if (!file_exists($directoryPath)) {
+        //          mkdir($directoryPath, 0755, true);
+        //      }
+
+        //      try {
+        //          Browsershot::html($htmlContent2)
+        //              ->windowSize(800, 400)
+        //              ->save($imagePath2);
+
+        //          // return response()->download($imagePath);
+        //      } catch (\Exception $e) {
+               
+        //          return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+        //      }
+
 
                   $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
                     ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
@@ -241,7 +277,7 @@ class StudentProgressPdfController extends Controller
                       return $query->whereIn('exam.subject_id', $subject_id);
                     })
                     ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
-                      return $query->where('marks.student_id', $exam_student_value['id']); // Fixed from whereIn to where
+                      return $query->where('marks.student_id', $exam_student_value['id']); 
                     })
                     ->when(!empty($request->exam_name), function ($query) use ($request) {
                       return $query->where('exam.exam_title', $request->exam_name);
@@ -293,11 +329,11 @@ class StudentProgressPdfController extends Controller
                   $chartContainer = "
                       <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
                           <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
-                          <div style='display:flex; gap: 160px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                          <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
                         
                       </div>
                       <div class='x-axis-labels' style='position: absolute'>
-                        <div class='x-axis-labels' style='display:flex; gap: 150px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
+                        <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
                               " . implode('', $xAxisLabels) . "
                           </div>
                           </div>
@@ -358,6 +394,7 @@ class StudentProgressPdfController extends Controller
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
                     'exam' => $exam_result,
                     'imagePath' => $imagePath,
+                    // 'imagePath2' => $imagePath2,
                     
 
 
@@ -399,11 +436,12 @@ class StudentProgressPdfController extends Controller
           'medium' => $medium_result,
         ];
       }
-      $data = ['board_result' => $board_result];
+      $response_institute = Institute_detail::where('id',$request->institute_id)->first();
+      $institute = ['institute_name'=>$response_institute->institute_name,
+                    'address'=>$response_institute->address];
+      $data = ['board_result' => $board_result,'institute'=>$institute];
       // print_r($data);exit;
-      if (empty($data['board_result'])) {
-        return response()->json(['error' => 'No data available for PDF generation.'], 400);
-    }
+     
   
     try { 
       $pdf = FacadePdf::loadView('pdf.studentprogressreport', ['data'=>$data]);
