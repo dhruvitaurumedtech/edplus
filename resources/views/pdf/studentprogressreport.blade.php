@@ -99,6 +99,8 @@
         .y-label {
             text-align: right;
         }
+       
+
     </style>
 </head>
 
@@ -129,15 +131,16 @@
     @foreach ($batchDT['student'] as $studentIndex => $studentDT)
     
 
-
-    <center><h1><p><b>Student Name: </b>{{ $studentDT['student_name'] }}</p> </h1></center>
+   <p><b>Student Name: </b>{{ $studentDT['student_name'] }}</p> 
     @php
     $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex . '.png');
     $imageData = file_exists($imagePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath)) : '';
     @endphp
 
     @if ($imageData)
+    
         <img src="{{ $imageData }}" alt="Student Image" style="width: 100%; height: auto;">
+    
     @else
         <p>No image available for this student.</p>
     @endif

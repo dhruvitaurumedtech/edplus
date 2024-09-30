@@ -272,19 +272,11 @@ class StudentProgressPdfController extends Controller
                     for ($i = 100; $i >= 0; $i -= 10) {
                         $yAxisLabels .= "<div class='y-label'>{$i}</div>";
                     }
-                    $xAxisLabels[] = "<div class='x-label'>{$exam_value['exam_date']}</div>"; // Store exam date for x-axis
+                    $xAxisLabels[] = "<div class='x-label'>" . date('d-m-Y', strtotime($exam_value['exam_date'])) . "</div>"; // Store exam date for x-axis
 
                     $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
                 
-                    // Prepare chart bars
-                   
-                
-                    // Set the image path
-                    
-                    
-                    // Generate image from HTML content using Browsershot
-                    // print_r($htmlContent);exit;
-                   
+                  
                     $exam_result[] = [
                       'exam_name'  => $exam_value['exam_title'],
                       'mark'       => $exam_value['marks_obtained'],
@@ -361,9 +353,6 @@ class StudentProgressPdfController extends Controller
                           
                             return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
                         }
-// Generate the image
-                  
-                
                   $exam_student_result[] = [
                     'student_id' => $exam_student_value['id'],
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
@@ -373,9 +362,7 @@ class StudentProgressPdfController extends Controller
 
 
                   ];
-                  
                 }
-                
                 $batch_result[] = [
                   'batch_id' => $batch_value['batch_id'],
                   'batch_name' => $batch_value['batch_name'],
