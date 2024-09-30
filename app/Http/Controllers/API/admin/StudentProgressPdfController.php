@@ -7,16 +7,17 @@ use App\Models\Student_detail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use App\Traits\ApiTrait;
+use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
 use Exception;
 use Illuminate\Support\Facades\DB;
-use PDF;
+use PDF; // Ensure this line is present
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
 
 
 use ConsoleTVs\Charts\Facades\Charts;
-use Chartisan\PHP\Chartisan;
 use Illuminate\Support\Facades\Log;
 use Spatie\Browsershot\Browsershot;
 
@@ -32,6 +33,7 @@ class StudentProgressPdfController extends Controller
       return $this->response([], $validator->errors()->first(), false, 400);
     }
     try {
+      // ini_set('memory_limit', '512M');
       $board_id = !empty($request->board_id) ? $request->board_id : '';
       $board_response = Student_detail::leftjoin('board', 'board.id', '=', 'students_details.board_id')
         ->when(!empty($request->institute_id), function ($query) use ($request) {
@@ -260,6 +262,8 @@ class StudentProgressPdfController extends Controller
 
                   $exam_result = [];
                   $chartBars = '';
+                  $xAxisLabels = []; // Date X-axis labels
+
                   foreach ($exam_response as $exam_index => $exam_value) {
                     $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
                     
@@ -268,6 +272,8 @@ class StudentProgressPdfController extends Controller
                     for ($i = 100; $i >= 0; $i -= 10) {
                         $yAxisLabels .= "<div class='y-label'>{$i}</div>";
                     }
+                    $xAxisLabels[] = "<div class='x-label'>{$exam_value['exam_date']}</div>"; // Store exam date for x-axis
+
                     $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
                 
                     // Prepare chart bars
@@ -296,7 +302,13 @@ class StudentProgressPdfController extends Controller
                       <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
                           <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
                           <div style='display:flex; gap: 160px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                        
                       </div>
+                      <div class='x-axis-labels' style='position: absolute'>
+                        <div class='x-axis-labels' style='display:flex; gap: 150px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
+                              " . implode('', $xAxisLabels) . "
+                          </div>
+                          </div>
                   ";
               
                   // Create complete HTML content
@@ -346,6 +358,7 @@ class StudentProgressPdfController extends Controller
 
                             // return response()->download($imagePath);
                         } catch (\Exception $e) {
+                          
                             return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
                         }
 // Generate the image
@@ -356,6 +369,8 @@ class StudentProgressPdfController extends Controller
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
                     'exam' => $exam_result,
                     'imagePath' => $imagePath,
+                    
+
 
                   ];
                   
@@ -397,36 +412,38 @@ class StudentProgressPdfController extends Controller
           'medium' => $medium_result,
         ];
       }
-      $data = ['board_result' => $board_result, 'request_data' => $request];
+      $data = ['board_result' => $board_result];
+      // print_r($data);exit;
+      if (empty($data['board_result'])) {
+        return response()->json(['error' => 'No data available for PDF generation.'], 400);
+    }
+  
+    try { 
+      $pdf = FacadePdf::loadView('pdf.studentprogressreport', ['data'=>$data]);
+          $folderPath = public_path('pdfs');
+           
+          if (!File::exists($folderPath)) {
+              File::makeDirectory($folderPath, 0755, true);
+          }
       
-      // return view('pdf.studentprogressreport',compact('data'));
-      $pdf = PDF::loadView('pdf.studentprogressreport', ['data' => $data]);
-
-      // $pdf->setOption('enable-javascript',true);
-      // $pdf->setOption('javascript-delay',1000);
-      // $pdf->setOption('no-stop-slow-scripts',true);
-      // $pdf->setOption('enable-smart-shrinking',true);
-
-      return $pdf->stream();
-
-      $folderPath = public_path('pdfs');
-
-      if (!File::exists($folderPath)) {
-        File::makeDirectory($folderPath, 0755, true);
+          $baseFileName = 'studentprogressreport.pdf';
+          $pdfPath = $folderPath . '/' . $baseFileName;
+      
+          $counter = 1;
+          while (File::exists($pdfPath)) {
+              $pdfPath = $folderPath . '/studentprogressreport' . $counter . '.pdf';
+              $counter++;
+          }
+      
+          $pdf->save($pdfPath);
+      
+          $pdfUrl = asset('pdfs/' . basename($pdfPath));
+      
+          return response()->json(['pdf_url' => $pdfUrl], 200);
+      } catch (\Exception $e) {
+      
+          return response()->json(['error' => 'PDF Generation Failed: ' . $e->getMessage()], 500);
       }
-
-      $baseFileName = 'studentprogressreport.pdf';
-      $pdfPath = $folderPath . '/' . $baseFileName;
-
-      $counter = 1;
-      while (File::exists($pdfPath)) {
-        $pdfPath = $folderPath . '/studentprogressreport' . $counter . '.pdf';
-        $counter++;
-      }
-
-      file_put_contents($pdfPath, $pdf->output());
-      $pdfUrl = asset('pdfs/' . basename($pdfPath));
-      return $this->response($pdfUrl);
     } catch (Exception $e) {
       return $this->response([], "Something want wrong!.", false, 400);
     }
