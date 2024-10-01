@@ -134,23 +134,37 @@ class StudentController extends Controller
             }
             //join with
             $date = Carbon::now()->format('Y-m-d');
-            $joininstitute = Institute_detail::where('status', 'active')
-                ->whereIn('id', function ($query) use ($user_id) {
-                    $query->select('institute_id')
-                        ->from('students_details')
-                        ->where('student_id', $user_id)
-                        ->where('status', '=', '1')
-                        ->whereNull('deleted_at');
-                })
-                ->whereDate('end_academic_year', '>=', $date)
-                ->paginate($perPage);
+            $joininstitute = Institute_detail::leftJoin('students_details', 'students_details.institute_id', '=', 'institute_detail.id')
+                                                ->leftJoin('board', 'board.id', '=', 'students_details.board_id')
+                                                ->leftJoin('medium', 'medium.id', '=', 'students_details.medium_id')
+                                                ->leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                                                ->where('institute_detail.status', 'active')
+                                                ->where('students_details.student_id', $user_id)
+                                                ->where('students_details.status', '1')
+                                                ->whereNull('students_details.deleted_at')
+                                                ->whereDate('institute_detail.end_academic_year', '>=', $date)
+                                                ->select('institute_detail.*','students_details.subject_id', 'board.name as board_name', 'medium.name as medium_name', 'standard.name as standard_name')
+                                                ->paginate($perPage);
+
             $join_with = [];
+            // print_r($joininstitute);exit;
             foreach ($joininstitute as $value) {
+                $subids = explode(',', $value->subject_id);
+                $subjectids = Subject_model::whereIn('id', $subids)->get();
+                $subs = [];
+                foreach ($subjectids as $subDT) {
+                    $subs[] = array('id' => $subDT->id, 'name' => $subDT->name, 'image' => asset($subDT->image));
+                }
                 $join_with[] = array(
                     'id' => $value->id,
                     'institute_name' => $value->institute_name . '(' . $value->unique_id . ')',
                     'address' => $value->address.' '.$value->state. ' '.$value->city.' '.$value->pincode,
                     'logo' => asset($value->logo),
+                    'board' => $value->board_name,
+                    'medium' => $value->medium_name,
+                    'standard' => $value->standard_name,
+                    'subject' =>$subs,
+
                 );
             }
             $parentsdt = Parents::where('student_id', $user_id)
