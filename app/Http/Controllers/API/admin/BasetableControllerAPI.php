@@ -870,6 +870,42 @@ class BasetableControllerAPI extends Controller
             
                 ->distinct()
                 ->get();
+            $intitute_base_subject_id = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
+            $subject = [];
+            foreach ($base_subject as $basesubject) {
+                $isAdded = in_array($basesubject->id, $intitute_base_subject_id);
+                $subject[] = array(
+                    'id' => $basesubject->id,
+                    'name' => $basesubject->name,
+                    'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
+                    'is_active'=>$basesubject->status,
+                    'is_added' => $isAdded
+                );
+            }  
+
+                $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
+                if (!array_key_exists($key, $data)) {
+                    $data[$key] = [
+                        'institute_for_id' => $base_standard->institute_for,
+                        'institute_for_name' => $base_standard->institute_for_name,
+                        'board_id' => $base_standard->board,
+                        'board_name' => $base_standard->board_name,
+                        'medium_id'=> $base_standard->medium,
+                        'medium_name' => $base_standard->medium_name,
+                        'class_id' => $base_standard->institute_for_class,
+                        'class_name' => $base_standard->class_name,
+                        'std_data' => [],
+                    ];
+                }
+                
+                $isAdded = in_array($base_standard->id, $institute_base_standard_id);
+                $data[$key]['std_data'][] = [
+                    'id' => $base_standard->id,
+                    'standard_name' => $base_standard->name,
+                    'is_active' =>$base_standard->status,
+                    'is_added' => $isAdded,
+                    'subject' => $subject
+                ];
                 
                 $institute_standard_id = Standard_sub::where('institute_id', $request->institute_id)
                 ->where('institute_for_id', $datas['institute_for_id'])
