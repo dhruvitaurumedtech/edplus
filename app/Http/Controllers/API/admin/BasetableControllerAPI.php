@@ -543,6 +543,7 @@ class BasetableControllerAPI extends Controller
                         'std_data' => [],
                     ];
                 }
+                
                 $isAdded = in_array($base_standard->id, $institute_base_standard_id);
                 $data[$key]['std_data'][] = [
                     'id' => $base_standard->id,
