@@ -1,4 +1,4 @@
-<h2>Student Progress Report</h2>
+<h1>Student Progress Report</h1>
 <hr>
 
 @if (!empty($data['institute']) && is_array($data['institute']))
@@ -44,7 +44,9 @@
                                                     <td><b>Student Name</b></td>
                                                     <td>{{ $studentDT['student_name'] }}</td>
                                                 </tr>
+                                                <tr><td><b>Exam Chart</b></td><td><b>Attendance Chart</b></td></tr>
                                                 <tr style="border: none;">
+                                                    
                                                     <td>
                                                         @php
                                                             $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex . '.png');
@@ -57,7 +59,7 @@
                                                             No image available
                                                         @endif
                                                     </td>
-                                                    <td colspan="2">
+                                                    <td >
                                                         @php
                                                             $imagePath2 = public_path('student_report_graph/student_attendance_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex . '.png');
                                                             $imageData2 = file_exists($imagePath2) ? 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath2)) : '';
@@ -71,10 +73,72 @@
                                                     </td>
                                                 </tr>
                                             </table>
-                                            <table>
-                                                <tr><th>student_name</th><th>Total_Fees</th><th>Discount</th><th>paid_amount</th></tr>
-                                            </table>
-                                            
+                                            <h2>Student Fees Report</h2>
+                                            <table border="1" style="border-collapse: collapse; width: 100%; font-family: 'Times New Roman', Times, serif;">
+
+                                                    <tr>
+                                                        <th width="10%" >No</th>
+                                                        <th>Student Name</th>
+                                                        <th>Total Fees</th>
+                                                        <th>Due Fees</th>
+                                                        <th>Paid Fees</th>
+                                                        <th>Status</th>
+                                                    </tr>
+
+                                                    @php $i = 1 @endphp
+                                                    @foreach ($studentDT['fees_response'] as $FeesDT)
+                                                        <tr>
+                                                            <td width="10%">{{$i}}</td>
+                                                            <td>{{$FeesDT['student_name']}}</td>
+                                                            <td>{{$FeesDT['student_fees']}}</td>
+                                                            <td>{{$FeesDT['remaing_amount']}}</td>
+                                                            <td>{{$FeesDT['paid_amount']}}</td>
+                                                            <td> @if($FeesDT['status']=='paid')
+                                                                    <span class="custom-btn">Paid</span>
+                                                                @else
+                                                                    <span class="custom-btn-danger">Pending</span>
+                                                                @endif
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                        <td colspan="6">
+                                                            @if(!empty($FeesDT['history']))
+                                                           
+                                                                
+                                                            <table class="table" style="border: 1px solid black" style="border-collapse: collapse; width: 100%; font-family: 'Times New Roman', Times, serif;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th width="65px">No</th>
+                                                                        <th>Paid Amount</th>
+                                                                        <th>Date</th>
+                                                                        <th>Mode</th>
+                                                                        <th>Invoice No</th>
+                                                                        <th>Transaction ID</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @php $j = 1 @endphp
+                                                                    @foreach ($FeesDT['history'] as $historyDT)
+                                                                        <tr>
+                                                                            <td>{{$j}}</td>
+                                                                            <td>{{$historyDT['paid_amount']}}</td>
+                                                                            <td>{{$historyDT['date']}}</td>
+                                                                            <td>{{$historyDT['payment_mode']}}</td>
+                                                                            <td>{{$historyDT['invoice_no']}}</td>
+                                                                            <td>{{$historyDT['transaction_id']}}</td>
+                                                                        </tr>
+                                                                        @php $j++ @endphp
+                                                                    @endforeach
+                                                                </tbody>
+                                                            </table>
+
+                                                            @endif
+                                                            </td>
+                                                        </tr>
+                                                        
+                                                       @php $i++ @endphp
+                                                    @endforeach
+                                                </table>
 
                                         @endforeach
 

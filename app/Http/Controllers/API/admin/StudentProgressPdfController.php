@@ -393,6 +393,7 @@ class StudentProgressPdfController extends Controller
                                   );
                                   margin: 0 auto;
                                   position: relative;
+                                  font-family: 'Times New Roman', Times, serif;
                               }
               
                               .piechart-text {
@@ -544,7 +545,7 @@ class StudentProgressPdfController extends Controller
                       <head>
                           <style>
                               body {
-                                  font-family: Arial, sans-serif;
+                                  font-family: 'Times New Roman', Times, serif;
                                   margin: 0;
                                   padding: 20px;
                                   background-color: #f4f4f4;
