@@ -366,14 +366,12 @@ class BasetableControllerAPI extends Controller
             $base_medium = Medium_model::join('base_table','base_table.medium','=','medium.id')
             ->whereIn('base_table.institute_for', $institute_for_ids)
             ->whereIn('base_table.board', $board_ids)
-            ->select('medium.id', 'medium.name','medium.status','medium.icon',
-             DB::raw('MAX(base_table.institute_for) as institute_for'),
-             DB::raw('MAX(base_table.board) as board'))
-            ->groupBy('medium.id', 'medium.name','medium.status','medium.icon')->get();
-
-            // $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
-            // $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
-
+            ->select('medium.id', 'medium.name','medium.status','medium.icon','base_table.institute_for','base_table.board')
+            //  DB::raw('MAX(base_table.institute_for) as institute_for'),
+            //  DB::raw('MAX(base_table.board) as board'))
+            // ->groupBy('medium.id', 'medium.name','medium.status','medium.icon')
+            ->distinct()
+            ->get();
             $institute_base_medium_id = Medium_sub::where('institute_id', $request->institute_id)->pluck('medium_id')->toArray();
             $data = [];
             foreach ($base_medium as $basemedium) {
