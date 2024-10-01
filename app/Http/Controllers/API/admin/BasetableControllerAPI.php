@@ -543,7 +543,8 @@ class BasetableControllerAPI extends Controller
     public function get_edit_institute_for(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
+            //'institute_id' => 'required',
+            'institute_id' => 'nullable|exists:institute_detail,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -572,7 +573,8 @@ class BasetableControllerAPI extends Controller
     public function get_edit_board(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
+            //'institute_id' => 'required',
+            'institute_id' => 'nullable|exists:institute_detail,id',
             'institute_for_id' => 'required',
         ]);
         if ($validator->fails()) {
