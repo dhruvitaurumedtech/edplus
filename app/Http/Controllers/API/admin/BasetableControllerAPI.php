@@ -23,8 +23,6 @@ use Exception;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Str;
-
 
 class BasetableControllerAPI extends Controller
 {
@@ -94,12 +92,10 @@ class BasetableControllerAPI extends Controller
             $data = [];
             foreach ($base_medium as $basemedium) {
                 $data[] = array(
-                    'id' => $basemedium->id, 
-                    'name' => $basemedium->name,
+                    'id' => $basemedium->id, 'name' => $basemedium->name,
                     'icon' => url($basemedium->icon)
                 );
             }
-            
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
@@ -297,18 +293,15 @@ class BasetableControllerAPI extends Controller
             $medium_ids = explode(',', $request->medium_id);
             $getClassId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->whereIn('medium', $medium_ids)->distinct()->pluck('institute_for_class');
             $base_class =  Class_model::whereIn('id', $getClassId)->get();
-            $classData = [];
+            $data = [];
             foreach ($base_class as $baseclass) {
-                $classData[] = array(
+                $data[] = array(
                     'id' => $baseclass->id, 'name' => $baseclass->name,
-                    'icon' => (!empty($baseclass->icon))?url($baseclass->icon):asset('profile/no-image.png'),
+                    'icon' => url($baseclass->icon)
                 );
             }
-           
-            
-            
 
-            return $this->response($classData, "Fetch Data Successfully");
+            return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!!", false, 400);
         }
@@ -318,130 +311,54 @@ class BasetableControllerAPI extends Controller
     public function standard(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_for_id.*' => 'required',
-            'board_id.*' => 'required',
-            'class_id.*' => 'required',
-            'medium_id.*' => 'required',
-       ]);
+             'institute_for_id.*' => 'required',
+             'board_id.*' => 'required',
+             'class_id.*' => 'required',
+        ]);
 
-       if ($validator->fails()) {
-           return $this->response([], $validator->errors()->first(), false, 400);
-       }
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
 
-       try {
-           
-          // Initialize the result array
-               $data = [];
-
-               // Example data processing logic (assuming $request->data is an array of input parameters)
-               foreach ($request->data as $datas) {
-                   // Query to get the base standards
-                   $base_standards = Base_table::join('standard', 'standard.id', '=', 'base_table.standard')
-                       ->join('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
-                       ->join('class', 'class.id', '=', 'base_table.institute_for_class')
-                       ->join('medium', 'medium.id', '=', 'base_table.medium')
-                       ->join('board', 'board.id', '=', 'base_table.board')
-                       ->join('subject', 'subject.base_table_id', '=', 'base_table.id')
-                       ->where('base_table.institute_for', $datas['institute_for_id'])
-                       ->where('base_table.board', $datas['board_id'])
-                       ->where('base_table.medium', $datas['medium_id'])
-                       ->whereIn('base_table.institute_for_class', $datas['class_id'])
-                       ->select(
-                           'standard.id',
-                           'standard.name',
-                           'institute_for.id as institute_for_id',
-                           'institute_for.name as institute_for_name',
-                           'class.id as class_id',
-                           'medium.id as medium_id',
-                           'board.id as board_id',
-                           'class.name as class_name',
-                           'medium.name as medium_name',
-                           'board.name as board_name',
-                           'subject.id as subject_id',
-                           'subject.name as subject_name'
-                       )
-                       ->get();
-
-                   foreach ($base_standards as $base_standard) {
-                       $key = $base_standard->institute_for_id . '_' . $base_standard->medium_id . '_' . $base_standard->board_id;
-
-                       // Check if the key already exists in the data array
-                       if (!array_key_exists($key, $data)) {
-                           $data[$key] = [
-                               'institute_for_id' => $base_standard->institute_for_id,
-                               'institute_for_name' => $base_standard->institute_for_name,
-                               'medium_id' => $base_standard->medium_id,
-                               'medium_name' => $base_standard->medium_name,
-                               'board_id' => $base_standard->board_id,
-                               'board_name' => $base_standard->board_name,
-                               'class_data' => [],
-                           ];
-                       }
-
-                       // Check if the class already exists in the class_data array
-                       $classExists = false;
-                       foreach ($data[$key]['class_data'] as &$class) {
-                           if ($class['class_id'] === $base_standard->class_id) {
-                               $classExists = true;
-                               break;
-                           }
-                       }
-
-                       // If the class does not exist, add it
-                       if (!$classExists) {
-                           $data[$key]['class_data'][] = [
-                               'class_id' => $base_standard->class_id,
-                               'class_name' => $base_standard->class_name,
-                               'std_data' => [],
-                           ];
-                       }
-
-                       // Find the class to add standard data
-                       foreach ($data[$key]['class_data'] as &$class) {
-                           if ($class['class_id'] === $base_standard->class_id) {
-                               // Initialize an array to keep track of added standards
-                               $added_standards = array_column($class['std_data'], 'id');
-
-                               // Check if the standard already exists
-                               if (!in_array($base_standard->id, $added_standards)) {
-                                   $class['std_data'][] = [
-                                       'id' => $base_standard->id,
-                                       'standard_name' => $base_standard->name,
-                                       'subject_data' => [], 
-                                   ];
-                               }
-
-                               // No need to check further classes
-                               foreach ($class['std_data'] as &$std) {
-                                   if ($std['id'] === $base_standard->id) {
-                                       // Initialize an array to keep track of added subjects
-                                       $added_subjects = array_column($std['subject_data'], 'subject_id');
-
-                                       // Check if the subject already exists
-                                       if (!in_array($base_standard->subject_id, $added_subjects)) {
-                                           $std['subject_data'][] = [
-                                               'subject_id' => $base_standard->subject_id,
-                                               'subject_name' => $base_standard->subject_name,
-                                           ];
-                                       }
-
-                                       // No need to check further standards
-                                       break;
-                                   }
-                               }
-
-                               // No need to check further classes
-                               break;
-                           }
-                       }
-                   }
-               }
-
-           $data = array_values($data);
-           return $this->response($data, "Fetch Data Successfully");
-       } catch (Exception $e) {
-           return $this->response($e, "Something went Wrong!!", false, 400);
-       }
+        try {
+            
+            $data = [];
+            
+            foreach ($request->data as $datas) {
+                $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+                ->join('class', 'base_table.institute_for_class', '=', 'class.id')
+                ->join('medium', 'base_table.medium', '=', 'medium.id')
+                ->join('board', 'base_table.board', '=', 'board.id')
+                ->where('base_table.institute_for', $datas['institute_for_id'])
+                ->where('base_table.board', $datas['board_id'])
+                ->where('base_table.medium', $datas['medium_id'])
+                ->whereIN('base_table.institute_for_class', $datas['class_id'])
+                ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
+                ->distinct()
+                ->get();
+                  
+                foreach ($base_standards as $base_standard) {
+                   
+                $key = $base_standard->class_name . '_' . $base_standard->medium_name . '_' . $base_standard->board_name;
+                if (!array_key_exists($key, $data)) {
+                    $data[$key] = [
+                        'class_name' => $base_standard->class_name,
+                        'medium_name' => $base_standard->medium_name,
+                        'board_name' => $base_standard->board_name,
+                        'std_data' => [],
+                    ];
+                }
+                $data[$key]['std_data'][] = [
+                    'id' => $base_standard->id,
+                    'standard_name' => $base_standard->name,
+                ];
+                }
+            }
+            $data = array_values($data);
+            return $this->response($data, "Fetch Data Successfully");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went Wrong!!", false, 400);
+        }
     }
 
     public function stream(Request $request)
@@ -711,7 +628,6 @@ class BasetableControllerAPI extends Controller
                     'is_added' => $isAdded
                 );
             }
-            
 
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
@@ -845,29 +761,34 @@ class BasetableControllerAPI extends Controller
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
                 ->join('board', 'base_table.board', '=', 'board.id')
-                ->join('subject', 'subject.base_table_id', '=', 'base_table.id')
                 ->where('base_table.institute_for', $datas['institute_for_id'])
                 ->where('base_table.board', $datas['board_id'])
                 ->where('base_table.medium', $datas['medium_id'])
                 ->whereIN('base_table.institute_for_class', $datas['class_id'])
-                // ->select('standard.id', 'standard.name', 'class.name as class_name', 'medium.name as medium_name', 'board.name as board_name')
-                ->select(
-                    'standard.id',
-                    'standard.name',
-                    'institute_for.id as institute_for_id',
-                    'institute_for.name as institute_for_name',
-                    'class.id as class_id',
-                    'medium.id as medium_id',
-                    'board.id as board_id',
-                    'class.name as class_name',
-                    'medium.name as medium_name',
-                    'board.name as board_name',
-                    'subject.id as subject_id',
-                    'subject.name as subject_name',
-                    'subject.status as subject_status',
-                    'standard.status as standard_status',
-                )
+                ->select('standard.id', 'standard.name','standard.status', 'class.name as class_name',
+                 'medium.name as medium_name', 'board.name as board_name'
+                 ,'base_table.institute_for_class','base_table.medium','base_table.board','base_table.institute_for','institute_for.name as institute_for_name')
+                ->distinct()
+                ->get();
+                
+            $institute_base_standard_id = Standard_sub::where('institute_id', $request->institute_id)->pluck('standard_id')->toArray();
             
+            foreach ($base_standards as $base_standard) {
+
+                $base_subject_query = Subject_model::join('base_table', 'base_table.id', '=', 'subject.base_table_id')
+                //->leftjoin('stream', 'base_table.stream', '=', 'stream.id')
+                ->where('base_table.institute_for', $datas['institute_for_id'])
+                ->where('base_table.board', $datas['board_id'])
+                ->where('base_table.medium', $datas['medium_id'])
+                ->where('base_table.institute_for_class', $base_standard->institute_for_class)
+                ->where('base_table.standard', $base_standard->id);
+
+            // if (!empty($stream_ids) && array_filter($stream_ids)) {
+            //     $base_subject_query->whereIn('base_table.stream', $stream_ids);
+            // }
+            $base_subject = $base_subject_query
+                ->select('subject.id', 'subject.name', 'subject.image', 'subject.status')
+                // 'stream.name as stream_name', 'base_table.stream as stream_id')
                 ->distinct()
                 ->get();
             $intitute_base_subject_id = Subject_sub::where('institute_id', $request->institute_id)->pluck('subject_id')->toArray();
@@ -907,88 +828,9 @@ class BasetableControllerAPI extends Controller
                     'subject' => $subject
                 ];
                 
-                $institute_standard_id = Standard_sub::where('institute_id', $request->institute_id)
-                ->where('institute_for_id', $datas['institute_for_id'])
-                ->where('board_id', $datas['board_id'])
-                ->where('medium_id', $datas['medium_id'])
-                ->whereIn('class_id', $datas['class_id'])
-                ->pluck('standard_id')
-                ->toArray(); 
-
-                   foreach ($base_standards as $base_standard) {
-                       $key = $base_standard->institute_for_id . '_' . $base_standard->medium_id . '_' . $base_standard->board_id;
-
-                       if (!array_key_exists($key, $data)) {
-                           $data[$key] = [
-                               'institute_for_id' => $base_standard->institute_for_id,
-                               'institute_for_name' => $base_standard->institute_for_name,
-                               'medium_id' => $base_standard->medium_id,
-                               'medium_name' => $base_standard->medium_name,
-                               'board_id' => $base_standard->board_id,
-                               'board_name' => $base_standard->board_name,
-                               'class_data' => [],
-                           ];
-                       }
-
-                       $classExists = false;
-                       foreach ($data[$key]['class_data'] as &$class) {
-                           if ($class['class_id'] === $base_standard->class_id) {
-                               $classExists = true;
-                               break;
-                           }
-                       }
-
-                       if (!$classExists) {
-                           $data[$key]['class_data'][] = [
-                               'class_id' => $base_standard->class_id,
-                               'class_name' => $base_standard->class_name,
-                               'std_data' => [],
-                           ];
-                       }
-
-                       foreach ($data[$key]['class_data'] as &$class) {
-                           if ($class['class_id'] === $base_standard->class_id) {
-                               $added_standards = array_column($class['std_data'], 'id');
-
-                               if (!in_array($base_standard->id, $added_standards)) {
-                                $isAdded = in_array($base_standard->id, $institute_standard_id);
-                                   $class['std_data'][] = [
-                                       'id' => $base_standard->id,
-                                       'standard_name' => $base_standard->name,
-                                       'is_active' => $isAdded === true ? 'active' : 'inactive',
-                                       'is_added' => $isAdded,
-                                       'subject_data' => [], 
-                                   ];
-                               }
-
-                               foreach ($class['std_data'] as &$std) {
-                                   if ($std['id'] === $base_standard->id) {
-                                       $added_subjects = array_column($std['subject_data'], 'subject_id');
-                                       $institute_subject_id = Subject_sub::where('institute_id', $request->institute_id)
-                                       ->where('subject_id', $base_standard->subject_id)
-                                       ->pluck('subject_id')
-                                       ->toArray();     
-                                       if (!in_array($base_standard->subject_id, $added_subjects)) {
-                                        $isAdded = in_array($base_standard->subject_id, $institute_subject_id);
-                                           $std['subject_data'][] = [
-                                               'subject_id' => $base_standard->subject_id,
-                                               'subject_name' => $base_standard->subject_name,
-                                               'is_active' => $isAdded === true ? 'active' : 'inactive',
-                                               'is_added' => $isAdded,
-                                           ];
-                                       }
-                                       break;
-                                   }
-                               }
-
-                               break;
-                           }
-                       }
-                   }
-               }
-
-           $data = array_values($data);
-        
+            }
+            $data = array_values($data);
+        }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
             return $this->response($e, "Something went Wrong!!", false, 400);
