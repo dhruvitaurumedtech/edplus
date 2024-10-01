@@ -214,42 +214,117 @@ class StudentProgressPdfController extends Controller
 
 
                 $exam_student_result = [];
-              
+                $html = ''; 
                 foreach ($exam_wise_student_response as $student_index=>$exam_student_value) {
                   $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
-            ->when(!empty($request->institute_id), function ($query) use ($request) {
-                return $query->where('students_details.institute_id', $request->institute_id);
-            })
-            ->when(!empty($request->student_id), function ($query) use ($request) {
-                return $query->where('attendance.student_id', $request->student_id);
-            })
-            ->when(!empty($request->date), function ($query) use ($request) {
-              return $query->where('attendance.date', $request->date);
-          })
-            ->select(
-                DB::raw('SUM(CASE WHEN attendance.attendance = "P" THEN 1 ELSE 0 END) as total_present'),
-                DB::raw('SUM(CASE WHEN attendance.attendance = "A" THEN 1 ELSE 0 END) as total_absent')
-            )
-            ->get()->toarray();
-            // print_r($attendance_data);exit;
+                  ->when(!empty($request->institute_id), function ($query) use ($request) {
+                      return $query->where('students_details.institute_id', $request->institute_id);
+                  })
+                  ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
+                      return $query->where('attendance.student_id', $exam_student_value['id']);
+                  })
+                  ->when(!empty($request->month), function ($query) use ($request) {
+                      return $query->whereRaw('MONTH(attendance.date) = ?', [$request->month]);
+                  })
+                  ->select(
+                      DB::raw('SUM(CASE WHEN attendance.attendance = "P" THEN 1 ELSE 0 END) as total_present'),
+                      DB::raw('SUM(CASE WHEN attendance.attendance = "A" THEN 1 ELSE 0 END) as total_absent')
+                  )
+                  ->get()
+                  ->toArray();
+                  $total_lectures = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
+                      ->select(DB::raw('COUNT(DISTINCT date) as total_lectures'))
+                      ->when(!empty($request->institute_id), function ($query) use ($request) {
+                          return $query->where('students_details.institute_id', $request->institute_id);
+                      })
+                      ->when(!empty($request->student_id), function ($query) use ($request) {
+                          return $query->where('attendance.student_id', $request->student_id);
+                      })
+                      ->when(!empty($request->month), function ($query) use ($request) {
+                          return $query->whereRaw('MONTH(date) = ?', [$request->month]);
+                      })
+                     ->pluck('total_lectures');
+                      // print_r($total_lectures[0]);exit;
+
+                      $present_percentage = ($attendance_data[0]['total_present'] / $total_lectures[0]) * 100;
+                      $absent_percentage = ($attendance_data[0]['total_absent'] / $total_lectures[0]) * 100;
+              
+                      // Embed the HTML for the pie chart and text dynamically
+
+                      $html .= "
+                      <!DOCTYPE html>
+                      <html lang='en-US'>
+                      <head>
+                          <meta charset='UTF-8'>
+                          <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+                          <title>Attendance Chart for {$exam_student_value['firstname']}</title>
+                          <style>
+                              .piechart-container {
+                                  width: 350px;
+                                  height: 250px;
+                                  border-radius: 50%;
+                                  background-image: conic-gradient(
+                                      #4CAF50 0deg {$present_percentage}deg,  
+                                      #F44336 {$present_percentage}deg 
+                                  );
+                                  margin: 0 auto;
+                                  position: relative;
+                              }
+              
+                              .piechart-text {
+                                  position: absolute;
+                                  font-family: Arial, sans-serif;
+                                  font-size: 18px;
+                                  font-weight: bold;
+                                  color: white;
+                                  text-align: center;
+                              }
+              
+                              .present {
+                                  top: 20%;
+                                  left: 55%;
+                              }
+              
+                              .absent {
+                                  top: 70%;
+                                  left: 40%;
+                              }
+                          </style>
+                      </head>
+                      <body>
+              
+                      <h1>{$exam_student_value['firstname']}'s Attendance    ,    Total Lecture:{$total_lectures[0]}</h1>
+                      <div class='piechart-container'>
+                          <!-- Text labels inside the pie chart -->
+                          <div class='piechart-text present'>Present " . number_format($present_percentage, 2) . "%</div>
+                          <div class='piechart-text absent'>Absent " . number_format($absent_percentage, 2) . "%</div>
+                      </div>
+                      
+                      <br><br>
+                      
+                      </body>
+                     
+                      </html>";
+                  
+            // print_r($total_lectures);exit;
         // Calculate total and percentages
      
-        // $imagePath2 = public_path('student_report_graph/student_attendance_report_'.$board_index.$medium_index.$class_index.$standard_index.$batch_index.$student_index.'.png');
-        // $directoryPath = public_path('student_report_graph');
-        //      if (!file_exists($directoryPath)) {
-        //          mkdir($directoryPath, 0755, true);
-        //      }
+        $imagePath2 = public_path('student_report_graph/student_attendance_report_'.$board_index.$medium_index.$class_index.$standard_index.$batch_index.$student_index.'.png');
+        $directoryPath = public_path('student_report_graph');
+             if (!file_exists($directoryPath)) {
+                 mkdir($directoryPath, 0755, true);
+             }
 
-        //      try {
-        //          Browsershot::html($htmlContent2)
-        //              ->windowSize(800, 400)
-        //              ->save($imagePath2);
+             try {
+                 Browsershot::html($html)
+                     ->windowSize(800, 400)
+                     ->save($imagePath2);
 
-        //          // return response()->download($imagePath);
-        //      } catch (\Exception $e) {
+                 // return response()->download($imagePath);
+             } catch (\Exception $e) {
                
-        //          return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
-        //      }
+                 return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+             }
 
 
                   $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
