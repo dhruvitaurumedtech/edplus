@@ -674,7 +674,7 @@ class BasetableControllerAPI extends Controller
         }
     }
 
-    public function get_edit_class(Request $request)
+    public function get_edit_class(Request $request) // not in use
     {
 
         $validator = Validator::make($request->all(), [
@@ -830,7 +830,7 @@ class BasetableControllerAPI extends Controller
              'board_id.*' => 'required',
              'medium_id.*' => 'required',
              'class_id.*' => 'required',
-            'institute_id' => 'required',
+             'institute_id' => 'nullable|exists:institute_detail,id',
         ]);
 
         if ($validator->fails()) {
@@ -839,9 +839,8 @@ class BasetableControllerAPI extends Controller
 
         try {
             $data = [];
-
-               foreach ($request->data as $datas) {
-                $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
+            foreach ($request->data as $datas) {
+            $base_standards = Standard_model::join('base_table', 'base_table.standard', '=', 'standard.id')
                 ->join('institute_for', 'institute_for.id', '=', 'base_table.institute_for')
                 ->join('class', 'base_table.institute_for_class', '=', 'class.id')
                 ->join('medium', 'base_table.medium', '=', 'medium.id')
