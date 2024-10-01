@@ -583,7 +583,7 @@ class BasetableControllerAPI extends Controller
             $base_board = board::join('base_table','base_table.board','=','board.id')
             ->whereIn('base_table.institute_for', $institute_for_ids)
             ->select('board.id', 'board.name','board.status','board.icon', DB::raw('MAX(base_table.institute_for) as institute_for'))
-            ->groupBy('board.id', 'board.name')->get();
+            ->groupBy('board.id', 'board.name','board.status','board.icon')->get();
             
             $institute_base_board_id = Institute_board_sub::where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
             foreach ($base_board as $baseboard) {
