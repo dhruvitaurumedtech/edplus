@@ -3,12 +3,17 @@
 namespace App\Http\Controllers\API\admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Discount_model;
+use App\Models\Fees_colletion_model;
 use App\Models\Institute_detail;
 use App\Models\Student_detail;
+use App\Models\Student_fees_model;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
 use App\Traits\ApiTrait;
 use Barryvdh\DomPDF\Facade\Pdf as FacadePdf;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use PDF; // Ensure this line is present
@@ -216,6 +221,125 @@ class StudentProgressPdfController extends Controller
                 $exam_student_result = [];
                 $html = ''; 
                 foreach ($exam_wise_student_response as $student_index=>$exam_student_value) {
+
+
+                  $query = Student_detail::leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                  ->select(
+                      'users.id',
+                      'users.firstname',
+                      'users.lastname',
+                      'users.image',
+                      'users.mobile',
+                      'students_details.student_id',
+                  )
+                  ->where('students_details.status', '1')
+                  ->whereNull('users.deleted_at')
+                  ->whereNull('students_details.deleted_at')
+                  ->groupBy(
+                      'users.id',
+                      'users.firstname',
+                      'users.lastname',
+                      'users.image',
+                      'students_details.student_id',
+                   )
+              
+                   ->where('students_details.institute_id', $request->institute_id)
+                   ->when(!empty($board_id), function ($query) use ($board_id) {
+                     return $query->where('students_details.board_id', $board_id);
+                     })
+                   ->when(!empty($medium_id), function ($query) use ($medium_id) {
+                     return $query->where('students_details.medium_id', $medium_id);
+                   })
+                   ->when(!empty($class_id), function ($query) use ($class_id) {
+                     return $query->where('students_details.class_id', $class_id);
+                   })
+                   ->when(!empty($standard_id), function ($query) use ($standard_id) {
+                     return $query->where('students_details.standard_id', $standard_id);
+                   }) 
+                   ->when(!empty($batch_id), function ($query) use ($batch_id) {
+                     return $query->where('students_details.batch_id', $batch_id);
+                   }) 
+                  // ->when(!empty($request->mobile), function ($query) use ($request) { 
+                  //     return $query->where('users.mobile', $request->mobile);
+                  // })
+                  ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) { 
+                      return $query->where('students_details.student_id', $exam_student_value['id']);
+                  });
+                  $student_response = $query->get()->toArray();
+                  $data_final=[];
+                  foreach ($student_response as $value) {
+                      $student_id=$value['student_id'];
+                      
+                      $student = User::where('id', $student_id)->first();
+                      $student_name = $student->firstname . ' ' . $student->lastname;
+                      // Fetch student fee and discount information
+                      
+                      $student_fees = Student_fees_model::where('student_id',  $student_id)
+                          ->where('institute_id', $request->institute_id)
+                          ->first();
+                         
+                     
+                      $discount = Discount_model::where('student_id',  $student_id)
+                          ->where('institute_id', $request->institute_id)
+                          ->first();
+          
+                      // Calculate revised fee and discount data
+                      $revise_fee = 0;
+                      $discount_data = '00.00';
+                      if ($discount) {
+                          if ($discount->discount_by == 'Rupee') {
+                              $revise_fee = $discount->discount_amount;
+                              $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '.00' : '00.00';
+                          } elseif ($discount->discount_by == 'Percentage') {
+                              $revise_fee = $student_fees->total_fees * ($discount->discount_amount / 100);
+                              $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '%' : '0%';
+                          }
+                      }
+          
+                      // Fetch student payment history
+                      $student_history = Fees_colletion_model::where('student_id',  $student_id)
+                          ->where('institute_id', $request->institute_id)
+                          ->orderBy('id', 'desc') 
+                          ->get();
+          
+                      // Prepare history and calculate paid amount
+                      $history = [];
+                      $paid_amount = 0;
+                      foreach ($student_history as $value) {
+                          $dateTime = Carbon::parse($value->created_at);
+                          $time = $dateTime->format('Y-m-d h:i:s A');
+                          $history[] = [
+                              'paid_amount' => $value->payment_amount,
+                              'date' => $time,
+                              'payment_mode' => $value->payment_type,
+                              'invoice_no' => $value->invoice_no,
+                              'transaction_id' => $value->transaction_id,
+                          ];
+                          if (!empty($value->payment_amount)) {
+                              $paid_amount += $value->payment_amount;
+                          }
+                      }
+                      
+                       $remaing_amount =$student_fees->total_fees - $paid_amount - $revise_fee ;
+                      // Prepare the final data structure
+                     
+                        $data_final[] = [
+                            'student_name' => $student_name,
+                            'student_fees' => !empty($student_fees->total_fees) ? $student_fees->total_fees . '.00' : '00.00',
+                            'discount' => $discount_data,
+                            'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
+                            'remaing_amount'=>!empty($remaing_amount) ? $remaing_amount . '.00' : '00.00',
+                            'status' => (!empty($remaing_amount))?'pending':'paid',
+                            'history' => $history,
+                        ];
+                  
+                      
+                  } 
+
+                  // print_r($data_final);
+                  //    exit;
+
+
                   $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
                   ->when(!empty($request->institute_id), function ($query) use ($request) {
                       return $query->where('students_details.institute_id', $request->institute_id);
@@ -469,6 +593,7 @@ class StudentProgressPdfController extends Controller
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
                     'exam' => $exam_result,
                     'imagePath' => $imagePath,
+                    'fees_response' => $data_final,
                     // 'imagePath2' => $imagePath2,
                     
 

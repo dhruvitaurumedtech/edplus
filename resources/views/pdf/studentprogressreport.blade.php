@@ -71,8 +71,13 @@
                                                     </td>
                                                 </tr>
                                             </table>
+                                            <table>
+                                                <tr><th>student_name</th><th>Total_Fees</th><th>Discount</th><th>paid_amount</th></tr>
+                                            </table>
+                                            
 
                                         @endforeach
+
                                     @endforeach
                                 @endif
                             @endforeach
