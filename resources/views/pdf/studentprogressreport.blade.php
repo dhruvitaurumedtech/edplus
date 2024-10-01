@@ -1,10 +1,10 @@
-<h1>Student Progress Report</h1>
-<hr>
+<style>
+     .page-break {
+            page-break-before: always;
+        }
+</style>
 
-@if (!empty($data['institute']) && is_array($data['institute']))
-    <p><b>Institute Name: </b>{{ $data['institute']['institute_name'] }}</p>
-    <p><b>Address: </b>{{ $data['institute']['address'] }}</p>
-@endif
+
 
 @if (!empty($data['board_result']) && is_array($data['board_result']))
     @foreach ($data['board_result'] as $board_index => $item)
@@ -19,6 +19,13 @@
                                         @foreach ($batchDT['student'] as $studentIndex => $studentDT)
                                             
                                             <!-- Table for displaying data in two columns -->
+                                            <h1>Student Progress Report</h1>
+                                            <hr>
+
+                                            @if (!empty($data['institute']) && is_array($data['institute']))
+                                                <p><b>Institute Name: </b>{{ $data['institute']['institute_name'] }}</p>
+                                                <p><b>Address: </b>{{ $data['institute']['address'] }}</p>
+                                            @endif
                                             <table border="1" cellpadding="5" cellspacing="0" style="width: 100%; border-collapse: collapse;">
                                                 <tr>
                                                     <td><b>Board Name</b></td>
@@ -139,6 +146,7 @@
                                                        @php $i++ @endphp
                                                     @endforeach
                                                 </table>
+                                                <div class="page-break"></div>
 
                                         @endforeach
 
