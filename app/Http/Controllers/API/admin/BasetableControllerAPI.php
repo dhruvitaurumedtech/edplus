@@ -534,9 +534,13 @@ class BasetableControllerAPI extends Controller
             $board_ids = explode(',', $request->board_id);
 
             $base_medium = Medium_model::join('base_table','base_table.medium','=','medium.id')
+            ->leftjoin('board','board.id','=','base_table.board')
+            ->leftjoin('institute_for','institute_for.id','=','base_table.institute_for')
             ->whereIn('base_table.institute_for', $institute_for_ids)
             ->whereIn('base_table.board', $board_ids)
-            ->select('medium.id', 'medium.name','medium.status','medium.icon','base_table.institute_for','base_table.board')
+            ->select('medium.id', 'medium.name','medium.status','medium.icon',
+            'base_table.institute_for','base_table.board',
+            'board.name as boardname','institute_for.name as institute_for_name')
             //  DB::raw('MAX(base_table.institute_for) as institute_for'),
             //  DB::raw('MAX(base_table.board) as board'))
             // ->groupBy('medium.id', 'medium.name','medium.status','medium.icon')
@@ -576,7 +580,9 @@ class BasetableControllerAPI extends Controller
 
                 //end class
                 $data[] = array('institute_for_id'=>$basemedium->institute_for,
+                    'institute_for_name'=>$basemedium->institute_for_name,
                     'board_id'=>$basemedium->board,
+                    'board_name'=>$basemedium->boardname,
                     'id' => $basemedium->id,
                     'name' => $basemedium->name,
                     'icon' => url($basemedium->icon),
