@@ -174,29 +174,37 @@ class ProductAndInventoryController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         } 
         try{
-        $user_list=User::leftjoin('students_details','students_details.student_id','=','users.id')
-                               ->when(!empty($request->role_id), function ($query) use ($request) {
-                                return $query->where('users.role_type', $request->role_id);
-                                })
-                               ->when(!empty($request->institute_id), function ($query) use ($request) {
-                                return $query->where('students_details.institute_id', $request->institute_id);
-                                })
-                                ->when(!empty($request->standard_id), function ($query) use ($request) {
-                                    return $query->where('students_details.standard_id', $request->standard_id);
-                                })
-                                ->when(!empty($request->medium_id), function ($query) use ($request) {
-                                    return $query->where('students_details.medium_id', $request->medium_id);
-                                })
-                                ->when(!empty($request->board_id), function ($query) use ($request) {
-                                    return $query->where('students_details.board_id', $request->board_id);
-                                })
-                                ->when(!empty($request->batch_id), function ($query) use ($request) {
-                                    return $query->where('students_details.batch_id', $request->batch_id);
-                                })
-                                ->when(!empty($request->subject_id), function ($query) use ($request) {
-                                    return $query->where('students_details.subject_id', 'LIKE', '%' . $request->subject_id . '%');
-                                })
-                        ->get()->toarray();
+            $user_list = User::leftJoin('students_details', 'students_details.student_id', '=', 'users.id')
+            ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
+            ->when(!empty($request->role_id), function ($query) use ($request) {
+                return $query->where('users.role_type', $request->role_id);
+            })
+            ->when(!empty($request->institute_id), function ($query) use ($request) {
+                return $query->where(function ($query) use ($request) {
+                    $query->where('students_details.institute_id', $request->institute_id)
+                          ->orWhere('teacher_detail.institute_id', $request->institute_id);
+                });
+            })
+            ->when(!empty($request->standard_id), function ($query) use ($request) {
+                return $query->where('students_details.standard_id', $request->standard_id);
+            })
+            ->when(!empty($request->medium_id), function ($query) use ($request) {
+                return $query->where('students_details.medium_id', $request->medium_id);
+            })
+            ->when(!empty($request->board_id), function ($query) use ($request) {
+                return $query->where('students_details.board_id', $request->board_id);
+            })
+            ->when(!empty($request->batch_id), function ($query) use ($request) {
+                return $query->where('students_details.batch_id', $request->batch_id);
+            })
+            ->when(!empty($request->subject_id), function ($query) use ($request) {
+                return $query->where('students_details.subject_id', 'LIKE', '%' . $request->subject_id . '%');
+            })
+            ->select('users.firstname', 'users.lastname','users.id')
+            ->distinct()
+            ->get()
+            ->toArray();
+        
                         $user_response=[];
                 foreach($user_list as $value){
                  $user_response[] = ['id'=>$value['id'],'username'=>$value['firstname'].$value['lastname']];
