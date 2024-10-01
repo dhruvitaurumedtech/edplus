@@ -352,7 +352,7 @@ class BasetableControllerAPI extends Controller
     public function get_edit_medium(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'institute_id' => 'required',
+            'institute_id' => 'nullable|exists:institute_detail,id',
             'institute_for_id' => 'required',
             'board_id' => 'required',
         ]);
@@ -362,16 +362,59 @@ class BasetableControllerAPI extends Controller
         try {
             $institute_for_ids = explode(',', $request->institute_for_id);
             $board_ids = explode(',', $request->board_id);
-            $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
-            $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
+
+            $base_medium = Medium_model::join('base_table','base_table.medium','=','medium.id')
+            ->whereIn('base_table.institute_for', $institute_for_ids)
+            ->whereIn('base_table.board', $board_ids)
+            ->select('medium.id', 'medium.name','medium.status','medium.icon',
+             DB::raw('MAX(base_table.institute_for) as institute_for'),
+             DB::raw('MAX(base_table.board) as board'))
+            ->groupBy('medium.id', 'medium.name','medium.status','medium.icon')->get();
+
+            // $getBoardsId  = Base_table::whereIn('institute_for', $institute_for_ids)->whereIn('board', $board_ids)->distinct()->pluck('medium');
+            // $base_medium = Medium_model::whereIn('id', $getBoardsId)->get();
+
             $institute_base_medium_id = Medium_sub::where('institute_id', $request->institute_id)->pluck('medium_id')->toArray();
             $data = [];
             foreach ($base_medium as $basemedium) {
                 $isAdded = in_array($basemedium->id, $institute_base_medium_id);
-                $data[] = array(
-                    'id' => $basemedium->id, 'name' => $basemedium->name,
+
+                //class
+                
+
+                $base_class = Class_model::join('base_table','base_table.institute_for_class','=','class.id')
+                ->where('base_table.institute_for', $basemedium->institute_for)
+                ->where('base_table.board', $basemedium->board)
+                ->where('base_table.medium', $basemedium->id)
+                ->select('class.id', 'class.name','class.status','class.icon')
+                ->groupBy('class.id', 'class.name','class.status','class.icon')->get();
+
+                $intitute_base_class_id = Class_sub::where('institute_id', $request->institute_id)
+                ->where('board_id', $basemedium->board)
+                ->where('medium_id', $basemedium->id)
+                ->pluck('class_id')->toArray();
+
+                $class = [];
+                foreach ($base_class as $baseclass) {
+                    $isAdded = in_array($baseclass->id, $intitute_base_class_id);
+                    $class[] = array(
+                        'id' => $baseclass->id,
+                        'name' => $baseclass->name,
+                        'icon' => url($baseclass->icon),
+                        'is_active'=>$baseclass->status,
+                        'is_added' => $isAdded
+                    );
+                }
+
+                //end class
+                $data[] = array('institute_for_id'=>$basemedium->institute_for,
+                    'board_id'=>$basemedium->board,
+                    'id' => $basemedium->id,
+                    'name' => $basemedium->name,
                     'icon' => url($basemedium->icon),
-                    'is_added' => $isAdded
+                    'is_active' => $basemedium->status,
+                    'is_added' => $isAdded,
+                    'class'=>$class
                 );
             }
             return $this->response($data, "Fetch Data Successfully");
