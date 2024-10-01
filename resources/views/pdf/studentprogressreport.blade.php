@@ -2,6 +2,7 @@
      .page-break {
             page-break-before: always;
         }
+       
 </style>
 
 
@@ -95,12 +96,12 @@
                                                     @php $i = 1 @endphp
                                                     @foreach ($studentDT['fees_response'] as $FeesDT)
                                                         <tr>
-                                                            <td width="10%">{{$i}}</td>
-                                                            <td>{{$FeesDT['student_name']}}</td>
-                                                            <td>{{$FeesDT['student_fees']}}</td>
-                                                            <td>{{$FeesDT['remaing_amount']}}</td>
-                                                            <td>{{$FeesDT['paid_amount']}}</td>
-                                                            <td> @if($FeesDT['status']=='paid')
+                                                            <td width="10%" style="text-align: center;">{{$i}}</td>
+                                                            <td style="text-align: center;">{{$FeesDT['student_name']}}</td>
+                                                            <td style="text-align: center;">{{$FeesDT['student_fees']}}</td>
+                                                            <td style="text-align: center;">{{$FeesDT['remaing_amount']}}</td>
+                                                            <td style="text-align: center;">{{$FeesDT['paid_amount']}}</td>
+                                                            <td style="text-align: center;"> @if($FeesDT['status']=='paid')
                                                                     <span class="custom-btn">Paid</span>
                                                                 @else
                                                                     <span class="custom-btn-danger">Pending</span>
@@ -127,12 +128,12 @@
                                                                     @php $j = 1 @endphp
                                                                     @foreach ($FeesDT['history'] as $historyDT)
                                                                         <tr>
-                                                                            <td>{{$j}}</td>
-                                                                            <td>{{$historyDT['paid_amount']}}</td>
-                                                                            <td>{{$historyDT['date']}}</td>
-                                                                            <td>{{$historyDT['payment_mode']}}</td>
-                                                                            <td>{{$historyDT['invoice_no']}}</td>
-                                                                            <td>{{$historyDT['transaction_id']}}</td>
+                                                                            <td style="text-align: center;">{{$j}}</td>
+                                                                            <td style="text-align: center;width:125px">{{$historyDT['paid_amount']}}</td>
+                                                                            <td style="text-align: center;">{{$historyDT['date']}}</td>
+                                                                            <td style="text-align: center;width:58px">{{$historyDT['payment_mode']}}</td>
+                                                                            <td style="text-align: center;">{{$historyDT['invoice_no']}}</td>
+                                                                            <td style="text-align: center;">{{$historyDT['transaction_id']}}</td>
                                                                         </tr>
                                                                         @php $j++ @endphp
                                                                     @endforeach

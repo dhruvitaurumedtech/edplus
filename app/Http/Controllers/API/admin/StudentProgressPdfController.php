@@ -382,7 +382,7 @@ class StudentProgressPdfController extends Controller
     <title>Attendance Chart for {$exam_student_value['firstname']}</title>
     <style>
         .piechart-container {
-            width: 260px;
+            width: 300px;
             height: 260px;
             border-radius: 50%;
             background-image: conic-gradient(
@@ -446,7 +446,8 @@ class StudentProgressPdfController extends Controller
 </head>
 <body>
 
-<h1>{$exam_student_value['firstname']}'s Attendance - Total Lectures: {$total_lectures[0]}</h1>
+<h1></h1>
+<br><br>
 <div class='piechart-container'>
     <!-- Text labels inside the pie chart -->
     <div class='piechart-text present'></div>
