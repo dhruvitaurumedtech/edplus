@@ -13,6 +13,7 @@ use App\Models\Products_inventory;
 use App\Models\Products_status;
 use App\Models\Student_detail;
 use App\Models\User;
+use Carbon\Carbon;
 
 class ProductAndInventoryController extends Controller
 {
@@ -125,11 +126,13 @@ class ProductAndInventoryController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
+            $returnDate = Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d');
             $product = new Products_assign();
             $product->user_id = $request->user_id;
             $product->product_id = $request->product_id;
             $product->status = $request->status;
             $product->quantity = $request->quantity;
+            $product->return_date = $returnDate;
             $product->save();
 
             $product = new Products_inventory();
