@@ -126,13 +126,12 @@ class ProductAndInventoryController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $returnDate = Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d');
             $product = new Products_assign();
             $product->user_id = $request->user_id;
             $product->product_id = $request->product_id;
             $product->status = $request->status;
             $product->quantity = $request->quantity;
-            $product->return_date = $returnDate;
+            $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
             $product->save();
 
             $product = new Products_inventory();
