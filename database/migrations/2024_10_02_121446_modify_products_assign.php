@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::table('products_assign', function (Blueprint $table) {
             $table->date('return_date')->nullable()->after('quantity');
+            $table->enum('is_returnable', ['0', '1'])->default('0');
         });
     }
 
@@ -23,6 +24,7 @@ return new class extends Migration
     {
         Schema::table('products_assign', function (Blueprint $table) {
             $table->dropColumn('return_date');
+            $table->dropColumn('is_returnable');
         });
     }
 };
