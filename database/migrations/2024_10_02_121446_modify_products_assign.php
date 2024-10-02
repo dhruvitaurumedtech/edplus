@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('products_assign', function (Blueprint $table) {
-            $table->date('return_date')->after('quantity');
+            $table->date('return_date')->nullable()->after('quantity');
         });
     }
 
