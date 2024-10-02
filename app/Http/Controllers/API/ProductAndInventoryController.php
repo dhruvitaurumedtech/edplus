@@ -167,7 +167,7 @@ class ProductAndInventoryController extends Controller
                 ->join('products', 'products.id', '=', 'products_assign.product_id')
                 ->join('roles', 'roles.id', '=', 'users.role_type')
                 ->where('products.institute_id', $request->institute_id)
-                ->select('products_assign.product_id','products.name as productname','roles.role_name','users.role_type','products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 'products_inventory_status.name as statusname')
+                ->select('products_assign.product_id','products.name as productname','roles.role_name','roles.id as role_id','products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 'products_inventory_status.name as statusname')
                 ->get();
             $productsList = [];
             foreach ($productshis as $prdt) {
@@ -175,7 +175,7 @@ class ProductAndInventoryController extends Controller
                     'id' => $prdt->id,
                     'firstname' => $prdt->firstname,
                     'lastname' => $prdt->lastname,
-                    'role_id'=>$prdt->role_type,
+                    'role_id'=>$prdt->role_id,
                     'role_name'=>$prdt->role_name,
                     'product_id'=>$prdt->product_id,
                     'product_name'=>$prdt->productname,
