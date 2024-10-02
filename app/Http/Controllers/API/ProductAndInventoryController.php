@@ -15,6 +15,12 @@ use App\Models\Student_detail;
 use App\Models\User;
 use Carbon\Carbon;
 
+// status
+// 1 - Add
+// 2 - Assign
+// 3 - Damaged
+// 4 - Lost
+// 5-return
 class ProductAndInventoryController extends Controller
 {
     use ApiTrait;
@@ -99,10 +105,10 @@ class ProductAndInventoryController extends Controller
                 ->get();
             $productsList = [];
             foreach ($products as $prdt) {
-                $addinventory = Products_inventory::whereIn('status', ['1', '2'])
+                $addinventory = Products_inventory::whereIn('status', ['1','5'])
                     ->where('product_id', $prdt->id)->sum('quantity');
 
-                $assigninventory = Products_inventory::whereNotIn('status', ['1', '2'])
+                $assigninventory = Products_inventory::whereNotIn('status', ['1', '5'])
                     ->where('product_id', $prdt->id)->sum('quantity');
                 $availableqty = $addinventory - $assigninventory;
 
