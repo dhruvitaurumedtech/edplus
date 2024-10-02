@@ -140,6 +140,7 @@ class ProductAndInventoryController extends Controller
             $product->status = $request->status;
             $product->quantity = $request->quantity;
             $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
+            $product->is_returnable = $request->is_returnable;
             $product->save();
 
             $product = new Products_inventory();
@@ -169,7 +170,7 @@ class ProductAndInventoryController extends Controller
                 ->where('products.institute_id', $request->institute_id)
                 ->select('products_assign.product_id','products.name as productname','roles.role_name','roles.id as role_id',
                 'products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 
-                'products_inventory_status.name as statusname')
+                'products_inventory_status.name as statusname','Products_assign.is_returnable')
                 ->get();
             $productsList = [];
             foreach ($productshis as $prdt) {
@@ -183,7 +184,8 @@ class ProductAndInventoryController extends Controller
                     'product_name'=>$prdt->productname,
                     'quantity' => $prdt->quantity,
                     'created_at' => $prdt->created_at,
-                    'status' => $prdt->statusname
+                    'status' => $prdt->statusname,
+                    'is_returnable' =>$prdt->is_returnable,
                 ];
             }
 
