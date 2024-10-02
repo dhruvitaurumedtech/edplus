@@ -1705,8 +1705,8 @@ class InstituteApiController extends Controller
                             $eyear = $endtDate->year;
 
                             $parDT = [
-                                'name' => $prdetail['firstname'] . ' ' . $prdetail['lastname'],
-                                'sname' => $response['firstname'] . ' ' . $response['lastname'],
+                                'name' => $prdetail->firstname. ' ' . $prdetail->lastname,
+                                'sname' => $response->firstname. ' ' . $response->lastname,
                                 'email' => $prdetail->email,
                                 'standard' => $response->standardn,
                                 'id' => $prdetail->id,
@@ -1718,6 +1718,7 @@ class InstituteApiController extends Controller
                                 'year' => $syear . '-' . $eyear,
                                 'subjects' => $sujids
                             ];
+                            // print_r($parDT);exit;
 
                             Mail::to($prdetail->email)->send(new WelcomeMail($parDT));
                         }
