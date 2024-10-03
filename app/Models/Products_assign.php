@@ -10,6 +10,6 @@ class Products_assign extends Model
     use HasFactory;
     protected $table = 'products_assign';
     protected $fillable = [
-        'user_id','product_id','status', 'quantity'
+        'user_id','product_id','status', 'quantity','is_returnable','return_date'
     ];
 }
