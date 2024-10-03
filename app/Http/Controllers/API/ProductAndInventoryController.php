@@ -21,6 +21,9 @@ use Carbon\Carbon;
 // 3 - Damaged
 // 4 - Lost
 // 5-return
+
+//if is_returnable then 1 and 0 means non returnable
+
 class ProductAndInventoryController extends Controller
 {
     use ApiTrait;
