@@ -173,7 +173,7 @@ class ProductAndInventoryController extends Controller
                 ->where('products.institute_id', $request->institute_id)
                 ->select('products_assign.product_id','products.name as productname','roles.role_name','roles.id as role_id',
                 'products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 
-                'products_inventory_status.name as statusname','Products_assign.is_returnable')
+                'products_inventory_status.name as statusname','products_assign.is_returnable')
                 ->get();
             $productsList = [];
             foreach ($productshis as $prdt) {
