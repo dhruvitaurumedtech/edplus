@@ -136,9 +136,20 @@ class ProductAndInventoryController extends Controller
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            $this->return_product_method($request,$request->return_quantity,5);
-            $this->return_product_method($request,$request->damaged_quantity,3);
-            $this->return_product_method($request,$request->lost_quantity,4);
+            if($request->return_quantity){
+                $this->return_product_method($request,$request->return_quantity,5);
+            }
+
+            if($request->damaged_quantity){
+                $this->return_product_method($request,$request->damaged_quantity,3);
+            }
+
+            if($request->lost_quantity){
+                $this->return_product_method($request,$request->lost_quantity,4);
+            }
+            
+            
+            
             return $this->response([], "Return successfully.");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
