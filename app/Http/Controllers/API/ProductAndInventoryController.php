@@ -165,7 +165,7 @@ class ProductAndInventoryController extends Controller
             $product->status = $status;
             $product->quantity = $quantity;
             $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
-            $product->is_returnable = $request->is_returnable ? $request->is_returnable : '0';
+            $product->is_returnable = '1';
             $product->save();
 
             $product = new Products_inventory();
