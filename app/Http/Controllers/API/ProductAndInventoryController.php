@@ -127,6 +127,44 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
+    public function return_product(Request $request){
+        $validator = Validator::make($request->all(), [
+            'user_id' => 'required|exists:users,id',
+            'product_id'=>'required|exists:products,id',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            $this->return_product_method($request,$request->return_quantity,5);
+            $this->return_product_method($request,$request->damaged_quantity,3);
+            $this->return_product_method($request,$request->lost_quantity,4);
+            return $this->response([], "Return successfully.");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!.", false, 400);
+        }
+    }
+
+    private function return_product_method($request,$quantity,$status)
+    {
+        
+            $product = new Products_assign();
+            $product->user_id = $request->user_id;
+            $product->product_id = $request->product_id;
+            $product->status = $status;
+            $product->quantity = $quantity;
+            $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
+            $product->is_returnable = $request->is_returnable ? $request->is_returnable : '0';
+            $product->save();
+
+            $product = new Products_inventory();
+            $product->product_id = $request->product_id;
+            $product->status = $status;
+            $product->quantity = $quantity;
+            $product->save();
+            return 1;
+        
+    }
 
     public function product_assign(Request $request)
     {
@@ -197,7 +235,7 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
-    function assign_inventory(Request $request)
+    function assign_inventory(Request $request) //assign time filter wise user list 
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
