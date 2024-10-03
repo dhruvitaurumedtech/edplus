@@ -19,6 +19,7 @@ use Exception;
 use Illuminate\Support\Facades\DB;
 use PDF; // Ensure this line is present
 
+
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Storage;
 
@@ -185,16 +186,35 @@ class StudentProgressPdfController extends Controller
                   ->distinct()
                   ->get()
                   ->toArray();
+                  // print_r($exam_wise_student_response);exit;
 
 
                 $exam_student_result = [];
                 $html = '';
-                foreach ($exam_wise_student_response as $student_index => $exam_student_value) {
+                $all_subjects = []; // To store unique subjects
 
-                  $subject_get = Student_detail::leftjoin('standard', 'standard.id', '=', 'students_details.standard_id')
-                  ->when(!empty($request->institute_id), function ($query) use ($request) {
-                    return $query->where('students_details.institute_id', $request->institute_id);
-                  })
+                foreach ($exam_wise_student_response as $student_index => $exam_student_value) {
+                  $query = Student_detail::leftJoin('users', 'users.id', '=', 'students_details.student_id')
+                  ->select(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'users.mobile',
+                    'students_details.student_id',
+                  )
+                  ->where('students_details.status', '1')
+                  ->whereNull('users.deleted_at')
+                  ->whereNull('students_details.deleted_at')
+                  ->groupBy(
+                    'users.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'users.image',
+                    'students_details.student_id',
+                  )
+
+                  ->where('students_details.institute_id', $request->institute_id)
                   ->when(!empty($board_id), function ($query) use ($board_id) {
                     return $query->where('students_details.board_id', $board_id);
                   })
@@ -207,106 +227,327 @@ class StudentProgressPdfController extends Controller
                   ->when(!empty($standard_id), function ($query) use ($standard_id) {
                     return $query->where('students_details.standard_id', $standard_id);
                   })
-                  ->when(!empty($exam_student_value['student_id']), function ($query) use ($exam_student_value) {
-                    return $query->where('students_details.student_id', $exam_student_value['student_id']);
-                  })
                   ->when(!empty($batch_id), function ($query) use ($batch_id) {
                     return $query->where('students_details.batch_id', $batch_id);
                   })
+                  // ->when(!empty($request->mobile), function ($query) use ($request) { 
+                  //     return $query->where('users.mobile', $request->mobile);
+                  // })
+                  ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
+                    return $query->where('students_details.student_id', $exam_student_value['id']);
+                  });
+                $student_response = $query->get()->toArray();
+                $data_final = [];
+                foreach ($student_response as $value) {
+                  $student_id = $value['student_id'];
 
-                  ->select('students_details.subject_id')
-                  ->distinct()
-                  ->pluck('students_details.subject_id');
+                  $student = User::where('id', $student_id)->first();
+                  $student_name = $student->firstname . ' ' . $student->lastname;
+                  // Fetch student fee and discount information
 
-                $mergedArray = [];
-                print_r($subject_get);exit;
-                foreach ($subject_get as $item) {
-                  // print_r($item);exit;
-                  $subject_ids = explode(',', $item);
-                  // print_r($subject_ids);exit; // Convert comma-separated IDs to an array
-                  $subject_response = Subject_model::whereIn('id', $subject_ids)->groupBy('id')->get()->toArray(); // Fetch subjects
-                  // print_r($subject_response);exit;
+                  $student_fees = Student_fees_model::where('student_id',  $student_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->first();
 
 
-                  foreach($subject_response as $subject_array_value){
-                    $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
-                    ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
-                    ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                  $discount = Discount_model::where('student_id',  $student_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->first();
+
+                  // Calculate revised fee and discount data
+                  $revise_fee = 0;
+                  $discount_data = '00.00';
+                  if ($discount) {
+                    if ($discount->discount_by == 'Rupee') {
+                      $revise_fee = $discount->discount_amount;
+                      $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '.00' : '00.00';
+                    } elseif ($discount->discount_by == 'Percentage') {
+                      $revise_fee = $student_fees->total_fees * ($discount->discount_amount / 100);
+                      $discount_data = !empty($discount->discount_amount) ? $discount->discount_amount . '%' : '0%';
+                    }
+                  }
+
+                  // Fetch student payment history
+                  $student_history = Fees_colletion_model::where('student_id',  $student_id)
+                    ->where('institute_id', $request->institute_id)
+                    ->orderBy('id', 'desc')
+                    ->get();
+
+                  // Prepare history and calculate paid amount
+                  $history = [];
+                  $paid_amount = 0;
+                  foreach ($student_history as $value) {
+                    $dateTime = Carbon::parse($value->created_at);
+                    $time = $dateTime->format('Y-m-d h:i:s A');
+                    // $history[] = [
+                    //   'paid_amount' => $value->payment_amount,
+                    //   'date' => $time,
+                    //   'payment_mode' => $value->payment_type,
+                    //   'invoice_no' => $value->invoice_no,
+                    //   'transaction_id' => $value->transaction_id,
+                    // ];
+                    if (!empty($value->payment_amount)) {
+                      $paid_amount += $value->payment_amount;
+                    }
+                  }
+
+                  $remaing_amount = $student_fees->total_fees - $paid_amount - $revise_fee;
+                  // Prepare the final data structure
+
+                  $data_final[] = [
+                    'student_name' => $student_name,
+                    'student_fees' => !empty($student_fees->total_fees) ? $student_fees->total_fees . '.00' : '00.00',
+                    'discount' => $discount_data,
+                    'paid_amount' => !empty($paid_amount) ? $paid_amount . '.00' : '00.00',
+                    'remaing_amount' => !empty($remaing_amount) ? $remaing_amount . '.00' : '00.00',
+                    'status' => (!empty($remaing_amount)) ? 'pending' : 'paid',
+                    // 'history' => $history,
+                  ];
+                }
+
+                    // Fetch subject IDs for the current student
+                    $subject_get = Student_detail::leftJoin('standard', 'standard.id', '=', 'students_details.standard_id')
+                        ->when(!empty($request->institute_id), function ($query) use ($request) {
+                            return $query->where('students_details.institute_id', $request->institute_id);
+                        })
+                        ->when(!empty($board_id), function ($query) use ($board_id) {
+                            return $query->where('students_details.board_id', $board_id);
+                        })
+                        ->when(!empty($medium_id), function ($query) use ($medium_id) {
+                            return $query->where('students_details.medium_id', $medium_id);
+                        })
+                        ->when(!empty($class_id), function ($query) use ($class_id) {
+                            return $query->where('students_details.class_id', $class_id);
+                        })
+                        ->when(!empty($standard_id), function ($query) use ($standard_id) {
+                            return $query->where('students_details.standard_id', $standard_id);
+                        })
+                        ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
+                            return $query->where('students_details.student_id', $exam_student_value['id']);
+                        })
+                        ->when(!empty($batch_id), function ($query) use ($batch_id) {
+                            return $query->where('students_details.batch_id', $batch_id);
+                        })
+                        ->select('students_details.subject_id')
+                        ->distinct()
+                        ->get()
+                        ->toArray();
+                
+                    // Collect all subject IDs from the result
+                    foreach ($subject_get as $item) {
+                        $ids = explode(',', $item['subject_id']); // Handle comma-separated subject IDs
+                
+                        // Fetch subject details for these IDs
+                        $subject_response = Subject_model::whereIn('id', $ids)
+                            ->distinct() // Ensure distinct subjects
+                            ->get()
+                            ->toArray();
+
+
+                            
+
+                          
+                        // Merge unique subjects into $all_subjects array
+                        foreach ($subject_response as $subject_array_value) {
+                              // print_r($subject_array_value['id']);exit;
+
+                          $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
+                          ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
+                          ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
+                          ->when(!empty($request->institute_id), function ($query) use ($request) {
+                            return $query->where('students_details.institute_id', $request->institute_id);
+                          })
+                          ->when(!empty($board_id), function ($query) use ($board_id) {
+                            return $query->where('students_details.board_id', $board_id);
+                          })
+                          ->when(!empty($medium_id), function ($query) use ($medium_id) {
+                            return $query->where('students_details.medium_id', $medium_id);
+                          })
+                          ->when(!empty($class_id), function ($query) use ($class_id) {
+                            return $query->where('students_details.class_id', $class_id);
+                          })
+                          ->when(!empty($standard_id), function ($query) use ($standard_id) {
+                            return $query->where('students_details.standard_id', $standard_id);
+                          })
+                          ->when(!empty($batch_id), function ($query) use ($batch_id) {
+                            return $query->where('students_details.batch_id', $batch_id);
+                          })
+                          ->when(!empty($subject_array_value['id']), function ($query) use ($subject_array_value) {
+                            return $query->where('exam.subject_id', $subject_array_value['id']);
+                          })
+                          ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
+                            return $query->where('marks.student_id', $exam_student_value['id']);
+                          })
+                          ->when(!empty($request->exam_name), function ($query) use ($request) {
+                            return $query->where('exam.exam_title', $request->exam_name);
+                          })
+                          ->when(!empty($request->start_date) && !empty($request->end_date), function ($query) use ($request) {
+                            return $query->whereBetween('exam.exam_date', [$request->start_date, $request->end_date]);
+                          })
+                          ->where('students_details.reject_count', '0')
+                          ->whereNull('students_details.deleted_at')
+                          ->select(
+                            'marks.mark as marks_obtained',
+                            'exam.total_mark as total_marks',
+                            'exam.exam_title',
+                            'exam.exam_date',
+                            // 'subject.name as subject_name'
+                          )
+                          ->get()
+                          ->toArray();
+                          // print_r($exam_response);exit;
+      
+                          $exam_result = [];
+                          $chartBars = '';
+                          $xAxisLabels = []; 
+                          $chartContainer='';
+                        foreach ($exam_response as $exam_index => $exam_value) {
+                          $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
+
+
+                          $yAxisLabels = '';
+                          for ($i = 100; $i >= 0; $i -= 10) {
+                            $yAxisLabels .= "<div class='y-label'>{$i}</div>";
+                          }
+                          $xAxisLabels[] = "<div class='x-label'>" . date('d-m-Y', strtotime($exam_value['exam_date'])) . "</div>"; // Store exam date for x-axis
+      
+                          $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
+      
+                          
+      
+                          $exam_result[] = [
+                            'exam_name'  => $exam_value['exam_title'],
+                            'mark'       => $exam_value['marks_obtained'],
+                            'total_mark' => $exam_value['total_marks'],
+                            'percentage' => round($percentage, 2),
+                            'exam_date'  => $exam_value['exam_date'],
+      
+                          ];
+                          
+                          if(!empty($exam_result)){
+                          $chartContainer = "
+                          <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin-left: 50px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
+                              <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
+                              <div style='position: absolute; left: -60px; top: 130px; writing-mode: vertical-lr; transform: rotate(180deg);'>Percentage</div>
+                              <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                            
+                          </div>
+                          <div class='x-axis-labels' style='position: absolute'>
+                            <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 150px; position: relative; height:100%; align-items: end;'>
+                                  " . implode('', $xAxisLabels) . "
+                              </div>
+                              <div style=' margin-left:350px;position: relative; height:100%; align-items: center;'>Exam Date</div>
+                              </div>
+
+                              
+                      ";
+                      $htmlContent = "
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    font-family: 'Times New Roman', Times, serif;
+                                    margin: 0;
+                                    padding: 20px;
+                                    background-color: #f4f4f4;
+                                }
+                                .chart-container {
+                                    display: flex;
+                                    align-items: flex-end;
+                                    height: 300px;
+                                    position: relative;
+                                    margin: 20px;
+                                    border-left: 2px solid #333;
+                                    border-bottom: 2px solid #333;
+                                    background-color: #fff;
+                                }
+                                .y-label {
+                                    text-align: right;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            $chartContainer
+                        </body>
+                        </html>
+                    ";
+                          }
+                          $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index .$subject_array_value['id'] . '.png');
+                    $directoryPath = public_path('student_report_graph');
+                    if (!file_exists($directoryPath)) {
+                      mkdir($directoryPath, 0755, true);
+                    }
+  
+                    try {
+                      Browsershot::html($htmlContent)
+                        ->windowSize(800, 400)
+                        ->save($imagePath);
+  
+                      // return response()->download($imagePath);
+                    } catch (\Exception $e) {
+  
+                      return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+                    }
+                        }
+
+                       
+  
+                    // Create complete HTML content
+                    
+  
+  
+  
+                    
+                            if (!isset($all_subjects[$subject_array_value['id']])) {
+                                // Add the subject if it's not already in the array
+                                $all_subjects[$subject_array_value['id']] = [
+                                    'id' => $subject_array_value['id'],
+                                    'subject_name' => $subject_array_value['name'],
+                                    'exam_result' => $exam_result,
+                                    
+                                    
+                                ];
+                            }
+                        }
+                    }
+
+                   $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
                     ->when(!empty($request->institute_id), function ($query) use ($request) {
                       return $query->where('students_details.institute_id', $request->institute_id);
                     })
-                    ->when(!empty($board_id), function ($query) use ($board_id) {
-                      return $query->where('students_details.board_id', $board_id);
-                    })
-                    ->when(!empty($medium_id), function ($query) use ($medium_id) {
-                      return $query->where('students_details.medium_id', $medium_id);
-                    })
-                    ->when(!empty($class_id), function ($query) use ($class_id) {
-                      return $query->where('students_details.class_id', $class_id);
-                    })
-                    ->when(!empty($standard_id), function ($query) use ($standard_id) {
-                      return $query->where('students_details.standard_id', $standard_id);
-                    })
-                    ->when(!empty($batch_id), function ($query) use ($batch_id) {
-                      return $query->where('students_details.batch_id', $batch_id);
-                    })
-                    // ->when(!empty(explode(',',$item['subject_id'])), function ($query) use ($item) {
-                    //   return $query->whereIn('exam.subject_id', explode(',',$item['subject_id']));
-                    // })
                     ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
-                      return $query->where('marks.student_id', $exam_student_value['id']);
+                      return $query->where('attendance.student_id', $exam_student_value['id']);
                     })
-                    ->when(!empty($request->exam_name), function ($query) use ($request) {
-                      return $query->where('exam.exam_title', $request->exam_name);
+                    ->when(!empty($request->month), function ($query) use ($request) {
+                      return $query->whereRaw('MONTH(attendance.date) = ?', [$request->month]);
                     })
-                    ->when(!empty($request->start_date) && !empty($request->end_date), function ($query) use ($request) {
-                      return $query->whereBetween('exam.exam_date', [$request->start_date, $request->end_date]);
-                    })
-                    ->where('students_details.reject_count', '0')
-                    ->whereNull('students_details.deleted_at')
                     ->select(
-                      'marks.mark as marks_obtained',
-                      'exam.total_mark as total_marks',
-                      'exam.exam_title',
-                      'exam.exam_date',
-                      'subject.name as subject_name'
+                      DB::raw('SUM(CASE WHEN attendance.attendance = "P" THEN 1 ELSE 0 END) as total_present'),
+                      DB::raw('SUM(CASE WHEN attendance.attendance = "A" THEN 1 ELSE 0 END) as total_absent')
                     )
-                    ->get()
-                    ->toArray();
-                    // print_r($exam_response);exit;
-
-                  $exam_result = [];
-                  $chartBars = '';
-                  $xAxisLabels = []; // Date X-axis labels
-
-                  foreach ($exam_response as $exam_index => $exam_value) {
-                
-
-                    $exam_result[] = [
-                      'exam_name'  => $exam_value['exam_title'],
-                      'mark'       => $exam_value['marks_obtained'],
-                      'total_mark' => $exam_value['total_marks'],
-                      // 'percentage' => round($percentage, 2),
-                      'exam_date'  => $exam_value['exam_date'],
-
-                    ];
-                  }
-                  $subject_reponse[] = [
-                                   'id'=>$subject_array_value['id'],
-                                   'subject_name'=>$subject_array_value['name']];
-               
-                  }                                    
-
-                   }
+                    ->first();
+                    $total_lectures = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
+                      ->select(DB::raw('COUNT(DISTINCT date) as total_lectures'))
+                      ->when(!empty($request->institute_id), function ($query) use ($request) {
+                        return $query->where('students_details.institute_id', $request->institute_id);
+                      })
+                      ->when(!empty($exam_student_value['id']), function ($query) use ($exam_student_value) {
+                        return $query->where('attendance.student_id', $exam_student_value['id']);
+                      })
+                      ->when(!empty($request->month), function ($query) use ($request) {
+                        return $query->whereRaw('MONTH(date) = ?', [$request->month]);
+                      })
+                      ->first();
                   $exam_student_result[] = [
                     'student_id' => $exam_student_value['id'],
                     'student_name' => $exam_student_value['firstname'] . '' . $exam_student_value['lastname'],
-                    'subject_reponse'=>$subject_reponse
-                  //   'exam' => $exam_result,
-                  //   'imagePath' => $imagePath,
-                  //   'fees_response' => $data_final,
-                  //   // 'imagePath2' => $imagePath2,
-
+                    'subject_reponse'=>$all_subjects,
+                    'fees_response' => $data_final,
+                    'imagePath'=>$imagePath,
+                    'total_lecture'=>$total_lectures['total_lectures'],
+                    'total_present'=>$attendance_data['total_present'],
+                    'total_absent'=>$attendance_data['total_absent']
+               
 
 
                   ];
@@ -353,7 +594,7 @@ class StudentProgressPdfController extends Controller
         'address' => $response_institute->address
       ];
       $data = ['board_result' => $board_result, 'institute' => $institute];
-      print_r($data);exit;
+      // print_r($data);exit;
 
 
       try {
