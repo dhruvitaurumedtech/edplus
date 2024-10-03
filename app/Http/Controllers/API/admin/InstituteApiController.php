@@ -244,7 +244,7 @@ class InstituteApiController extends Controller
             'institute_board_id' => 'required',
             'institute_for_class_id' => 'required',
             'institute_medium_id' => 'required',
-            'institute_work_id' => 'required',
+            //'institute_work_id' => 'required',
             'standard_id' => 'required',
             'subject_id' => 'required',
             'institute_name' => 'required|string',
@@ -419,32 +419,32 @@ class InstituteApiController extends Controller
                     }
                 }
             }
-            $institute_work_id = explode(',', $request->input('institute_work_id'));
-            foreach ($institute_work_id as $value) {
-                if ($value == 'other') {
-                    $instituteforadd = Dobusinesswith_Model::create([
-                        'name' => $request->input('do_businesswith_name'),
-                        'category_id' => $request->input('category_id'),
-                        'created_by' => $request->input('user_id'),
-                        'status' => 'active',
-                    ]);
-                    $dobusinesswith_id = $instituteforadd->id;
-                } else {
-                    $dobusinesswith_id = $value;
-                }
+            // $institute_work_id = explode(',', $request->input('institute_work_id'));
+            // foreach ($institute_work_id as $value) {
+            //     if ($value == 'other') {
+            //         $instituteforadd = Dobusinesswith_Model::create([
+            //             'name' => $request->input('do_businesswith_name'),
+            //             'category_id' => $request->input('category_id'),
+            //             'created_by' => $request->input('user_id'),
+            //             'status' => 'active',
+            //         ]);
+            //         $dobusinesswith_id = $instituteforadd->id;
+            //     } else {
+            //         $dobusinesswith_id = $value;
+            //     }
 
-                $addeddobusn = Dobusinesswith_sub::where('institute_id', $lastInsertedId)
-                    ->where('do_business_with_id', $dobusinesswith_id)
-                    ->first();
+            //     $addeddobusn = Dobusinesswith_sub::where('institute_id', $lastInsertedId)
+            //         ->where('do_business_with_id', $dobusinesswith_id)
+            //         ->first();
 
-                if (empty($addeddobusn)) {
-                    Dobusinesswith_sub::create([
-                        'user_id' => $request->input('user_id'),
-                        'institute_id' => $lastInsertedId,
-                        'do_business_with_id' => $dobusinesswith_id,
-                    ]);
-                }
-            }
+            //     if (empty($addeddobusn)) {
+            //         Dobusinesswith_sub::create([
+            //             'user_id' => $request->input('user_id'),
+            //             'institute_id' => $lastInsertedId,
+            //             'do_business_with_id' => $dobusinesswith_id,
+            //         ]);
+            //     }
+            // }
             $intitute_for_id = explode(',', $request->input('institute_for_id'));
             foreach ($intitute_for_id as $value) {
                 if ($value == 5) {
