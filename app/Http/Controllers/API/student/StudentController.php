@@ -645,7 +645,8 @@ class StudentController extends Controller
                     ->max('mark');
                 $result[] = array(
                     'subject' => $resultDDt->subject,
-                    'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
+                    'title' => $resultDDt->exam_title,
+                    'exam_type'=> $resultDDt->exam_type,
                     'total_marks' => intval($resultDDt->total_mark),
                     'achiveddmarks_marks' => $resultDDt->mark,
                     'date' => date('d-m-Y',strtotime($resultDDt->exam_date)),
