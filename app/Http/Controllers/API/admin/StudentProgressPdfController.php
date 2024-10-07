@@ -397,53 +397,18 @@ class StudentProgressPdfController extends Controller
                           ->toArray();
                         
       
-                          $exam_result = [];
-                         $exam_result = [];
-                          $labels = '';
+                          $xAxisLabels = []; 
+                          $chartContainer='';
                           $chartBars = '';
-                          $xAxisLabels = [];
-                          $chart = '';
-                          
-                          // Loop through the exam responses
-                          // print_r($exam_response);exit;
-                          foreach ($exam_response as $exam_index => $exam_value) {
-                              // Calculate percentage
-                              // print_r($exam_response);exit;
-                              $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
-                              
-                              // Construct SVG labels
-                              $labels .= '<g class="x-labels">
-                                              <text x="' . (150 + ($exam_index * 100)) . '" y="630">' . date('d-m-Y', strtotime($exam_value['exam_date'])) . '</text>
-                                          </g>';
-                              
-                              // Y-axis labels
-                              $labels .= '<g class="y-labels">';
-                              for ($i = 100; $i >= 0; $i -= 10) {
-                                  $labels .= '<text x="42" y="' . (610 - ($i * 5)) . '">' . $i . '</text>';
-                              }
-                              $labels .= '</g>';
-                          
-                              // Polyline points for the gradient
-                              $points = (50 + ($exam_index * 100)) . ',' . (400 - ($percentage * 4));
-                              
-                              // Add gradient and polyline
-                              $labels .= '<linearGradient id="grad" x1="0%" y1="0%" x2="0%" y2="100%">
-                                              <stop offset="0%" style="stop-color:rgba(99,224,238,.5);stop-opacity:1"></stop>
-                                              <stop offset="100%" style="stop-color:white;stop-opacity:0"></stop>
-                                          </linearGradient>';
-                              $labels .= '<polyline fill="url(#grad)" stroke="#34becd" stroke-width="0" points="' . $points . '"></polyline>';
-                              $labels .= '<polyline fill="none" stroke="#34becd" stroke-width="2" points="' . $points . '"></polyline>';
-                          
-                              // Start dot and current exam dot
-                              $labels .= '<circle class="quiz-graph-start-dot" cx="50" cy="400" data-value="0" r="6"></circle>';
-                              $labels .= '<circle class="quiz-graph-dot" cx="' . (50 + ($exam_index * 100)) . '" cy="' . (400 - ($percentage * 4)) . '" 
-                                              data-value="' . $percentage . '" 
-                                              q-title="Q' . ($exam_index + 1) . '" 
-                                              answer-count="" 
-                                              percent-value="' . $percentage . '%">
-                                          </circle>';
-                          
-                              // Prepare data for the exam result
+                        foreach ($exam_response as $exam_index => $exam_value) {
+                          $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
+                          $yAxisLabels = '';
+                          for ($i = 100; $i >= 0; $i -= 10) {
+                            $yAxisLabels .= "<div class='y-label'>{$i}</div>";
+                          }
+                          $xAxisLabels[] = "<div class='x-label'>" . date('d-m-Y', strtotime($exam_value['exam_date'])) . "</div>"; // Store exam date for x-axis
+      
+                          $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
                               $exam_result[] = [
                                   'exam_name'  => $exam_value['exam_title'],
                                   'mark'       => $exam_value['marks_obtained'],
@@ -454,71 +419,53 @@ class StudentProgressPdfController extends Controller
                           }
                           
                           // Generate chart grid
-                          if (!empty($exam_result)) {
-                              $chart .= '<defs>
-                                              <pattern id="grid" width="50" height="50" patternUnits="userSpaceOnUse">
-                                                  <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#e5e5e5" stroke-width="1"></path>
-                                              </pattern>
-                                          </defs>
-                                          <rect x="50" width="calc(800% - 50px)" height="600px" fill="url(#grid)" stroke="gray"></rect>
-                                          <g class="label-title">
-                                              <text x="-250" y="10" transform="rotate(-90)">Percentage</text>
-                                          </g>
-                                          <g class="label-title">
-                                              <text x="50%" y="640">Date</text>
-                                          </g>';
-                          }
+                          if(!empty($exam_result)){
+                            $chartContainer = "
+                            <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin-left: 50px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
+                                <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
+                                <div style='position: absolute; left: -60px; top: 130px; writing-mode: vertical-lr; transform: rotate(180deg);'>Percentage</div>
+                                <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                              
+                            </div>
+                            <div class='x-axis-labels' style='position: absolute'>
+                              <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 150px; position: relative; height:100%; align-items: end;'>
+                                    " . implode('', $xAxisLabels) . "
+                                </div>
+                                <div style=' margin-left:350px;position: relative; height:100%; align-items: center;'>Exam Date</div>
+                                </div>
                           
                           // Create the HTML content
-                          $htmlContent = '<html>
-                                               <head>
-                                                   <style>
-                                                       .quiz-chartTip {
-                                                           padding: 5px 10px;
-                                                           border: 1px solid rgba(0,0,0,.1);
-                                                           border-radius: 4px;
-                                                           background-color: rgba(255,255,255,.9);
-                                                           box-shadow: 3px 3px 10px rgba(0,0,0,.1);
-                                                           position: absolute;
-                                                           z-index: 50;
-                                                           max-width: 250px;
-                                                       }
-                                                       .quiz-graph {
-                                                           padding: 10px; 
-                                                           height: 650px; 
-                                                           width: 100%;
-                                                       }
-                                                       .quiz-graph .x-labels {
-                                                           text-anchor: middle;
-                                                           fill: #333; 
-                                                           font-size: 12px;
-                                                       }
-                                                       .quiz-graph .y-labels {
-                                                           text-anchor: end;
-                                                           fill: #333; 
-                                                           font-size: 12px;
-                                                       }
-                                                       .label-title {
-                                                           text-anchor: middle;
-                                                           text-transform: uppercase;
-                                                           font-size: 14px;
-                                                           fill: gray;
-                                                           font-weight: bold; /* Bolder text for title */
-                                                       }
-                                                       .quiz-graph-dot, .quiz-graph-start-dot {
-                                                           fill: rgba(0,112,210,1);
-                                                           stroke-width: 2;
-                                                           stroke: white;   
-                                                       }
-                                                   </style>
-                                               </head>
-                                               <body>
-                                                   <svg version="1.2" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="quiz-graph">
-                                                       ' . $chart . $labels . '
-                                                   </svg>
-                                               </body>
-                                           </html>';
-                                           
+                         ";
+                      $htmlContent = "
+                        <html>
+                        <head>
+                            <style>
+                                body {
+                                    font-family: 'Times New Roman', Times, serif;
+                                    margin: 0;
+                                    padding: 20px;
+                                    background-color: #f4f4f4;
+                                }
+                                .chart-container {
+                                    display: flex;
+                                    align-items: flex-end;
+                                    height: 300px;
+                                    position: relative;
+                                    margin: 20px;
+                                    border-left: 2px solid #333;
+                                    border-bottom: 2px solid #333;
+                                    background-color: #fff;
+                                }
+                                .y-label {
+                                    text-align: right;
+                                }
+                            </style>
+                        </head>
+                        <body>
+                            $chartContainer
+                        </body>
+                        </html>
+                    ";
                           $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index .$subject_array_value['id'] . '.png');
                     $directoryPath = public_path('student_report_graph');
                     if (!file_exists($directoryPath)) {
@@ -527,7 +474,7 @@ class StudentProgressPdfController extends Controller
   
                     try {
                       Browsershot::html($htmlContent)
-                        ->windowSize(1200, 750)
+                      ->windowSize(800, 400)
                         ->save($imagePath);
   
                       // return response()->download($imagePath);
