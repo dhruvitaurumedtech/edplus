@@ -346,10 +346,10 @@ class StudentProgressPdfController extends Controller
 
                             
 
-                          
+                            // print_r($subject_response);exit;
                         // Merge unique subjects into $all_subjects array
                         foreach ($subject_response as $subject_array_value) {
-                              // print_r($subject_response);exit;
+                            
 
                           $exam_response = Student_detail::leftJoin('marks', 'marks.student_id', '=', 'students_details.student_id')
                           ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
@@ -397,76 +397,82 @@ class StudentProgressPdfController extends Controller
                           ->toArray();
                         
       
-                          $xAxisLabels = []; 
-                          $chartContainer='';
+                          $exam_result = [];
                           $chartBars = '';
-                        foreach ($exam_response as $exam_index => $exam_value) {
-                          $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
-                          $yAxisLabels = '';
-                          for ($i = 100; $i >= 0; $i -= 10) {
-                            $yAxisLabels .= "<div class='y-label'>{$i}</div>";
+                          $xAxisLabels = []; // Date X-axis labels
+        
+                          foreach ($exam_response as $exam_index => $exam_value) {
+                            $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
+        
+        
+                            $yAxisLabels = '';
+                            for ($i = 100; $i >= 0; $i -= 10) {
+                              $yAxisLabels .= "<div class='y-label'>{$i}</div>";
+                            }
+                            $xAxisLabels[] = "<div class='x-label'>" . date('d-m-Y', strtotime($exam_value['exam_date'])) . "</div>"; // Store exam date for x-axis
+        
+                            $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
+        
+        
+                            $exam_result[] = [
+                              'exam_name'  => $exam_value['exam_title'],
+                              'mark'       => $exam_value['marks_obtained'],
+                              'total_mark' => $exam_value['total_marks'],
+                              'percentage' => round($percentage, 2),
+                              'exam_date'  => $exam_value['exam_date'],
+        
+                            ];
                           }
-                          $xAxisLabels[] = "<div class='x-label'>" . date('d-m-Y', strtotime($exam_value['exam_date'])) . "</div>"; // Store exam date for x-axis
-      
-                          $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
-                              $exam_result[] = [
-                                  'exam_name'  => $exam_value['exam_title'],
-                                  'mark'       => $exam_value['marks_obtained'],
-                                  'total_mark' => $exam_value['total_marks'],
-                                  'percentage' => round($percentage, 2),
-                                  'exam_date'  => $exam_value['exam_date'],
-                              ];
-                          }
-                          
-                          // Generate chart grid
-                          if(!empty($exam_result)){
-                            $chartContainer = "
-                            <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin-left: 50px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
-                                <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
-                                <div style='position: absolute; left: -60px; top: 130px; writing-mode: vertical-lr; transform: rotate(180deg);'>Percentage</div>
-                                <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
-                              
-                            </div>
-                            <div class='x-axis-labels' style='position: absolute'>
-                              <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 150px; position: relative; height:100%; align-items: end;'>
-                                    " . implode('', $xAxisLabels) . "
-                                </div>
-                                <div style=' margin-left:350px;position: relative; height:100%; align-items: center;'>Exam Date</div>
-                                </div>
-                          
-                          // Create the HTML content
-                         ";
-                      $htmlContent = "
-                        <html>
-                        <head>
-                            <style>
-                                body {
-                                    font-family: 'Times New Roman', Times, serif;
-                                    margin: 0;
-                                    padding: 20px;
-                                    background-color: #f4f4f4;
-                                }
-                                .chart-container {
-                                    display: flex;
-                                    align-items: flex-end;
-                                    height: 300px;
-                                    position: relative;
-                                    margin: 20px;
-                                    border-left: 2px solid #333;
-                                    border-bottom: 2px solid #333;
-                                    background-color: #fff;
-                                }
-                                .y-label {
-                                    text-align: right;
-                                }
-                            </style>
-                        </head>
-                        <body>
-                            $chartContainer
-                        </body>
-                        </html>
-                    ";
-                          $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index .$subject_array_value['id'] . '.png');
+        
+                          // Render the chart and labels
+                          $chartContainer = "
+                              <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
+                                  <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
+                                  <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                                
+                              </div>
+                              <div class='x-axis-labels' style='position: absolute'>
+                                <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
+                                      " . implode('', $xAxisLabels) . "
+                                  </div>
+                                  </div>
+                          ";
+        
+                          // Create complete HTML content
+                          $htmlContent = "
+                              <html>
+                              <head>
+                                  <style>
+                                      body {
+                                          font-family: 'Times New Roman', Times, serif;
+                                          margin: 0;
+                                          padding: 20px;
+                                          background-color: #f4f4f4;
+                                      }
+                                      .chart-container {
+                                          display: flex;
+                                          align-items: flex-end;
+                                          height: 250px;
+                                          position: relative;
+                                          margin: 20px;
+                                          border-left: 2px solid #333;
+                                          border-bottom: 2px solid #333;
+                                          background-color: #fff;
+                                      }
+                                      .y-label {
+                                          text-align: right;
+                                      }
+                                  </style>
+                              </head>
+                              <body>
+                                  $chartContainer
+                              </body>
+                              </html>
+                          ";
+        
+        
+        
+                    $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index .$subject_array_value['id'] . '.png');
                     $directoryPath = public_path('student_report_graph');
                     if (!file_exists($directoryPath)) {
                       mkdir($directoryPath, 0755, true);
@@ -474,7 +480,7 @@ class StudentProgressPdfController extends Controller
   
                     try {
                       Browsershot::html($htmlContent)
-                      ->windowSize(800, 400)
+                          ->windowSize(800, 400)
                         ->save($imagePath);
   
                       // return response()->download($imagePath);
@@ -486,8 +492,7 @@ class StudentProgressPdfController extends Controller
 
                        
   
-                    // Create complete HTML content
-                    
+                  
   
   
   
