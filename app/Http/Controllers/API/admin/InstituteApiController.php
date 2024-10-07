@@ -3405,10 +3405,14 @@ class InstituteApiController extends Controller
             $institute_id = $request->institute_id;
             // Query to fetch users based on institute_id and role_type conditions
             $user_list = User::leftJoin('staff_detail', 'staff_detail.user_id', '=', 'users.id')
-                ->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
+                //->leftJoin('teacher_detail', 'teacher_detail.teacher_id', '=', 'users.id')
+                ->leftJoin('teacher_detail', function($join) {
+                    $join->on('teacher_detail.teacher_id', '=', 'users.id')
+                         ->where('teacher_detail.status', '1');  // Only join if teacher_detail.status is 1
+                })
                 ->leftJoin('roles', 'roles.id', '=', 'users.role_type')
                 ->select('users.*', 'roles.role_name')
-                ->where('teacher_detail.status','1')
+                //->where('teacher_detail.status','1')
                 ->where(function ($query) use ($institute_id) {
                     $query->where('staff_detail.institute_id', $institute_id)
                         ->orWhere('teacher_detail.institute_id', $institute_id);
