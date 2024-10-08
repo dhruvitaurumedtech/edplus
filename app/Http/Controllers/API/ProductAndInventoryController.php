@@ -253,6 +253,7 @@ class ProductAndInventoryController extends Controller
                 $totalasign = Products_assign::where('status',2)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
+                ->where('is_returnable',0)
                 ->count('quantity');
                 //return
                 $totalreturn = Products_assign::where('status',5)
@@ -280,13 +281,11 @@ class ProductAndInventoryController extends Controller
                     'role_name' => $prdt->role_name,
                     'product_id' => $prdt->product_id,
                     'product_name' => $prdt->productname,
-                    'quantity' => $prdt->quantity,
-                    'created_at' => $prdt->created_at,
-                    'is_returnable' => $prdt->is_returnable,
                     'total_remaining'=> $totalremain,
                     'total_assign'=> $totalasign,
                     'total_return'=> $totalreturn,
                     'total_damaged'=> $totaldamage,
+                    'total_lost'=> $totallost,
                 ];
             }
 
