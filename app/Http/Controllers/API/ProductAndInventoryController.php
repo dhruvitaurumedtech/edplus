@@ -14,6 +14,7 @@ use App\Models\Products_status;
 use App\Models\Student_detail;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
 
 // status
 // 1 - Add
@@ -67,7 +68,7 @@ class ProductAndInventoryController extends Controller
         try {
             $product_inventory = json_decode($request->product_inventory, true);
             foreach ($product_inventory as $productinventory) {
-                
+
                 if ($productinventory['product_name']) {
                     $product = new Products();
                     $product->name = $productinventory['product_name'];
@@ -76,7 +77,7 @@ class ProductAndInventoryController extends Controller
                     $product->save();
                     $product_id = $product->id;
                 } else {
-                    
+
                     $product_id = $productinventory['product_id'];
                 }
                 if ($productinventory['quantity']) {
@@ -108,7 +109,7 @@ class ProductAndInventoryController extends Controller
                 ->get();
             $productsList = [];
             foreach ($products as $prdt) {
-                $addinventory = Products_inventory::whereIn('status', ['1','5'])
+                $addinventory = Products_inventory::whereIn('status', ['1', '5'])
                     ->where('product_id', $prdt->id)->sum('quantity');
 
                 $assigninventory = Products_inventory::whereNotIn('status', ['1', '5'])
@@ -127,54 +128,54 @@ class ProductAndInventoryController extends Controller
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
-    public function return_product(Request $request){
+    public function return_product(Request $request)
+    {
         $validator = Validator::make($request->all(), [
             'user_id' => 'required|exists:users,id',
-            'product_id'=>'required|exists:products,id',
+            'product_id' => 'required|exists:products,id',
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
         }
         try {
-            if($request->return_quantity){
-                $this->return_product_method($request,$request->return_quantity,5);
+            if ($request->return_quantity) {
+                $this->return_product_method($request, $request->return_quantity, 5);
             }
 
-            if($request->damaged_quantity){
-                $this->return_product_method($request,$request->damaged_quantity,3);
+            if ($request->damaged_quantity) {
+                $this->return_product_method($request, $request->damaged_quantity, 3);
             }
 
-            if($request->lost_quantity){
-                $this->return_product_method($request,$request->lost_quantity,4);
+            if ($request->lost_quantity) {
+                $this->return_product_method($request, $request->lost_quantity, 4);
             }
-            
-            
-            
+
+
+
             return $this->response([], "Return successfully.");
         } catch (Exception $e) {
             return $this->response($e, "Something went wrong!.", false, 400);
         }
     }
 
-    private function return_product_method($request,$quantity,$status)
+    private function return_product_method($request, $quantity, $status)
     {
-        
-            $product = new Products_assign();
-            $product->user_id = $request->user_id;
-            $product->product_id = $request->product_id;
-            $product->status = $status;
-            $product->quantity = $quantity;
-            $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
-            $product->is_returnable = '1';
-            $product->save();
 
-            $product = new Products_inventory();
-            $product->product_id = $request->product_id;
-            $product->status = $status;
-            $product->quantity = $quantity;
-            $product->save();
-            return 1;
-        
+        $product = new Products_assign();
+        $product->user_id = $request->user_id;
+        $product->product_id = $request->product_id;
+        $product->status = $status;
+        $product->quantity = $quantity;
+        $product->return_date = (!empty($request->return_date)) ? Carbon::createFromFormat('d-m-Y', $request->input('return_date'))->format('Y-m-d') : null;
+        $product->is_returnable = '1';
+        $product->save();
+
+        $product = new Products_inventory();
+        $product->product_id = $request->product_id;
+        $product->status = $status;
+        $product->quantity = $quantity;
+        $product->save();
+        return 1;
     }
 
     public function product_assign(Request $request)
@@ -206,10 +207,100 @@ class ProductAndInventoryController extends Controller
         }
     }
 
-    public function product_assign_history(Request $request)
+    public function product_assign_list(Request $request)
     {
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required'
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        try {
+            // $productshis = Products_assign::join('users', 'users.id', '=', 'products_assign.user_id')
+            //     ->join('products_inventory_status', 'products_inventory_status.id', '=', 'products_assign.status')
+            //     ->join('products', 'products.id', '=', 'products_assign.product_id')
+            //     ->join('roles', 'roles.id', '=', 'users.role_type')
+            //     ->where('products.institute_id', $request->institute_id)
+            //     ->select('products_assign.product_id','products.name as productname','roles.role_name','roles.id as role_id',
+            //     'products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 
+            //     'products_inventory_status.name as statusname','products_assign.is_returnable','products_assign.user_id')
+            //     ->groupBy('products_assign.user_id', 'products_assign.product_id')
+            //     ->get();
+            $productshis = Products_assign::join('users', 'users.id', '=', 'products_assign.user_id')
+                ->join('products', 'products.id', '=', 'products_assign.product_id')
+                ->join('roles', 'roles.id', '=', 'users.role_type')
+                ->where('products.institute_id', $request->institute_id)
+                ->select(
+                    'products_assign.product_id',
+                    DB::raw('MAX(products.name) as productname'),
+                    DB::raw('MAX(roles.role_name) as role_name'),
+                    'roles.id as role_id',
+                    DB::raw('MAX(products_assign.id) as id'),
+                    DB::raw('MAX(users.firstname) as firstname'),
+                    DB::raw('MAX(users.lastname) as lastname'),
+                    // DB::raw('SUM(products_assign.quantity) as total_quantity'),
+                    // DB::raw('MAX(products_assign.created_at) as created_at'),
+                    // DB::raw('MAX(products_assign.is_returnable) as is_returnable'),
+                    'products_assign.user_id'
+                )
+                ->groupBy('products_assign.user_id', 'products_assign.product_id')
+                ->get();
+
+            $productsList = [];
+            foreach ($productshis as $prdt) {
+                //assign
+                $totalasign = Products_assign::where('status',2)
+                ->where('user_id',$prdt->user_id)
+                ->where('product_id',$prdt->product_id)
+                ->count('quantity');
+                //return
+                $totalreturn = Products_assign::where('status',5)
+                ->where('user_id',$prdt->user_id)
+                ->where('product_id',$prdt->product_id)
+                ->count('quantity');
+                //damaged
+                $totaldamage = Products_assign::where('status',3)
+                ->where('user_id',$prdt->user_id)
+                ->where('product_id',$prdt->product_id)
+                ->count('quantity');
+                //lost
+                $totallost = Products_assign::where('status',4)
+                ->where('user_id',$prdt->user_id)
+                ->where('product_id',$prdt->product_id)
+                ->count('quantity');
+                $totalremain = $totalasign - ($totalreturn+$totaldamage+$totallost);
+
+                $productsList[] = [
+                    'id' => $prdt->id,
+                    'user_id' => $prdt->user_id,
+                    'firstname' => $prdt->firstname,
+                    'lastname' => $prdt->lastname,
+                    'role_id' => $prdt->role_id,
+                    'role_name' => $prdt->role_name,
+                    'product_id' => $prdt->product_id,
+                    'product_name' => $prdt->productname,
+                    'quantity' => $prdt->quantity,
+                    'created_at' => $prdt->created_at,
+                    'is_returnable' => $prdt->is_returnable,
+                    'total_remaining'=> $totalremain,
+                    'total_assign'=> $totalasign,
+                    'total_return'=> $totalreturn,
+                    'total_damaged'=> $totaldamage,
+                ];
+            }
+
+            return $this->response($productsList, "Products List.");
+        } catch (Exception $e) {
+            return $this->response($e, "Something went wrong!.", false, 400);
+        }
+    }
+
+    public function product_assign_history(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'institute_id' => 'required',
+            'product_id' => 'required',
+            'user_id' => 'required'
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -220,25 +311,38 @@ class ProductAndInventoryController extends Controller
                 ->join('products', 'products.id', '=', 'products_assign.product_id')
                 ->join('roles', 'roles.id', '=', 'users.role_type')
                 ->where('products.institute_id', $request->institute_id)
-                ->select('products_assign.product_id','products.name as productname','roles.role_name','roles.id as role_id',
-                'products_assign.id', 'users.firstname', 'users.lastname', 'products_assign.quantity', 'products_assign.created_at', 
-                'products_inventory_status.name as statusname','products_assign.is_returnable','products_assign.user_id')
+                ->where('products_assign.product_id', $request->product_id)
+                ->where('products_assign.user_id', $request->user_id)
+                ->select(
+                    'products_assign.product_id',
+                    'products.name as productname',
+                    'roles.role_name',
+                    'roles.id as role_id',
+                    'products_assign.id',
+                    'users.firstname',
+                    'users.lastname',
+                    'products_assign.quantity',
+                    'products_assign.created_at',
+                    'products_inventory_status.name as statusname',
+                    'products_assign.is_returnable',
+                    'products_assign.user_id'
+                )
                 ->get();
             $productsList = [];
             foreach ($productshis as $prdt) {
                 $productsList[] = [
                     'id' => $prdt->id,
-                    'user_id'=>$prdt->user_id,
+                    'user_id' => $prdt->user_id,
                     'firstname' => $prdt->firstname,
                     'lastname' => $prdt->lastname,
-                    'role_id'=>$prdt->role_id,
-                    'role_name'=>$prdt->role_name,
-                    'product_id'=>$prdt->product_id,
-                    'product_name'=>$prdt->productname,
+                    'role_id' => $prdt->role_id,
+                    'role_name' => $prdt->role_name,
+                    'product_id' => $prdt->product_id,
+                    'product_name' => $prdt->productname,
                     'quantity' => $prdt->quantity,
                     'created_at' => $prdt->created_at,
                     'status' => $prdt->statusname,
-                    'is_returnable' =>$prdt->is_returnable,
+                    'is_returnable' => $prdt->is_returnable,
                 ];
             }
 
