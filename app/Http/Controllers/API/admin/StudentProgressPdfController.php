@@ -346,7 +346,7 @@ class StudentProgressPdfController extends Controller
 
                             
 
-                            // print_r($subject_response);exit;
+                            // print_r($subject_response);
                         // Merge unique subjects into $all_subjects array
                         foreach ($subject_response as $subject_array_value) {
                             
@@ -402,7 +402,8 @@ class StudentProgressPdfController extends Controller
                           $xAxisLabels = []; // Date X-axis labels
         
                           foreach ($exam_response as $exam_index => $exam_value) {
-                            $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
+                            $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
+
         
         
                             $yAxisLabels = '';
@@ -423,8 +424,9 @@ class StudentProgressPdfController extends Controller
         
                             ];
                           }
-        
-                          // Render the chart and labels
+                          if (empty($chartBars)) {
+                            $chartBars = "<div class='no-data'>No data available to generate chart</div>";
+                        }
                           $chartContainer = "
                               <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
                                   <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
@@ -437,6 +439,7 @@ class StudentProgressPdfController extends Controller
                                   </div>
                                   </div>
                           ";
+                          
         
                           // Create complete HTML content
                           $htmlContent = "
@@ -469,7 +472,7 @@ class StudentProgressPdfController extends Controller
                               </body>
                               </html>
                           ";
-        
+                        
         
         
                     $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index .$subject_array_value['id'] . '.png');
@@ -488,7 +491,7 @@ class StudentProgressPdfController extends Controller
   
                       return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
                     }
-                 }
+                 
 
                        
   
@@ -507,7 +510,7 @@ class StudentProgressPdfController extends Controller
                                     
                                 ];
                             }
-                        
+                          }
                     }
 
                    $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
@@ -543,6 +546,7 @@ class StudentProgressPdfController extends Controller
                     'subject_reponse'=>$all_subjects,
                     'fees_response' => $data_final,
                     'imagePath'=>$imagePath,
+                    'chartBars'=>$chartBars,
                     'total_lecture'=>$total_lectures['total_lectures'],
                     'total_present'=>$attendance_data['total_present'],
                     'total_absent'=>$attendance_data['total_absent']
