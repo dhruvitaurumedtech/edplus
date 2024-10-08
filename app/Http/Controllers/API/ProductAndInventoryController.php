@@ -234,7 +234,7 @@ class ProductAndInventoryController extends Controller
                     'products_assign.product_id',
                     DB::raw('MAX(products.name) as productname'),
                     DB::raw('MAX(roles.role_name) as role_name'),
-                    DB::raw('MAX(roles.id as role_id) as role_id'),
+                    DB::raw('MAX(roles.id) as role_id'), // Corrected this line
                     DB::raw('MAX(products_assign.id) as id'),
                     DB::raw('MAX(users.firstname) as firstname'),
                     DB::raw('MAX(users.lastname) as lastname'),
@@ -245,6 +245,7 @@ class ProductAndInventoryController extends Controller
                 )
                 ->groupBy('products_assign.user_id', 'products_assign.product_id')
                 ->get();
+
 
             $productsList = [];
             foreach ($productshis as $prdt) {
