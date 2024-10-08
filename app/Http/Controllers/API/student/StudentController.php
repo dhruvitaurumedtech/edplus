@@ -564,6 +564,7 @@ class StudentController extends Controller
                 ->join('users', 'users.id', '=', 'timetables.teacher_id')
                 ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                 ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+                ->join('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                 ->where('timetables.batch_id', $getstdntdata->batch_id)
                 //->whereRaw("FIND_IN_SET(time_table.subject_id,?)", [$getstdntdata->subject_id])
                  ->whereIn('timetables.subject_id',explode(",",$getstdntdata->subject_id))
@@ -576,7 +577,8 @@ class StudentController extends Controller
                     'lecture_type.name as lecture_type_name',
                     'timetables.start_time',
                     'timetables.end_time',
-                    'timetables.day'
+                    'timetables.day',
+                    'class_room.name as class_room'
                 )
                 ->orderBy('timetables.start_time', 'asc')
                 ->get();
@@ -585,6 +587,7 @@ class StudentController extends Controller
                 $todays_lecture[] = array(
                     'subject' => $todayslecDT->subject,
                     'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                    'class_room'=>$todayslecDT->class_room,
                     'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),  //$todayslecDT->start_time,
@@ -1362,6 +1365,7 @@ class StudentController extends Controller
             if ($stdntdata) {
                 $todayslect = Timetables::join('subject', 'subject.id', '=', 'timetables.subject_id')
                     ->join('users', 'users.id', '=', 'timetables.teacher_id')
+                    ->join('class_room', 'class_room.id', '=', 'timetables.class_room_id')
                     ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
                     ->join('batches', 'batches.id', '=', 'timetables.batch_id')
                     ->where('timetables.batch_id', $stdntdata->batch_id)
@@ -1375,6 +1379,7 @@ class StudentController extends Controller
                         'lecture_type.name as lecture_type_name',
                         'timetables.start_time',
                         'timetables.end_time',
+                        'class_room.name as class_room'
                     )
                     ->orderBy('timetables.start_time', 'asc')
                     ->get();
@@ -1382,6 +1387,7 @@ class StudentController extends Controller
                     $lectures[] = array(
                         'subject' => $todayslecDT->subject,
                         'teacher' => $todayslecDT->firstname . ' ' . $todayslecDT->lastname,
+                        'class_room'=>$todayslecDT->class_room,
                         'teacher_image' =>(!empty($todayslecDT->image)) ? asset($todayslecDT->image) : asset('profile/no-image.png'),
                         'lecture_type' => $todayslecDT->lecture_type_name,
                         'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
