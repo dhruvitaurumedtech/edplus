@@ -253,7 +253,7 @@ class ProductAndInventoryController extends Controller
                 $totalasign = Products_assign::where('status',2)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->where('is_returnable',0)
+                ->where('is_returnable','0')
                 ->count('quantity');
                 //return
                 $totalreturn = Products_assign::where('status',5)
