@@ -253,8 +253,15 @@ class ProductAndInventoryController extends Controller
                 $totalasign = Products_assign::where('status',2)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->where('is_returnable','0')
                 ->count('quantity');
+
+                //non returnable 
+                $totalnonreturnable = Products_assign::where('status',2)
+                ->where('is_returnable','0')
+                ->where('user_id',$prdt->user_id)
+                ->where('product_id',$prdt->product_id)
+                ->count('quantity');
+
                 //return
                 $totalreturn = Products_assign::where('status',5)
                 ->where('user_id',$prdt->user_id)
@@ -270,7 +277,7 @@ class ProductAndInventoryController extends Controller
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
                 ->count('quantity');
-                $totalremain = $totalasign - ($totalreturn+$totaldamage+$totallost);
+                $totalremain = $totalasign - ($totalreturn+$totaldamage+$totallost-$totalnonreturnable);
 
                 $productsList[] = [
                     'id' => $prdt->id,
@@ -300,7 +307,7 @@ class ProductAndInventoryController extends Controller
         $validator = Validator::make($request->all(), [
             'institute_id' => 'required',
             'product_id' => 'required',
-            'user_id' => 'required'
+            //'user_id' => 'required'
         ]);
         if ($validator->fails()) {
             return $this->response([], $validator->errors()->first(), false, 400);
@@ -312,7 +319,7 @@ class ProductAndInventoryController extends Controller
                 ->join('roles', 'roles.id', '=', 'users.role_type')
                 ->where('products.institute_id', $request->institute_id)
                 ->where('products_assign.product_id', $request->product_id)
-                ->where('products_assign.user_id', $request->user_id)
+                //->where('products_assign.user_id', $request->user_id)
                 ->select(
                     'products_assign.product_id',
                     'products.name as productname',
