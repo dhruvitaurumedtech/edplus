@@ -369,15 +369,24 @@ class ParentsController extends Controller
                     'institute_detail.institute_name',
                     'institute_detail.logo',
                     'institute_detail.address',
-                    'standard.name as strandard',
-                    'board.name as board',
-                    'medium.name as medium',
-                    'batches.batch_name'
-
+                    DB::raw('MAX(standard.name) as standard'),
+                    DB::raw('MAX(board.name) as board'),
+                    DB::raw('MAX(medium.name) as medium'),
+                    DB::raw('MAX(batches.batch_name) as batch_name')
                 )
                 ->whereNull('students_details.deleted_at')
                 ->where('students_details.status','1')
-                ->groupBy('institute_detail.id', 'institute_detail.institute_name', 'institute_detail.logo', 'institute_detail.address', 'students_details.institute_id')
+                ->groupBy(
+                    'institute_detail.id', 
+                    'institute_detail.institute_name', 
+                    'institute_detail.logo', 
+                    'institute_detail.address', 
+                    'students_details.institute_id',
+                    'standard.name',
+                    'board.name',
+                    'medium.name',
+                    'batches.batch_name'
+                )
                 ->get();
                 $insts=[];
                 foreach($student2 as $insdat){
