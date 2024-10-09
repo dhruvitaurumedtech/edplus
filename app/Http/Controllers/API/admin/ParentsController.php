@@ -356,7 +356,7 @@ class ParentsController extends Controller
                 ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
                 ->join('standard', 'standard.id', '=', 'students_details.standard_id')
                 ->join('board', 'board.id', '=', 'students_details.board_id')
-                ->join('medium', 'standard.id', '=', 'students_details.medium_id')
+                ->join('medium', 'medium.id', '=', 'students_details.medium_id')  // Fix the join here
                 ->join('batches', 'batches.id', '=', 'students_details.batch_id')
                 ->where('parents.parent_id', $parent_id)
                 ->where('parents.student_id', $value_student->id)
@@ -366,21 +366,25 @@ class ParentsController extends Controller
                     DB::raw('MAX(users.lastname) as lastname'),
                     DB::raw('MAX(users.email) as email'),
                     DB::raw('MAX(users.mobile) as mobile'),
-                    'institute_detail.institute_name',
-                    'institute_detail.logo',
-                    'institute_detail.address',
                     DB::raw('MAX(standard.name) as standard'),
                     DB::raw('MAX(board.name) as board'),
                     DB::raw('MAX(medium.name) as medium'),
-                    DB::raw('MAX(batches.batch_name) as batch_name')
+                    DB::raw('MAX(batches.batch_name) as batches'),
+                    'institute_detail.institute_name',
+                    'institute_detail.logo',
+                    'institute_detail.address',
+                    'standard.name as standard',
+                    'board.name as board',
+                    'medium.name as medium',
+                    'batches.batch_name'
                 )
                 ->whereNull('students_details.deleted_at')
-                ->where('students_details.status','1')
+                ->where('students_details.status', '1')
                 ->groupBy(
-                    'institute_detail.id', 
-                    'institute_detail.institute_name', 
-                    'institute_detail.logo', 
-                    'institute_detail.address', 
+                    'institute_detail.id',
+                    'institute_detail.institute_name',
+                    'institute_detail.logo',
+                    'institute_detail.address',
                     'students_details.institute_id',
                     'standard.name',
                     'board.name',
@@ -388,6 +392,7 @@ class ParentsController extends Controller
                     'batches.batch_name'
                 )
                 ->get();
+
                 $insts=[];
                 foreach($student2 as $insdat){
                     $insts[] = ['institute_name'=>$insdat->institute_name,
@@ -395,7 +400,7 @@ class ParentsController extends Controller
                     'institute_address'=>$insdat->address,
                     'board'=>$insdat->board,
                     'medium'=>$insdat->medium,
-                    'strandard'=>$insdat->strandard,
+                    'strandard'=>$insdat->standard,
                     'batch_name'=>$insdat->batch_name];
                 }
                 $data2[] = ['child_id'=>$value_student->id,
