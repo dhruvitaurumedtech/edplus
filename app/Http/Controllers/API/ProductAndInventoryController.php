@@ -253,30 +253,30 @@ class ProductAndInventoryController extends Controller
                 $totalasign = Products_assign::where('status',2)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->count('quantity');
+                ->sum('quantity');
 
                 //non returnable 
                 $totalnonreturnable = Products_assign::where('status',2)
                 ->where('is_returnable','0')
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->count('quantity');
+                ->sum('quantity');
 
                 //return
                 $totalreturn = Products_assign::where('status',5)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->count('quantity');
+                ->sum('quantity');
                 //damaged
                 $totaldamage = Products_assign::where('status',3)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->count('quantity');
+                ->sum('quantity');
                 //lost
                 $totallost = Products_assign::where('status',4)
                 ->where('user_id',$prdt->user_id)
                 ->where('product_id',$prdt->product_id)
-                ->count('quantity');
+                ->sum('quantity');
                 $totalremain = $totalasign - ($totalreturn+$totaldamage+$totallost-$totalnonreturnable);
 
                 $productsList[] = [
