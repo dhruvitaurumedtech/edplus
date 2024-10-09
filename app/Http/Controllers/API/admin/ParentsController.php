@@ -131,9 +131,13 @@ class ParentsController extends Controller
 
             $getstdntdata = Student_detail::join('users', 'users.id', '=', 'students_details.student_id')
             ->join('institute_detail', 'institute_detail.id', '=', 'students_details.institute_id')
+            ->join('standard', 'standard.id', '=', 'students_details.standard_id')
+            ->join('board', 'board.id', '=', 'students_details.board_id')
+            ->join('medium', 'medium.id', '=', 'students_details.medium_id')  // Fix the join here
+            ->join('batches', 'batches.id', '=', 'students_details.batch_id')
             ->select('users.firstname', 'users.lastname','users.image',
              'institute_detail.institute_name','institute_detail.id as institute_id',
-             'students_details.*')
+             'students_details.*','standard.name as standard','board.name as board','medium.name as medium','batches.batch_name')
             ->where('students_details.student_id', $request->child_id)
             ->where('students_details.institute_id', $request->institute_id)->first();
 
@@ -156,6 +160,10 @@ class ParentsController extends Controller
                     'image'=> (!empty($getstdntdata->image)) ? asset($getstdntdata->image) : asset('profile/no-image.png'),
                     'institute_id' => intval($getstdntdata->institute_id),
                     'institute_name' => $getstdntdata->institute_name,
+                    'board'=>$getstdntdata->board,
+                    'medium'=>$getstdntdata->medium,
+                    'strandard'=>$getstdntdata->standard,
+                    'batch_name'=>$getstdntdata->batch_name,
                     'subjects' => $subjDTs
                 );
 
@@ -369,10 +377,7 @@ class ParentsController extends Controller
                     'institute_detail.institute_name',
                     'institute_detail.logo',
                     'institute_detail.address',
-                    'standard.name as standard',
-                    'board.name as board',
-                    'medium.name as medium',
-                    'batches.batch_name'
+                    'students_details.subject_id'
                 )
                 ->whereNull('students_details.deleted_at')
                 ->where('students_details.status', '1')
@@ -391,13 +396,20 @@ class ParentsController extends Controller
 
                 $insts=[];
                 foreach($student2 as $insdat){
+                    $subids = explode(',', $insdat->subject_id);
+                    $subjectQY = Subject_model::whereIN('id', $subids)->get();
+                    $subjDTs = [];
+                    foreach ($subjectQY as $subDT) {
+                        $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                    }
                     $insts[] = ['institute_name'=>$insdat->institute_name,
                     'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('profile/no-image.png'),
                     'institute_address'=>$insdat->address,
                     'board'=>$insdat->board,
                     'medium'=>$insdat->medium,
                     'strandard'=>$insdat->standard,
-                    'batch_name'=>$insdat->batch_name];
+                    'batch_name'=>$insdat->batch_name,
+                    'subjects'=>$subjDTs];
                 }
                 $data2[] = ['child_id'=>$value_student->id,
                             'first_name'=>$value_student->firstname,
