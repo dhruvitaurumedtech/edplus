@@ -167,6 +167,7 @@ class ParentsController extends Controller
             ->join('users', 'users.id', '=', 'timetables.teacher_id')
             ->join('lecture_type', 'lecture_type.id', '=', 'timetables.lecture_type')
             ->join('batches', 'batches.id', '=', 'timetables.batch_id')
+            ->join('class_room', 'class_room.id', '=', 'timetables.class_room_id')
             ->where('timetables.batch_id', $getstdntdata->batch_id)
             ->whereRaw("FIND_IN_SET(timetables.subject_id,?)", [$getstdntdata->subject_id])
             ->where('timetables.day', $daysidg->id)
@@ -178,7 +179,8 @@ class ParentsController extends Controller
                 'lecture_type.name as lecture_type_name',
                 'timetables.start_time',
                 'timetables.end_time',
-                'timetables.day'
+                'timetables.day',
+                'class_room.name as class_room_name'
             )
             ->orderBy('timetables.start_time', 'asc')
             ->get();
@@ -192,6 +194,7 @@ class ParentsController extends Controller
                     'lecture_type' => $todayslecDT->lecture_type_name,
                     'start_time' => $this->convertTo12HourFormat($todayslecDT->start_time),
                     'end_time' => $this->convertTo12HourFormat($todayslecDT->end_time),
+                    'class_room' => $todayslecDT->class_room_name,
                 );
             }
             
@@ -265,7 +268,8 @@ class ParentsController extends Controller
                     ->max('mark');
             $result[] = array(
                 'subject' => $resultDDt->subject,
-                'title' => $resultDDt->exam_title . '(' . $resultDDt->exam_type . ')',
+                'title' => $resultDDt->exam_title,
+                'exam_type' => $examsDT->exam_type,
                 'total_marks' => intval($resultDDt->total_mark),
                 'achiveddmarks_marks' => $resultDDt->mark,
                 'date' => $resultDDt->exam_date,
