@@ -45,18 +45,19 @@
             <p>Student Name: {{$data['sname']}}</p>
             <p>Standard: {{$data['standard']}}</p>
             <p>Subject Applied For: </p>
-            <table border="2">
-                <tr><th>Subject_name</th><th>Fees</th></tr>
-            @foreach($subjects as $sub)
-                <tr><td>{{$sub['name']}}</td><td>{{$sub['amount']}}</td></tr> 
-            @endforeach
+
+            @if(!empty($subjects))
+                @foreach($subjects as $sub)
+                    <tr><td>{{ $sub->name }}</td><td>{{ $sub->amount }}</td></tr> 
+                @endforeach
+            @endif
             </table>
             <br>
             <p>"I,confirm that my child, {{$data['sname']}}, has my permission to enroll at {{$data['institute']}} for the {{$data['year']}}. </p>
             <p> I acknowledge that I have reviewed the enrollment details and agree to the terms and conditions outlined by the institute."
             </p>
 
-            <b><p>Please Click Here to <a href="{{ url('/update-value/' . $id) }}"  style="  color: #fff;  background-color: #007bff;  border-color: #007bff;  display: inline-block; font-weight: 400; text-align: center; white-space: nowrap; vertical-align: middle;   -webkit-user-select: none;      -moz-user-select: none;  -ms-user-select: none;    user-select: none;     border: 1px solid transparent;   padding: .375rem .75rem;      font-size: 1rem;         line-height: 1.5;    border-radius: .25rem;  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;" class="btn btn-primary">Verify</a></p></b>
+            <b><p>Please Click Here to <a href="{{ url('/update-value/' . $data['id']) }}"  style="  color: #fff;  background-color: #007bff;  border-color: #007bff;  display: inline-block; font-weight: 400; text-align: center; white-space: nowrap; vertical-align: middle;   -webkit-user-select: none;      -moz-user-select: none;  -ms-user-select: none;    user-select: none;     border: 1px solid transparent;   padding: .375rem .75rem;      font-size: 1rem;         line-height: 1.5;    border-radius: .25rem;  transition: color .15s ease-in-out,background-color .15s ease-in-out,border-color .15s ease-in-out,box-shadow .15s ease-in-out;" class="btn btn-primary">Verify</a></p></b>
             
             <br>
             <p>Thank you for your prompt attention to this matter. We look forward to welcoming {{$data['sname']}} to our institute.</p>
