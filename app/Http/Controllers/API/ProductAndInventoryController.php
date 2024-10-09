@@ -288,11 +288,11 @@ class ProductAndInventoryController extends Controller
                     'role_name' => $prdt->role_name,
                     'product_id' => $prdt->product_id,
                     'product_name' => $prdt->productname,
-                    'total_remaining'=> $totalremain,
+                    'total_remaining'=> intval($totalremain),
                     'total_assign'=> intval($totalasign),
                     'total_return'=> intval($totalreturn),
-                    'total_damaged'=> $totaldamage,
-                    'total_lost'=> $totallost,
+                    'total_damaged'=> intval($totaldamage),
+                    'total_lost'=> intval($totallost),
                 ];
             }
 
