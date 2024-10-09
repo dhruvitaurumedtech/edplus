@@ -65,7 +65,7 @@ class ParentsController extends Controller
                 $subjectQY = Subject_model::whereIN('id', $subids)->get();
                 $subjDTs = [];
                 foreach ($subjectQY as $subDT) {
-                    $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                    $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name,'icon'=>$subDT->image);
                 }
 
                 $childs[] = array(
@@ -150,7 +150,7 @@ class ParentsController extends Controller
                 $subjectQY = Subject_model::whereIN('id', $subids)->get();
                 $subjDTs = [];
                 foreach ($subjectQY as $subDT) {
-                    $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                    $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name,'icon'=>$subDT->image);
                 }
 
                 $child_detail[] = array(
@@ -404,7 +404,7 @@ class ParentsController extends Controller
                     $subjectQY = Subject_model::whereIN('id', $subids)->get();
                     $subjDTs = [];
                     foreach ($subjectQY as $subDT) {
-                        $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name);
+                        $subjDTs[] = array('id' => $subDT->id, 'name' => $subDT->name,'icon'=>$subDT->image);
                     }
                     $insts[] = ['institute_name'=>$insdat->institute_name,
                     'logo'=>(!empty($insdat->logo)) ? asset($insdat->logo) : asset('profile/no-image.png'),
