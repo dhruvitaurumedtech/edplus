@@ -289,8 +289,8 @@ class ProductAndInventoryController extends Controller
                     'product_id' => $prdt->product_id,
                     'product_name' => $prdt->productname,
                     'total_remaining'=> $totalremain,
-                    'total_assign'=> $totalasign,
-                    'total_return'=> $totalreturn,
+                    'total_assign'=> intval($totalasign),
+                    'total_return'=> intval($totalreturn),
                     'total_damaged'=> $totaldamage,
                     'total_lost'=> $totallost,
                 ];
