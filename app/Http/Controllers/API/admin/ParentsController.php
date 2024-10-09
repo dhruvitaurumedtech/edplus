@@ -340,6 +340,7 @@ class ParentsController extends Controller
             ->where('parents.parent_id', $parent_id)
             ->whereNull('students_details.deleted_at')
             ->where('students_details.status','1')
+            ->where('parents.verify', '1')
               ->select('users.*')
               ->get();
               $uniqueStudents = $student->unique('id')->values();
