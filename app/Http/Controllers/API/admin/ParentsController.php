@@ -373,11 +373,11 @@ class ParentsController extends Controller
                     DB::raw('MAX(standard.name) as standard'),
                     DB::raw('MAX(board.name) as board'),
                     DB::raw('MAX(medium.name) as medium'),
-                    DB::raw('MAX(batches.batch_name) as batches'),
+                    DB::raw('MAX(batches.batch_name) as batch_name'),
+                    DB::raw('MAX(students_details.subject_id) as subject_id'),
                     'institute_detail.institute_name',
                     'institute_detail.logo',
                     'institute_detail.address',
-                    'students_details.subject_id'
                 )
                 ->whereNull('students_details.deleted_at')
                 ->where('students_details.status', '1')
