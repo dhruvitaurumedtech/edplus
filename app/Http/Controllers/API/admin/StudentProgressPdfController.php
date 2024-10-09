@@ -391,6 +391,7 @@ class StudentProgressPdfController extends Controller
                             'exam.total_mark as total_marks',
                             'exam.exam_title',
                             'exam.exam_date',
+                            'exam.id as exam_id',
                             // 'subject.name as subject_name'
                           )
                           ->get()
@@ -425,6 +426,7 @@ foreach ($exam_response as $exam_index => $exam_value) {
         
         // Collect exam results for further processing
         $exam_result[] = [
+            'exam_id' => $exam_value['exam_id'],
             'exam_name'  => $exam_value['exam_title'],
             'mark'       => $exam_value['marks_obtained'],
             'total_mark' => $exam_value['total_marks'],
@@ -432,92 +434,82 @@ foreach ($exam_response as $exam_index => $exam_value) {
             'exam_date'  => $exam_value['exam_date'],
         ];
     }
-}
-if(!empty($exam_value['marks_obtained'])){
-  // echo $exam_value['marks_obtained'];echo "<br>";
-// Check if valid data was found before generating chart
-if (!$hasValidData) {
-  $chartBars = "<div class='no-data'>No data available to generate chart</div>";
-  // You can also decide to set a default chart container or just continue with an empty chart
-}
+          }
+          if(!empty($exam_value['marks_obtained'])){
+            // echo $exam_value['marks_obtained'];echo "<br>";
+          // Check if valid data was found before generating chart
+          if (!$hasValidData) {
+            $chartBars = "<div class='no-data'>No data available to generate chart</div>";
+            // You can also decide to set a default chart container or just continue with an empty chart
+          }
 
-// If chartBars is still empty after looping through the data
-if (empty($chartBars)) {
-    $chartBars = "<div class='no-data'>No data available to generate chart</div>";
-}
+          // If chartBars is still empty after looping through the data
+          if (empty($chartBars)) {
+              $chartBars = "<div class='no-data'>No data available to generate chart</div>";
+          }
 
 // Generate the chart container with X and Y-axis labels
-$chartContainer = "
-    <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
-        <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
-        <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
-    </div>
-    <div class='x-axis-labels' style='position: absolute'>
-        <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
-            " . implode('', $xAxisLabels) . "
-        </div>
-    </div>
-";
+                                $chartContainer = "
+                                    <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
+                                        <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
+                                        <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
+                                    </div>
+                                    <div class='x-axis-labels' style='position: absolute'>
+                                        <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
+                                            " . implode('', $xAxisLabels) . "
+                                        </div>
+                                    </div>
+                                ";
 
-// Complete HTML content
-$htmlContent = "
-    <html>
-    <head>
-        <style>
-            body {
-                font-family: 'Times New Roman', Times, serif;
-                margin: 0;
-                padding: 20px;
-                background-color: #f4f4f4;
-            }
-            .chart-container {
-                display: flex;
-                align-items: flex-end;
-                height: 250px;
-                position: relative;
-                margin: 20px;
-                border-left: 2px solid #333;
-                border-bottom: 2px solid #333;
-                background-color: #fff;
-            }
-            .y-label {
-                text-align: right;
-            }
-        </style>
-    </head>
-    <body>
-        $chartContainer
-    </body>
-    </html>
-";
+                                // Complete HTML content
+                                $htmlContent = "
+                                    <html>
+                                    <head>
+                                        <style>
+                                            body {
+                                                font-family: 'Times New Roman', Times, serif;
+                                                margin: 0;
+                                                padding: 20px;
+                                                background-color: #f4f4f4;
+                                            }
+                                            .chart-container {
+                                                display: flex;
+                                                align-items: flex-end;
+                                                height: 250px;
+                                                position: relative;
+                                                margin: 20px;
+                                                border-left: 2px solid #333;
+                                                border-bottom: 2px solid #333;
+                                                background-color: #fff;
+                                            }
+                                            .y-label {
+                                                text-align: right;
+                                            }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        $chartContainer
+                                    </body>
+                                    </html>
+                                ";
 
-// Define paths
-$imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index . $subject_array_value['id'] . '.png');
-$directoryPath = public_path('student_report_graph');
+                                $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index . $subject_array_value['id'] .$exam_value['exam_id']. '.png');
+                                $directoryPath = public_path('student_report_graph');
 
-// Ensure the directory exists
-if (!file_exists($directoryPath)) {
-    mkdir($directoryPath, 0755, true);
-}
+                                if (!file_exists($directoryPath)) {
+                                    mkdir($directoryPath, 0755, true);
+                                }
 
-// Try generating the image
-try {
-    Browsershot::html($htmlContent)
-        ->windowSize(800, 400)
-        ->save($imagePath);
-} catch (\Exception $e) {
-    return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
-}
+                                try {
+                                    Browsershot::html($htmlContent)
+                                        ->windowSize(800, 400)
+                                        ->save($imagePath);
+                                } catch (\Exception $e) {
+                                    return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+                                }
 
-}
-                       
-  
-                  
-  
-  
-  
-                    
-                            if (!isset($all_subjects[$subject_array_value['id']])) {
+                                }
+                               if (!isset($all_subjects[$subject_array_value['id']])) {
                                 // Add the subject if it's not already in the array
                                 $all_subjects[$subject_array_value['id']] = [
                                     'id' => $subject_array_value['id'],
