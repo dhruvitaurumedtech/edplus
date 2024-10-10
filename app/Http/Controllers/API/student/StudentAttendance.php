@@ -37,7 +37,7 @@ class StudentAttendance extends Controller
              $stdetails = Attendance_model::join('subject', 'subject.id','=','attendance.subject_id')
                 ->where('attendance.institute_id', $request->institute_id)
                 ->where('attendance.student_id', $student_id)
-                ->where('attendance.date', $request->date)
+                ->where('attendance.date','like', '%'. $request->date. '%')
                 ->select('attendance.*', 'subject.name')
                 ->get();
             $attenlist = [];
