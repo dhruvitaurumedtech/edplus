@@ -451,7 +451,7 @@ class StudentProgressPdfController extends Controller
                                   <g class=\"y-labels\">";
                   
                           for ($i = 100; $i >= 0; $i -= 10) {
-                              $yPosition = 600 - ($i * 4);
+                              $yPosition = 600 - ($i * 5);
                               $svgMarkup .= "<text x=\"40\" y=\"$yPosition\" text-anchor=\"end\">$i</text>";
                           }
                   
@@ -460,18 +460,18 @@ class StudentProgressPdfController extends Controller
                       
                       foreach ($points as $index => $point) {
                           $xPosition = 100 + ($index * 150); 
-                          $yPosition = 400 - ($point * 4); 
+                          $yPosition = 600 - ($point * 5); 
                           $svgMarkup .= " $xPosition,$yPosition";
                       }
                       
                       $svgMarkup .= " 950,400\"></polyline>";
                       
                       $svgMarkup .= "
-                          <polyline fill=\"none\" stroke=\"#34becd\" stroke-width=\"3\" points=\"50,400"; // Start at the baseline
+                          <polyline fill=\"none\" stroke=\"#34becd\" stroke-width=\"3\" points=\"50,600"; 
                       
                       foreach ($points as $index => $point) {
                           $xPosition = 100 + ($index * 150);
-                          $yPosition = 400 - ($point * 4);
+                          $yPosition = 600 - ($point * 5);
                           $svgMarkup .= " $xPosition,$yPosition";
                       }
                       
@@ -479,10 +479,11 @@ class StudentProgressPdfController extends Controller
                           <g>";
                   
                          
-                          foreach ($circlePoints as $index=>$point) {
-                            $svgMarkup .= "<circle class=\"quiz-graph-dot\" $point></circle>";
+                          foreach ($circlePoints as $index=>$pointsk) {
+                            $svgMarkup .= "<circle class=\"quiz-graph-dot\" $pointsk></circle>";
                             $xPosition = 100 + ($index * 150);
-                            $yPosition = 400 - ($points[$index] * 4);
+                            $yPosition = 600 - ($points[$index] * 5);
+                            
                             $percentageText = number_format($points[$index], 2) . '%'; 
                             $svgMarkup .= "<text x=\"$xPosition\" y=\"" . ($yPosition - 10) . "\" text-anchor=\"middle\" fill=\"#333\">$percentageText</text>"; // Show percentage above the point
                        
