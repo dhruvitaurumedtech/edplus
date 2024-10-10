@@ -480,7 +480,7 @@ class StudentProgressPdfController extends Controller
                   
                          
                           foreach ($circlePoints as $index=>$pointsk) {
-                            $svgMarkup .= "<circle class=\"quiz-graph-dot\" $pointsk></circle>";
+                            $svgMarkup .= "<circle class=\"quiz-graph-dot\" cx=\"$xPosition\" cy=\"$yPosition\" r=\"5\"></circle>";
                             $xPosition = 100 + ($index * 150);
                             $yPosition = 600 - ($points[$index] * 5);
                             
