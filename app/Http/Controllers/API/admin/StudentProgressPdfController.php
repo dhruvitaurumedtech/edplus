@@ -355,8 +355,10 @@ class StudentProgressPdfController extends Controller
                           ->leftJoin('exam', 'exam.id', '=', 'marks.exam_id')
                           ->leftJoin('subject', 'subject.id', '=', 'exam.subject_id')
                           ->when(!empty($request->institute_id), function ($query) use ($request) {
-                            return $query->where('students_details.institute_id', $request->institute_id);
+                            return $query->where('students_details.institute_id', $request->institute_id)
+                            ->where('exam.institute_id', $request->institute_id);
                           })
+                          
                           ->when(!empty($board_id), function ($query) use ($board_id) {
                             return $query->where('students_details.board_id', $board_id);
                           })
@@ -396,117 +398,171 @@ class StudentProgressPdfController extends Controller
                           )
                           ->get()
                           ->toArray();
+                        // print_r($exam_response);exit;
+                          $labels = [];
+                          $points = [];
+                          $circlePoints = [];
+                  
+                          foreach ($exam_response as $exam_index => $exam_value) {
+                              // Format the exam date for display on the X-axis
+                              $labels[] = date('d/m/Y', strtotime($exam_value['exam_date']));
+                              $percentage = ($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100;
+                              $points[] = $percentage;
+                  
+                              // Set X position for the circles
+                              $xPosition = 100 + ($exam_index * 150);
+                              $yPosition = 400 - ($percentage * 4);
+                              $circlePoints[] = "cx=\"$xPosition\" cy=\"$yPosition\" data-value=\"$percentage\" r=\"6\"";
+                              $exam_result[] = [
+                                'exam_id' => $exam_value['exam_id'],
+                                'exam_name'  => $exam_value['exam_title'],
+                                'mark'       => $exam_value['marks_obtained'],
+                                'total_mark' => $exam_value['total_marks'],
+                                'percentage' => $percentage,
+                                'exam_date'  => $exam_value['exam_date'],
+                            ];
+                          }
+                          // print_r($exam_result);exit;
+                          // Create the SVG markup
+                          $svgMarkup = "
+                          <div class=\"slds-p-top--medium\">
+                              <svg version=\"1.1\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" class=\"quiz-graph\" width=\"1000\" height=\"650\">
+                                  <defs>
+                                      <pattern id=\"grid\" width=\"50\" height=\"50\" patternUnits=\"userSpaceOnUse\">
+                                          <path d=\"M 50 0 L 0 0 0 50\" fill=\"none\" stroke=\"#e5e5e5\" stroke-width=\"1\"></path>
+                                      </pattern>
+                                  </defs>
+                                  <rect x=\"50\" width=\"900\" height=\"600\" fill=\"url(#grid)\" stroke=\"gray\"></rect>
+                                  <g class=\"label-title\">
+                                      <text x=\"-250\" y=\"10\" transform=\"rotate(-90)\">Percentage</text>
+                                  </g>
+                                  <g class=\"label-title\">
+                                      <text x=\"450\" y=\"650\" text-anchor=\"middle\">Date</text>
+                                  </g>
+                                  <g class=\"x-labels\">";
+                  
+                          foreach ($labels as $index => $label) {
+                              $xPosition = 100 + ($index * 150);
+                              $svgMarkup .= "<text x=\"$xPosition\" y=\"630\" text-anchor=\"middle\">$label</text>";
+                          }
                         
-      
-                          $hasValidData = false; // Flag to track if there are valid entries
-$chartBars = ''; // Reset chartBars variable
-$xAxisLabels = []; // Reset xAxisLabels variable
-
-foreach ($exam_response as $exam_index => $exam_value) {
-    // Check if total_marks is greater than 0 to avoid division by zero
-    if (!empty($exam_value['total_marks']) && $exam_value['total_marks'] > 0) {
-        // Calculate percentage
-        $percentage = round(($exam_value['marks_obtained'] / $exam_value['total_marks']) * 100, 2);
-        
-        // Update flag to indicate valid data
-        $hasValidData = true;
-
-        // Generate Y-axis labels
-        $yAxisLabels = '';
-        for ($i = 100; $i >= 0; $i -= 10) {
-            $yAxisLabels .= "<div class='y-label'>{$i}</div>";
-        }
-
-        // Add exam date to X-axis labels
-        $examDate = date('d-m-Y', strtotime($exam_value['exam_date']));
-        $xAxisLabels[] = "<div class='x-label'>{$examDate}</div>"; // Store exam date for x-axis
-
-        // Generate the chart bar for each exam
-        $chartBars .= "<div class='test-{$exam_index}' style='height: {$percentage}%; width: 70px; background-color: #4CAF50; text-align:center; color:#fff'>{$percentage}%<br>{$exam_value['marks_obtained']}/{$exam_value['total_marks']}</div>";
-        
-        // Collect exam results for further processing
-        $exam_result[] = [
-            'exam_id' => $exam_value['exam_id'],
-            'exam_name'  => $exam_value['exam_title'],
-            'mark'       => $exam_value['marks_obtained'],
-            'total_mark' => $exam_value['total_marks'],
-            'percentage' => $percentage,
-            'exam_date'  => $exam_value['exam_date'],
-        ];
-    }
-          }
-          if(!empty($exam_value['marks_obtained'])){
-            // echo $exam_value['marks_obtained'];echo "<br>";
-          // Check if valid data was found before generating chart
-          if (!$hasValidData) {
-            $chartBars = "<div class='no-data'>No data available to generate chart</div>";
-            // You can also decide to set a default chart container or just continue with an empty chart
-          }
-
-          // If chartBars is still empty after looping through the data
-          if (empty($chartBars)) {
-              $chartBars = "<div class='no-data'>No data available to generate chart</div>";
-          }
-
-// Generate the chart container with X and Y-axis labels
-                                $chartContainer = "
-                                    <div class='chart-container' style='display:flex; align-items: flex-end; height: 300px; position: relative; margin: 20px; border-left: 2px solid #333; border-bottom: 2px solid #333; background-color: #fff;'>
-                                        <div class='y-axis-labels' style='position: absolute; left: -40px; top: 10px; height: 100%; display: flex; flex-direction: column; justify-content: space-between;'>$yAxisLabels</div>
-                                        <div style='display:flex; gap: 80px; margin-left: 100px; position: relative; height:100%; align-items: end;'>$chartBars</div>
-                                    </div>
-                                    <div class='x-axis-labels' style='position: absolute'>
-                                        <div class='x-axis-labels' style='display:flex; gap: 70px; margin-left: 120px; position: relative; height:100%; align-items: end;'>
-                                            " . implode('', $xAxisLabels) . "
-                                        </div>
-                                    </div>
-                                ";
-
-                                // Complete HTML content
-                                $htmlContent = "
-                                    <html>
-                                    <head>
-                                        <style>
-                                            body {
-                                                font-family: 'Times New Roman', Times, serif;
-                                                margin: 0;
-                                                padding: 20px;
-                                                background-color: #f4f4f4;
-                                            }
-                                            .chart-container {
-                                                display: flex;
-                                                align-items: flex-end;
-                                                height: 250px;
-                                                position: relative;
-                                                margin: 20px;
-                                                border-left: 2px solid #333;
-                                                border-bottom: 2px solid #333;
-                                                background-color: #fff;
-                                            }
-                                            .y-label {
-                                                text-align: right;
-                                            }
-                                        </style>
-                                    </head>
-                                    <body>
-                                        $chartContainer
-                                    </body>
-                                    </html>
-                                ";
-
-                                $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index . $subject_array_value['id'] .$exam_value['exam_id']. '.png');
-                                $directoryPath = public_path('student_report_graph');
-
-                                if (!file_exists($directoryPath)) {
-                                    mkdir($directoryPath, 0755, true);
-                                }
-
-                                try {
-                                    Browsershot::html($htmlContent)
-                                        ->windowSize(800, 400)
-                                        ->save($imagePath);
-                                } catch (\Exception $e) {
-                                    return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
-                                }
+                          $svgMarkup .= "
+                                  </g>
+                                  <g class=\"y-labels\">";
+                  
+                          for ($i = 100; $i >= 0; $i -= 10) {
+                              $yPosition = 600 - ($i * 4);
+                              $svgMarkup .= "<text x=\"40\" y=\"$yPosition\" text-anchor=\"end\">$i</text>";
+                          }
+                  
+                          $svgMarkup .= "
+                          50,400"; 
+                      
+                      foreach ($points as $index => $point) {
+                          $xPosition = 100 + ($index * 150); 
+                          $yPosition = 400 - ($point * 4); 
+                          $svgMarkup .= " $xPosition,$yPosition";
+                      }
+                      
+                      $svgMarkup .= " 950,400\"></polyline>";
+                      
+                      $svgMarkup .= "
+                          <polyline fill=\"none\" stroke=\"#34becd\" stroke-width=\"3\" points=\"50,400"; // Start at the baseline
+                      
+                      foreach ($points as $index => $point) {
+                          $xPosition = 100 + ($index * 150);
+                          $yPosition = 400 - ($point * 4);
+                          $svgMarkup .= " $xPosition,$yPosition";
+                      }
+                      
+                      $svgMarkup .= "\"></polyline>
+                          <g>";
+                  
+                         
+                          foreach ($circlePoints as $index=>$point) {
+                            $svgMarkup .= "<circle class=\"quiz-graph-dot\" $point></circle>";
+                            $xPosition = 100 + ($index * 150);
+                            $yPosition = 400 - ($points[$index] * 4);
+                            $percentageText = number_format($points[$index], 2) . '%'; 
+                            $svgMarkup .= "<text x=\"$xPosition\" y=\"" . ($yPosition - 10) . "\" text-anchor=\"middle\" fill=\"#333\">$percentageText</text>"; // Show percentage above the point
+                       
+                          }
+                          $svgMarkup .= "
+                                  </g>
+                              </svg>
+                          </div>";
+                  
+                          $htmlContent = "
+                          <html>
+                          <head>
+                              <style>
+                                  .quiz-chartTip {
+                                      padding: 5px 10px;
+                                      border: 1px solid rgba(0,0,0,.1);
+                                      border-radius: 4px;
+                                      background-color: rgba(255,255,255,.9);
+                                      box-shadow: 3px 3px 10px rgba(0,0,0,.1);
+                                      position: absolute;
+                                      z-index: 50;
+                                      max-width: 250px;
+                                  }
+                                  .quiz-graph {
+                                      padding: 10px; 
+                                      height: 650px; 
+                                      width: 100%;
+                                  }
+                                  .quiz-graph .x-labels {
+                                      text-anchor: middle;
+                                      fill: #333; 
+                                      font-size: 12px;
+                                  }
+                                  .quiz-graph .y-labels {
+                                      text-anchor: end;
+                                      fill: #333; 
+                                      font-size: 12px;
+                                  }
+                                  .label-title {
+                                      text-anchor: middle;
+                                      text-transform: uppercase;
+                                      font-size: 14px;
+                                      fill: gray;
+                                      font-weight: bold; 
+                                  }
+                                  .quiz-graph-dot, .quiz-graph-start-dot {
+                                      fill: rgba(0,112,210,1);
+                                      stroke-width: 2;
+                                      stroke: white;   
+                                  }
+                                  .quiz-graph .quiz-graph-grid {
+                                      stroke: #ccc;
+                                      stroke-dasharray: 2; 
+                                      stroke-width: 1;
+                                  }
+                              </style>
+                          </head>
+                          <body>
+                              $svgMarkup
+                          </body>
+                          </html>";
+                  
+                          // Specify the image path
+                          $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $student_index . $subject_array_value['id'] . '.png');
+                          $directoryPath = public_path('student_report_graph');
+                  
+                          // Create directory if it does not exist
+                          if (!file_exists($directoryPath)) {
+                              mkdir($directoryPath, 0755, true);
+                          }
+                  
+                          // Generate the image using Browsershot
+                          try {
+                              Browsershot::html($htmlContent)
+                                  ->windowSize(1600, 800)
+                                  ->save($imagePath);
+                          } catch (\Exception $e) {
+                              return response()->json(['error' => 'Failed to create image: ' . $e->getMessage()], 500);
+                          }
+                  
 
                                 }
                                if (!isset($all_subjects[$subject_array_value['id']])) {
@@ -519,7 +575,7 @@ foreach ($exam_response as $exam_index => $exam_value) {
                                     
                                 ];
                             }
-                          }
+                          // }
                     }
 
                    $attendance_data = Student_detail::leftJoin('attendance', 'attendance.student_id', '=', 'students_details.student_id')
@@ -555,7 +611,7 @@ foreach ($exam_response as $exam_index => $exam_value) {
                     'subject_reponse'=>$all_subjects,
                     'fees_response' => $data_final,
                     'imagePath'=>$imagePath,
-                    'chartBars'=>$chartBars,
+                    'chartBars'=>$circlePoints,
                     'total_lecture'=>$total_lectures['total_lectures'],
                     'total_present'=>$attendance_data['total_present'],
                     'total_absent'=>$attendance_data['total_absent']
@@ -606,8 +662,7 @@ foreach ($exam_response as $exam_index => $exam_value) {
         'address' => $response_institute->address
       ];
       $data = ['board_result' => $board_result, 'institute' => $institute];
-      // print_r($data);exit;
-
+   
 
       try {
         $pdf = FacadePdf::loadView('pdf.studentprogressreport', ['data' => $data])->setPaper('a4', 'portrait');

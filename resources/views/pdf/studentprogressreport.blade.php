@@ -36,9 +36,8 @@
                                                 <h2>Exam Chart</h2>
                                                
                                                 @foreach ($studentDT['subject_reponse'] as $subjectIndex => $subjectDT)
-                                                
                                                         @php
-                                                            $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex .$subjectIndex. '.png');
+                                                            $imagePath = public_path('student_report_graph/student_image_report_' . $board_index . $medium_index . $class_index . $standard_index . $batch_index . $studentIndex .$subjectIndex.'.png');
                                                             $imageData = file_exists($imagePath) ? 'data:image/png;base64,' . base64_encode(file_get_contents($imagePath)) : '';
                                                         @endphp
                                                     <div class="row">
@@ -56,6 +55,7 @@
                                                         </div>
                                                     </div>
                                                        
+                                                   
                                                        
                                                         @endforeach
                                                         <h2>Student Attendance</h2>
