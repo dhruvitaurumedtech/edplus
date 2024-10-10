@@ -5,12 +5,16 @@ namespace App\Http\Controllers\API\student;
 use App\Http\Controllers\Controller;
 use App\Models\Attendance_model;
 use App\Models\Student_detail;
+use App\Models\Timetables;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Traits\ApiTrait;
 use Exception;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\Days;
+use PhpOffice\PhpSpreadsheet\Calculation\DateTimeExcel\WorkDay;
 
 class StudentAttendance extends Controller
 {
@@ -39,12 +43,19 @@ class StudentAttendance extends Controller
             $attenlist = [];
             if (!empty($stdetails)) {
                 foreach ($stdetails as $stdetail) {
+                    $dayName = date('l', strtotime($stdetail->date));
+                    $dayid = DB::table('days')->where('day',$dayName)->first();
+                    $selcttim = Timetables::where('batch_id',$stdetail->batch_id)
+                    ->where('subject_id',$stdetail->subject_id)
+                    ->where('day',$dayid->id)->first();
                     $attenlist[] = array(
                         'id' => $stdetail->id,
                         'subject_id' => $stdetail->subject_id,
                         'subject_name' => $stdetail->name,
                         'attendance' => $stdetail->attendance,
                         'date' => $stdetail->date,
+                        'start_time' => $selcttim->start_time,
+                        'end_time'=>$selcttim->end_time,
                     );
                 }
             }
