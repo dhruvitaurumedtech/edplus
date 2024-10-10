@@ -54,8 +54,8 @@ class StudentAttendance extends Controller
                         'subject_name' => $stdetail->name,
                         'attendance' => $stdetail->attendance,
                         'date' => $stdetail->date,
-                        'start_time' => $selcttim->start_time,
-                        'end_time'=>$selcttim->end_time,
+                        'start_time' => !empty($selcttim) ? $selcttim->start_time : '',
+                        'end_time'=> !empty($selcttim) ? $selcttim->end_time : '',
                     );
                 }
             }
