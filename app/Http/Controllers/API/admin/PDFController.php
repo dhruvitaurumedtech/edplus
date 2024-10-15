@@ -487,6 +487,7 @@ class PDFController extends Controller
         
         $validator = Validator::make($request->all(), [
             'teacher_id' => 'required',
+            'institute_id'=> 'required',
         ]);
 
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
@@ -502,7 +503,7 @@ class PDFController extends Controller
                 $img = asset('profile/no-image.png');
             }
 
-            $standardids = Teacher_model::where('teacher_id', $teacher_id)
+            $standardids = Teacher_model::where('teacher_id', $teacher_id)->where('institute_id', $request->institute_id)
                 ->whereNull('deleted_at')->pluck('standard_id');
 
             $standards = Standard_model::whereIN('id', $standardids)->get();
