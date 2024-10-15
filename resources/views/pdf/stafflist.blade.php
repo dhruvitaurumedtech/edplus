@@ -34,7 +34,7 @@
     <h3>{{$data['institute_data']['institute_name']}}</h3>
     <hr>
     @if($data['requestdata']['name'])
-        <p><b>Item Name: </b>{{$data['stafflist'][0]['firstname']}}</p>
+        <p><b>Name: </b>{{$data['stafflist'][0]['firstname']}}</p>
     @endif
     <div class="content">
     <table>
