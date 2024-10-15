@@ -276,6 +276,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -339,6 +340,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -413,6 +415,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -472,6 +475,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -573,6 +577,7 @@ class PDFController extends Controller
 
         file_put_contents($pdfPath, $pdf->output());
         $pdfUrl = asset('pdfs/' . basename($pdfPath));
+        return $this->response($pdfUrl);
         } catch (Exception $e) {
             return $this->response([], "Somthing went wrong!!", false, 400);
         }
@@ -633,6 +638,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -674,6 +680,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
@@ -713,6 +720,7 @@ class PDFController extends Controller
 
                 file_put_contents($pdfPath, $pdf->output());
                 $pdfUrl = asset('pdfs/' . basename($pdfPath));
+                return $this->response($pdfUrl);
         }catch(Exception $e){
             return $this->response([], "Something went wrong!.", false, 400);
         }
