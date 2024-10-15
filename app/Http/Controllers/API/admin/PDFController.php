@@ -846,20 +846,33 @@ class PDFController extends Controller
     {
         try{
         $reportList = [
-            ['id' => 1, 'name' => 'Student List Report', 'api' => 'institute/studentprogress-report'],
-            ['id' => 2, 'name' => 'Teacher List Report', 'api' => 'institute/teacher-reports'],
-            ['id' => 3, 'name' => 'Parents Report', 'api' => 'institute/parents-reports'],
-            ['id' => 4, 'name' => 'Attendance Report', 'api' => 'institute/attendance-report-pdf'],
-            ['id' => 5, 'name' => 'Result Report', 'api' => 'institute/result-report-pdf'],
-            ['id' => 6, 'name' => 'Fees Report', 'api' => 'institute/fees-report-pdf'],
-            ['id' => 7, 'name' => 'Content list Report', 'api' => 'institute/content-list-video-pdf'],
-            ['id' => 8, 'name' => 'Timetable Report', 'api' => 'institute/timetable-reports'],
-            ['id' => 9, 'name' => 'Dead Stock Report', 'api' => 'institute/dead-stock'],
-            ['id' => 10, 'name' => 'Staff list Report', 'api' => 'institute/staff-list'],
-            ['id' => 11, 'name' => 'Role Permission Report', 'api' => 'institute/role-wise-permission'],
-            ['id' => 12, 'name' => 'Teacher Profile Report', 'api' => 'institute/teacher-profile-report'],
-            ['id' => 13, 'name' => 'Institute Registered Report', 'api' => 'institute/institute-registered-detail'],
-            ['id' => 14, 'name' => 'Student Progress Report', 'api' => 'institute/studentprogress-report'],
+            ['id' => 1, 'name' => 'Student List Report', 'api' => 'institute/studentlist-pdf',
+            'filters'=>['institute_id','board_id','medium_id','class_id','batch_id','subject_id']],
+
+            ['id' => 2, 'name' => 'Teacher List Report', 'api' => 'institute/teacher-reports',
+            'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','subject_id','creatdate']],
+
+            ['id' => 3, 'name' => 'Parents Report', 'api' => 'institute/parents-reports',
+            'filters'=>['name','institute_id','mobile','email','batch_id']],
+
+            ['id' => 4, 'name' => 'Attendance Report', 'api' => 'institute/attendance-report-pdf',
+            'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id','start_date','end_date','date','attendance_status','student_id']],
+
+            ['id' => 5, 'name' => 'Result Report', 'api' => 'institute/result-report-pdf',
+            'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id','exam_name','exam_date','student_id']],
+
+            ['id' => 6, 'name' => 'Fees Report', 'api' => 'institute/fees-report-pdf',
+            'filters'=>['board_id','medium_id','class_id','standard_id','batch_id','subject_id','status','mobile','student_id','date']],
+
+            ['id' => 7, 'name' => 'Content list Report', 'api' => 'institute/content-list-video-pdf','filters'=>['institute_id']],
+            ['id' => 8, 'name' => 'Timetable Report', 'api' => 'institute/timetable-reports','filters'=>['institute_id','batch_id','teacher_id','standard_id']],
+            ['id' => 9, 'name' => 'Dead Stock Report', 'api' => 'institute/dead-stock','filters'=>['institute_id','item_name']],
+            ['id' => 10, 'name' => 'Staff list Report', 'api' => 'institute/staff-list','filters'=>['institute_id']],
+            ['id' => 11, 'name' => 'Role Permission Report', 'api' => 'institute/role-wise-permission','filters'=>['institute_id','user_id']],
+            ['id' => 12, 'name' => 'Teacher Profile Report', 'api' => 'institute/teacher-profile-report','filters'=>['institute_id','teacher_id']],
+            ['id' => 13, 'name' => 'Institute Registered Report', 'api' => 'institute/institute-registered-detail','filters'=>['institute_id']],
+            ['id' => 14, 'name' => 'Student Progress Report', 'api' => 'institute/studentprogress-report',
+            'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id','start_date','end_date','date','attendance_status','student_id']],
 
         ];
 
