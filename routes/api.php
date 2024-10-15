@@ -277,7 +277,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/studentlist-pdf', [AdminPDFController::class, 'index']);
     Route::post('/institute/teacher-reports', [AdminPDFController::class, 'teacher_reports']);
     Route::post('/institute/parents-reports', [AdminPDFController::class, 'parents_reports']);
-    Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+   
+     Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+     Route::post('/institute/get-report-list', [AdminPDFController::class, 'get_report_list']);
+     Route::post('/institute/get-report-fields-list', [AdminPDFController::class, 'get_report_fields_list']);
+   
 
 });
     //token without use 
