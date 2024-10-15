@@ -304,6 +304,11 @@ Route::middleware(['auth:api', 'apilogs'])->group(function () {
     Route::post('/institute/role-wise-permission', [AdminPDFController::class, 'rolewisepermission']);
     
     
+   
+     Route::post('/institute/institute-registered-detail', [AdminPDFController::class, 'instituteregisteredetail']);
+     Route::post('/institute/get-report-list', [AdminPDFController::class, 'get_report_list']);
+     Route::post('/institute/get-report-fields-list', [AdminPDFController::class, 'get_report_fields_list']);
+   
 
 });
     //token without use 

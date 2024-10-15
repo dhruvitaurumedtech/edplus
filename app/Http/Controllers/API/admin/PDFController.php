@@ -841,20 +841,235 @@ class PDFController extends Controller
     {
         //
     }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+   
+    public function get_report_list()
     {
-        //
-    }
+        try{
+        $reportList = [
+            ['id' => 1, 'name' => 'Student List Report', 'api' => 'institute/studentprogress-report'],
+            ['id' => 2, 'name' => 'Teacher List Report', 'api' => 'institute/teacher-reports'],
+            ['id' => 3, 'name' => 'Parents Report', 'api' => 'institute/parents-reports'],
+            ['id' => 4, 'name' => 'Attendance Report', 'api' => 'institute/attendance-report-pdf'],
+            ['id' => 5, 'name' => 'Result Report', 'api' => 'institute/result-report-pdf'],
+            ['id' => 6, 'name' => 'Fees Report', 'api' => 'institute/fees-report-pdf'],
+            ['id' => 7, 'name' => 'Content list Report', 'api' => 'institute/content-list-video-pdf'],
+            ['id' => 8, 'name' => 'Timetable Report', 'api' => 'institute/timetable-reports'],
+            ['id' => 9, 'name' => 'Dead Stock Report', 'api' => 'institute/dead-stock'],
+            ['id' => 10, 'name' => 'Staff list Report', 'api' => 'institute/staff-list'],
+            ['id' => 11, 'name' => 'Role Permission Report', 'api' => 'institute/role-wise-permission'],
+            ['id' => 12, 'name' => 'Teacher Profile Report', 'api' => 'institute/teacher-profile-report'],
+            ['id' => 13, 'name' => 'Institute Registered Report', 'api' => 'institute/institute-registered-detail'],
+            ['id' => 14, 'name' => 'Student Progress Report', 'api' => 'institute/studentprogress-report'],
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        ];
+
+            return $this->response($reportList, 'Successfully fetch ReportList.');
+        }catch(Exception $e){
+            return $this->response([], "Something want wrong!.", false, 400);
+        }
     }
+    function get_report_fields_list(Request $request){
+        $validator = Validator::make($request->all(), [
+            'report_id' => 'required',
+        ]);
+        if ($validator->fails()) {
+            return $this->response([], $validator->errors()->first(), false, 400);
+        }
+        
+        if($request['report_id']==1){
+            $response = [
+                'id',
+                'firstname',
+                'lastname',
+                'email',
+                'board_name',
+                'batch_name',
+                'class_name',
+                'medium_name',
+                'standard_name'
+            ];
+            return $this->response($response, 'Successfully fetch Studentlist Fields.');
+        }
+        if($request['report_id']==2){
+            $response = [
+                'id',
+                'firstname',
+                'lastname',
+                'board_name',
+                'medium_name',
+                'standard_name',
+            ];
+        return $this->response($response, 'Successfully fetch Teacherlist Fields.');
+         }
+         if($request['report_id']==3){
+            $response = [
+                'id',
+                'firstname',
+                'lastname',
+                'student_name',
+                'address',
+                'mobile',
+            ];
+        return $this->response($response, 'Successfully fetch Parentlist Fields.');
+         }
+         if($request['report_id']==4){
+            $response = [
+                'board_name',
+                'medium_name',
+                'class_name',
+                'standard_name',
+                'batch_name',
+                'subject_name',
+                'start_date',
+                'end_date',
+                'student_name',
+                'present_count',
+                'absent_count',
+            ];
+        return $this->response($response, 'Successfully fetch Attendancelist Fields.');
+         }
+         if($request['report_id']==5){
+            $response = [
+                        'field_name'=>'board_name',
+                        'field_name'=>'medium_name',
+                        'field_name'=>'class_name',
+                        'field_name'=>'standard_name',
+                        'field_name'=>'batch_name',
+                        'field_name'=>'subject_name',
+                        'field_name'=>'exam_date',
+                        'field_name'=>'exam',
+                        'field_name'=>'subject',
+                        'field_name'=>'total_marks',
+                        'field_name'=>'student_name',
+                        'field_name'=>'mark',
+         ];
+         return $this->response($response, 'Successfully fetch Resultreportlist Fields.');
+        }
+         if($request['report_id']==6){
+            $response = [
+                'board_name',
+                'medium_name',
+                'class_name',
+                'standard_name',
+                'batch_name',
+                'student_name',
+                'student_fees',
+                'remaining_fees',
+                'paid_fees',
+                'status',
+                'history',
+            ];
+             return $this->response($response, 'Successfully fetch Fees Report Fields.');
+         }
+         if($request['report_id']==7){
+            $response = [
+                'board_name',
+                'medium_name',
+                'standard_name',
+                'subject_name',
+                'topic_name',
+                'description',
+                'chapter_no',
+                'chapter_name',
+            ];
+             return $this->response($response, 'Successfully fetch Contentlist Fields.');
+         }
+         if($request['report_id']==8){
+            $response = [
+                'standard_name',
+                'batch_name',
+                'firstname',
+                'lastname',
+                'day',
+                'subject_name',
+                'lecture_type',
+                'class_name',
+            ];
+             return $this->response($response, 'Successfully fetch Timetablelist Fields.');
+         }
+         if($request['report_id']==9){
+            $response = [
+                'item_name',
+                'no_of_item',
+            ];
+             return $this->response($response, 'Successfully fetch Deadstock Fields.');
+         }
+         if($request['report_id']==10){
+            $response = [
+                'institute_name',
+                'firstname',
+                'lastname',
+                'rolename',
+                'mobile',
+            ];
+             return $this->response($response, 'Successfully fetch Stafflist Fields.');
+         }
+         if($request['report_id']==11){
+            $response = [
+                'board_name',
+                'medium_name',
+                'standard_name',
+                'subject_name',
+                'topic_name',
+                'topic_description',
+                'chapter_no',
+                'chapter_name',
+            ];
+             return $this->response($response, 'Successfully fetch RolePermission  Fields.');
+         }
+         if($request['report_id']==12){
+            $response = [
+                'profile_image',
+                'firstname',
+                'lastname',
+                'email',
+                'mobile',
+                'dob',
+                'address',
+                'country',
+                'state',
+                'city',
+                'pincode',
+                'aboutus',
+                'education',
+                'experience',
+                'emergency_contact',
+            ];
+             return $this->response($response, 'Successfully fetch TeacherProfile Fields.');
+         }
+         if($request['report_id']==13){
+            $response = [
+                'firstname',
+                'lastname',
+                'email',
+                'address',
+                'mobile',
+                'institute_for_list',
+                'board_list',
+                'medium_list',
+                'class_list',
+                'standard_list',
+                'subject_list',
+            ];
+             return $this->response($response, 'Successfully fetch Institute Registerted Fields.');
+         }
+         if($request['report_id']==14){
+            $response = [
+                'institute_name',
+                'address',
+                'student_name',
+                'board_name',
+                'standard_name',
+                'batch_name',
+                'subject_name',
+                'student_attendance',
+                'student_fees',
+            ];
+             return $this->response($response, 'Successfully fetch Student Progress Fields.');
+         }
+    
+        
+       
+    }
+    
 }
