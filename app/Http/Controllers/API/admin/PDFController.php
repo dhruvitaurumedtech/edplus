@@ -655,7 +655,7 @@ class PDFController extends Controller
         try{
             
             $deastockqy=DeadStock::where('institute_id',$request->institute_id)
-            ->when(!empty($request->teacher_id) ,function ($query) use ($request){
+            ->when(!empty($request->item_name) ,function ($query) use ($request){
                 return $query->where('deadstocks.item_name', $request->item_name);
             })
             ->get()->toarray();
