@@ -70,8 +70,8 @@ class SubjectController extends Controller
             ->where('medium', request('medium'))
             ->where('institute_for_class', request('institute_for_class'))
             ->where('standard', request('standard'))
-            ->where('stream', request('stream'))
             ->where('status', request('status'))
+            ->orwhere('stream', request('stream'))
             ->whereExists($subquery);
         $exists = $query->count();
         if ($exists <= 0) {
