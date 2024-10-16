@@ -159,38 +159,31 @@ class ChapterController extends Controller
             'chapter_no.*.required' => 'Chapter number is required.',
             'chapter_name.*.required' => 'Chapter name is required.',
         ]);
-        $exists = Chapter::where('subject_id', $request->input('subject'))
-            ->where('base_table_id', $request->input('standard_id'))
-            ->exists();
-        if ($exists > 0) {
+        
             foreach ($request->chapter_name as $i => $chapterName) {
-                $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
+                $exists = Chapter::where('subject_id', $request->input('subject'))
+                ->where('base_table_id', $request->input('standard_id'))
+                ->where('chapter_name', $request->input('standard_id')[$i])
+                ->where('chapter_no', $request->input('chapter_no')[$i])
+                ->exists();
+                    if ($exists > 0) {
+                       return redirect()->route('chapter.list')->with('success', 'Already Exists!');
+                    }else{
+                       $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
-                if ($request->hasFile('chapter_image')) {
-                    $chapter_imageFile = $request->file('chapter_image')[$i];
-                    $imagePath = $chapter_imageFile->store('chapter', 'public');
-                    $chapter->chapter_image = $imagePath;
-                }
-                $chapter->save();
-            }
-            return redirect()->route('chapter.list')->with('success', 'Already Exists!');
-        } else {
-
-            foreach ($request->chapter_name as $i => $chapterName) {
-                $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
-
-                if ($request->hasFile('chapter_image')) {
-                    $chapter_imageFile = $request->file('chapter_image')[$i];
-                    $imagePath = $chapter_imageFile->store('chapter', 'public');
-                    $chapter->chapter_image = $imagePath;
-                }
-                $chapter->base_table_id = $request->input('standard_id');
-                $chapter->subject_id = $request->input('subject');
-                $chapter->chapter_no = $request->input('chapter_no')[$i];
-                $chapter->chapter_name = $chapterName;
-                $chapter->save();
-            }
-        }
+                        if ($request->hasFile('chapter_image')) {
+                            $chapter_imageFile = $request->file('chapter_image')[$i];
+                            $imagePath = $chapter_imageFile->store('chapter', 'public');
+                            $chapter->chapter_image = $imagePath;
+                        }
+                        $chapter->base_table_id = $request->input('standard_id');
+                        $chapter->subject_id = $request->input('subject');
+                        $chapter->chapter_no = $request->input('chapter_no')[$i];
+                        $chapter->chapter_name = $chapterName;
+                        $chapter->save();
+                    }
+           
+        } 
         return redirect()->route('chapter.list')->with('success', 'Chapters Updated Successfully');
     }
     function chapter_delete(Request $request)
