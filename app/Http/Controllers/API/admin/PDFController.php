@@ -355,7 +355,7 @@ class PDFController extends Controller
             'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','subject_id','creatdate']],
 
             ['id' => 3, 'name' => 'Parents Report', 'api' => 'institute/parents-reports',
-            'filters'=>['name','institute_id','mobile','email','batch_id']],
+            'filters'=>['name','institute_id','mobile','email','board_id','medium_id','class_id','standard_id','batch_id']],
 
             ['id' => 4, 'name' => 'Attendance Report', 'api' => 'institute/attendance-report-pdf',
             'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id','start_date','end_date','date','attendance_status','student_id']],
