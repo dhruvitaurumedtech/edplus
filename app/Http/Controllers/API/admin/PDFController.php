@@ -866,11 +866,11 @@ class PDFController extends Controller
             'filters'=>['board_id','medium_id','class_id','standard_id','batch_id','subject_id','status','mobile','student_id','date']],
 
             ['id' => 7, 'name' => 'Content list Report', 'api' => 'institute/content-list-video-pdf','filters'=>['institute_id']],
-            ['id' => 8, 'name' => 'Timetable Report', 'api' => 'institute/timetable-reports','filters'=>['institute_id','batch_id','teacher_id','standard_id']],
+            ['id' => 8, 'name' => 'Timetable Report', 'api' => 'institute/timetable-reports','filters'=>['institute_id','teacher_id','board_id','medium_id','class_id','standard_id','batch_id']],
             ['id' => 9, 'name' => 'Dead Stock Report', 'api' => 'institute/dead-stock','filters'=>['institute_id','item_name']],
             ['id' => 10, 'name' => 'Staff list Report', 'api' => 'institute/staff-list','filters'=>['institute_id']],
             ['id' => 11, 'name' => 'Role Permission Report', 'api' => 'institute/role-wise-permission','filters'=>['institute_id','user_id']],
-            ['id' => 12, 'name' => 'Teacher Profile Report', 'api' => 'institute/teacher-profile-report','filters'=>['institute_id','teacher_id']],
+            ['id' => 12, 'name' => 'Teacher Profile Report', 'api' => 'institute/teacher-profile-report','filters'=>['institute_id','teacher_id','board_id','medium_id','class_id','standard_id']],
             ['id' => 13, 'name' => 'Institute Registered Report', 'api' => 'institute/institute-registered-detail','filters'=>['institute_id']],
             ['id' => 14, 'name' => 'Student Progress Report', 'api' => 'institute/studentprogress-report',
             'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id','start_date','end_date','date','attendance_status','student_id']],
