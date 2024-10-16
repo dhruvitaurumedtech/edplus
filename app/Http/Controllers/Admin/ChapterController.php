@@ -24,7 +24,8 @@ class ChapterController extends Controller
                 'board.name as board',
                 'base_table.id as base_id'
             )
-            ->where('standard.status', 'active')->get();
+            ->where('standard.status', 'active')
+            ->wherenull('base_table.deleted_at')->get();
         $subjects = Subject_model::get();
         return view('chapter.create', compact('Standard', 'subjects'));
     }
