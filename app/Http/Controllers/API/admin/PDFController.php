@@ -50,6 +50,9 @@ class PDFController extends Controller
                         ->when(!empty($request->board_id), function ($query) use ($request) {
                             return $query->where('students_details.board_id', $request->board_id);
                         })
+                        ->when(!empty($request->standard_id), function ($query) use ($request) {
+                            return $query->where('students_details.standard_id', $request->standard_id);
+                        })
                         ->when(!empty($request->batch_id), function ($query) use ($request) {
                             return $query->where('students_details.batch_id', $request->batch_id);
                         })
@@ -349,7 +352,7 @@ class PDFController extends Controller
         try{
         $reportList = [
             ['id' => 1, 'name' => 'Student List Report', 'api' => 'institute/studentlist-pdf',
-            'filters'=>['institute_id','board_id','medium_id','class_id','batch_id','subject_id']],
+            'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','batch_id','subject_id']],
 
             ['id' => 2, 'name' => 'Teacher List Report', 'api' => 'institute/teacher-reports',
             'filters'=>['institute_id','board_id','medium_id','class_id','standard_id','subject_id','creatdate']],
