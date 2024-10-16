@@ -159,16 +159,22 @@ class ChapterController extends Controller
             'chapter_no.*.required' => 'Chapter number is required.',
             'chapter_name.*.required' => 'Chapter name is required.',
         ]);
-        
+       
             foreach ($request->chapter_name as $i => $chapterName) {
+               
+                $chapter_image=(empty($request->file('chapter_image')[$i])?$request->input('old_chapter_image')[$i]:$request->file('chapter_image')[$i]);
                 $exists = Chapter::where('subject_id', $request->input('subject'))
                 ->where('base_table_id', $request->input('standard_id'))
-                ->where('chapter_name', $request->input('standard_id')[$i])
+                ->where('chapter_name', $request->input('chapter_name')[$i])
                 ->where('chapter_no', $request->input('chapter_no')[$i])
+                ->where('chapter_image',  $chapter_image)
                 ->exists();
+                // echo "<pre>";print_r($request->all());exit;
                     if ($exists > 0) {
+                        
                        return redirect()->route('chapter.list')->with('success', 'Already Exists!');
                     }else{
+                        // echo "<pre>";print_r($request->all());exit;
                        $chapter = Chapter::findOrFail($request->input('chapter_id')[$i]);
 
                         if ($request->hasFile('chapter_image')) {
