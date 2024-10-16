@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Institute_detail;
 use Vinkla\Hashids\Facades\Hashids;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -144,8 +145,9 @@ class Users extends Controller
     //delete
     public function subadmin_delete(Request $request)
     {
-        $did = $request->input('user_id');
-        $userd = User::find($did);
+        $institute_id = $request->input('user_id');
+        $userd = Institute_detail::find($institute_id);
+
 
         if ($userd->role_type == 2) {
             $routnm = 'admin.list';
