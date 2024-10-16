@@ -29,6 +29,9 @@
         <div class="form-group">
           <label for="exampleInputPassword1">Password</label>
           <input id="password" name="password" type="password" class="form-control " placeholder="Password" required autocomplete="current-password">
+          <i class="fa fa-eye" aria-hidden="true" id="showHidePassword"
+                                                    style="position: absolute; font-size:20px; margin-left: 390px;margin-top:68px;
+                                                    top: 45%; cursor: pointer;"></i>
         </div>
         <div class="form-group ml-4">
           <input class="form-check-input" type="checkbox" value="" id="remember_me" name="remember">
@@ -49,3 +52,19 @@
 </body>
 
 </html>
+<script>
+  const showHidePass = document.getElementById('showHidePassword');
+        const userPassword = document.getElementById('password');
+
+        showHidePass.addEventListener('click', function(e) {
+            let showHideAttr = userPassword.getAttribute('type');
+
+            if (showHideAttr === 'password') {
+                showHideAttr = 'text';
+            } else {
+                showHideAttr = 'password';
+            }
+            userPassword.setAttribute('type', showHideAttr);
+            this.classList.toggle('fa-eye-slash');
+        });
+</script>
