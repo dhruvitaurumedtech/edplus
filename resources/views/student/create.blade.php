@@ -118,7 +118,7 @@
                                         @enderror
                                         <img src="" id="image" alt="image" class="mt-4" style="display: none; width:80px; height:80px">
                                     </div>
-
+<!-- 
                                     <div class="col-md-3">
                                         <label for="exampleInputEmail1">Institute For : </label>
                                         <select name="institute_for_id" id="institute_for_id" class="form-control" onchange="boardlist()">
@@ -231,7 +231,7 @@
                                         @error('status')
                                         <div class="text-danger">{{ $message }}</div>
                                         @enderror
-                                    </div>
+                                    </div> -->
 
                                 </div>
 

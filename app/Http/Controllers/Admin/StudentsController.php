@@ -104,19 +104,21 @@ class StudentsController extends Controller
         } else {
             $subjectIds = $request->subject_id;
         }
-        $studentdetail = Student_detail::create([
-            'user_id' => $id,
-            'institute_id' => $request->institute_id,
-            'student_id' => $student_id,
-            'institute_for_id' => $request->institute_for_id,
-            'board_id' =>  $request->board_id,
-            'medium_id' => $request->medium_id,
-            'class_id' => $request->class_id,
-            'standard_id' => $request->standard_id,
-            'stream_id' => $request->stream_id,
-            'subject_id' => $subjectIds,
-            'status' => $request->status,
-        ]);
+        
+        // $studentdetail = Student_detail::create([
+        //     'user_id' => $id,
+        //     'institute_id' => $request->institute_id,
+        //     'student_id' => $student_id,
+        //     'institute_for_id' => $request->institute_for_id,
+        //     'board_id' =>  $request->board_id,
+        //     'medium_id' => $request->medium_id,
+        //     'class_id' => $request->class_id,
+        //     'standard_id' => $request->standard_id,
+        //     'stream_id' => $request->stream_id,
+        //     'subject_id' => $subjectIds,
+        //     'status' => $request->status,
+        // ]);
+
         if ($studentdetail) {
             return redirect('student/list/' . $request->institute_id)->with('success', 'profile-created');
         } else {
@@ -176,18 +178,18 @@ class StudentsController extends Controller
         } else {
             $subject_id = $request->subject_id;
         }
-        $studentdetailsDT = Student_detail::where('id', $Student_detail_id)->first();
-        $studentdetailsDT->update([
-            'institute_for_id' => $request->institute_for_id,
-            'board_id' =>  $request->board_id,
-            'medium_id' => $request->medium_id,
-            'class_id' => $request->class_id,
-            'standard_id' => $request->standard_id,
-            'stream_id' => $request->stream_id,
-            'subject_id' => $subject_id,
-            'status' => $request->status,
-            'note' => ($request->note) ? $request->note : ''
-        ]);
+        // $studentdetailsDT = Student_detail::where('id', $Student_detail_id)->first();
+        // $studentdetailsDT->update([
+        //     'institute_for_id' => $request->institute_for_id,
+        //     'board_id' =>  $request->board_id,
+        //     'medium_id' => $request->medium_id,
+        //     'class_id' => $request->class_id,
+        //     'standard_id' => $request->standard_id,
+        //     'stream_id' => $request->stream_id,
+        //     'subject_id' => $subject_id,
+        //     'status' => $request->status,
+        //     'note' => ($request->note) ? $request->note : ''
+        // ]);
         return redirect('student/list/' . $request->institute_id)->with('success', 'profile-created');
     }
     public function view_student(Request $request)
