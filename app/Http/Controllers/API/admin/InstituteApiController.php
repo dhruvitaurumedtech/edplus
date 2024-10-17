@@ -996,14 +996,20 @@ class InstituteApiController extends Controller
 
                 $teacher_check = Teacher_model::where('subject_id', $institute_subject_id)
                 ->where('institute_id', $institute->id)
-                ->whereNull('deleted_at')->first();
+                ->where(function($query) {
+                    $query->whereNull('deleted_at')
+                          ->orWhere('status', 2);
+                })->first();
 
                 if (!empty($student_check) || !empty($teacher_check)) {
                     return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
                 } else {
                     $teacher_check = Teacher_model::where('subject_id', $institute_subject_id)
                     ->where('institute_id', $institute->id)
-                    ->whereNotNull('deleted_at')->forceDelete();
+                    ->where(function($query) {
+                        $query->whereNull('deleted_at')
+                              ->orWhere('status', 2);
+                    })->forceDelete();
 
                     $delete_sub = Subject_sub::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->delete(); 
                 } 
