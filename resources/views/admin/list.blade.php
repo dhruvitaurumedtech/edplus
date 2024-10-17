@@ -84,7 +84,6 @@
               <div class="col-sm-10">
                 <select class="form-control" name="role_type" id="role_type">
                   <option value="">Select Role</option>
-                  <option value="2">Admin</option>
                   <option value="3">Institute</option>
                 </select>
                 @error('role_type')

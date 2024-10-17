@@ -43,7 +43,14 @@
                   <td>{{$value['institute_name']}}</td>
                   <td>{{$value['email']}}</td>
                   <td>{{$value['contact_no']}}</td>
-                  <td>{{$value['status']}}</td>
+                  <td>
+                      @if ($value['status'] == 'active')
+                          <button class="btn btn-success">Active</button>
+                      @else
+                          <button class="btn btn-danger">Deactive</button>
+                      @endif
+                  </td>
+
                   <td>
                     <div class="d-flex">
                       <input type="submit" class="btn text-white btn-rmv2 institute_list_editButton" data-user-id="{{ $value['id'] }}"  value="Edit">&nbsp;&nbsp;
@@ -88,12 +95,24 @@
         <form method="post" action="{{ url('institute_admin/update') }}">
           @csrf
           <div class="card-body">
-           
-            <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+            <!-- <div class="form-group row">
+              <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
               <div class="col-sm-10">
-                <input type="hidden" name="user_id" id="user_id">
-                <input type="text" id="name" name="name" class="form-control" placeholder="Name">
+                <select class="form-control" name="role_type" id="role_type">
+                  <option value="">Select Role</option>
+                  <option value="2">Admin</option>
+                  <option value="3">Institute</option>
+                </select>
+                @error('role_type')
+                <div class="alert alert-danger">{{ $message }}</div>
+                @enderror
+              </div>
+            </div> -->
+            <div class="form-group row">
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Institute</label>
+              <div class="col-sm-10">
+                <input type="hidden" name="institute_id" id="institute_id">
+                <input type="text" id="name" name="institute_name" class="form-control" placeholder="institute_name">
                 @error('name')
                 <div class="alert alert-danger">{{ $message }}</div>
                 @enderror
@@ -109,9 +128,9 @@
               </div>
             </div>
             <div class="form-group row">
-              <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+              <label for="inputEmail3" class="col-sm-2 col-form-label">Mobile</label>
               <div class="col-sm-10">
-                <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
+                <input type="text" id="mobile" name="contact_no" class="form-control" placeholder="Mobile Number">
               </div>
             </div>
 

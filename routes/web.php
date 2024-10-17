@@ -68,11 +68,12 @@ Route::middleware('auth')->group(function () {
     Route::get('create/admin', [Users::class, 'subadmin_create'])->name('admin.create');
     Route::post('store/admin', [Users::class, 'subadmin_store'])->name('admin.store');
     Route::post('admin/edit', [Users::class, 'subadmin_edit'])->name('admin.edit');
-    Route::post('/institute_list_admin/edit', [Users::class, 'institute_subadmin_edit'])->name('institute_list_admin.edit');
+    Route::post('user/edit', [Users::class, 'user_edit'])->name('user.edit');
     Route::post('admin/update', [Users::class, 'subadmin_update'])->name('admin.update');
-    Route::post('institute_admin/update', [Users::class, 'institute_subadmin_update'])->name('institute_admin.update');
+    Route::post('user/update', [Users::class, 'user_update'])->name('user.edit');
     Route::post('admin/delete', [Users::class, 'subadmin_delete'])->name('admin.delete');
     Route::post('user/delete', [Users::class, 'user_delete'])->name('user.delete');
+    Route::post('institute/delete', [Users::class, 'institute_delete'])->name('user.delete');
 
     //institute
     Route::get('institute-admin', [Users::class, 'list_institute'])->name('institute_admin.list');
