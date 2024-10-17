@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Chapter;
 use App\Models\Subject_model;
 use App\Models\Standard_model;
+use Illuminate\Database\QueryException;
 use PHPOpenSourceSaver\JWTAuth\Claims\Subject;
 
 class ChapterController extends Controller
@@ -195,12 +196,27 @@ class ChapterController extends Controller
     }
     function chapter_delete(Request $request)
     {
+        
+        try{
         $chapter_id = $request->input('id');
+        
+
+        
         $class_list = Chapter::where('id', $chapter_id);
-        if (!$class_list) {
-            return redirect()->route('chapter.list')->with('error', 'Chapters not found');
-        }
-        $class_list->delete();
-        return redirect()->route('chapter.list')->with('success', 'Chapters deleted successfully');
+            if ($class_list) {
+                $class_list->delete();
+                return redirect()->route('chapter.list')->with('success', 'Chapters deleted successfully');
+            
+            }else{
+                return redirect()->route('chapter.list')->with('error', 'Chapters not found');
+            }
+        }catch (QueryException $e) {
+                if ($e->getCode() == '23000') { 
+                    return redirect()->route('chapter.list')->with('error','Cannot delete chapter as it has related topics.');
+                }
+
+                return redirect()->route('chapter.list')->with('error','An error occurred while deleting the chapter.');
+            }
+                
     }
 }

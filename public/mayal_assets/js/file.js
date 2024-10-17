@@ -215,7 +215,7 @@ document.querySelectorAll('.institute_list_deletebutton').forEach(function (butt
             confirmButtonText: 'Yes, delete it!'
         }).then((result) => {
             if (result.isConfirmed) {
-                axios.post('/admin/delete', {
+                axios.post('/user/delete', {
                     user_id: user_id
                 })
                     .then(response => {

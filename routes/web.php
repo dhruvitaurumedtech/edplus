@@ -72,6 +72,7 @@ Route::middleware('auth')->group(function () {
     Route::post('admin/update', [Users::class, 'subadmin_update'])->name('admin.update');
     Route::post('institute_admin/update', [Users::class, 'institute_subadmin_update'])->name('institute_admin.update');
     Route::post('admin/delete', [Users::class, 'subadmin_delete'])->name('admin.delete');
+    Route::post('user/delete', [Users::class, 'user_delete'])->name('user.delete');
 
     //institute
     Route::get('institute-admin', [Users::class, 'list_institute'])->name('institute_admin.list');
@@ -197,6 +198,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/student/edit', [StudentsController::class, 'edit_student'])->name('student.edit');
     Route::post('/student/update', [StudentsController::class, 'update_student'])->name('student.update');
     Route::post('/student/view', [StudentsController::class, 'view_student'])->name('create_form_data.view');
+    Route::post('/student/delete', [StudentsController::class, 'delete_student'])->name('create_form_data.delete');
     Route::get('/student/create-form-data', [StudentsController::class, 'createformdata'])->name('student.view');
     //banner
     Route::get('banner-list', [BannerController::class, 'list_banner'])->name('banner.list');

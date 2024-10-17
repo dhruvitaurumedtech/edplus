@@ -204,12 +204,15 @@ class StudentsController extends Controller
     {
         $did = $request->input('student_id');
         $student = User::find($did);
-        if (Auth::role_type() == 1 && $student) {
+        // print_r(Auth::role_type());exit;
+        if ($student) {
             Student_detail::where('student_id', $did)->delete();
             $student->delete();
-        } elseif (Auth::role_type() == 3 && $student) {
-            $institute_id = Auth::id();
-            Student_detail::where('student_id', $did)->where('institute_id', $institute_id)->delete();
+            $user_table=User::where('id',$did);
+            $user_table->delete();
+        // } elseif (Auth::role_type() == 3 && $student) {
+        //     $institute_id = Auth::id();
+        //     Student_detail::where('student_id', $did)->where('institute_id', $institute_id)->delete();
         } else {
             return response()->json(['error' => 'Student not found'], 404);
         }
