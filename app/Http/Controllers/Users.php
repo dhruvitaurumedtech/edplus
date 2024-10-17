@@ -163,4 +163,24 @@ class Users extends Controller
 
         return redirect()->route($routnm)->with('success', 'Role deleted successfully');
     }
+    public function user_delete(Request $request){
+// echo "hi";exit;
+        $user_id = $request->input('user_id');
+        $userd = User::find($user_id);
+
+
+        if ($userd->role_type == 2) {
+            $routnm = 'admin.list';
+        } else {
+            $routnm = 'institute.list';
+        }
+
+        if (!$userd) {
+            return redirect()->route($routnm)->with('error', 'Role not found');
+        }
+
+        $userd->delete();
+
+        return redirect()->route($routnm)->with('success', 'Role deleted successfully');
+    }
 }

@@ -71,7 +71,7 @@
                         <input type="hidden" name="student_id" value="{{ $value->id }}">
                       </form>&nbsp;&nbsp;
                       &nbsp;&nbsp;
-                      <input type="submit" class="btn btn-danger deletebutton" data-student-id="{{ $value->id }}" value="Delete">
+                      <input type="submit" class="btn btn-danger student_deletebutton" data-student-id="{{ $value->id }}" value="Delete">
 
                     </div>
                 </tr>
