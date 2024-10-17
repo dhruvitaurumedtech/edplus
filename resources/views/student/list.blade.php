@@ -169,7 +169,7 @@
                       <img src="" id="image" alt="image" class="mt-4" style="width:150px; height:150px;display:none">
                     </div>
 
-
+<!-- 
                     <div class="col-md-4">
                       <label for="exampleInputEmail1">Institute For : </label>
                       <select name="institute_for_id" id="institute_for_id" class="form-control">
@@ -269,7 +269,7 @@
                     <div class="col-md-4">
                       <label for="exampleInputEmail1">Note : </label>
                       <input type="text" name="note" id="note" class="form-control" placeholder="Please enter note">
-                    </div>
+                    </div> -->
                   </div>
                 </div>
               </div>
