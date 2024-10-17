@@ -610,6 +610,7 @@ class InstituteApiController extends Controller
 
             $removedSubject = array_diff($institute_subjects, $institute_subject_ids);
             $addSubject= array_diff($institute_subject_ids,$institute_subjects);
+
             if($addSubject){
                 $this->addsubject($addSubject,$institute);
             }
@@ -998,9 +999,8 @@ class InstituteApiController extends Controller
                 ->where('institute_id', $institute->id)
                 ->where(function($query) {
                     $query->whereNull('deleted_at')
-                          ->orWhere('status', 2);
+                          ->orWhere('status','!=', 2);
                 })->first();
-
                 if (!empty($student_check) || !empty($teacher_check)) {
                     return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
                 } else {
