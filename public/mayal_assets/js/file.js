@@ -127,7 +127,7 @@ document.querySelectorAll('.institute_admin_editButton').forEach(function (butto
     button.addEventListener('click', function () {
         var user_id = this.getAttribute('data-user-id');
         var baseUrl = $('meta[name="base-url"]').attr('content');
-        axios.post(baseUrl + '/admin/edit', {
+        axios.post(baseUrl + '/user/edit', {
             user_id: user_id
         })
             .then(response => {
@@ -180,6 +180,7 @@ document.querySelectorAll('.institute_admin_deletebutton').forEach(function (but
 document.querySelectorAll('.institute_list_editButton').forEach(function (button) {
     button.addEventListener('click', function () {
         var user_id = this.getAttribute('data-user-id');
+        // alert(user_id);
         var baseUrl = $('meta[name="base-url"]').attr('content');
         axios.post(baseUrl + '/admin/edit', {
             user_id: user_id
@@ -187,11 +188,11 @@ document.querySelectorAll('.institute_list_editButton').forEach(function (button
             .then(response => {
                 var reponse_data = response.data.userDT;
                 console.log(reponse_data);
-                $('#user_id').val(reponse_data.id);
-                $('#role_type').val(reponse_data.role_type);
-                $('#name').val(reponse_data.firstname);
+                $('#institute_id').val(reponse_data.id);
+                // $('#role_type').val(reponse_data.role_type);
+                $('#name').val(reponse_data.institute_name);
                 $('#email').val(reponse_data.email);
-                $('#mobile').val(reponse_data.mobile);
+                $('#mobile').val(reponse_data.contact_no);
                 $('#usereditModal').modal('show');
             })
             .catch(error => {
@@ -230,6 +231,38 @@ document.querySelectorAll('.institute_list_deletebutton').forEach(function (butt
         });
     });
 });
+document.querySelectorAll('.institute_list_deletebutton').forEach(function (button) {
+    button.addEventListener('click', function (event) {
+        event.preventDefault(); // Prevent the default form submission
+
+        var user_id = this.getAttribute('data-user-id');
+
+        // Show SweetAlert confirmation
+        Swal.fire({
+            title: 'Are you sure?',
+            text: 'Are you sure want to delete?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                axios.post('/institute/delete', {
+                    user_id: user_id
+                })
+                    .then(response => {
+                        location.reload(true);
+
+                    })
+                    .catch(error => {
+                        console.error(error);
+                    });
+            }
+        });
+    });
+});
+
 
 //student code 
 document.querySelectorAll('.student_editButton').forEach(function (button) {

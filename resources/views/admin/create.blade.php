@@ -27,14 +27,17 @@
       <div class="dashboard-content side-content">
         <form class="s-chapter-form institute-form" method="post" id="myForm" action="{{ url('store/admin') }}">
           @csrf
-          <h4 class="mb-3">Create Admin</h4>
+          <div class="row">
+          <div class="col-lg-12 mt-3 ">
+          <h4 class="mb-3">Create Admin   
+             <a href="{{url('institute-admin')}}" class="btn text-white btn-rmv2" style="float: right;">Display Institute Admin</a>
+          </h4>
           <div class="card-body">
             <div class="form-group row">
               <label for="inputPassword3" class="col-sm-2 col-form-label mt-0">Select Role :</label>
               <div class="col-sm-10">
                 <select class="form-control" name="role_type" id="role_type">
                   <option value="">Select Role</option>
-                  <option value="2" {{ old('role_type') == '2' ? 'selected' : '' }}>Admin</option>
                   <option value="3" {{ old('role_type') == '3' ? 'selected' : '' }}>Institute</option>
                 </select>
                 @error('role_type')
@@ -88,7 +91,7 @@
           <div class="d-flex">
             <button type="submit" class="btn text-white btn-rmv2" style="margin-left: auto;">Submit</button>
           </div>
-
+            </div></div>
         </form>
       </div>
 

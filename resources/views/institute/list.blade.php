@@ -21,7 +21,7 @@
         </ul>
       </div>
       @include('layouts/alert')
-      <div class="dashboard-content side-content">
+      <div class="dashboard-content side-content ">
         <div class="row">
           <div class="col-lg-12 mt-3 institute-form">
             <div class="create-title-btn">
@@ -89,22 +89,21 @@
           </button>
         </div>
         <div class="modal-body">
-          <form method="post" action="{{ url('admin/update') }}">
+          <form method="post" action="{{ url('user/update') }}">
             @csrf
             <div class="card-body">
-              <div class="form-group row">
+              <!-- <div class="form-group row">
                 <label for="inputPassword3" class="col-sm-2 col-form-label">Select Role</label>
                 <div class="col-sm-10">
                   <select class="form-control" name="role_type" id="role_type">
                     <option value="">Select Role</option>
-                    <option value="2">Admin</option>
                     <option value="3">Institute</option>
                   </select>
                   @error('role_type')
                   <div class="alert alert-danger">{{ $message }}</div>
                   @enderror
                 </div>
-              </div>
+              </div> -->
               <div class="form-group row">
                 <label for="inputEmail3" class="col-sm-2 col-form-label">firstname</label>
                 <div class="col-sm-10">
@@ -134,7 +133,7 @@
                 </div>
               </div>
               <div class="form-group row">
-                <label for="inputEmail3" class="col-sm-2 col-form-label">Name</label>
+                <label for="inputEmail3" class="col-sm-2 col-form-label">Mobile</label>
                 <div class="col-sm-10">
                   <input type="text" id="mobile" name="mobile" class="form-control" placeholder="Mobile Number">
                 </div>
