@@ -66,11 +66,12 @@
 
     <h2>Parents List</h2>
     <hr>
-    @if($data['requestdata']['mobile'])
-        <p><b>Mobile: </b>{{$data['parents'][0]['mobile']}}</p>
+    @if(!empty($data['parents']) && !empty($data['parents'][0]['mobile']) && !empty($data['requestdata']['mobile']))
+    <p><b>Mobile: </b>{{ $data['parents'][0]['mobile'] }}</p>
     @endif
-    @if($data['requestdata']['address'])
-        <p><b>Address: </b>{{$data['parents'][0]['address']}}</p>
+
+    @if(!empty($data['parents']) && !empty($data['parents'][0]['address']) && !empty($data['requestdata']['address']))
+        <p><b>Address: </b>{{ $data['parents'][0]['address'] }}</p>
     @endif
     
     <div class="content">
@@ -90,6 +91,7 @@
             </tr>
         </thead>
         <tbody><?php $i=1;?>
+        @if($data['parents']) 
             @foreach ($data['parents'] as $item)
             <tr>
                 <td>{{ $i }}</td>
@@ -105,6 +107,9 @@
             </tr>
             <?php $i++ ?>
             @endforeach
+            @else
+            <tr><center><p>No Data Found</p></center></tr>
+            @endif
         </tbody>
     </table>
     </div>
