@@ -129,7 +129,7 @@
                     @if($data['fields']['firstname'] == 1 || $data['fields']['lastname'] == 1)
                     <th>Parent Name</th>
                     @endif
-                    @if($data['fields']['student_name'] == 1)
+                    @if($data['fields']['name'] == 1)
                     <th>Student Name</th>
                     @endif
                     <!-- <th>Email</th> -->
@@ -153,7 +153,7 @@
                         @if($data['fields']['lastname'] == 1) $item['lastname'] @endif</td>
                     @endif
 
-                    @if($data['fields']['student_name'] == 1)
+                    @if($data['fields']['name'] == 1)
                     <td>{{ $item['student_name'] }}</td>
                     @endif
                     <!-- <td>{{ $item['email'] }}</td> -->
