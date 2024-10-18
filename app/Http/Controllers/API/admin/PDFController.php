@@ -424,7 +424,7 @@ class PDFController extends Controller
                 ['display_name'=>'id', 'associate_name'=>''],
                 ['display_name'=>'firstname', 'associate_name'=>''],
                 ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'student_name', 'associate_name'=>'name'],
+                ['display_name'=>'name', 'associate_name'=>'name'],
                 ['display_name'=>'mobile', 'associate_name'=>'mobile'],
                 ['display_name'=>'address', 'associate_name'=>'']
                 
