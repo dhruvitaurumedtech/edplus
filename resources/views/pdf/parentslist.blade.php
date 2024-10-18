@@ -109,12 +109,15 @@
 
     <h2>Parents List</h2>
     <hr>
-    @if($data['requestdata']['mobile'])
-    <p><b>Mobile: </b>{{$data['parents'][0]['mobile']}}</p>
+    
+
+    @if(!empty($data['parents']) && !empty($data['parents'][0]['mobile']) && !empty($data['requestdata']['mobile']))
+    <p><b>Mobile: </b>{{ $data['parents'][0]['mobile'] }}</p>
     @endif
-    @if($data['requestdata']['address'])
-    <p><b>Address: </b>{{$data['parents'][0]['address']}}</p>
-    @endif
+
+    @if(!empty($data['parents']) && !empty($data['parents'][0]['address']) && !empty($data['requestdata']['address']))
+        <p><b>Address: </b>{{ $data['parents'][0]['address'] }}</p>
+        @endif
 
     <div class="content">
         <table>
