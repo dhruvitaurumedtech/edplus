@@ -498,21 +498,26 @@ class BasetableControllerAPI extends Controller
                 $isAdded = in_array($basedata->id, $institute_base_for_ids);
 
                 $studnt = Student_detail::where('institute_for_id',$basedata->id)
-                ->where('institute_id',$request->institute_id)->exists();
+                ->where('institute_id',$request->institute_id)
+                ->where('status', '!=', '2')->count();
 
-                $teacher = Teacher_model::where('institute_for_id',$basedata->id)
-                ->where('institute_id',$request->institute_id)->exists();
-
+                $teacher = Teacher_model::where(function ($query) use ($basedata, $request) {
+                    $query->where('institute_for_id', $basedata->id)
+                          ->where('institute_id', $request->institute_id);
+                })
+                ->where('status', '!=', '2')
+                ->distinct('teacher_id')
+                ->count();
                 $isexists = false;
                 $errmsg = '';
-                if($studnt && $teacher){
-                    $errmsg = "student and teacher data exists in $basedata->name";
+                if($studnt > 0 && $teacher > 0){
+                    $errmsg = "can not remove becuase $studnt student and $teacher teacher data exists in $basedata->name";
                     $isexists = true;
-                }elseif($studnt){
-                    $errmsg = "student data exists in $basedata->name";
+                }elseif($studnt > 0){
+                    $errmsg = "can not remove becuase $studnt student data exists in $basedata->name";
                     $isexists = true;
-                }elseif($teacher){
-                    $errmsg = "teacher data exists in $basedata->name";
+                }elseif($teacher > 0){
+                    $errmsg = "can not remove becuase $teacher teacher data exists in $basedata->name";
                     $isexists = true;
                 }
 
@@ -552,22 +557,30 @@ class BasetableControllerAPI extends Controller
                 $isAdded = in_array($baseboard->id, $institute_base_board_id);
 
                 $studnt = Student_detail::where('board_id',$baseboard->id)
-                ->where('institute_id',$request->institute_id)->exists();
+                ->where('institute_id',$request->institute_id)
+                ->where('status', '!=', '2')->count();
 
-                $teacher = Teacher_model::where('board_id',$baseboard->id)
-                ->where('institute_id',$request->institute_id)->exists();
+                $teacher = Teacher_model::where(function ($query) use ($baseboard, $request) {
+                    $query->where('board_id', $baseboard->id)
+                          ->where('institute_id', $request->institute_id);
+                })
+                ->where('status', '!=', '2')
+                ->distinct('teacher_id')->count();
 
                 $isexists = false;
                 $errmsg = '';
-                if($studnt && $teacher){
+                if($studnt > 0 && $teacher > 0){
                     $errmsg = "student and teacher data exists in $baseboard->name";
                     $isexists = true;
-                }elseif($studnt){
+                }elseif($studnt > 0){
                     $errmsg = "student data exists in $baseboard->name";
                     $isexists = true;
-                }elseif($teacher){
+                }elseif($teacher > 0){
                     $errmsg = "teacher data exists in $baseboard->name";
                     $isexists = true;
+                }else{
+                    $isexists = false;
+                    $errmsg = '';
                 }
 
                 $data[] = array('id' => $baseboard->id,
@@ -617,22 +630,30 @@ class BasetableControllerAPI extends Controller
                 $isAdded = in_array($basemedium->id, $institute_base_medium_id);
 
                     $mstudnt = Student_detail::where('medium_id',$basemedium->id)
-                    ->where('institute_id',$request->institute_id)->exists();
+                    ->where('institute_id',$request->institute_id)
+                    ->where('status', '!=', '2')->count();
 
-                    $mteacher = Teacher_model::where('medium_id',$basemedium->id)
-                    ->where('institute_id',$request->institute_id)->exists();
+                    $mteacher = Teacher_model::where(function ($query) use ($basemedium, $request) {
+                        $query->where('medium_id', $basemedium->id)
+                              ->where('institute_id', $request->institute_id);
+                    })
+                    ->where('status', '!=', '2')
+                    ->distinct('teacher_id')->count();
 
                     $misexists = false;
                     $merrmsg = '';
-                    if($mstudnt && $mteacher){
-                        $merrmsg = "student and teacher data exists in $basemedium->name";
+                    if($mstudnt > 0 && $mteacher > 0){
+                        $merrmsg = "can not remove because $mstudnt student and $mteacher teacher data exists in $basemedium->name";
                         $misexists = true;
-                    }elseif($mstudnt){
-                        $merrmsg = "student data exists in $basemedium->name";
+                    }elseif($mstudnt > 0){
+                        $merrmsg = "can not remove because $mstudnt student data exists in $basemedium->name";
                         $misexists = true;
-                    }elseif($mteacher){
+                    }elseif($mteacher > 0){
                         $merrmsg = "teacher data exists in $basemedium->name";
                         $misexists = true;
+                    }else{
+                        $misexists = false;
+                        $merrmsg = '';
                     }
 
                 //class
@@ -653,22 +674,32 @@ class BasetableControllerAPI extends Controller
                     $isAdded = in_array($baseclass->id, $intitute_base_class_id);
 
                     $studnt = Student_detail::where('class_id',$baseclass->id)
-                    ->where('institute_id',$request->institute_id)->exists();
+                    ->where('institute_id',$request->institute_id)
+                    ->where('status', '!=', '2')->count();
 
-                    $teacher = Teacher_model::where('class_id',$baseclass->id)
-                    ->where('institute_id',$request->institute_id)->exists();
+                    $teacher = Teacher_model::where(function ($query) use ($baseclass, $request) {
+                        $query->where('class_id', $baseclass->id)
+                              ->where('institute_id', $request->institute_id);
+                    })
+                    ->where('status', '!=', '2')
+                    ->distinct('teacher_id')->count();
+                    
+                    
 
                     $isexists = false;
                     $errmsg = '';
-                    if($studnt && $teacher){
+                    if($studnt > 0 && $teacher > 0){
                         $errmsg = "student and teacher data exists in $baseclass->name";
                         $isexists = true;
-                    }elseif($studnt){
+                    }elseif($studnt > 0){
                         $errmsg = "student data exists in $baseclass->name";
                         $isexists = true;
-                    }elseif($teacher){
+                    }elseif($teacher > 0){
                         $errmsg = "teacher data exists in $baseclass->name";
                         $isexists = true;
+                    }else{
+                        $isexists = false;
+                        $errmsg = '';
                     }
 
                     $class[] = array(
@@ -997,12 +1028,17 @@ class BasetableControllerAPI extends Controller
                         $isAdded = in_array($basesubject->id, $intitute_base_subject_id);
 
                         $studentsub = Student_detail::where('institute_id',$request->institute_id)
+                        ->where('status', '!=', '2')
                         ->pluck('subject_id')
                         ->toArray();
                         $studnt = in_array($basesubject->id, $studentsub);
 
-                        $teacher = Teacher_model::where('subject_id',$basesubject->id)
-                        ->where('institute_id',$request->institute_id)->exists();
+                        $teacher = Teacher_model::where(function ($query) use ($basesubject, $request) {
+                            $query->where('subject_id', $basesubject->id)
+                                  ->where('institute_id', $request->institute_id);
+                        })
+                        ->where('status', '!=', '2')
+                        ->distinct('teacher_id')->count();
 
                         $isexists = false;
                         $errmsg = '';
@@ -1015,6 +1051,9 @@ class BasetableControllerAPI extends Controller
                         }elseif($teacher){
                             $errmsg = "teacher data exists in $basesubject->name";
                             $isexists = true;
+                        }else{
+                            $isexists = false;
+                            $errmsg = '';
                         }
 
                         $subject[] = [
@@ -1059,22 +1098,30 @@ class BasetableControllerAPI extends Controller
                     $isAdded = in_array($base_standard->id, $institute_base_standard_id);
 
                     $sstudnt = Student_detail::where('standard_id',$base_standard->id)
+                    ->where('status', '!=', '2')
                     ->where('institute_id',$request->institute_id)->exists();
-
-                    $steacher = Teacher_model::where('standard_id',$base_standard->id)
-                    ->where('institute_id',$request->institute_id)->exists();
+                    
+                    $steacher = Teacher_model::where(function ($query) use ($base_standard, $request) {
+                        $query->where('standard_id', $base_standard->id)
+                                ->where('institute_id', $request->institute_id);
+                    })
+                    ->where('status', '!=', '2')
+                    ->distinct('teacher_id')->count();
 
                     $sisexists = false;
                     $serrmsg = '';
-                    if($sstudnt && $steacher){
+                    if($sstudnt > 0 && $steacher > 0){
                         $serrmsg = "student and teacher data exists in $base_standard->name";
                         $sisexists = true;
-                    }elseif($sstudnt){
+                    }elseif($sstudnt > 0){
                         $serrmsg = "student data exists in $base_standard->name";
                         $sisexists = true;
-                    }elseif($steacher){
+                    }elseif($steacher > 0){
                         $serrmsg = "teacher data exists in $base_standard->name";
                         $sisexists = true;
+                    }else{
+                        $sisexists = false;
+                        $serrmsg = '';
                     }
 
                     $data[$key]['classes'][$classKey]['std_data'][] = [
