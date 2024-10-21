@@ -996,8 +996,10 @@ class BasetableControllerAPI extends Controller
                     foreach ($base_subject as $basesubject) {
                         $isAdded = in_array($basesubject->id, $intitute_base_subject_id);
 
-                        $studnt = Student_detail::where('subject_id',$basesubject->id)
-                        ->where('institute_id',$request->institute_id)->exists();
+                        $studentsub = Student_detail::where('institute_id',$request->institute_id)
+                        ->pluck('subject_id')
+                        ->toArray();
+                        $studnt = in_array($basesubject->id, $studentsub);
 
                         $teacher = Teacher_model::where('subject_id',$basesubject->id)
                         ->where('institute_id',$request->institute_id)->exists();
@@ -1055,11 +1057,33 @@ class BasetableControllerAPI extends Controller
         
                     // Add standard data along with subjects to the class
                     $isAdded = in_array($base_standard->id, $institute_base_standard_id);
+
+                    $sstudnt = Student_detail::where('standard_id',$base_standard->id)
+                    ->where('institute_id',$request->institute_id)->exists();
+
+                    $steacher = Teacher_model::where('standard_id',$base_standard->id)
+                    ->where('institute_id',$request->institute_id)->exists();
+
+                    $sisexists = false;
+                    $serrmsg = '';
+                    if($sstudnt && $steacher){
+                        $serrmsg = "student and teacher data exists in $base_standard->name";
+                        $sisexists = true;
+                    }elseif($sstudnt){
+                        $serrmsg = "student data exists in $base_standard->name";
+                        $sisexists = true;
+                    }elseif($steacher){
+                        $serrmsg = "teacher data exists in $base_standard->name";
+                        $sisexists = true;
+                    }
+
                     $data[$key]['classes'][$classKey]['std_data'][] = [
                         'id' => $base_standard->id,
                         'standard_name' => $base_standard->name,
                         'is_active' => $base_standard->status,
                         'is_added' => $isAdded,
+                        'is_exists'=>$sisexists,
+                        'err_msg'=>$serrmsg,
                         'subject' => $subject
                     ];
                 }
