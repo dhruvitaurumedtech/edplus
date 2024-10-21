@@ -15,8 +15,10 @@ use App\Models\Medium_sub;
 use App\Models\Standard_model;
 use App\Models\Standard_sub;
 use App\Models\Stream_model;
+use App\Models\Student_detail;
 use App\Models\Subject_model;
 use App\Models\Subject_sub;
+use App\Models\Teacher_model;
 use App\Traits\ApiTrait;
 use Illuminate\Http\Request;
 use Exception;
@@ -299,8 +301,31 @@ class BasetableControllerAPI extends Controller
             $institute_base_for_ids = Institute_for_sub::where('institute_id', $request->institute_id)->pluck('institute_for_id')->toArray();;
             $data = [];
             foreach ($base_institutfor as $basedata) {
+                $studnt = Student_detail::where('institute_for_id',$basedata->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $teacher = Teacher_model::where('institute_for_id',$basedata->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $isexists = 0;
+                $errmsg = '';
+                if($studnt && $teacher){
+                    $errmsg = "student and teacher data exists in $basedata->name";
+                    $isexists = 1;
+                }elseif($studnt){
+                    $errmsg = "student data exists in $basedata->name";
+                    $isexists = 1;
+                }elseif($teacher){
+                    $errmsg = "teacher data exists in $basedata->name";
+                    $isexists = 1;
+                }
+
                 $isAdded = in_array($basedata->id, $institute_base_for_ids);
-                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 'icon' => url($basedata->icon), 'is_added' => $isAdded);
+                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 
+                'icon' => url($basedata->icon),
+                'is_added' => $isAdded,
+                'is_exists'=>$isexists,
+                'err_msg'=>$errmsg);
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
