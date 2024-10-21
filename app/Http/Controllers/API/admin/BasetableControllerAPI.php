@@ -307,17 +307,17 @@ class BasetableControllerAPI extends Controller
                 $teacher = Teacher_model::where('institute_for_id',$basedata->id)
                 ->where('institute_id',$request->institute_id)->exists();
 
-                $isexists = 0;
+                $isexists = false;
                 $errmsg = '';
                 if($studnt && $teacher){
                     $errmsg = "student and teacher data exists in $basedata->name";
-                    $isexists = 1;
+                    $isexists = true;
                 }elseif($studnt){
                     $errmsg = "student data exists in $basedata->name";
-                    $isexists = 1;
+                    $isexists = true;
                 }elseif($teacher){
                     $errmsg = "teacher data exists in $basedata->name";
-                    $isexists = 1;
+                    $isexists = true;
                 }
 
                 $isAdded = in_array($basedata->id, $institute_base_for_ids);
