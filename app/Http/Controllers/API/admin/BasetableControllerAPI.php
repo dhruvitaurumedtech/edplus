@@ -1042,13 +1042,13 @@ class BasetableControllerAPI extends Controller
 
                         $isexists = false;
                         $errmsg = '';
-                        if($studnt && $teacher){
+                        if($studnt > 0 && $teacher > 0){
                             $errmsg = "student and teacher data exists in $basesubject->name";
                             $isexists = true;
-                        }elseif($studnt){
+                        }elseif($studnt > 0){
                             $errmsg = "student data exists in $basesubject->name";
                             $isexists = true;
-                        }elseif($teacher){
+                        }elseif($teacher > 0){
                             $errmsg = "teacher data exists in $basesubject->name";
                             $isexists = true;
                         }else{
