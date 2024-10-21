@@ -992,8 +992,18 @@ class InstituteApiController extends Controller
             $sub_instboard_exists = Subject_sub::where('institute_id', $institute->id)->where('subject_id', $institute_subject_id)->first(); 
             
             if ($sub_instboard_exists) {
-                $student_check = Student_detail::where('subject_id', $institute_subject_id)
-                ->where('institute_id', $institute->id)->whereNull('deleted_at')->first();
+                // $student_check = Student_detail::where('subject_id', $institute_subject_id)
+                // ->where('institute_id', $institute->id)->whereNull('deleted_at')->first();
+
+                $subjectIds = Student_detail::where('institute_id', $institute->id)
+                ->where(function($query) {
+                    $query->whereNull('deleted_at')
+                          ->orWhere('status','!=', 2);
+                })
+                ->pluck('subject_id')
+                ->toArray(); 
+
+                $subdt = in_array($institute_subject_id,$subjectIds);
 
                 $teacher_check = Teacher_model::where('subject_id', $institute_subject_id)
                 ->where('institute_id', $institute->id)
@@ -1001,15 +1011,43 @@ class InstituteApiController extends Controller
                     $query->whereNull('deleted_at')
                           ->orWhere('status','!=', 2);
                 })->first();
-                if (!empty($student_check) || !empty($teacher_check)) {
+                if ($subdt || !empty($teacher_check)) {
                     return $this->response([], "Cannot remove institute_subject. Already exist student and teacher for this institute_subject.", false, 400);
                 } else {
                     $teacher_check = Teacher_model::where('subject_id', $institute_subject_id)
                     ->where('institute_id', $institute->id)
                     ->where(function($query) {
-                        $query->whereNull('deleted_at')
+                        $query->whereNotNull('deleted_at')
                               ->orWhere('status', 2);
                     })->forceDelete();
+
+                    $studts = Student_detail::where('institute_id', $institute->id)
+                    ->where(function($query) {
+                        $query->whereNotNull('deleted_at')
+                              ->orWhere('status', 2);
+                    })->get();
+                    foreach($studts as $studt){
+                        $subids = explode(",",$studt['subject_id']);
+                        $subdt = in_array($institute_subject_id,$subids);
+                        if(count($subids) > 1){
+                            $key = array_search($institute_subject_id, $subids);
+                            if($key !== false) {
+                                unset($subids[$key]);  // Remove the value at the found index
+                            }
+                            $subids = array_values($subids);
+                            Student_detail::where('institute_id', $institute->id)->update([
+                                'subject_id'=>implode(",", $subids)
+                            ]);
+                        }else{
+                            Student_detail::where('institute_id', $institute->id)
+                            ->where(function($query) {
+                                $query->whereNotNull('deleted_at')
+                                      ->orWhere('status', 2);
+                            })->where('id',$studt->id)->forceDelete();
+                        }
+
+                    }
+                    
 
                     $delete_sub = Subject_sub::where('subject_id', $institute_subject_id)->where('institute_id', $institute->id)->delete(); 
                 } 
