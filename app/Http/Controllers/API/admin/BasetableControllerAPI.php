@@ -989,6 +989,10 @@ class BasetableControllerAPI extends Controller
                     ->get();
         
                 $institute_base_standard_id = Standard_sub::where('institute_id', $request->institute_id)
+                    ->where('institute_for_id', $datas['institute_for_id'])
+                    ->where('board_id', $datas['board_id'])
+                    ->where('medium_id', $datas['medium_id'])
+                    ->where('class_id', $datas['class_id'])  
                     ->pluck('standard_id')->toArray();
         
                 foreach ($base_standards as $base_standard) {
@@ -1083,7 +1087,7 @@ class BasetableControllerAPI extends Controller
                     }
         
                     // Add standard data along with subjects to the class
-                    $isAdded = in_array($base_standard->id, $institute_base_standard_id);
+                    $sisAdded = in_array($base_standard->id, $institute_base_standard_id);
 
                     $sstudnt = Student_detail::where('standard_id',$base_standard->id)
                     ->where('status', '!=', '2')
@@ -1116,7 +1120,7 @@ class BasetableControllerAPI extends Controller
                         'id' => $base_standard->id,
                         'standard_name' => $base_standard->name,
                         'is_active' => $base_standard->status,
-                        'is_added' => $isAdded,
+                        'is_added' => $sisAdded,
                         'is_exists'=>$sisexists,
                         'err_msg'=>$serrmsg,
                         'subject' => $subject
