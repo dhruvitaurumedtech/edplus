@@ -675,12 +675,16 @@ class BasetableControllerAPI extends Controller
 
                     $studnt = Student_detail::where('class_id',$baseclass->id)
                     ->where('institute_id',$request->institute_id)
+                    ->where('board_id', $basemedium->board)
+                    ->where('medium_id', $basemedium->id)
                     ->where('status', '!=', '2')->count();
 
                     $teacher = Teacher_model::where(function ($query) use ($baseclass, $request) {
                         $query->where('class_id', $baseclass->id)
                               ->where('institute_id', $request->institute_id);
                     })
+                    ->where('board_id', $basemedium->board)
+                    ->where('medium_id', $basemedium->id)
                     ->where('status', '!=', '2')
                     ->distinct('teacher_id')->count();
                     
