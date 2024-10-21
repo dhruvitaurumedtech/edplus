@@ -1012,8 +1012,11 @@ class BasetableControllerAPI extends Controller
                         ->where('status', '!=', '2')
                         ->pluck('subject_id')
                         ->toArray();
-                        $studnt = in_array($basesubject->id, $studentsub);
-
+                        $individualSubjects = [];
+                        foreach ($studentsub as $subject_ids) {
+                            $individualSubjects = array_merge($individualSubjects, explode(",", $subject_ids));
+                        }
+                        $studnt = in_array($basesubject->id, $individualSubjects);
                         $teacher = Teacher_model::where(function ($query) use ($basesubject, $request) {
                             $query->where('subject_id', $basesubject->id)
                                   ->where('institute_id', $request->institute_id);
@@ -1036,7 +1039,7 @@ class BasetableControllerAPI extends Controller
                             $isexists = false;
                             $errmsg = '';
                         }
-
+                       
                         $subject[] = [
                             'id' => $basesubject->id,
                             'name' => $basesubject->name,
@@ -1047,7 +1050,7 @@ class BasetableControllerAPI extends Controller
                             'err_msg'=>$errmsg
                         ];
                     }
-        
+                    
                     // Key to group by institute_for_id, board_id, and medium_id
                     $key = $base_standard->institute_for . '_' . $base_standard->board . '_' . $base_standard->medium;
         
