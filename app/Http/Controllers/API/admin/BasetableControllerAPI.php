@@ -349,7 +349,30 @@ class BasetableControllerAPI extends Controller
             $institute_base_board_id = Institute_board_sub::where('institute_id', $request->institute_id)->pluck('board_id')->toArray();
             foreach ($base_board as $baseboard) {
                 $isAdded = in_array($baseboard->id, $institute_base_board_id);
-                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name, 'icon' => url($baseboard->icon), 'is_added' => $isAdded);
+
+                $studnt = Student_detail::where('board_id',$baseboard->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $teacher = Teacher_model::where('board_id',$baseboard->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $isexists = false;
+                $errmsg = '';
+                if($studnt && $teacher){
+                    $errmsg = "student and teacher data exists in $baseboard->name";
+                    $isexists = true;
+                }elseif($studnt){
+                    $errmsg = "student data exists in $baseboard->name";
+                    $isexists = true;
+                }elseif($teacher){
+                    $errmsg = "teacher data exists in $baseboard->name";
+                    $isexists = true;
+                }
+
+                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name,
+                'icon' => url($baseboard->icon), 'is_added' => $isAdded,
+                'is_exists'=>$isexists,
+                'err_msg'=>$errmsg);
             }
             return $this->response($data, "Fetch Data Successfully");
         } catch (Exception $e) {
