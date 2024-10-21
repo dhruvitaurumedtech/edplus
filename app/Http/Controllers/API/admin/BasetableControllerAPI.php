@@ -496,8 +496,30 @@ class BasetableControllerAPI extends Controller
                 }
 
                 $isAdded = in_array($basedata->id, $institute_base_for_ids);
-                $data[] = array('id' => $basedata->id, 'name' => $basedata->name, 
+
+                $studnt = Student_detail::where('institute_for_id',$basedata->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $teacher = Teacher_model::where('institute_for_id',$basedata->id)
+                ->where('institute_id',$request->institute_id)->exists();
+
+                $isexists = false;
+                $errmsg = '';
+                if($studnt && $teacher){
+                    $errmsg = "student and teacher data exists in $basedata->name";
+                    $isexists = true;
+                }elseif($studnt){
+                    $errmsg = "student data exists in $basedata->name";
+                    $isexists = true;
+                }elseif($teacher){
+                    $errmsg = "teacher data exists in $basedata->name";
+                    $isexists = true;
+                }
+
+                $data[] = array('id' => $basedata->id,
+                'name' => $basedata->name,
                 'icon' => url($basedata->icon),
+                'is_active' => $basedata->status,
                 'is_added' => $isAdded,
                 'is_exists'=>$isexists,
                 'err_msg'=>$errmsg);
@@ -548,8 +570,12 @@ class BasetableControllerAPI extends Controller
                     $isexists = true;
                 }
 
-                $data[] = array('id' => $baseboard->id, 'name' => $baseboard->name,
-                'icon' => url($baseboard->icon), 'is_added' => $isAdded,
+                $data[] = array('id' => $baseboard->id,
+                'name' => $baseboard->name,
+                'icon' => url($baseboard->icon),
+                'institute_for_id' => $baseboard->institute_for,
+                'is_active' => $baseboard->status,
+                'is_added' => $isAdded,
                 'is_exists'=>$isexists,
                 'err_msg'=>$errmsg);
             }
@@ -590,9 +616,26 @@ class BasetableControllerAPI extends Controller
             foreach ($base_medium as $basemedium) {
                 $isAdded = in_array($basemedium->id, $institute_base_medium_id);
 
-                //class
-                
+                    $mstudnt = Student_detail::where('medium_id',$basemedium->id)
+                    ->where('institute_id',$request->institute_id)->exists();
 
+                    $mteacher = Teacher_model::where('medium_id',$basemedium->id)
+                    ->where('institute_id',$request->institute_id)->exists();
+
+                    $misexists = false;
+                    $merrmsg = '';
+                    if($mstudnt && $mteacher){
+                        $merrmsg = "student and teacher data exists in $basemedium->name";
+                        $misexists = true;
+                    }elseif($mstudnt){
+                        $merrmsg = "student data exists in $basemedium->name";
+                        $misexists = true;
+                    }elseif($mteacher){
+                        $merrmsg = "teacher data exists in $basemedium->name";
+                        $misexists = true;
+                    }
+
+                //class
                 $base_class = Class_model::join('base_table','base_table.institute_for_class','=','class.id')
                 ->where('base_table.institute_for', $basemedium->institute_for)
                 ->where('base_table.board', $basemedium->board)
@@ -608,12 +651,34 @@ class BasetableControllerAPI extends Controller
                 $class = [];
                 foreach ($base_class as $baseclass) {
                     $isAdded = in_array($baseclass->id, $intitute_base_class_id);
+
+                    $studnt = Student_detail::where('class_id',$baseclass->id)
+                    ->where('institute_id',$request->institute_id)->exists();
+
+                    $teacher = Teacher_model::where('class_id',$baseclass->id)
+                    ->where('institute_id',$request->institute_id)->exists();
+
+                    $isexists = false;
+                    $errmsg = '';
+                    if($studnt && $teacher){
+                        $errmsg = "student and teacher data exists in $baseclass->name";
+                        $isexists = true;
+                    }elseif($studnt){
+                        $errmsg = "student data exists in $baseclass->name";
+                        $isexists = true;
+                    }elseif($teacher){
+                        $errmsg = "teacher data exists in $baseclass->name";
+                        $isexists = true;
+                    }
+
                     $class[] = array(
                         'id' => $baseclass->id,
                         'name' => $baseclass->name,
                         'icon' => url($baseclass->icon),
                         'is_active'=>$baseclass->status,
-                        'is_added' => $isAdded
+                        'is_added' => $isAdded,
+                        'is_exists'=>$isexists,
+                        'err_msg'=>$errmsg
                     );
                 }
 
@@ -627,6 +692,8 @@ class BasetableControllerAPI extends Controller
                     'icon' => url($basemedium->icon),
                     'is_active' => $basemedium->status,
                     'is_added' => $isAdded,
+                    'is_exists'=>$misexists,
+                    'err_msg'=>$merrmsg,
                     'class'=>$class
                 );
             }
@@ -928,12 +995,34 @@ class BasetableControllerAPI extends Controller
                     $subject = [];
                     foreach ($base_subject as $basesubject) {
                         $isAdded = in_array($basesubject->id, $intitute_base_subject_id);
+
+                        $studnt = Student_detail::where('subject_id',$basesubject->id)
+                        ->where('institute_id',$request->institute_id)->exists();
+
+                        $teacher = Teacher_model::where('subject_id',$basesubject->id)
+                        ->where('institute_id',$request->institute_id)->exists();
+
+                        $isexists = false;
+                        $errmsg = '';
+                        if($studnt && $teacher){
+                            $errmsg = "student and teacher data exists in $basesubject->name";
+                            $isexists = true;
+                        }elseif($studnt){
+                            $errmsg = "student data exists in $basesubject->name";
+                            $isexists = true;
+                        }elseif($teacher){
+                            $errmsg = "teacher data exists in $basesubject->name";
+                            $isexists = true;
+                        }
+
                         $subject[] = [
                             'id' => $basesubject->id,
                             'name' => $basesubject->name,
                             'image' => !empty($basesubject->image) ? asset($basesubject->image) : '',
                             'is_active' => $basesubject->status,
-                            'is_added' => $isAdded
+                            'is_added' => $isAdded,
+                            'is_exists'=>$isexists,
+                            'err_msg'=>$errmsg
                         ];
                     }
         
