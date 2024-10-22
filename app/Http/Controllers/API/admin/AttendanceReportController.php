@@ -76,8 +76,9 @@ class AttendanceReportController extends Controller
             })
             ->get()->toArray();
             // print_r($attendance);exit;
-
-            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $attendance]);
+            $fields = json_decode($request['fields'], true);
+            $data = ['attendance'=>$attendance,'requestdata'=>$request,'fields'=>$fields];
+            $pdf = PDF::loadView('pdf.attendance_report', ['data' => $data]);
 
             $folderPath = public_path('pdfs');
 

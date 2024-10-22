@@ -83,7 +83,7 @@
         <tbody>
                 @php $i = 1; @endphp
                 @if(!empty($data))
-                    @foreach ($data as $item)
+                    @foreach ($data['attendance'] as $item)
                         <tr>
                             <td>{{ $i }}</td>
                             <td>{{ $item['id'] }}</td>
