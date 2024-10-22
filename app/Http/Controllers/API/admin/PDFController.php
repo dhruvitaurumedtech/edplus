@@ -896,15 +896,15 @@ class PDFController extends Controller
         }
         if($request['report_id']==1){
                 $response = [
-                    ['display_name'=>'id', 'associate_name'=>''],
-                    ['display_name'=>'firstname', 'associate_name'=>''],
-                    ['display_name'=>'lastname', 'associate_name'=>''],
-                    ['display_name'=>'email', 'associate_name'=>''],
-                    ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                    ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                    ['display_name'=>'class_name', 'associate_name'=>'class_id'],
-                    ['display_name'=>'medium_name', 'associate_name'=>'medium_id'],
-                    ['display_name'=>'standard_name', 'associate_name'=>'standard_id']
+                    ['display_name'=>'Student id', 'associate_name'=>''],
+                    ['display_name'=>'First Name', 'associate_name'=>''],
+                    ['display_name'=>'Last Name', 'associate_name'=>''],
+                    ['display_name'=>'E-mail', 'associate_name'=>''],
+                    ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                    ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                    ['display_name'=>'Class', 'associate_name'=>'class_id'],
+                    ['display_name'=>'Medium', 'associate_name'=>'medium_id'],
+                    ['display_name'=>'Standard', 'associate_name'=>'standard_id']
                 ]
                 ;
             return $this->response($response, 'Successfully fetch Studentlist Fields.');
@@ -912,185 +912,185 @@ class PDFController extends Controller
         if($request['report_id']==2){
             $response = [
                     ['display_name'=>'id', 'associate_name'=>''],
-                    ['display_name'=>'firstname', 'associate_name'=>''],
-                    ['display_name'=>'lastname', 'associate_name'=>''],
-                    ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                    ['display_name'=>'medium_name', 'associate_name'=>'medium_id'],
-                    ['display_name'=>'standard_name', 'associate_name'=>'standard_id']
+                    ['display_name'=>'First Name', 'associate_name'=>''],
+                    ['display_name'=>'Last Name', 'associate_name'=>''],
+                    ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                    ['display_name'=>'Medium', 'associate_name'=>'medium_id'],
+                    ['display_name'=>'Standard', 'associate_name'=>'standard_id']
             ];
         return $this->response($response, 'Successfully fetch Teacherlist Fields.');
          }
          if($request['report_id']==3){
             $response = [
                 ['display_name'=>'id', 'associate_name'=>''],
-                ['display_name'=>'firstname', 'associate_name'=>''],
-                ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'name', 'associate_name'=>'name'],
-                ['display_name'=>'mobile', 'associate_name'=>'mobile'],
-                ['display_name'=>'address', 'associate_name'=>'']
+                ['display_name'=>'First Name', 'associate_name'=>''],
+                ['display_name'=>'Last Name', 'associate_name'=>''],
+                ['display_name'=>'Name', 'associate_name'=>'name'],
+                ['display_name'=>'Mobile', 'associate_name'=>'mobile'],
+                ['display_name'=>'Address', 'associate_name'=>'']
                 
             ];
         return $this->response($response, 'Successfully fetch Parentlist Fields.');
          }
          if($request['report_id']==4){
             $response = [
-                ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                ['display_name'=>'medium_name', 'associate_name'=>'medium_id'],
-                ['display_name'=>'class_name', 'associate_name'=>'class_id'],
-                ['display_name'=>'standard_name', 'associate_name'=>'standard_id'],
-                ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                ['display_name'=>'subject_name', 'associate_name'=>'subject_id'],
-                ['display_name'=>'start_date', 'associate_name'=>'start_date'],
-                ['display_name'=>'end_date', 'associate_name'=>'end_date'],
-                ['display_name'=>'student_name', 'associate_name'=>''],
-                ['display_name'=>'present_count', 'associate_name'=>''],
-                ['display_name'=>'absent_count', 'associate_name'=>'']
+                ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                ['display_name'=>'Medium', 'associate_name'=>'medium_id'],
+                ['display_name'=>'Class', 'associate_name'=>'class_id'],
+                ['display_name'=>'Standard', 'associate_name'=>'standard_id'],
+                ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                ['display_name'=>'Subject', 'associate_name'=>'subject_id'],
+                ['display_name'=>'Start Date', 'associate_name'=>'start_date'],
+                ['display_name'=>'End Date', 'associate_name'=>'end_date'],
+                ['display_name'=>'Student Name', 'associate_name'=>''],
+                ['display_name'=>'Present Count', 'associate_name'=>''],
+                ['display_name'=>'Absent Count', 'associate_name'=>'']
             ];
         return $this->response($response, 'Successfully fetch Attendancelist Fields.');
          }
          if($request['report_id']==5){
             $response = [
-                ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                ['display_name'=>'medium_name', 'associate_name'=>'medium_id'],
-                ['display_name'=>'class_name', 'associate_name'=>'class_id'],
-                ['display_name'=>'standard_name', 'associate_name'=>'standard_id'],
-                ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                ['display_name'=>'subject_name', 'associate_name'=>'subject_id'],
-                ['display_name'=>'exam_date', 'associate_name'=>'exam_date'],
-                ['display_name'=>'exam', 'associate_name'=>'exam_name'],
-                ['display_name'=>'student_name', 'associate_name'=>'student_id'],
-                ['display_name'=>'subject', 'associate_name'=>''],
-                ['display_name'=>'total_marks', 'associate_name'=>''],
-                ['display_name'=>'mark', 'associate_name'=>'']
+                ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                ['display_name'=>'Medium', 'associate_name'=>'medium_id'],
+                ['display_name'=>'Class', 'associate_name'=>'class_id'],
+                ['display_name'=>'Standard', 'associate_name'=>'standard_id'],
+                ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                ['display_name'=>'Subject', 'associate_name'=>'subject_id'],
+                ['display_name'=>'Exam Date', 'associate_name'=>'exam_date'],
+                ['display_name'=>'Exam', 'associate_name'=>'exam_name'],
+                ['display_name'=>'Student Name', 'associate_name'=>'student_id'],
+                //['display_name'=>'subject', 'associate_name'=>''],
+                ['display_name'=>'Total Marks', 'associate_name'=>''],
+                ['display_name'=>'Mark', 'associate_name'=>'']
 
          ];
          return $this->response($response, 'Successfully fetch Resultreportlist Fields.');
         }
          if($request['report_id']==6){
             $response = [
-                ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                ['display_name'=>'medium_name', 'associate_name'=>'medium_id'],
-                ['display_name'=>'class_name', 'associate_name'=>'class_id'],
-                ['display_name'=>'standard_name', 'associate_name'=>'standard_id'],
-                ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                ['display_name'=>'student_name', 'associate_name'=>'student_id'],
-                ['display_name'=>'student_fees', 'associate_name'=>''],
-                ['display_name'=>'remaining_fees', 'associate_name'=>''],
-                ['display_name'=>'paid_fees', 'associate_name'=>''],
-                ['display_name'=>'status', 'associate_name'=>'status'],
-                ['display_name'=>'history', 'associate_name'=>''],
+                ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                ['display_name'=>'Medium', 'associate_name'=>'medium_id'],
+                ['display_name'=>'Class', 'associate_name'=>'class_id'],
+                ['display_name'=>'Standard', 'associate_name'=>'standard_id'],
+                ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                ['display_name'=>'Student Name', 'associate_name'=>'student_id'],
+                ['display_name'=>'Student Fees', 'associate_name'=>''],
+                ['display_name'=>'Remaining Fees', 'associate_name'=>''],
+                ['display_name'=>'Paid Fees', 'associate_name'=>''],
+                ['display_name'=>'Status', 'associate_name'=>'status'],
+                ['display_name'=>'History', 'associate_name'=>''],
 
             ];
              return $this->response($response, 'Successfully fetch Fees Report Fields.');
          }
          if($request['report_id']==7){
             $response = [
-                ['display_name'=>'board_name', 'associate_name'=>''],
-                ['display_name'=>'medium_name', 'associate_name'=>''],
-                ['display_name'=>'standard_name', 'associate_name'=>''],
-                ['display_name'=>'subject_name', 'associate_name'=>''],
-                ['display_name'=>'topic_name', 'associate_name'=>''],
-                ['display_name'=>'description', 'associate_name'=>''],
-                ['display_name'=>'chapter_no', 'associate_name'=>''],
-                ['display_name'=>'chapter_name', 'associate_name'=>'']
+                ['display_name'=>'Board', 'associate_name'=>''],
+                ['display_name'=>'Medium', 'associate_name'=>''],
+                ['display_name'=>'Standard', 'associate_name'=>''],
+                ['display_name'=>'Subject', 'associate_name'=>''],
+                ['display_name'=>'Topic', 'associate_name'=>''],
+                ['display_name'=>'Description', 'associate_name'=>''],
+                ['display_name'=>'Chapter.No', 'associate_name'=>''],
+                ['display_name'=>'Chapter Name', 'associate_name'=>'']
 
             ];
              return $this->response($response, 'Successfully fetch Contentlist Fields.');
          }
          if($request['report_id']==8){
             $response = [
-                ['display_name'=>'standard_name', 'associate_name'=>'standard_id'],
-                ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                ['display_name'=>'firstname', 'associate_name'=>''],
-                ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'day', 'associate_name'=>''],
-                ['display_name'=>'subject_name', 'associate_name'=>''],
-                ['display_name'=>'lecture_type', 'associate_name'=>''],
-                ['display_name'=>'class_name', 'associate_name'=>'']
+                ['display_name'=>'Standard', 'associate_name'=>'standard_id'],
+                ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                ['display_name'=>'First Name', 'associate_name'=>''],
+                ['display_name'=>'Last Name', 'associate_name'=>''],
+                ['display_name'=>'Day', 'associate_name'=>''],
+                ['display_name'=>'Subject', 'associate_name'=>''],
+                ['display_name'=>'Lecture Type', 'associate_name'=>''],
+                ['display_name'=>'Class', 'associate_name'=>'']
 
             ];
              return $this->response($response, 'Successfully fetch Timetablelist Fields.');
          }
          if($request['report_id']==9){
             $response = [
-                ['display_name'=>'item_name', 'associate_name'=>'item_name'],
-                ['display_name'=>'no_of_item', 'associate_name'=>'']
+                ['display_name'=>'Item Name', 'associate_name'=>'item_name'],
+                ['display_name'=>'No Of Qty', 'associate_name'=>'']
             ];
              return $this->response($response, 'Successfully fetch Deadstock Fields.');
          }
          if($request['report_id']==10){
             $response = [
-                ['display_name'=>'institute_name', 'associate_name'=>''],
-                ['display_name'=>'firstname', 'associate_name'=>''],
-                ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'rolename', 'associate_name'=>''],
-                ['display_name'=>'mobile', 'associate_name'=>'']
+                ['display_name'=>'Institute Name', 'associate_name'=>''],
+                ['display_name'=>'First Name', 'associate_name'=>''],
+                ['display_name'=>'Last Name', 'associate_name'=>''],
+                ['display_name'=>'Role', 'associate_name'=>''],
+                ['display_name'=>'Mobile', 'associate_name'=>'']
             ];
              return $this->response($response, 'Successfully fetch Stafflist Fields.');
          }
          if($request['report_id']==11){
             $response = [
-                ['display_name'=>'board_name', 'associate_name'=>''],
-                ['display_name'=>'medium_name', 'associate_name'=>''],
-                ['display_name'=>'standard_name', 'associate_name'=>''],
-                ['display_name'=>'subject_name', 'associate_name'=>''],
-                ['display_name'=>'topic_name', 'associate_name'=>''],
-                ['display_name'=>'topic_description', 'associate_name'=>''],
-                ['display_name'=>'chapter_no', 'associate_name'=>''],
-                ['display_name'=>'chapter_name', 'associate_name'=>'']
+                ['display_name'=>'Board', 'associate_name'=>''],
+                ['display_name'=>'Medium', 'associate_name'=>''],
+                ['display_name'=>'Standard', 'associate_name'=>''],
+                ['display_name'=>'Subject', 'associate_name'=>''],
+                ['display_name'=>'Topic', 'associate_name'=>''],
+                ['display_name'=>'Description', 'associate_name'=>''],
+                ['display_name'=>'Chapter.No', 'associate_name'=>''],
+                ['display_name'=>'Chapter Name', 'associate_name'=>'']
 
             ];
              return $this->response($response, 'Successfully fetch RolePermission  Fields.');
          }
          if($request['report_id']==12){
             $response = [
-                ['display_name'=>'profile_image', 'associate_name'=>''],
-                ['display_name'=>'firstname', 'associate_name'=>''],
-                ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'email', 'associate_name'=>''],
-                ['display_name'=>'mobile', 'associate_name'=>''],
-                ['display_name'=>'dob', 'associate_name'=>''],
-                ['display_name'=>'address', 'associate_name'=>''],
-                ['display_name'=>'country', 'associate_name'=>''],
-                ['display_name'=>'state', 'associate_name'=>''],
-                ['display_name'=>'city', 'associate_name'=>''],
-                ['display_name'=>'pincode', 'associate_name'=>''],
-                ['display_name'=>'aboutus', 'associate_name'=>''],
-                ['display_name'=>'education', 'associate_name'=>''],
-                ['display_name'=>'experience', 'associate_name'=>''],
-                ['display_name'=>'emergency_contact', 'associate_name'=>'']
+                ['display_name'=>'Profile Image', 'associate_name'=>''],
+                ['display_name'=>'First Name', 'associate_name'=>''],
+                ['display_name'=>'Last Name', 'associate_name'=>''],
+                ['display_name'=>'Email', 'associate_name'=>''],
+                ['display_name'=>'Mobile', 'associate_name'=>''],
+                ['display_name'=>'DOB', 'associate_name'=>''],
+                ['display_name'=>'Address', 'associate_name'=>''],
+                ['display_name'=>'Country', 'associate_name'=>''],
+                ['display_name'=>'State', 'associate_name'=>''],
+                ['display_name'=>'City', 'associate_name'=>''],
+                ['display_name'=>'Pincode', 'associate_name'=>''],
+                ['display_name'=>'About Us', 'associate_name'=>''],
+                ['display_name'=>'Education', 'associate_name'=>''],
+                ['display_name'=>'Experience', 'associate_name'=>''],
+                ['display_name'=>'Emergency Contact', 'associate_name'=>'']
                 
             ];
              return $this->response($response, 'Successfully fetch TeacherProfile Fields.');
          }
          if($request['report_id']==13){
             $response = [
-                ['display_name'=>'firstname', 'associate_name'=>''],
-                ['display_name'=>'lastname', 'associate_name'=>''],
-                ['display_name'=>'email', 'associate_name'=>''],
-                ['display_name'=>'address', 'associate_name'=>''],
-                ['display_name'=>'mobile', 'associate_name'=>''],
-                ['display_name'=>'institute_for_list', 'associate_name'=>''],
-                ['display_name'=>'board_list', 'associate_name'=>''],
-                ['display_name'=>'medium_list', 'associate_name'=>''],
-                ['display_name'=>'class_list', 'associate_name'=>''],
-                ['display_name'=>'standard_list', 'associate_name'=>''],
-                ['display_name'=>'subject_list', 'associate_name'=>'']
+                ['display_name'=>'First Name', 'associate_name'=>''],
+                ['display_name'=>'Last Name', 'associate_name'=>''],
+                ['display_name'=>'Email', 'associate_name'=>''],
+                ['display_name'=>'Address', 'associate_name'=>''],
+                ['display_name'=>'Mobile', 'associate_name'=>''],
+                ['display_name'=>'Institute For', 'associate_name'=>''],
+                ['display_name'=>'Boards', 'associate_name'=>''],
+                ['display_name'=>'Medium', 'associate_name'=>''],
+                ['display_name'=>'Classes', 'associate_name'=>''],
+                ['display_name'=>'Standards', 'associate_name'=>''],
+                ['display_name'=>'Subjects', 'associate_name'=>'']
                 
             ];
              return $this->response($response, 'Successfully fetch Institute Registerted Fields.');
          }
          if($request['report_id']==14){
             $response = [
-                ['display_name'=>'institute_name', 'associate_name'=>''],
-                ['display_name'=>'address', 'associate_name'=>''],
-                ['display_name'=>'student_name', 'associate_name'=>'student_id'],
-                ['display_name'=>'board_name', 'associate_name'=>'board_id'],
-                ['display_name'=>'standard_name', 'associate_name'=>'standard_id'],
-                ['display_name'=>'batch_name', 'associate_name'=>'batch_id'],
-                ['display_name'=>'subject_name', 'associate_name'=>'subject_id'],
-                ['display_name'=>'student_attendance', 'associate_name'=>''],
-                ['display_name'=>'student_fees', 'associate_name'=>'']
+                ['display_name'=>'Institute Name', 'associate_name'=>''],
+                ['display_name'=>'Address', 'associate_name'=>''],
+                ['display_name'=>'Student Name', 'associate_name'=>'student_id'],
+                ['display_name'=>'Board', 'associate_name'=>'board_id'],
+                ['display_name'=>'Standard', 'associate_name'=>'standard_id'],
+                ['display_name'=>'Batch', 'associate_name'=>'batch_id'],
+                ['display_name'=>'Subject', 'associate_name'=>'subject_id'],
+                ['display_name'=>'Student Attendance', 'associate_name'=>''],
+                ['display_name'=>'Student Fees', 'associate_name'=>'']
 
             ];
              return $this->response($response, 'Successfully fetch Student Progress Fields.');
