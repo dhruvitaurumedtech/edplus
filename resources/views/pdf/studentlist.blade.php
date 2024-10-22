@@ -167,23 +167,23 @@
                     @if($data['fields']['email'] == 1)
                     <td>{{ $item['email'] }}</td>
                     @endif
-                    @if(empty($data['requestdata']['board_id']) || $data['fields']['board_name'] == 1)
+                    @if($data['fields']['board_name'] == 1) 
                     <td> {{ $item['board_name'] }}</td>
                     @endif
 
-                    @if(empty($data['requestdata']['batch_id']) || $data['fields']['batch_name'] == 1)
+                    @if($data['fields']['batch_name'] == 1)
                     <td> {{ $item['batch_name'] }}</td>
                     @endif
 
-                    @if(empty($data['requestdata']['class_id']) || $data['fields']['class_name'] == 1)
+                    @if($data['fields']['class_name'] == 1)
                     <td> {{ $item['class_name'] }}</td>
                     @endif
 
-                    @if(empty($data['requestdata']['medium_id']) || $data['fields']['medium_name'] == 1)
+                    @if($data['fields']['medium_name'] == 1)
                     <td> {{ $item['medium_name'] }}</td>
                     @endif
 
-                    @if(empty($data['requestdata']['standard_id']) || $data['fields']['standard_name'] == 1)
+                    @if($data['fields']['standard_name'] == 1)
                     <td> {{ $item['standard_name'] }}</td>
                     @endif
                 </tr>
