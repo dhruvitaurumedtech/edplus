@@ -126,28 +126,28 @@
             <thead>
                 <tr>
                     <th>No</th>
-                    @if($data['fields']['id'] == 1)
+                    @if($data['fields']['Student id'] == 1)
                     <th>Stud_ID</th>
                     @endif
-                    @if($data['fields']['firstname'] == 1 || $data['fields']['lastname'] == 1)
+                    @if($data['fields']['First Name'] == 1 || $data['fields']['Last Name'] == 1)
                     <th>Full Name</th>
                     @endif
-                    @if($data['fields']['email'] == 1)
+                    @if($data['fields']['E-mail'] == 1)
                     <th>Email</th>
                     @endif
-                    @if($data['fields']['board_name'] == 1)
+                    @if($data['fields']['Board'] == 1)
                     <th>Board</th>
                     @endif
-                    @if($data['fields']['batch_name'] == 1)
+                    @if($data['fields']['Batch'] == 1)
                     <th>Batch</th>
                     @endif
-                    @if($data['fields']['class_name'] == 1)
+                    @if($data['fields']['Class'] == 1)
                     <th>Class</th>
                     @endif
-                    @if($data['fields']['medium_name'] == 1)
+                    @if($data['fields']['Medium'] == 1)
                     <th>Medium</th>
                     @endif
-                    @if($data['fields']['standard_name'] == 1)
+                    @if($data['fields']['Standard'] == 1)
                     <th>Standard</th>
                     @endif
                 </tr>
@@ -157,33 +157,33 @@
                 @foreach ($data['studentdata'] as $item)
                 <tr>
                     <td>{{ $i }}</td>
-                    @if($data['fields']['id'] == 1)
+                    @if($data['fields']['Student id'] == 1)
                     <td>{{ $item['id'] }}</td>
                     @endif
-                    @if($data['fields']['firstname'] == 1 || $data['fields']['lastname'] == 1)
-                    <td>@if($data['fields']['firstname'] == 1) {{$item['firstname']}} @endif
-                         @if($data['fields']['lastname'] == 1) $item['lastname'] @endif</td>
+                    @if($data['fields']['First Name'] == 1 || $data['fields']['Last Name'] == 1)
+                    <td>@if($data['fields']['First Name'] == 1) {{$item['firstname']}} @endif
+                         @if($data['fields']['First Name'] == 1) $item['lastname'] @endif</td>
                     @endif
-                    @if($data['fields']['email'] == 1)
+                    @if($data['fields']['E-mail'] == 1)
                     <td>{{ $item['email'] }}</td>
                     @endif
-                    @if($data['fields']['board_name'] == 1) 
+                    @if($data['fields']['Board'] == 1) 
                     <td> {{ $item['board_name'] }}</td>
                     @endif
 
-                    @if($data['fields']['batch_name'] == 1)
+                    @if($data['fields']['Batch'] == 1)
                     <td> {{ $item['batch_name'] }}</td>
                     @endif
 
-                    @if($data['fields']['class_name'] == 1)
+                    @if($data['fields']['Class'] == 1)
                     <td> {{ $item['class_name'] }}</td>
                     @endif
 
-                    @if($data['fields']['medium_name'] == 1)
+                    @if($data['fields']['Medium'] == 1)
                     <td> {{ $item['medium_name'] }}</td>
                     @endif
 
-                    @if($data['fields']['standard_name'] == 1)
+                    @if($data['fields']['Standard'] == 1)
                     <td> {{ $item['standard_name'] }}</td>
                     @endif
                 </tr>
