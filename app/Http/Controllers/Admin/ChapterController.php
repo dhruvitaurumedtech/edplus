@@ -139,7 +139,8 @@ class ChapterController extends Controller
         //     'chapter_name' => 'required|array',
         //     'chapter_image' => 'nullable|array',
         // ]);
-       
+        $chapterData = []; // Initialize an empty array to hold the data
+
             foreach ($request->chapter_name as $i => $chapterName) {
 
                 $exists = Chapter::where('subject_id', $request->input('subject'))
@@ -155,20 +156,21 @@ class ChapterController extends Controller
                 {
                     $chapter_imageFile = $request->file('chapter_image')[$i];
                     $imagePath = $chapter_imageFile->store('chapter', 'public');
-                    $base_table = Chapter::create([
+                    $chapterData[] = [
                         'subject_id' => $request->input('subject'),
                         'base_table_id' => $request->input('standard_id'),
                         'chapter_no' => $request->input('chapter_no')[$i],
-                        'chapter_name' => $chapterName,
+                        'chapter_name' => $request->input('chapter_name')[$i],
                         'chapter_image' => $imagePath,
-                        //'status' => $request->input('status'),
-                    ]);
-            }
-          
-            // exit;
-        
-            return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
+                        // 'status' => $request->input('status'), // Uncomment if status is needed
+                        'created_at' => now(), // Add timestamps if needed
+                        'updated_at' => now(),
+                    ];
+                }
+   
         }
+        Chapter::insert($chapterData);
+        return redirect()->route('chapter.list')->with('success', 'Chapter Created Successfully');
     }
     //chapter_lists
     public function chapter_lists(Request $request)
