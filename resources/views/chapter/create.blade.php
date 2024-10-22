@@ -17,7 +17,7 @@
             </div>
             @include('layouts/alert')
             <div class="dashboard-content side-content">
-                <a href="{{url('chapter-list')}}" class="btn text-white btn-rmv2"> Chapter List</a>
+                <a href="{{url('chapter-list')}}" class="btn text-white btn-rmv2 mt-3 mr-4"> Chapter List</a>
                 <form class="s-chapter-form" method="post" action="{{ url('chapter-save') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="institute-list">
