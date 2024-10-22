@@ -129,11 +129,11 @@ class AuthController extends Controller
             'country_code_name'=>'required',
         ]);
         if ($validator->fails()) return $this->response([], $validator->errors()->first(), false, 400);
-        // $user = User::where('email', $request->email)
-        // ->where('status', '1')->first();
-        // if (isset($user)) {
-        //     return $this->response([], 'This email already exists.', false, 400);
-        // }
+        $user = User::where('email', $request->email)
+        ->where('status', '1')->first();
+        if (isset($user)) {
+            return $this->response([], 'This email already exists.', false, 400);
+        }
         // $data= User::withTrashed()->where('email', $request->email)->whereNull('deleted_at')->first();
         // if(!empty($data)){
         //     return $this->response([],'Enter Your Mobile Number !' , false, 400);
