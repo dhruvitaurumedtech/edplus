@@ -135,19 +135,19 @@
                     @if($data['fields']['email'] == 1)
                     <th>Email</th>
                     @endif
-                    @if(empty($data['requestdata']['board_id']) || $data['fields']['board_name'] == 1)
+                    @if($data['fields']['board_name'] == 1)
                     <th>Board</th>
                     @endif
-                    @if(empty($data['requestdata']['batch_id']) || $data['fields']['batch_name'] == 1)
+                    @if($data['fields']['batch_name'] == 1)
                     <th>Batch</th>
                     @endif
-                    @if(empty($data['requestdata']['class_id']) || $data['fields']['class_name'] == 1)
+                    @if($data['fields']['class_name'] == 1)
                     <th>Class</th>
                     @endif
-                    @if(empty($data['requestdata']['medium_id']) || $data['fields']['medium_name'] == 1)
+                    @if($data['fields']['medium_name'] == 1)
                     <th>Medium</th>
                     @endif
-                    @if(empty($data['requestdata']['standard_id']) || $data['fields']['standard_name'] == 1)
+                    @if($data['fields']['standard_name'] == 1)
                     <th>Standard</th>
                     @endif
                 </tr>
