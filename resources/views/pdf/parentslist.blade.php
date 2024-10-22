@@ -126,17 +126,17 @@
                     @if($data['fields']['id'] == 1)
                     <th>No</th>
                     @endif
-                    @if($data['fields']['firstname'] == 1 || $data['fields']['lastname'] == 1)
+                    @if($data['fields']['First Name'] == 1 || $data['fields']['Last Name'] == 1)
                     <th>Parent Name</th>
                     @endif
-                    @if($data['fields']['name'] == 1)
+                    @if($data['fields']['Name'] == 1)
                     <th>Student Name</th>
                     @endif
                     <!-- <th>Email</th> -->
-                    @if($data['requestdata']['address'] == '' || $data['fields']['address'] == 1)
+                    @if($data['requestdata']['address'] == '' || $data['fields']['Address'] == 1)
                     <th>Address</th>
                     @endif
-                    @if($data['requestdata']['mobile'] == '' || $data['fields']['mobile'] == 1)
+                    @if($data['requestdata']['mobile'] == '' || $data['fields']['Mobile'] == 1)
                     <th>Mobile</th>
                     @endif
                 </tr>
@@ -148,19 +148,19 @@
                     <td>{{ $i }}</td>
                     @endif
 
-                    @if($data['fields']['firstname'] == 1 || $data['fields']['lastname'] == 1)
-                    <td>@if($data['fields']['firstname'] == 1) {{$item['firstname']}} @endif
-                        @if($data['fields']['lastname'] == 1) $item['lastname'] @endif</td>
+                    @if($data['fields']['First Name'] == 1 || $data['fields']['Last Name'] == 1)
+                    <td>@if($data['fields']['First Name'] == 1) {{$item['firstname']}} @endif
+                        @if($data['fields']['Last Name'] == 1) $item['lastname'] @endif</td>
                     @endif
 
-                    @if($data['fields']['name'] == 1)
+                    @if($data['fields']['Name'] == 1)
                     <td>{{ $item['student_name'] }}</td>
                     @endif
                     <!-- <td>{{ $item['email'] }}</td> -->
-                    @if($data['requestdata']['address'] == '' || $data['fields']['address'] == 1)
+                    @if($data['requestdata']['address'] == '' || $data['fields']['Address'] == 1)
                     <td>{{ $item['address'] }}</td>
                     @endif
-                    @if($data['requestdata']['mobile'] == '' || $data['fields']['mobile'] == 1)
+                    @if($data['requestdata']['mobile'] == '' || $data['fields']['Mobile'] == 1)
                     <td>{{ $item['mobile'] }}</td>
                     @endif
                 </tr>
