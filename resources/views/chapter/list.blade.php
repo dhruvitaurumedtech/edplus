@@ -32,6 +32,15 @@
           @endif
         </div>
       </div>
+      <div class="row">
+        <div class="col-md-10 offset-md-1">
+          @if (session('error'))
+          <div class="alert alert-danger">
+            {{ session('error') }}
+          </div>
+          @endif
+        </div>
+      </div>
       <div class="dashboard-content side-content">
 
         <div class="row">
@@ -39,61 +48,94 @@
           <div class="col-lg-12 mt-5">
             <div class="institute-form">
               <div class="create-title-btn">
-                <h4 class="mb-0">Chapter List</h4>
-                <a href="{{url('add-lists')}}" class="btn text-white btn-rmv2">Create Chapter</a>
+                <h4 class="mb-5"></h4>
+                <a href="{{url('add-lists')}}" class="btn text-white btn-rmv2 mb-5">Create Chapter</a>
               </div>
-              <table class="table table-responsive-sm table-bordered institute-table mt-4">
-                <thead>
-                  <tr>
-                    <th scope="col">No</th>
-                    <th scope="col">Standard</th>
-                    <th scope="col">Subjects</th>
-                    <th scope="col">chapter_no</th>
-                    <th scope="col">chapter_name</th>
-                    <th scope="col">chapter_image</th>
-                    <th scope="col">Action</th>
-                  </tr>
-                </thead>
-                <tbody>
+              <table class="table table-bordered">
+    <thead>
+        <tr>
+            <th width="50px">#</th>
+            <th width="300px">Standard Name</th>
+            <th>Subjects</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($data['data'] as $keys => $value)
+            <tr>
+                <td width="50px">{{ $loop->iteration }}</td> <!-- Use loop iteration for counting -->
+                <td width="300px">{{ $value['standard_name'] }}</td>
+                <td>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="alert alert-secondary" style="width: 200px;">Subject</th>
+                                <th>Chapters</th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($value['subjects'] as $key => $value2)
+                                <tr>
+                                    <td style="width: 100px;">{{ $value2['subject_name'] }}</td>
+                                    <td>
+                                        <table class="table table-bordered">
+                                            <thead>
+                                                <tr>
+                                                    <th class="alert alert-secondary" style="width: 200px;">Chapter No</th>
+                                                    <th class="alert alert-secondary" style="width: 200px;">Chapter Name</th>
+                                                    <th class="alert alert-secondary" style="width: 200px;">Chapter Image</th>
+                                                    <th class="alert alert-secondary">Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @foreach($value2['chapters'] as $key => $value3)
+                                                    <tr>
+                                                        <td style="width: 100px;">{{ $value3['chapter_no'] }}</td>
+                                                        <td style="width: 100px;">{{ $value3['chapter_name'] }}</td>
+                                                        <td style="width: 100px;">
+                                                            <img src="{{ asset($value3['chapter_image']) }}" style="height: 60px; width: 60px;" alt="Chapter Image">
+                                                        </td>
+                                                        <td>
+                                        <div class="d-flex align-items-center">
+                                            <a class="btn btn-warning" href="{{ url('chapter/edit/'.$value3['id']) }}">
+                                                Edit
+                                            </a>
+                                            &nbsp;&nbsp;
+                                            <button type="button" class="btn btn-danger chapter_delete" data-user-id="{{ $value3['id'] }}">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                                    </tr>
+                                                @endforeach
+                                            </tbody>
+                                        </table>
+                                    </td>
+                                   
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+            <div class="text-right" >
+                    <p>Showing {{ $data['pagination']['from'] }} to {{ $data['pagination']['to'] }} of {{ $data['pagination']['total'] }} items</p>
+                    
+                    
+                        @if ($data['pagination']['current_page'] > 1)
+                            <a href="{{ request()->url() }}?page={{ $data['pagination']['current_page'] - 1 }}" class="btn btn-primary" >Previous</a>
+                        @endif
+                        
+                        @if ($data['pagination']['current_page'] < $data['pagination']['last_page'])
+                            <a href="{{ request()->url() }}?page={{ $data['pagination']['current_page'] + 1 }}" class="btn btn-primary" >Next</a>
+                        @endif
+                    </div>
+                </div>
+            <div>
 
-                  @php
-                  $i = 1;
-                  @endphp
-                  
-                  @foreach($Standards as $value)
-                  <tr>
-                    <td>{{$i}}</td>
-                    <td>
-                      {{$value->standard_name .'('.$value->board.','.$value->medium.','.$value->stream.')'}}
-                    </td>
-                    @foreach($subjects as $subject_value)
-                    @if($subject_value->id == $value->subject_id)
-                    <td>
-                      {{$subject_value->name}}
-                    </td>
-                    @endif
-                    @endforeach
-                    <td>{{$value->chapter_no}}</td>
-                    <td>{{$value->chapter_name}}</td>
-                    <td><img src="{{url($value->chapter_image)}}" class="img-resize"></td>
-                    <td>
-                      <div class="d-flex align-items-center">
-                        <div class="d-flex">
-                          <a href="{{url('chapter/edit/'.$value->id)}}" class="btn text-white btn-rmv2" value="Edit">Edit</a>&nbsp;&nbsp;
-                         
-                          &nbsp;&nbsp;
-                          <input type="submit" class="btn btn-danger chapter_delete" data-user-id="{{$value->id}}" value="Delete">
-                        </div>
-                      </div>
-                    </td>
-                  </tr>
-                  @php $i++ @endphp
-                  @endforeach
-                </tbody>
-              </table>
-              <div class="d-flex justify-content-end">
-                {!! $Standards->withQueryString()->links('pagination::bootstrap-5') !!}
-              </div>
             </div>
           </div>
 
@@ -260,4 +302,47 @@
       });
     });
   </script>
+  <div class="modal fade" id="usereditModal" tabindex="-1" aria-labelledby="usereditModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="usereditModalLabel">Edit Subject </h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+              <form method="post" action="{{ url('chapter-subject/update') }}" enctype="multipart/form-data">
+                @csrf
+                <div class="card-body">
+                  <div class="form-group">
+                    <div class="row justify-content-center">
+                      <div class="col-md-12">
+                        <input type="hidden" id="chapter_id" name="chapter_id">
+                        <input type="hidden" id="base_table_id" name="base_table_id">
+                        <label for="exampleInputEmail1">Subject Name : </label>
+                        <div class="form-group">
+                        <select id="subject_id" name="subject_id" class="form-control">
+                              <!-- Options will be populated by JS -->
+                          </select>
+                          </div>
+                        @error('name')
+                        <div class="text-danger">{{ $message }}</div>
+                        @enderror
+                      </div>
+                      
+
+                    </div>
+
+                  </div>
+                </div>
+                <div class="d-flex justify-content-end">
+                  <button type="submit" class="btn text-white btn-rmv2">Update</button>
+                </div>
+            </div>
+          </div>
+          </form>
+        </div>
+
+      </div>
 </body>

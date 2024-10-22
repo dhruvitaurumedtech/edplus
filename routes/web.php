@@ -158,6 +158,9 @@ Route::middleware('auth')->group(function () {
     Route::post('chapter/update', [ChapterController::class, 'chapter_update']);
     Route::post('chapter-delete', [ChapterController::class, 'chapter_delete'])->name('chapter.delete');
     
+    Route::post('chapter-subject/edit', [ChapterController::class, 'chapter_subject_edit'])->name('chapter_subject.edit');
+    Route::post('chapter-subject/update', [ChapterController::class, 'chapter_subject_update'])->name('chapter_subject.update');
+
     //topic
     Route::get('topic-list', [TopicController::class, 'index'])->name('list.topic');
     Route::get('create/topic', [TopicController::class, 'list_topic'])->name('create.topic');

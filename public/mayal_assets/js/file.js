@@ -1087,3 +1087,48 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 });
 });
+document.querySelectorAll('.chapter_subject_edit').forEach(function (button) {
+    button.addEventListener('click', function () {
+        var subject_id = this.getAttribute('data-subject-id');
+        var base_table_id = this.getAttribute('data-base-table-id');
+        var chapter_id = this.getAttribute('data-chapter-id');
+        var baseUrl = $('meta[name="base-url"]').attr('content');
+
+        axios.post(baseUrl + '/chapter-subject/edit', {
+            subject_id: subject_id,
+            base_table_id:base_table_id,
+            chapter_id:chapter_id,
+        })
+            .then(response => {
+                var reponse_data = response.data.chapter_subject;
+                console.log(reponse_data);
+                var subject_list_data = response.data.subject_list;
+                document.getElementById('base_table_id').value = base_table_id;
+                document.getElementById('chapter_id').value = chapter_id;
+                var subjectSelect = document.getElementById('subject_id');
+
+                // Clear the existing options in the dropdown
+                subjectSelect.innerHTML = '';
+                
+                subject_list_data.forEach(function (subject) {
+                    var option = document.createElement('option');
+                    option.value = subject.id;  
+                    option.text = subject.name; 
+                
+                   if (subject.id == reponse_data[0].subject_id) {
+                        option.selected = true;
+                    }
+                
+                    subjectSelect.appendChild(option);
+                });
+                
+                subjectSelect.value = reponse_data[0].subject_id;
+
+                var myModal = new bootstrap.Modal(document.getElementById('usereditModal'));
+                myModal.show();
+            })
+            .catch(error => {
+                console.error(error);
+            });
+    });
+});
