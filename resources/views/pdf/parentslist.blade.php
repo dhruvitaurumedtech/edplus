@@ -117,7 +117,7 @@
 
     @if(!empty($data['parents']) && !empty($data['parents'][0]['address']) && !empty($data['requestdata']['address']))
         <p><b>Address: </b>{{ $data['parents'][0]['address'] }}</p>
-        @endif
+    @endif
 
     <div class="content">
         <table>
