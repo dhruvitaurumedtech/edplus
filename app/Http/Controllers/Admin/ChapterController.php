@@ -146,6 +146,7 @@ class ChapterController extends Controller
                                   ->where('base_table_id', $request->input('standard_id'))
                                   ->where('chapter_name', $request->input('chapter_name')[$i])
                                   ->where('chapter_no', $request->input('chapter_no')[$i])
+                                  
                                   ->exists();
                 if ($exists) {
                     return redirect()->route('chapter.list')->with('error', 'Already Chapter Exists!');
@@ -309,6 +310,10 @@ class ChapterController extends Controller
                     ->where('base_table_id', $request->input('standard_id'))
                     ->where('chapter_name', $chapterName)
                     ->where('chapter_no', $request->input('chapter_no')[$i]);
+                    if (!empty($request->chapter_id)) {
+                        $chapterQuery ->where('id', '!=', $request->chapter_id);
+                    }
+                    
                     if (!empty($request->file('chapter_image')[$i])) {
                         $chapterQuery ->where('chapter_image', 'chapter/'.$request->file('chapter_image')[$i]);
                     }
